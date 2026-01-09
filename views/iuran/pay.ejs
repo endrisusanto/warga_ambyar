@@ -1,0 +1,73 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-2xl mx-auto bg-white shadow overflow-hidden sm:rounded-lg p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Input Pembayaran Iuran</h3>
+            <form action="/iuran/pay" method="POST" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+
+                    <div class="sm:col-span-6">
+                        <label for="warga_id" class="block text-sm font-medium text-gray-700">Nama Warga</label>
+                        <div class="mt-1">
+                            <select id="warga_id" name="warga_id"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                                <% warga.forEach(w=> { %>
+                                    <option value="<%= w.id %>">
+                                        <%= w.nama %> - Blok <%= w.blok %> No. <%= w.nomor_rumah %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-6">
+                        <label for="bulan" class="block text-sm font-medium text-gray-700">Bulan Iuran</label>
+                        <div class="mt-1">
+                            <input type="month" name="bulan" id="bulan" required
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pembayaran</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <input id="iuran_kas" name="jenis_iuran[]" value="kas" type="checkbox" checked
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="iuran_kas" class="ml-2 block text-sm text-gray-900">
+                                    Iuran Kas/Keamanan (Rp 25.000)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="iuran_sampah" name="jenis_iuran[]" value="sampah" type="checkbox" checked
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="iuran_sampah" class="ml-2 block text-sm text-gray-900">
+                                    Iuran Sampah (Rp 25.000)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-6">
+                        <label for="bukti_bayar" class="block text-sm font-medium text-gray-700">Bukti Transfer
+                            (Gambar)</label>
+                        <div class="mt-1">
+                            <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">Opsional jika bayar tunai langsung ke bendahara.</p>
+                    </div>
+
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <a href="/iuran"
+                        class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">Cancel</a>
+                    <button type="submit"
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit
+                        Payment</button>
+                </div>
+            </form>
+        </div>
+
+        <%- include('../partials/footer') %>

@@ -1,0 +1,141 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Data Warga</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Daftar semua warga Blok F7 & F8.</p>
+                </div>
+                <% if(user.role !=='warga' ) { %>
+                    <div>
+                        <a href="/warga/create"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Tambah Warga
+                        </a>
+                    </div>
+                    <% } %>
+            </div>
+            <div class="border-t border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Rumah</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nama</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status Keluarga</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Role</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Approval</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    No HP</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ronda?</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Edit</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% warga.forEach(w=> { %>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-bold text-gray-900">Blok <%= w.blok %> - <%=
+                                                    w.nomor_rumah %>
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            <%= w.status_huni %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            <%= w.nama %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            <%= w.status_keluarga %>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <% if(user.role==='admin' ) { %>
+                                            <form action="/warga/update-role/<%= w.id %>" method="POST" class="inline">
+                                                <select name="role" onchange="this.form.submit()"
+                                                    class="text-xs border-gray-300 rounded-md">
+                                                    <option value="warga" <%=w.role==='warga' ? 'selected' : '' %>>Warga
+                                                    </option>
+                                                    <option value="ketua" <%=w.role==='ketua' ? 'selected' : '' %>>Ketua
+                                                    </option>
+                                                    <option value="bendahara" <%=w.role==='bendahara' ? 'selected' : ''
+                                                        %>>Bendahara</option>
+                                                    <option value="admin" <%=w.role==='admin' ? 'selected' : '' %>>Admin
+                                                    </option>
+                                                </select>
+                                            </form>
+                                            <% } else { %>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 capitalize">
+                                                    <%= w.role || 'warga' %>
+                                                </span>
+                                                <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <% const approvalStatus=w.approval_status || 'approved' ; const
+                                            statusColor=approvalStatus==='approved' ? 'bg-green-100 text-green-800' :
+                                            (approvalStatus==='pending' ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-red-100 text-red-800' ); %>
+                                            <span
+                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= statusColor %>">
+                                                <%= approvalStatus %>
+                                            </span>
+                                            <% if(approvalStatus==='pending' && (user.role==='admin' ||
+                                                user.role==='ketua' )) { %>
+                                                <div class="mt-1">
+                                                    <a href="/warga/approve/<%= w.id %>"
+                                                        class="text-xs text-green-600 hover:text-green-900 mr-2">✓</a>
+                                                    <a href="/warga/reject/<%= w.id %>"
+                                                        class="text-xs text-red-600 hover:text-red-900">✗</a>
+                                                </div>
+                                                <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <%= w.no_hp || '-' %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <% if(w.is_ronda) { %>
+                                            <span class="text-green-600 font-bold">Ya</span>
+                                            <% } else { %>
+                                                <span class="text-gray-400">Tidak</span>
+                                                <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <% if(user.role !=='warga' ) { %>
+                                            <a href="/warga/edit/<%= w.id %>"
+                                                class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                                            <a href="/warga/delete/<%= w.id %>" class="text-red-600 hover:text-red-900"
+                                                onclick="return confirm('Are you sure?')">Delete</a>
+                                            <% } %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

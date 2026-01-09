@@ -1,0 +1,94 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+            <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Manajemen Tim Ronda</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Atur anggota untuk Tim A, B, C, dan D.</p>
+                </div>
+                <a href="/ronda" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Kembali ke Jadwal</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <% ['A', 'B' , 'C' , 'D' ].forEach(team=> { %>
+                <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-indigo-500">
+                    <div class="px-4 py-5 sm:px-6 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">Tim <%= team %>
+                        </h3>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            <%= teams[team].length %> Anggota
+                        </span>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                        <ul class="space-y-3">
+                            <% teams[team].forEach(member=> { %>
+                                <li class="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
+                                    <div>
+                                        <div class="font-medium text-gray-900">
+                                            <%= member.nama %>
+                                        </div>
+                                        <div class="text-gray-500 text-xs">Blok <%= member.blok %>-<%=
+                                                    member.nomor_rumah %>
+                                        </div>
+                                    </div>
+                                    <form action="/ronda/teams/update" method="POST" class="ml-2">
+                                        <input type="hidden" name="warga_id" value="<%= member.id %>">
+                                        <button type="submit" name="tim" value=""
+                                            class="text-red-500 hover:text-red-700 text-xs" title="Hapus dari tim">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </li>
+                                <% }) %>
+                                    <% if(teams[team].length===0) { %>
+                                        <li class="text-gray-400 text-sm italic text-center py-4">Belum ada anggota</li>
+                                        <% } %>
+                        </ul>
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg border-t-4 border-gray-300">
+            <div class="px-4 py-5 sm:px-6 bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-900">Belum Masuk Tim</h3>
+                <p class="text-sm text-gray-500">Warga yang wajib ronda tapi belum dapat tim.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <% teams.Unassigned.forEach(member=> { %>
+                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-md bg-gray-50">
+                            <div>
+                                <div class="font-medium text-sm text-gray-900">
+                                    <%= member.nama %>
+                                </div>
+                                <div class="text-gray-500 text-xs">Blok <%= member.blok %>-<%= member.nomor_rumah %>
+                                </div>
+                            </div>
+                            <form action="/ronda/teams/update" method="POST">
+                                <input type="hidden" name="warga_id" value="<%= member.id %>">
+                                <select name="tim" onchange="this.form.submit()"
+                                    class="text-xs border-gray-300 rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="">Pilih Tim</option>
+                                    <option value="A">Tim A</option>
+                                    <option value="B">Tim B</option>
+                                    <option value="C">Tim C</option>
+                                    <option value="D">Tim D</option>
+                                </select>
+                            </form>
+                        </div>
+                        <% }) %>
+                            <% if(teams.Unassigned.length===0) { %>
+                                <div class="col-span-full text-center text-gray-500 italic py-4">Semua warga sudah masuk
+                                    tim.</div>
+                                <% } %>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>
