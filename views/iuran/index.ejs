@@ -144,14 +144,23 @@
                             </thead>
                             <tbody class="bg-white/5 divide-y divide-white/10">
                                 <% warga.forEach(w=> { %>
-                                    <tr class="hover:bg-white/10 transition-colors">
+                                    <tr
+                                        class="transition-colors border-l-2 <%= w.status_huni === 'kosong' ? 'bg-black/40 border-l-gray-600 hover:bg-black/60' : w.status_huni === 'kontrak' ? 'bg-amber-500/10 border-l-amber-500 hover:bg-amber-500/20' : 'hover:bg-white/10 border-l-transparent' %>">
                                         <td
-                                            class="px-2 py-1 whitespace-nowrap sticky left-0 bg-white/5 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">
+                                            class="px-2 py-1 whitespace-nowrap sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)] <%= w.status_huni === 'kosong' ? 'bg-gray-900' : w.status_huni === 'kontrak' ? 'bg-[#1a1500]' : 'bg-[#0f1115]' %>">
                                             <div class="font-medium text-gray-200">
                                                 <%= w.nama %>
                                             </div>
-                                            <div class="text-[10px] text-gray-500">Blok <%= w.blok %>-<%= w.nomor_rumah
-                                                        %>
+                                            <div class="flex items-center gap-2">
+                                                <div class="text-[10px] text-gray-500">Blok <%= w.blok %>-<%=
+                                                            w.nomor_rumah %>
+                                                </div>
+                                                <% if(w.status_huni !=='tetap' ) { %>
+                                                    <span
+                                                        class="text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold <%= w.status_huni === 'kosong' ? 'bg-gray-700 text-gray-300' : 'bg-amber-500/20 text-amber-500' %>">
+                                                        <%= w.status_huni %>
+                                                    </span>
+                                                    <% } %>
                                             </div>
                                         </td>
 
