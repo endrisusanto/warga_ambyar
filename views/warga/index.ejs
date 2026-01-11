@@ -1,57 +1,62 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
 
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div class="glass-card overflow-hidden">
+            <div
+                class="px-4 py-5 sm:px-6 flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 border-b border-white/10">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Data Warga</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Daftar semua warga Blok F7 & F8.</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-100">Data Warga</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-400">Daftar semua warga Blok F7 & F8.</p>
                 </div>
                 <% if(user.role !=='warga' ) { %>
-                    <div>
+                    <div class="grid grid-cols-2 gap-3 md:flex md:space-x-3 w-full md:w-auto">
+                        <a href="/warga/export"
+                            class="glass-button justify-center inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-300 border border-white/10">
+                            Export Excel
+                        </a>
                         <a href="/warga/create"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            class="glass-button justify-center inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-200 bg-white/10 hover:bg-white/15 border border-white/15">
                             Tambah Warga
                         </a>
                     </div>
                     <% } %>
             </div>
-            <div class="border-t border-gray-200">
+            <div class="border-t border-white/10">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-white/10">
+                        <thead class="bg-white/5">
                             <tr>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Rumah</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Nama</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Status Keluarga</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Role</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Approval</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     No HP</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Ronda?</th>
                                 <th scope="col" class="relative px-6 py-3">
                                     <span class="sr-only">Edit</span>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white/5 divide-y divide-white/10">
                             <% warga.forEach(w=> { %>
-                                <tr>
+                                <tr class="hover:bg-white/10 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-gray-900">Blok <%= w.blok %> - <%=
+                                        <div class="text-sm font-bold text-gray-200">Blok <%= w.blok %> - <%=
                                                     w.nomor_rumah %>
                                         </div>
                                         <div class="text-xs text-gray-500">
@@ -59,13 +64,13 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
+                                        <div class="text-sm font-medium text-gray-200">
                                             <%= w.nama %>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-white/10 text-gray-300 border border-white/10">
                                             <%= w.status_keluarga %>
                                         </span>
                                     </td>
@@ -73,7 +78,7 @@
                                         <% if(user.role==='admin' ) { %>
                                             <form action="/warga/update-role/<%= w.id %>" method="POST" class="inline">
                                                 <select name="role" onchange="this.form.submit()"
-                                                    class="text-xs border-gray-300 rounded-md">
+                                                    class="glass-input text-xs rounded-md">
                                                     <option value="warga" <%=w.role==='warga' ? 'selected' : '' %>>Warga
                                                     </option>
                                                     <option value="ketua" <%=w.role==='ketua' ? 'selected' : '' %>>Ketua
@@ -86,48 +91,60 @@
                                             </form>
                                             <% } else { %>
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 capitalize">
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-white/10 text-gray-300 capitalize border border-white/10">
                                                     <%= w.role || 'warga' %>
                                                 </span>
                                                 <% } %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <% const approvalStatus=w.approval_status || 'approved' ; const
-                                            statusColor=approvalStatus==='approved' ? 'bg-green-100 text-green-800' :
-                                            (approvalStatus==='pending' ? 'bg-yellow-100 text-yellow-800'
-                                            : 'bg-red-100 text-red-800' ); %>
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= statusColor %>">
-                                                <%= approvalStatus %>
-                                            </span>
-                                            <% if(approvalStatus==='pending' && (user.role==='admin' ||
-                                                user.role==='ketua' )) { %>
-                                                <div class="mt-1">
-                                                    <a href="/warga/approve/<%= w.id %>"
-                                                        class="text-xs text-green-600 hover:text-green-900 mr-2">✓</a>
-                                                    <a href="/warga/reject/<%= w.id %>"
-                                                        class="text-xs text-red-600 hover:text-red-900">✗</a>
-                                                </div>
-                                                <% } %>
+                                            approvalClass=approvalStatus==='approved'
+                                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                                            approvalStatus==='pending'
+                                            ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                            : 'bg-red-500/20 text-red-400 border-red-500/30' ; %>
+                                            <% if(user.role==='admin' ) { %>
+                                                <form action="/warga/update-approval/<%= w.id %>" method="POST"
+                                                    class="inline">
+                                                    <select name="approval_status" onchange="this.form.submit()"
+                                                        class="glass-input text-xs rounded-md">
+                                                        <option value="approved" <%=approvalStatus==='approved'
+                                                            ? 'selected' : '' %>>Approved</option>
+                                                        <option value="pending" <%=approvalStatus==='pending'
+                                                            ? 'selected' : '' %>>Pending</option>
+                                                        <option value="rejected" <%=approvalStatus==='rejected'
+                                                            ? 'selected' : '' %>>Rejected</option>
+                                                    </select>
+                                                </form>
+                                                <% } else { %>
+                                                    <span
+                                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= approvalClass %> capitalize border border-white/10">
+                                                        <%= approvalStatus %>
+                                                    </span>
+                                                    <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        <%= w.no_hp || '-' %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">
-                                            <%= w.no_hp || '-' %>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <% if(w.is_ronda) { %>
-                                            <span class="text-green-600 font-bold">Ya</span>
+                                        <% if(user.role==='admin' ) { %>
+                                            <form action="/warga/toggle-ronda/<%= w.id %>" method="POST" class="inline">
+                                                <button type="submit"
+                                                    class="<%= w.is_ronda ? 'bg-white/15 text-gray-200' : 'bg-white/5 text-gray-500' %> px-3 py-1 rounded-lg text-xs font-medium border border-white/10 hover:bg-white/20 transition-colors">
+                                                    <%= w.is_ronda ? 'Ya' : 'Tidak' %>
+                                                </button>
+                                            </form>
                                             <% } else { %>
-                                                <span class="text-gray-400">Tidak</span>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= w.is_ronda ? 'bg-white/15 text-gray-200' : 'bg-white/5 text-gray-500' %> border border-white/10">
+                                                    <%= w.is_ronda ? 'Ya' : 'Tidak' %>
+                                                </span>
                                                 <% } %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <% if(user.role !=='warga' ) { %>
                                             <a href="/warga/edit/<%= w.id %>"
-                                                class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                            <a href="/warga/delete/<%= w.id %>" class="text-red-600 hover:text-red-900"
-                                                onclick="return confirm('Are you sure?')">Delete</a>
+                                                class="text-gray-400 hover:text-gray-200 transition-colors">Edit</a>
                                             <% } %>
                                     </td>
                                 </tr>

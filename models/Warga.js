@@ -2,11 +2,21 @@ const db = require('../config/db');
 
 const Warga = {
     getAll: async () => {
-        const [rows] = await db.query('SELECT * FROM warga ORDER BY blok, nomor_rumah, status_keluarga');
+        const [rows] = await db.query(`
+            SELECT w.*, u.role, u.username 
+            FROM warga w 
+            LEFT JOIN users u ON u.warga_id = w.id 
+            ORDER BY w.blok, w.nomor_rumah, w.status_keluarga
+        `);
         return rows;
     },
     findById: async (id) => {
-        const [rows] = await db.query('SELECT * FROM warga WHERE id = ?', [id]);
+        const [rows] = await db.query(`
+            SELECT w.*, u.role, u.username 
+            FROM warga w 
+            LEFT JOIN users u ON u.warga_id = w.id 
+            WHERE w.id = ?
+        `, [id]);
         return rows[0];
     },
     create: async (data) => {
@@ -39,11 +49,14 @@ const Warga = {
         const [rows] = await db.query("SELECT * FROM warga WHERE is_ronda = 1 ORDER BY blok, nomor_rumah");
         return rows;
     },
-    updateRole: async (id, role) => {
-        await db.query('UPDATE warga SET role = ? WHERE id = ?', [role, id]);
+    updateRole: async (wargaId, role) => {
+        await db.query('UPDATE users SET role = ? WHERE warga_id = ?', [role, wargaId]);
     },
     updateApprovalStatus: async (id, status) => {
         await db.query('UPDATE warga SET approval_status = ? WHERE id = ?', [status, id]);
+    },
+    toggleRonda: async (id) => {
+        await db.query('UPDATE warga SET is_ronda = NOT is_ronda WHERE id = ?', [id]);
     }
 };
 

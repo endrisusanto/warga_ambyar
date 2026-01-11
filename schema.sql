@@ -16,6 +16,7 @@ CREATE TABLE warga (
     no_hp VARCHAR(15),
     status_huni ENUM('tetap', 'kontrak', 'kosong') DEFAULT 'tetap',
     is_ronda BOOLEAN DEFAULT FALSE, -- Eligible for ronda?
+    approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'approved',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY unique_rumah_person (blok, nomor_rumah, nama)
 );

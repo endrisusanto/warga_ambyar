@@ -1,70 +1,208 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
 
-        <div class="max-w-2xl mx-auto bg-white shadow overflow-hidden sm:rounded-lg p-6">
-            <div class="flex items-center space-x-4 mb-6">
-                <div class="bg-indigo-100 p-3 rounded-full">
-                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Profil Saya</h3>
-                    <p class="text-sm text-gray-500">
-                        <%= user.username %> (<%= user.role %>)
-                    </p>
-                </div>
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <h1 class="text-2xl font-semibold text-gray-100 mb-6">Profile Saya</h1>
+
+                <% if(success) { %>
+                    <div
+                        class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-lg relative mb-4">
+                        Profile berhasil diupdate!
+                    </div>
+                    <% } %>
+
+                        <% if(password_changed) { %>
+                            <div
+                                class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-lg relative mb-4">
+                                Password berhasil diubah!
+                            </div>
+                            <% } %>
+
+                                <!-- Profile Information -->
+                                <div class="glass-card mb-6">
+                                    <div class="px-4 py-5 sm:p-6">
+                                        <h2 class="text-lg font-medium text-gray-100 mb-4">Informasi Profile</h2>
+                                        <form action="/profile" method="POST" enctype="multipart/form-data">
+                                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                                <!-- Photo -->
+                                                <div class="sm:col-span-6">
+                                                    <label class="block text-sm font-medium text-gray-300">Foto
+                                                        Profile</label>
+                                                    <div class="mt-1 flex items-center">
+                                                        <span
+                                                            class="inline-block h-12 w-12 rounded-full overflow-hidden bg-white/10 border border-white/20">
+                                                            <% const currentPhoto=warga ? warga.foto_profil : (userData
+                                                                ? userData.foto_profil : null); if(currentPhoto) { %>
+                                                                <img class="h-full w-full object-cover"
+                                                                    src="/uploads/profiles/<%= currentPhoto %>" alt="">
+                                                                <% } else { %>
+                                                                    <svg class="h-full w-full text-gray-400"
+                                                                        fill="currentColor" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                                    </svg>
+                                                                    <% } %>
+                                                        </span>
+                                                        <label for="foto_profil"
+                                                            class="ml-5 glass-button py-2 px-3 rounded-lg text-sm leading-4 font-medium text-gray-300 cursor-pointer border border-white/10">
+                                                            Change
+                                                        </label>
+                                                        <input id="foto_profil" name="foto_profil" type="file"
+                                                            class="sr-only" accept="image/*"
+                                                            onchange="previewImage(this)">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Name -->
+                                                <div class="sm:col-span-4">
+                                                    <label for="nama"
+                                                        class="block text-sm font-medium text-gray-300">Nama
+                                                        Lengkap</label>
+                                                    <div class="mt-1">
+                                                        <% const currentName=warga ? warga.nama : (userData ?
+                                                            userData.nama || userData.username : '' ); %>
+                                                            <input type="text" name="nama" id="nama"
+                                                                value="<%= currentName %>"
+                                                                class="glass-input block w-full sm:text-sm rounded-md px-3 py-2">
+                                                    </div>
+                                                </div>
+
+                                                <% if(warga) { %>
+                                                    <!-- Read only fields for warga -->
+                                                    <div class="sm:col-span-2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-400">Blok</label>
+                                                        <div class="mt-1 text-sm text-gray-200">
+                                                            <%= warga.blok %>-<%= warga.nomor_rumah %>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="sm:col-span-2">
+                                                        <label class="block text-sm font-medium text-gray-400">Tim
+                                                            Ronda</label>
+                                                        <div class="mt-1 text-sm text-gray-200">
+                                                            <%= warga.tim_ronda || '-' %>
+                                                        </div>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <!-- Read only fields for admin -->
+                                                        <div class="sm:col-span-2">
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-400">Username</label>
+                                                            <div class="mt-1 text-sm text-gray-200">
+                                                                <%= userData.username %>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="sm:col-span-2">
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-400">Role</label>
+                                                            <div class="mt-1 text-sm text-gray-200">
+                                                                <%= userData.role %>
+                                                            </div>
+                                                        </div>
+                                                        <% } %>
+
+                                            </div>
+
+                                            <div class="mt-6">
+                                                <button type="submit"
+                                                    class="glass-button inline-flex justify-center py-2 px-4 text-sm font-medium rounded-lg text-gray-200 bg-white/10 hover:bg-white/15 border border-white/15">
+                                                    Simpan Profile
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Change Password -->
+                                <div class="glass-card mb-6">
+                                    <div class="px-4 py-5 sm:p-6">
+                                        <h2 class="text-lg font-medium text-gray-100 mb-4">Ganti Password</h2>
+                                        <form action="/profile/change-password" method="POST">
+                                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                                <div class="sm:col-span-4">
+                                                    <label for="current_password"
+                                                        class="block text-sm font-medium text-gray-300">Password
+                                                        Lama</label>
+                                                    <div class="mt-1">
+                                                        <input type="password" name="current_password"
+                                                            id="current_password" required
+                                                            class="glass-input block w-full sm:text-sm rounded-md px-3 py-2">
+                                                    </div>
+                                                </div>
+
+                                                <div class="sm:col-span-4">
+                                                    <label for="new_password"
+                                                        class="block text-sm font-medium text-gray-300">Password
+                                                        Baru</label>
+                                                    <div class="mt-1">
+                                                        <input type="password" name="new_password" id="new_password"
+                                                            required minlength="6"
+                                                            class="glass-input block w-full sm:text-sm rounded-md px-3 py-2">
+                                                    </div>
+                                                    <p class="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
+                                                </div>
+
+                                                <div class="sm:col-span-4">
+                                                    <label for="confirm_password"
+                                                        class="block text-sm font-medium text-gray-300">Konfirmasi
+                                                        Password Baru</label>
+                                                    <div class="mt-1">
+                                                        <input type="password" name="confirm_password"
+                                                            id="confirm_password" required minlength="6"
+                                                            class="glass-input block w-full sm:text-sm rounded-md px-3 py-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-6">
+                                                <button type="submit"
+                                                    class="glass-button inline-flex justify-center py-2 px-4 text-sm font-medium rounded-lg text-red-400 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30">
+                                                    Ganti Password
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Logout Section -->
+                                <div class="glass-card">
+                                    <div class="px-4 py-5 sm:p-6">
+                                        <h2 class="text-lg font-medium text-gray-100 mb-2">Keluar dari Akun</h2>
+                                        <p class="text-sm text-gray-400 mb-4">Keluar dari akun Anda dan kembali ke
+                                            halaman login.</p>
+                                        <form action="/auth/logout" method="POST">
+                                            <button type="submit"
+                                                class="glass-button inline-flex items-center justify-center py-2 px-4 text-sm font-medium rounded-lg text-gray-300 border border-white/10">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                                    </path>
+                                                </svg>
+                                                Logout
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
             </div>
-
-            <form action="/profile/update" method="POST">
-                <div class="grid grid-cols-1 gap-y-6">
-
-                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-yellow-700">
-                                    Untuk saat ini hanya password yang dapat diubah. Hubungi admin untuk perubahan data
-                                    lainnya.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password Baru</label>
-                        <div class="mt-1">
-                            <input type="password" name="password" id="password"
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-                                placeholder="Kosongkan jika tidak ingin mengubah">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="confirm_password" class="block text-sm font-medium text-gray-700">Konfirmasi
-                            Password Baru</label>
-                        <div class="mt-1">
-                            <input type="password" name="confirm_password" id="confirm_password"
-                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="mt-6 flex justify-end">
-                    <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Simpan Perubahan
-                    </button>
-                </div>
-            </form>
         </div>
+
+        <script>
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        // Find span container
+                        const span = input.previousElementSibling.previousElementSibling;
+                        span.innerHTML = '<img class="h-full w-full object-cover" src="' + e.target.result + '" alt="">';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
 
         <%- include('../partials/footer') %>

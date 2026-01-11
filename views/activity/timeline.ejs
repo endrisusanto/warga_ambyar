@@ -1,0 +1,157 @@
+<%- include('../partials/head') %>
+
+    <body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+        <%- include('../partials/navbar') %>
+
+            <!-- Header Section -->
+            <div class="mb-8 border-b border-white/10 pb-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold text-gray-100 flex items-center">
+                        <svg class="w-8 h-8 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Cash Flow Log Activity
+                    </h1>
+                    <div class="text-sm text-gray-400">
+                        Total Transaksi: <span class="font-bold text-gray-200">
+                            <%= logs ? logs.length : 0 %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Content -->
+            <div class="w-full">
+
+                <% if(logs && logs.length> 0) { %>
+                    <div class="relative border-l-2 border-indigo-200 ml-3 md:ml-6 space-y-8 pb-12">
+
+                        <% logs.forEach((log)=> {
+                            const isMasuk = log.tipe === 'masuk';
+                            const dateObj = new Date(log.tanggal);
+                            const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year:
+                            'numeric' });
+                            const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            %>
+                            <div class="relative pl-8 md:pl-12 group">
+                                <!-- Dot -->
+                                <div class="absolute -left-[9px] top-6 w-5 h-5 rounded-full border-2 border-white shadow-sm ring-2 ring-offset-1 
+                    <%= isMasuk ? 'bg-green-500 ring-green-100' : 'bg-red-500 ring-red-100' %> z-10"></div>
+
+                                <!-- Card -->
+                                <div
+                                    class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 transition hover:shadow-md relative overflow-hidden group-hover:border-indigo-100">
+                                    <!-- Decoration Item -->
+                                    <div class="absolute top-0 right-0 w-16 h-16 transform translate-x-8 -translate-y-8 rounded-full opacity-10 
+                        <%= isMasuk ? 'bg-green-500' : 'bg-red-500' %>"></div>
+
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 md:mb-1">
+                                        <div class="text-sm text-slate-400 font-medium mb-1 sm:mb-0 flex items-center">
+                                            <svg class="w-4 h-4 mr-1 text-slate-300" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                            <span class="mr-3">
+                                                <%= dateStr %>
+                                            </span>
+
+                                            <svg class="w-4 h-4 mr-1 text-slate-300" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded">
+                                                <%= timeStr %>
+                                            </span>
+                                        </div>
+                                        <div class="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded
+                            <%= isMasuk ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' %>">
+                                            <%= log.tipe %>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-end justify-between mt-2">
+                                        <div class="flex-grow">
+                                            <h3
+                                                class="text-xl font-bold <%= isMasuk ? 'text-green-600' : 'text-red-600' %>">
+                                                <%= isMasuk ? '+' : '-' %>
+                                                    <%= new Intl.NumberFormat('id-ID', { style: 'currency' ,
+                                                        currency: 'IDR' , minimumFractionDigits: 0,
+                                                        maximumFractionDigits: 0 }).format(Number(log.jumlah)) %>
+                                            </h3>
+                                            <p class="text-slate-600 text-base mt-1 font-medium">
+                                                <%= log.keterangan || 'Tidak ada keterangan' %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+
+                    </div>
+                    <% } else { %>
+                        <div
+                            class="text-center py-12 glass-card rounded-xl border-2 border-dashed border-white/20 mt-8">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-200">Belum ada aktivitas</h3>
+                            <p class="mt-1 text-sm text-gray-400">Mulai catat pemasukan atau pengeluaran.</p>
+                        </div>
+                        <% } %>
+
+            </div>
+
+            </div>
+
+            <!-- Bukti Image Modal -->
+            <div id="buktiModal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title"
+                role="dialog" aria-modal="true">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+                        onclick="closeBuktiModal()"></div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div
+                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Bukti Transaksi
+                                </h3>
+                                <div class="mt-4">
+                                    <img id="buktiImage" src="" alt="Bukti"
+                                        class="w-full h-auto rounded-md border border-gray-200">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" onclick="closeBuktiModal()"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function openBuktiModal(filename, caption) {
+                    let path = '/uploads/kas/'; // Default path
+                    if (caption && caption.toLowerCase().includes('iuran')) {
+                        path = '/uploads/iuran/';
+                    }
+                    document.getElementById('buktiImage').src = path + filename;
+                    document.getElementById('buktiModal').classList.remove('hidden');
+                }
+
+                function closeBuktiModal() {
+                    document.getElementById('buktiModal').classList.add('hidden');
+                }
+            </script>
+
+            <%- include('../partials/footer') %>

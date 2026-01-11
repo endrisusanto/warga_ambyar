@@ -1,4 +1,51 @@
 const Warga = require('../models/Warga');
+const ExcelJS = require('exceljs');
+
+exports.exportExcel = async (req, res) => {
+    try {
+        const warga = await Warga.getAll();
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Data Warga');
+
+        worksheet.columns = [
+            { header: 'No', key: 'no', width: 5 },
+            { header: 'Nama', key: 'nama', width: 25 },
+            { header: 'NIK', key: 'nik', width: 20 },
+            { header: 'No KK', key: 'no_kk', width: 20 },
+            { header: 'L/P', key: 'jenis_kelamin', width: 10 },
+            { header: 'Blok', key: 'blok', width: 8 },
+            { header: 'No Rumah', key: 'nomor_rumah', width: 10 },
+            { header: 'No HP', key: 'no_hp', width: 15 },
+            { header: 'Status Huni', key: 'status_huni', width: 15 },
+            { header: 'Role', key: 'role', width: 10 }
+        ];
+
+        warga.forEach((w, index) => {
+            worksheet.addRow({
+                no: index + 1,
+                nama: w.nama,
+                nik: w.nik,
+                no_kk: w.no_kk,
+                jenis_kelamin: w.jenis_kelamin,
+                blok: w.blok,
+                nomor_rumah: w.nomor_rumah,
+                no_hp: w.no_hp,
+                status_huni: w.status_huni,
+                role: w.role
+            });
+        });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=' + 'data_warga.xlsx');
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal export excel');
+        res.redirect('/warga');
+    }
+};
 
 exports.index = async (req, res) => {
     try {
@@ -93,6 +140,18 @@ exports.reject = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal reject warga');
+        res.redirect('/warga');
+    }
+};
+
+exports.toggleRonda = async (req, res) => {
+    try {
+        await Warga.toggleRonda(req.params.id);
+        req.flash('success_msg', 'Status ronda berhasil diupdate');
+        res.redirect('/warga');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal update status ronda');
         res.redirect('/warga');
     }
 };

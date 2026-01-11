@@ -6,7 +6,7 @@ exports.getLogin = (req, res) => {
 };
 
 exports.postLogin = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, remember_me } = req.body;
     try {
         const user = await User.findByUsername(username);
         if (!user) {
@@ -21,6 +21,16 @@ exports.postLogin = async (req, res) => {
         }
 
         req.session.user = user;
+
+        // "Remember Me" logic
+        if (remember_me === 'on') {
+            // Set session to expire in 30 days
+            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+        } else {
+            // Browser-session cookie (expires when browser is closed)
+            req.session.cookie.expires = false;
+        }
+
         req.session.save(() => {
             res.redirect('/dashboard');
         });
@@ -59,21 +69,27 @@ exports.postRegister = async (req, res) => {
             status_keluarga,
             no_hp,
             status_huni: 'Tetap', // Default
-            is_ronda: 0 // Default
+            is_ronda: status_keluarga === 'Kepala Keluarga' ? 1 : 0
         });
 
-        // Set approval status to pending
-        await Warga.updateApprovalStatus(wargaId, 'pending');
+        const userCount = await User.count();
+        console.log('DEBUG: User count:', userCount, typeof userCount);
+        const role = Number(userCount) === 0 ? 'admin' : 'warga';
+        console.log('DEBUG: Assigning role:', role);
+
+        // Set approval status
+        await Warga.updateApprovalStatus(wargaId, role === 'admin' ? 'approved' : 'pending');
 
         const hashedPassword = await bcrypt.hash(password, 10);
         // Create User linked to Warga
-        const userId = await User.create(username, hashedPassword, 'warga', wargaId);
+        const userId = await User.create(username, hashedPassword, role, wargaId);
 
         // Auto Login
         const user = await User.findByUsername(username);
         req.session.user = user;
         req.session.save(() => {
-            req.flash('success_msg', 'Registrasi berhasil! Menunggu approval dari admin/ketua.');
+            const msg = role === 'admin' ? 'Registrasi Admin Berhasil!' : 'Registrasi berhasil! Menunggu approval.';
+            req.flash('success_msg', msg);
             res.redirect('/dashboard');
         });
 

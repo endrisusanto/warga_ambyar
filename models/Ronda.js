@@ -17,52 +17,40 @@ const Ronda = {
             day.add(1, 'days');
         }
 
-        // Get the last scheduled team to determine rotation
-        let nextTeamIndex = 0; // 0=A, 1=B, 2=C, 3=D
-        const teams = ['A', 'B', 'C', 'D'];
+        const teamsList = ['A', 'B', 'C', 'D'];
+        // Epoch: Jan 10 2026 is Tim C (Index 2)
+        // Rotation: A -> B -> C -> D
+        const epochDate = moment('2026-01-10');
+        const epochIndex = 2; // C
 
-        const [lastSchedule] = await db.query(`
-            SELECT w.tim_ronda 
-            FROM ronda_jadwal r 
-            JOIN warga w ON r.warga_id = w.id 
-            WHERE w.tim_ronda IS NOT NULL 
-            ORDER BY r.tanggal DESC LIMIT 1
-        `);
+        for (const dateStr of saturdays) {
+            const dateObj = moment(dateStr);
+            const diffDays = dateObj.diff(epochDate, 'days');
+            const diffWeeks = Math.round(diffDays / 7);
 
-        if (lastSchedule.length > 0) {
-            const lastTeam = lastSchedule[0].tim_ronda;
-            const lastIdx = teams.indexOf(lastTeam);
-            if (lastIdx !== -1) {
-                nextTeamIndex = (lastIdx + 1) % 4;
-            }
-        }
-
-        for (const date of saturdays) {
-            // Check if schedule already exists for this date
-            const [existing] = await db.query("SELECT id FROM ronda_jadwal WHERE tanggal = ?", [date]);
-            if (existing.length > 0) {
-                // Schedule exists, but we still need to increment team index for next week
-                nextTeamIndex = (nextTeamIndex + 1) % 4;
-                continue;
-            }
-
-            const currentTeam = teams[nextTeamIndex];
+            let teamIndex = (epochIndex + diffWeeks) % 4;
+            if (teamIndex < 0) teamIndex += 4;
+            const currentTeam = teamsList[teamIndex];
 
             // Get members of this team
             const [members] = await db.query("SELECT id FROM warga WHERE tim_ronda = ? AND is_ronda = 1", [currentTeam]);
 
             for (const member of members) {
-                try {
-                    await db.query(
-                        "INSERT INTO ronda_jadwal (tanggal, warga_id) VALUES (?, ?)",
-                        [date, member.id]
-                    );
-                } catch (e) {
-                    // Ignore duplicates
+                // Check if already scheduled
+                const [existing] = await db.query(
+                    "SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?",
+                    [dateStr, member.id]
+                );
+
+                if (existing.length === 0) {
+                    try {
+                        await db.query(
+                            "INSERT INTO ronda_jadwal (tanggal, warga_id, status) VALUES (?, ?, 'scheduled')",
+                            [dateStr, member.id]
+                        );
+                    } catch (e) { }
                 }
             }
-
-            nextTeamIndex = (nextTeamIndex + 1) % 4;
         }
     },
 
@@ -84,7 +72,7 @@ const Ronda = {
     getTodaySchedule: async () => {
         const today = moment().format('YYYY-MM-DD');
         const [rows] = await db.query(`
-            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda
+            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda, w.foto_profil
             FROM ronda_jadwal r
             JOIN warga w ON r.warga_id = w.id
             WHERE r.tanggal = ?
@@ -95,7 +83,7 @@ const Ronda = {
     getNextSchedule: async () => {
         const today = moment().format('YYYY-MM-DD');
         const [rows] = await db.query(`
-            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda
+            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda, w.foto_profil
             FROM ronda_jadwal r
             JOIN warga w ON r.warga_id = w.id
             WHERE r.tanggal > ?
@@ -107,7 +95,7 @@ const Ronda = {
 
         const nextDate = rows[0].tanggal;
         const [schedule] = await db.query(`
-            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda
+            SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda, w.foto_profil
             FROM ronda_jadwal r
             JOIN warga w ON r.warga_id = w.id
             WHERE r.tanggal = ?
@@ -205,6 +193,16 @@ const Ronda = {
         const endDate = moment(startDate).endOf('month').format('YYYY-MM-DD');
         const [rows] = await db.query("SELECT * FROM ronda_dokumentasi WHERE tanggal BETWEEN ? AND ?", [startDate, endDate]);
         return rows;
+    },
+
+    createShare: async (date, filename) => {
+        const [result] = await db.query("INSERT INTO ronda_shares (date, image_filename) VALUES (?, ?)", [date, filename]);
+        return result.insertId;
+    },
+
+    getShare: async (id) => {
+        const [rows] = await db.query("SELECT * FROM ronda_shares WHERE id = ?", [id]);
+        return rows[0];
     },
 
     deletePhoto: async (filename) => {

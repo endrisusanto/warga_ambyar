@@ -1,0 +1,479 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="min-h-screen pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                <!-- Header Section -->
+                <div class="md:flex md:items-center md:justify-between mb-8">
+                    <div class="flex-1 min-w-0">
+                        <h2
+                            class="text-2xl font-bold leading-7 text-gray-100 sm:text-3xl sm:truncate flex items-center">
+                            <span class="bg-white/10 text-gray-300 p-2 rounded-lg mr-3 border border-white/15">💰</span>
+                            Laporan Keuangan
+                        </h2>
+                        <p class="mt-2 text-sm text-gray-400 ml-1">
+                            Neraca kas, rekapitulasi pemasukan warga, dan transparansi pengeluaran operasional.
+                        </p>
+                    </div>
+                    <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+                        <a href="/activity/timeline"
+                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition border border-white/10">
+                            <span class="mr-2">🕒</span> Log
+                        </a>
+                        <a href="/keuangan/export" target="_blank"
+                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition border border-white/10">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export Excel
+                        </a>
+                        <% if(user.role==='admin' || user.role==='bendahara' ) { %>
+                            <button type="button" onclick="openModal()"
+                                class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-200 bg-white/10 hover:bg-white/15 transition border border-white/15">
+                                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Catat Transaksi
+                            </button>
+                            <% } %>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+                    <!-- Saldo -->
+                    <div
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
+                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                            Saldo Kas Saat Ini</dt>
+                                        <dd>
+                                            <div class="text-3xl font-extrabold text-gray-100 mt-1">Rp <%=
+                                                    Number(saldo).toLocaleString('id-ID') %>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pemasukan -->
+                    <div
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
+                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                            Pemasukan Bulan Ini</dt>
+                                        <dd>
+                                            <div class="text-3xl font-bold text-gray-200 mt-1">+ Rp <%=
+                                                    Number(pemasukanBulanIni).toLocaleString('id-ID') %>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pengeluaran -->
+                    <div
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
+                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                            Pengeluaran Bulan Ini</dt>
+                                        <dd>
+                                            <div class="text-3xl font-bold text-gray-300 mt-1">- Rp <%=
+                                                    Number(pengeluaranBulanIni).toLocaleString('id-ID') %>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 gap-8">
+
+                    <!-- Financial Chart -->
+                    <div class="glass-card rounded-xl p-6 w-full transition-shadow hover:bg-white/10">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-100 flex items-center">
+                                <span class="bg-white/10 p-1.5 rounded-lg mr-2 border border-white/10">📊</span> Tren
+                                Keuangan (12 Bulan)
+                            </h3>
+                        </div>
+                        <div class="relative h-80 w-full">
+                            <canvas id="financeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions Table -->
+                    <div
+                        class="glass-card rounded-xl overflow-hidden flex flex-col h-[600px] w-full transition-shadow hover:bg-white/10">
+                        <div class="px-6 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-100 flex items-center">
+                                <span class="bg-white/10 p-1.5 rounded-lg mr-2 border border-white/10">📝</span> Mutasi
+                                Terakhir
+                            </h3>
+                        </div>
+                        <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/5 sticky top-0 z-10">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                            Keterangan</th>
+                                        <th scope="col"
+                                            class="px-3 py-3 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">
+                                            Debit (Masuk)</th>
+                                        <th scope="col"
+                                            class="px-3 py-3 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">
+                                            Kredit (Keluar)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white/5 divide-y divide-white/10">
+                                    <% transactions.forEach(t=> { %>
+                                        <tr class="hover:bg-white/10 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-200">
+                                                    <%= t.keterangan %>
+                                                </div>
+                                                <div class="flex items-center mt-1 space-x-2">
+                                                    <span class="text-xs text-gray-500">
+                                                        <%= moment(t.tanggal).format('DD MMM YYYY') %>
+                                                    </span>
+                                                    <% if(t.bukti_foto) { %>
+                                                        <button type="button"
+                                                            onclick="showProof('/uploads/keuangan/<%= t.bukti_foto %>')"
+                                                            class="px-2 py-0.5 rounded bg-white/10 text-gray-300 text-xs hover:bg-white/15 flex items-center gap-1 transition-colors border border-white/10">
+                                                            Bukti 👁️
+                                                        </button>
+                                                        <% } %>
+                                                </div>
+                                            </td>
+                                            <td
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-200">
+                                                <%= t.tipe==='masuk' ? Number(t.jumlah).toLocaleString('id-ID') : '-' %>
+                                            </td>
+                                            <td
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-300">
+                                                <%= t.tipe==='keluar' ? Number(t.jumlah).toLocaleString('id-ID') : '-'
+                                                    %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% if(transactions.length===0) { %>
+                                                <tr>
+                                                    <td colspan="3" class="px-6 py-10 text-center text-gray-500">Belum
+                                                        ada transaksi saat ini.</td>
+                                                </tr>
+                                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tambah Transaksi -->
+        <div id="addModal" class="fixed inset-0 z-50 hidden overflow-y-auto font-sans" aria-labelledby="modal-title"
+            role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                    onclick="closeModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="inline-block align-bottom glass-card rounded-2xl text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <form action="/keuangan/add" method="POST" enctype="multipart/form-data">
+                        <div class="bg-white/10 px-4 py-4 sm:px-6 border-b border-white/10">
+                            <h3 class="text-lg leading-6 font-bold text-gray-100 flex items-center" id="modal-title">
+                                <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v3m0 0v3m0-6h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Catat Transaksi Baru
+                            </h3>
+                        </div>
+                        <div class="px-4 pt-5 pb-4 sm:p-6">
+
+                            <div class="mb-5">
+                                <label class="block text-sm font-bold text-gray-300 mb-2">Jenis Transaksi</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="tipe" value="masuk" class="peer sr-only" checked>
+                                        <div
+                                            class="glass-card rounded-lg border-2 border-white/10 p-3 text-center peer-checked:border-white/30 peer-checked:bg-white/15 transition-all">
+                                            <div class="font-bold text-gray-300">📥 Pemasukan</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="tipe" value="keluar" class="peer sr-only">
+                                        <div
+                                            class="glass-card rounded-lg border-2 border-white/10 p-3 text-center peer-checked:border-white/30 peer-checked:bg-white/15 transition-all">
+                                            <div class="font-bold text-gray-300">📤 Pengeluaran</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-300 mb-1">Nominal (Rp)</label>
+                                <div class="relative rounded-md">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 sm:text-sm">Rp</span>
+                                    </div>
+                                    <input type="number" name="jumlah" required
+                                        class="glass-input block w-full pl-10 sm:text-sm rounded-lg py-2"
+                                        placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-300 mb-1">Tanggal</label>
+                                <input type="date" name="tanggal" required
+                                    class="glass-input block w-full sm:text-sm rounded-lg py-2 px-3"
+                                    value="<%= moment().format('YYYY-MM-DD') %>">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-300 mb-1">Keterangan</label>
+                                <textarea name="keterangan" rows="3" required
+                                    class="glass-input block w-full sm:text-sm rounded-lg py-2 px-3"
+                                    placeholder="Deskripsi transaksi..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-300 mb-1">Bukti Foto / Struk
+                                    (Opsional)</label>
+                                <input type="file" name="bukti_foto" accept="image/*,application/pdf"
+                                    class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-300 hover:file:bg-white/15 file:border file:border-white/10">
+                            </div>
+
+                        </div>
+                        <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
+                            <button type="submit"
+                                class="glass-button w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Simpan
+                                Transaksi</button>
+                            <button type="button" onclick="closeModal()"
+                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/10 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Preview Bukti -->
+        <div id="proofModal" class="fixed inset-0 z-[60] hidden overflow-y-auto" aria-labelledby="modal-proof-title"
+            role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                    onclick="closeProofModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="inline-block align-bottom glass-card rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start sm:justify-between mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-100" id="modal-proof-title">Preview Bukti
+                            </h3>
+                            <button type="button" class="text-gray-400 hover:text-gray-200" onclick="closeProofModal()">
+                                <span class="sr-only">Close</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-2 flex justify-center bg-white/5 rounded p-2 border border-white/10">
+                            <img id="proofImage" src="" alt="Bukti"
+                                class="max-w-full max-h-[70vh] object-contain rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chartDataContainer" data-chart="<%= chartData %>" class="hidden"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            function openModal() {
+                document.getElementById('addModal').classList.remove('hidden');
+            }
+            function closeModal() {
+                document.getElementById('addModal').classList.add('hidden');
+            }
+
+            function showProof(src) {
+                document.getElementById('proofImage').src = src;
+                document.getElementById('proofModal').classList.remove('hidden');
+            }
+
+            function closeProofModal() {
+                document.getElementById('proofModal').classList.add('hidden');
+                document.getElementById('proofImage').src = '';
+            }
+
+            // Chart Configuration - Monochrome
+            try {
+                const rawData = document.getElementById('chartDataContainer').getAttribute('data-chart');
+                const chartData = JSON.parse(rawData);
+
+                if (chartData) {
+                    const ctx = document.getElementById('financeChart').getContext('2d');
+
+                    const gradientMasuk = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradientMasuk.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+                    gradientMasuk.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+
+                    const gradientKeluar = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradientKeluar.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                    gradientKeluar.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: chartData.labels,
+                            datasets: [
+                                {
+                                    label: 'Pemasukan',
+                                    data: chartData.income,
+                                    backgroundColor: gradientMasuk,
+                                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                                    borderWidth: 1,
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                },
+                                {
+                                    label: 'Pengeluaran',
+                                    data: chartData.expense,
+                                    backgroundColor: gradientKeluar,
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderWidth: 1,
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        color: '#d1d5db'
+                                    }
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleColor: '#f9fafb',
+                                    bodyColor: '#d1d5db',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                                    borderWidth: 1,
+                                    displayColors: true,
+                                    boxPadding: 4
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)',
+                                        borderDash: [2, 4]
+                                    },
+                                    ticks: {
+                                        callback: function (value) {
+                                            return 'Rp ' + (value / 1000).toLocaleString('id-ID') + 'k';
+                                        },
+                                        font: { size: 10 },
+                                        color: '#9ca3af'
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { size: 10 },
+                                        color: '#9ca3af'
+                                    }
+                                }
+                            },
+                            interaction: {
+                                mode: 'nearest',
+                                axis: 'x',
+                                intersect: false
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.log("Chart Error", e);
+            }
+        </script>
+
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 4px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
+        </style>
+
+        <%- include('../partials/footer') %>

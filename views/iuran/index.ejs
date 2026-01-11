@@ -1,304 +1,608 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
+        <% function safeJson(obj) { if (!obj) return 'null' ; return JSON.stringify(obj).replace(/"/g, '&quot;' ); } %>
 
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div
-                class="px-4 py-5 sm:px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Data Iuran</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Daftar tagihan dan pembayaran iuran warga.</p>
-                </div>
-                <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3 items-center">
-                    <!-- View Toggle -->
-                    <div class="bg-gray-100 p-1 rounded-lg flex">
-                        <button onclick="switchView('table')" id="btn-table"
-                            class="px-3 py-1 rounded-md text-sm font-medium bg-white shadow-sm text-gray-900">
-                            Table
-                        </button>
-                        <button onclick="switchView('grid')" id="btn-grid"
-                            class="px-3 py-1 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900">
-                            Grid
-                        </button>
-                    </div>
-
-                    <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
-                        <form action="/iuran/generate" method="POST" class="inline">
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                Generate Tagihan
-                            </button>
-                        </form>
-                        <a href="/iuran/arrears"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
-                            Tunggakan
-                        </a>
-                        <% } %>
-                            <a href="/iuran/pay"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
-                                Input Bayar
-                            </a>
-                </div>
-            </div>
-
-            <!-- Table View -->
-            <div id="view-table" class="border-t border-gray-200">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rumah</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Kas (50k)
-                                </th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Sampah
-                                    (20k)</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <% iuran.forEach(item=> { %>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <%= moment(item.periode).format('MMM YYYY') %>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                                        Blok <%= item.blok %>-<%= item.nomor_rumah %>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <%= item.nama %>
-                                    </td>
-
-                                    <!-- Status Kas -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <% if(item.kas) { %>
-                                            <div class="flex flex-col items-center">
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    <%= item.kas.status === 'lunas' ? 'bg-green-100 text-green-800' : 
-                                                       (item.kas.status === 'menunggu_konfirmasi' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') %>">
-                                                    <%= item.kas.status.replace('_', ' ' ) %>
-                                                </span>
-                                                <% if(item.kas.bukti_bayar) { %>
-                                                    <a href="<%= item.kas.bukti_bayar.startsWith('/uploads/') ? item.kas.bukti_bayar : '/uploads/' + item.kas.bukti_bayar %>"
-                                                        target="_blank"
-                                                        class="text-xs text-indigo-600 hover:text-indigo-900 mt-1 flex items-center">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
-                                                            </path>
-                                                        </svg>
-                                                        Bukti
-                                                    </a>
-                                                    <% } %>
-                                            </div>
-                                            <% } else { %>
-                                                <span class="text-gray-400 text-xs">-</span>
-                                                <% } %>
-                                    </td>
-
-                                    <!-- Status Sampah -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <% if(item.sampah) { %>
-                                            <div class="flex flex-col items-center">
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    <%= item.sampah.status === 'lunas' ? 'bg-green-100 text-green-800' : 
-                                                       (item.sampah.status === 'menunggu_konfirmasi' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') %>">
-                                                    <%= item.sampah.status.replace('_', ' ' ) %>
-                                                </span>
-                                                <% if(item.sampah.bukti_bayar) { %>
-                                                    <a href="<%= item.sampah.bukti_bayar.startsWith('/uploads/') ? item.sampah.bukti_bayar : '/uploads/' + item.sampah.bukti_bayar %>"
-                                                        target="_blank"
-                                                        class="text-xs text-indigo-600 hover:text-indigo-900 mt-1 flex items-center">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
-                                                            </path>
-                                                        </svg>
-                                                        Bukti
-                                                    </a>
-                                                    <% } %>
-                                            </div>
-                                            <% } else { %>
-                                                <span class="text-gray-400 text-xs">-</span>
-                                                <% } %>
-                                    </td>
-
-                                    <!-- Aksi Confirm -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                        <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
-                                            <div class="flex justify-center space-x-2">
-                                                <% if(item.kas && item.kas.status==='menunggu_konfirmasi' ) { %>
-                                                    <a href="/iuran/confirm/<%= item.kas.id %>"
-                                                        class="text-green-600 hover:text-green-900"
-                                                        title="Confirm Kas">✓ Kas</a>
-                                                    <% } %>
-                                                        <% if(item.sampah && item.sampah.status==='menunggu_konfirmasi'
-                                                            ) { %>
-                                                            <a href="/iuran/confirm/<%= item.sampah.id %>"
-                                                                class="text-blue-600 hover:text-blue-900"
-                                                                title="Confirm Sampah">✓ Sampah</a>
-                                                            <% } %>
-                                            </div>
-                                            <% } %>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Grid View -->
-            <div id="view-grid" class="hidden p-6 bg-gray-50">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <% iuran.forEach(item=> { %>
-                        <div
-                            class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-900">Blok <%= item.blok %>-<%=
-                                                item.nomor_rumah %>
-                                    </h4>
-                                    <p class="text-sm text-gray-500">
-                                        <%= item.nama %>
-                                    </p>
-                                </div>
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
-                                    <%= moment(item.periode).format('MMM YYYY') %>
-                                </span>
-                            </div>
-
-                            <div class="space-y-3">
-                                <!-- Kas Row -->
-                                <div
-                                    class="flex justify-between items-center p-2 rounded-md <%= item.kas && item.kas.status === 'lunas' ? 'bg-green-50' : 'bg-red-50' %>">
-                                    <div class="flex items-center">
-                                        <span
-                                            class="w-2 h-2 rounded-full mr-2 <%= item.kas && item.kas.status === 'lunas' ? 'bg-green-500' : 'bg-red-500' %>"></span>
-                                        <span class="text-sm font-medium text-gray-700">Kas RT</span>
-                                    </div>
-                                    <% if(item.kas) { %>
-                                        <div class="flex flex-col items-end">
-                                            <span
-                                                class="text-xs font-bold <%= item.kas.status === 'lunas' ? 'text-green-700' : 'text-red-700' %>">
-                                                <%= item.kas.status==='lunas' ? 'LUNAS' :
-                                                    item.kas.status.replace('_', ' ' ).toUpperCase() %>
-                                            </span>
-                                            <div class="flex space-x-2 mt-1">
-                                                <% if(item.kas.bukti_bayar) { %>
-                                                    <a href="<%= item.kas.bukti_bayar.startsWith('/uploads/') ? item.kas.bukti_bayar : '/uploads/' + item.kas.bukti_bayar %>"
-                                                        target="_blank" class="text-indigo-600 hover:text-indigo-900"
-                                                        title="Lihat Bukti">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
-                                                            </path>
-                                                        </svg>
-                                                    </a>
-                                                    <% } %>
-                                                        <% if(item.kas.status==='menunggu_konfirmasi' &&
-                                                            (user.role==='admin' || user.role==='bendahara' )) { %>
-                                                            <a href="/iuran/confirm/<%= item.kas.id %>"
-                                                                class="text-xs text-blue-600 hover:underline">Confirm</a>
-                                                            <% } %>
-                                            </div>
-                                        </div>
-                                        <% } else { %>
-                                            <span class="text-xs text-gray-400">-</span>
-                                            <% } %>
-                                </div>
-
-                                <!-- Sampah Row -->
-                                <div
-                                    class="flex justify-between items-center p-2 rounded-md <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-green-50' : 'bg-red-50' %>">
-                                    <div class="flex items-center">
-                                        <span
-                                            class="w-2 h-2 rounded-full mr-2 <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-green-500' : 'bg-red-500' %>"></span>
-                                        <span class="text-sm font-medium text-gray-700">Sampah</span>
-                                    </div>
-                                    <% if(item.sampah) { %>
-                                        <div class="flex flex-col items-end">
-                                            <span
-                                                class="text-xs font-bold <%= item.sampah.status === 'lunas' ? 'text-green-700' : 'text-red-700' %>">
-                                                <%= item.sampah.status==='lunas' ? 'LUNAS' :
-                                                    item.sampah.status.replace('_', ' ' ).toUpperCase() %>
-                                            </span>
-                                            <div class="flex space-x-2 mt-1">
-                                                <% if(item.sampah.bukti_bayar) { %>
-                                                    <a href="<%= item.sampah.bukti_bayar.startsWith('/uploads/') ? item.sampah.bukti_bayar : '/uploads/' + item.sampah.bukti_bayar %>"
-                                                        target="_blank" class="text-indigo-600 hover:text-indigo-900"
-                                                        title="Lihat Bukti">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
-                                                            </path>
-                                                        </svg>
-                                                    </a>
-                                                    <% } %>
-                                                        <% if(item.sampah.status==='menunggu_konfirmasi' &&
-                                                            (user.role==='admin' || user.role==='bendahara' )) { %>
-                                                            <a href="/iuran/confirm/<%= item.sampah.id %>"
-                                                                class="text-xs text-blue-600 hover:underline">Confirm</a>
-                                                            <% } %>
-                                            </div>
-                                        </div>
-                                        <% } else { %>
-                                            <span class="text-xs text-gray-400">-</span>
-                                            <% } %>
-                                </div>
+            <div class="glass-card">
+                <div class="glass-card">
+                    <div
+                        class="px-4 py-5 sm:px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 border-b border-white/10">
+                        <div class="w-full md:w-auto flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-100">Data Iuran</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-400">Daftar tagihan dan pembayaran iuran
+                                    warga.</p>
                             </div>
                         </div>
-                        <% }) %>
+
+                        <!-- Mobile Action Bar (Visible < md) -->
+                        <div class="w-full md:hidden mt-4 space-y-3">
+                            <a href="/iuran/pay"
+                                class="w-full glass-button inline-flex justify-center items-center px-4 py-3 text-base font-bold rounded-xl text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg border border-white/20">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Input Bayar
+                            </a>
+                            <button onclick="toggleFilters()"
+                                class="w-full glass-button inline-flex justify-between items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-300 border border-white/10 bg-white/5">
+                                <span>Filters & Options</span>
+                                <svg id="filter-icon" class="w-5 h-5 transform transition-transform duration-200"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Desktop & Expanded Mobile Filters -->
+                        <div id="filter-container"
+                            class="hidden md:flex w-full md:w-auto mt-2 md:mt-0 flex-col md:flex-row gap-2">
+                            <div class="grid grid-cols-1 md:flex md:items-center gap-2 md:space-x-2">
+                                <!-- Year Filter -->
+                                <select onchange="window.location.href='/iuran?year='+this.value"
+                                    class="glass-input w-full md:w-auto rounded-lg text-sm py-2 px-3 cursor-pointer">
+                                    <% for(let y=2024; y<=parseInt(moment().format('YYYY')) + 1; y++) { %>
+                                        <option value="<%= y %>" <%=y==year ? 'selected' : '' %>><%= y %>
+                                        </option>
+                                        <% } %>
+                                </select>
+
+                                <!-- View Toggle -->
+                                <div
+                                    class="w-full md:w-auto bg-white/5 p-1 rounded-lg flex cursor-pointer border border-white/10">
+                                    <button onclick="switchView('table')" id="btn-table"
+                                        class="flex-1 md:flex-none px-3 py-1 rounded-md text-sm font-medium bg-white/10 text-gray-100 text-center transition-all">
+                                        Table
+                                    </button>
+                                    <button onclick="switchView('grid')" id="btn-grid"
+                                        class="flex-1 md:flex-none px-3 py-1 rounded-md text-sm font-medium text-gray-400 hover:text-gray-200 text-center transition-all">
+                                        Grid
+                                    </button>
+                                </div>
+
+                                <!-- Export Dropdown -->
+                                <div class="relative inline-block text-left w-full md:w-auto">
+                                    <button onclick="toggleExportDropdown(event)" type="button"
+                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 transition-colors border border-white/10"
+                                        id="menu-button" aria-expanded="true" aria-haspopup="true">
+                                        Export
+                                        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+
+                                    <div id="export-dropdown"
+                                        class="hidden origin-top-right absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-gray-900/95 backdrop-blur-xl border border-white/20 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
+                                        tabindex="-1">
+                                        <div class="py-1" role="none">
+                                            <button onclick="exportToImage(); toggleExportDropdown(event)"
+                                                class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                role="menuitem" tabindex="-1">
+                                                Image
+                                            </button>
+                                            <button onclick="exportToPDF(); toggleExportDropdown(event)"
+                                                class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                role="menuitem" tabindex="-1">
+                                                PDF
+                                            </button>
+                                            <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
+                                                <a href="/iuran/export"
+                                                    class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                    role="menuitem" tabindex="-1">
+                                                    Excel
+                                                </a>
+                                                <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
+                                    <form action="/iuran/generate" method="POST" class="w-full md:w-auto">
+                                        <button type="submit"
+                                            class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 transition-colors border border-white/10">
+                                            Generate
+                                        </button>
+                                    </form>
+                                    <a href="/iuran/arrears"
+                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 bg-white/10 hover:bg-white/15 transition-colors border border-white/15">
+                                        Tunggakan
+                                    </a>
+                                    <% } %>
+                            </div>
+
+                            <!-- Desktop Input Bayar (Hidden on Mobile) -->
+                            <a href="/iuran/pay"
+                                class="hidden md:inline-flex glass-button items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-200 bg-white/10 hover:bg-white/15 border border-white/15 ml-2">
+                                Input Bayar
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <script>
-            function switchView(view) {
-                const tableBtn = document.getElementById('btn-table');
-                const gridBtn = document.getElementById('btn-grid');
-                const tableView = document.getElementById('view-table');
-                const gridView = document.getElementById('view-grid');
+                <!-- Table View (Matrix) -->
+                <div id="view-table" class="mt-6 glass-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white/10 text-xs">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th
+                                        class="px-2 py-2 text-left font-medium text-gray-400 uppercase tracking-wider sticky left-0 bg-white/5 z-20 min-w-[100px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">
+                                        Warga / Blok</th>
+                                    <% ['Jan', 'Feb' , 'Mar' , 'Apr' , 'Mei' , 'Jun' , 'Jul' , 'Agt' , 'Sep' , 'Okt'
+                                        , 'Nov' , 'Des' ].forEach(m=> { %>
+                                        <th
+                                            class="px-2 py-3 text-center font-medium text-gray-400 uppercase tracking-wider border-l border-white/10 min-w-[60px]">
+                                            <%= m %>
+                                        </th>
+                                        <% }) %>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white/5 divide-y divide-white/10">
+                                <% warga.forEach(w=> { %>
+                                    <tr class="hover:bg-white/10 transition-colors">
+                                        <td
+                                            class="px-2 py-1 whitespace-nowrap sticky left-0 bg-white/5 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">
+                                            <div class="font-medium text-gray-200">
+                                                <%= w.nama %>
+                                            </div>
+                                            <div class="text-[10px] text-gray-500">Blok <%= w.blok %>-<%= w.nomor_rumah
+                                                        %>
+                                            </div>
+                                        </td>
 
-                if (view === 'table') {
-                    tableView.classList.remove('hidden');
-                    gridView.classList.add('hidden');
+                                        <% matrix[w.id].forEach(status=> { %>
+                                            <td
+                                                class="px-2 py-2 whitespace-nowrap text-center border-l border-white/10">
+                                                <div class="flex justify-center space-x-1">
+                                                    <!-- KAS -->
+                                                    <div class="inline-block px-2 py-1.5 rounded-full text-[8px] font-bold text-gray-900 min-w-[24px] text-center
+                                    <%= status.kas && status.kas.status === 'lunas' ? 'bg-emerald-500' : 
+                                        status.kas && status.kas.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
+                                        status.kas ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                    <%= status.kas ? 'cursor-pointer hover:opacity-80' : '' %>"
+                                                        title="<%= status.kas ? 'Kas: ' + status.kas.status.replace('_', ' ') : 'Belum Ditagih' %>"
+                                                        onclick="showDetail(this)"
+                                                        data-payment="<%- safeJson(status.kas) %>">
+                                                        <span
+                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">Kas</span>
+                                                    </div>
+                                                    <!-- SAMPAH -->
+                                                    <div class="inline-block px-2 py-1.5 rounded-full text-[8px] font-bold text-gray-900 min-w-[32px] text-center
+                                    <%= status.sampah && status.sampah.status === 'lunas' ? 'bg-emerald-500' : 
+                                        status.sampah && status.sampah.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
+                                        status.sampah ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                    <%= status.sampah ? 'cursor-pointer hover:opacity-80' : '' %>"
+                                                        title="<%= status.sampah ? 'Sampah: ' + status.sampah.status.replace('_', ' ') : 'Belum Ditagih' %>"
+                                                        onclick="showDetail(this)"
+                                                        data-payment="<%- safeJson(status.sampah) %>">
+                                                        <span
+                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">Sampah</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <% }) %>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 bg-white/5 border-t border-white/10">
+                        <div class="flex flex-wrap gap-4 text-xs text-gray-400">
+                            <div class="flex items-center"><span
+                                    class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>Lunas
+                            </div>
+                            <div class="flex items-center"><span
+                                    class="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>Menunggu Konfirmasi</div>
+                            <div class="flex items-center"><span
+                                    class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>Belum
+                                Lunas</div>
+                            <div class="flex items-center"><span
+                                    class="w-3 h-3 bg-white/10 rounded-full mr-2"></span>Belum
+                                Ditagih</div>
+                        </div>
+                    </div>
+                </div>
 
-                    tableBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
-                    tableBtn.classList.remove('text-gray-500');
+                <!-- Grid View -->
+                <div id="view-grid" class="hidden mt-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <% iuran.forEach(item=> { %>
+                            <div class="glass-card p-4 hover:bg-white/10 transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 class="text-lg font-bold text-gray-100">Blok <%= item.blok %>-<%=
+                                                    item.nomor_rumah %>
+                                        </h4>
+                                        <p class="text-sm text-gray-400">
+                                            <%= item.nama %>
+                                        </p>
+                                    </div>
+                                    <span
+                                        class="px-2 py-1 bg-white/10 text-gray-300 text-xs rounded-md font-medium border border-white/10">
+                                        <%= moment(item.periode).format('MMM YYYY') %>
+                                    </span>
+                                </div>
 
-                    gridBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
-                    gridBtn.classList.add('text-gray-500');
-                } else {
-                    tableView.classList.add('hidden');
-                    gridView.classList.remove('hidden');
+                                <div class="space-y-3">
+                                    <!-- Kas Row -->
+                                    <div
+                                        class="flex justify-between items-center p-2 rounded-md <%= item.kas && item.kas.status === 'lunas' ? 'bg-white/10' : 'bg-white/5' %> border border-white/10">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="w-2 h-2 rounded-full mr-2 <%= item.kas && item.kas.status === 'lunas' ? 'bg-emerald-500' : item.kas && item.kas.status === 'menunggu_konfirmasi' ? 'bg-amber-500' : 'bg-red-500' %>"></span>
+                                            <span class="text-sm font-medium text-gray-300">Kas RT</span>
+                                        </div>
+                                        <% if(item.kas) { %>
+                                            <div class="flex flex-col items-end">
+                                                <span
+                                                    class="cursor-pointer text-xs font-bold <%= item.kas.status === 'lunas' ? 'text-gray-200' : 'text-gray-400' %> hover:underline"
+                                                    onclick="showDetail(this)" data-payment="<%- safeJson(item.kas) %>"
+                                                    title="Lihat Detail">
+                                                    <%= item.kas.status==='lunas' ? 'LUNAS' :
+                                                        item.kas.status.replace('_', ' ' ).toUpperCase() %>
+                                                </span>
+                                                <div class="flex space-x-2 mt-1 items-center">
+                                                    <% if(item.kas.status==='menunggu_konfirmasi' &&
+                                                        (user.role==='admin' || user.role==='bendahara' )) { %>
+                                                        <a href="/iuran/confirm/<%= item.kas.id %>"
+                                                            class="text-[10px] font-medium text-gray-300 hover:text-gray-100 bg-white/10 px-2 py-0.5 rounded border border-white/10">
+                                                            Confirm
+                                                        </a>
+                                                        <% } %>
+                                                            <button onclick="showDetail(this)"
+                                                                data-payment="<%- safeJson(item.kas) %>"
+                                                                class="text-gray-400 hover:text-gray-200"
+                                                                title="Detail">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                </div>
+                                            </div>
+                                            <% } else { %>
+                                                <span class="text-xs text-gray-500">-</span>
+                                                <% } %>
+                                    </div>
 
-                    gridBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
-                    gridBtn.classList.remove('text-gray-500');
+                                    <!-- Sampah Row -->
+                                    <div
+                                        class="flex justify-between items-center p-2 rounded-md <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-white/10' : 'bg-white/5' %> border border-white/10">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="w-2 h-2 rounded-full mr-2 <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-emerald-500' : item.sampah && item.sampah.status === 'menunggu_konfirmasi' ? 'bg-amber-500' : 'bg-red-500' %>"></span>
+                                            <span class="text-sm font-medium text-gray-300">Sampah</span>
+                                        </div>
+                                        <% if(item.sampah) { %>
+                                            <div class="flex flex-col items-end">
+                                                <span
+                                                    class="cursor-pointer text-xs font-bold <%= item.sampah.status === 'lunas' ? 'text-gray-200' : 'text-gray-400' %> hover:underline"
+                                                    onclick="showDetail(this)"
+                                                    data-payment="<%- safeJson(item.sampah) %>" title="Lihat Detail">
+                                                    <%= item.sampah.status==='lunas' ? 'LUNAS' :
+                                                        item.sampah.status.replace('_', ' ' ).toUpperCase() %>
+                                                </span>
+                                                <div class="flex space-x-2 mt-1 items-center">
+                                                    <% if(item.sampah.status==='menunggu_konfirmasi' &&
+                                                        (user.role==='admin' || user.role==='bendahara' )) { %>
+                                                        <a href="/iuran/confirm/<%= item.sampah.id %>"
+                                                            class="text-[10px] font-medium text-gray-300 hover:text-gray-100 bg-white/10 px-2 py-0.5 rounded border border-white/10">
+                                                            Confirm
+                                                        </a>
+                                                        <% } %>
+                                                            <button onclick="showDetail(this)"
+                                                                data-payment="<%- safeJson(item.sampah) %>"
+                                                                class="text-gray-400 hover:text-gray-200"
+                                                                title="Detail">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                </div>
+                                            </div>
+                                            <% } else { %>
+                                                <span class="text-xs text-gray-500">-</span>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                </div>
 
-                    tableBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
-                    tableBtn.classList.add('text-gray-500');
-                }
+                <!-- Payment Detail Modal -->
+                <div id="paymentModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
+                    role="dialog" aria-modal="true">
+                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                            onclick="closePaymentModal()"></div>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                            aria-hidden="true">&#8203;</span>
+                        <div
+                            class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                            <div class="p-6">
+                                <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
+                                    Pembayaran</h3>
+                                <div class="space-y-3">
+                                    <p class="text-sm text-gray-300" id="modal-warga"></p>
+                                    <p class="text-sm text-gray-300" id="modal-jenis"></p>
+                                    <p class="text-sm text-gray-300" id="modal-nominal"></p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm text-gray-300">Status:</p>
+                                        <span id="modal-status-badge"
+                                            class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+                                    </div>
+                                    <div id="modal-proof"
+                                        class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
+                                        <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
+                                        <img src="" class="w-full object-contain max-h-64 rounded">
+                                        <a href="#" target="_blank"
+                                            class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
+                                            Ukuran Penuh</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
+                                id="modal-actions">
+                                <button type="button"
+                                    class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
+                                    onclick="closePaymentModal()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                // Save preference
-                localStorage.setItem('iuranView', view);
-            }
+                <script src="/js/html2canvas.min.js"></script>
+                <script>
+                    function showDetail(element) {
+                        const dataStr = element.getAttribute('data-payment');
+                        if (!dataStr || dataStr === 'null') return;
 
-            // Load preference
-            document.addEventListener('DOMContentLoaded', () => {
-                const savedView = localStorage.getItem('iuranView') || 'table';
-                switchView(savedView);
-            });
-        </script>
+                        try {
+                            const data = JSON.parse(dataStr);
+                            const modal = document.getElementById('paymentModal');
+                            if (!modal) return;
 
-        <%- include('../partials/footer') %>
+                            document.getElementById('modal-warga').innerText = `Warga: ${data.nama} (Blok ${data.blok}-${data.nomor_rumah})`;
+                            const date = new Date(data.periode);
+                            const monthYear = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                            document.getElementById('modal-jenis').innerText = `Jenis: ${data.jenis.toUpperCase()} - ${monthYear}`;
+                            document.getElementById('modal-nominal').innerText = `Nominal: Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}`;
+
+                            // Status badge with color
+                            const statusBadge = document.getElementById('modal-status-badge');
+                            const statusText = data.status.replace('_', ' ').toUpperCase();
+                            statusBadge.innerText = statusText;
+
+                            // Apply color based on status
+                            if (data.status === 'lunas') {
+                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                            } else if (data.status === 'menunggu_konfirmasi') {
+                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                            } else {
+                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30';
+                            }
+
+                            const proofDiv = document.getElementById('modal-proof');
+                            const img = proofDiv.querySelector('img');
+                            const link = proofDiv.querySelector('a');
+
+                            if (data.bukti_bayar) {
+                                proofDiv.classList.remove('hidden');
+                                const src = data.bukti_bayar.startsWith('/uploads/') ? data.bukti_bayar : '/uploads/' + data.bukti_bayar;
+                                img.src = src;
+                                link.href = src;
+                            } else {
+                                proofDiv.classList.add('hidden');
+                            }
+
+                            const actionsDiv = document.getElementById('modal-actions');
+                            const userRole = "<%= user ? user.role : '' %>";
+
+                            let html = `<button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10" onclick="closePaymentModal()">Close</button>`;
+
+                            if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
+                                html = `
+                <a href="/iuran/confirm/${data.id}" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Approve</a>
+                <a href="/iuran/reject/${data.id}" onclick="return confirm('Tolak pembayaran?')" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/10 text-base font-medium text-gray-300 hover:bg-white/15 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Reject</a>
+            ` + html;
+                            }
+                            actionsDiv.innerHTML = html;
+
+                            modal.classList.remove('hidden');
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+
+                    function closePaymentModal() {
+                        document.getElementById('paymentModal').classList.add('hidden');
+                    }
+
+                    function toggleExportDropdown(event) {
+                        if (event) event.stopPropagation();
+                        const dropdown = document.getElementById('export-dropdown');
+                        dropdown.classList.toggle('hidden');
+                    }
+
+                    function toggleFilters() {
+                        const container = document.getElementById('filter-container');
+                        const icon = document.getElementById('filter-icon');
+                        container.classList.toggle('hidden');
+                        // Reset rotation if hidden, rotate if shown
+                        if (container.classList.contains('hidden')) {
+                            icon.style.transform = 'rotate(0deg)';
+                        } else {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+
+                    // Close dropdown when clicking outside
+                    window.onclick = function (event) {
+                        if (!event.target.closest('#menu-button') && !event.target.closest('#export-dropdown')) {
+                            const dropdown = document.getElementById('export-dropdown');
+                            if (dropdown && !dropdown.classList.contains('hidden')) {
+                                dropdown.classList.add('hidden');
+                            }
+                        }
+                    }
+
+                    function exportToImage() {
+                        const currentView = localStorage.getItem('iuranView') || 'table';
+                        if (currentView !== 'table') {
+                            if (confirm('Export hanya tersedia untuk Table View. Pindah ke Table View sekarang?')) {
+                                switchView('table');
+                            }
+                            return;
+                        }
+
+                        const tableElement = document.querySelector('#view-table table');
+
+                        if (!tableElement) return alert('Table not found');
+
+                        const btn = document.getElementById('menu-button');
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '⏳ Processing...';
+
+                        html2canvas(tableElement, {
+                            scale: 2,
+                            useCORS: true,
+                            logging: true,
+                            backgroundColor: '#0a0a0a'
+                        }).then(canvas => {
+                            const link = document.createElement('a');
+                            link.download = 'Data_Iuran_' + new Date().getTime() + '.png';
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                            btn.innerHTML = originalText;
+                        }).catch(err => {
+                            console.error(err);
+                            alert('Gagal export image');
+                            btn.innerHTML = originalText;
+                        });
+                    }
+
+                    function switchView(view) {
+                        const tableBtn = document.getElementById('btn-table');
+                        const gridBtn = document.getElementById('btn-grid');
+                        const tableView = document.getElementById('view-table');
+                        const gridView = document.getElementById('view-grid');
+
+                        if (view === 'table') {
+                            tableView.classList.remove('hidden');
+                            gridView.classList.add('hidden');
+
+                            tableBtn.classList.add('bg-white/10', 'text-gray-100');
+                            tableBtn.classList.remove('text-gray-400');
+
+                            gridBtn.classList.remove('bg-white/10', 'text-gray-100');
+                            gridBtn.classList.add('text-gray-400');
+                        } else {
+                            tableView.classList.add('hidden');
+                            gridView.classList.remove('hidden');
+
+                            gridBtn.classList.add('bg-white/10', 'text-gray-100');
+                            gridBtn.classList.remove('text-gray-400');
+
+                            tableBtn.classList.remove('bg-white/10', 'text-gray-100');
+                            tableBtn.classList.add('text-gray-400');
+                        }
+
+                        localStorage.setItem('iuranView', view);
+                    }
+
+                    // Export to PDF function
+                    async function exportToPDF() {
+                        const btn = document.getElementById('menu-button');
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '⏳ Processing...';
+
+                        try {
+                            // Check if html2canvas is available
+                            if (typeof html2canvas === 'undefined') {
+                                throw new Error('html2canvas library not loaded');
+                            }
+
+                            // Load jsPDF library dynamically
+                            if (typeof window.jspdf === 'undefined') {
+                                const script = document.createElement('script');
+                                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                                document.head.appendChild(script);
+                                await new Promise((resolve, reject) => {
+                                    script.onload = resolve;
+                                    script.onerror = () => reject(new Error('Failed to load jsPDF'));
+                                });
+                            }
+
+                            const { jsPDF } = window.jspdf;
+                            const tableElement = document.getElementById('view-table');
+
+                            if (!tableElement) {
+                                throw new Error('Table element not found');
+                            }
+
+                            // Capture table as canvas
+                            const canvas = await html2canvas(tableElement, {
+                                scale: 2,
+                                useCORS: true,
+                                logging: false,
+                                backgroundColor: '#0a0a0a'
+                            });
+
+                            const imgData = canvas.toDataURL('image/png');
+                            const imgWidth = 210; // A4 width in mm
+                            const pageHeight = 297; // A4 height in mm
+                            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                            const pdf = new jsPDF('p', 'mm', 'a4');
+                            let heightLeft = imgHeight;
+                            let position = 0;
+
+                            // Add first page
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+
+                            // Add additional pages if needed
+                            while (heightLeft >= 0) {
+                                position = heightLeft - imgHeight;
+                                pdf.addPage();
+                                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                                heightLeft -= pageHeight;
+                            }
+
+                            // Download PDF
+                            const filename = 'Data_Iuran_' + new Date().toISOString().slice(0, 10) + '.pdf';
+                            pdf.save(filename);
+                            btn.innerHTML = originalText;
+                        } catch (err) {
+                            console.error('Export PDF Error:', err);
+                            alert('Gagal export PDF: ' + err.message);
+                            btn.innerHTML = originalText;
+                        }
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const savedView = localStorage.getItem('iuranView') || 'table';
+                        switchView(savedView);
+                    });
+                </script>
+
+                <%- include('../partials/footer') %>

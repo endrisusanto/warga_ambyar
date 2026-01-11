@@ -1,37 +1,65 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
+        <script src="/js/html2canvas.min.js"></script>
 
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-            <div class="px-4 py-5 sm:px-6 flex justify-between items-center flex-wrap gap-4">
+        <div class="glass-card mb-6">
+            <div class="px-6 py-6 flex flex-col sm:flex-row justify-between items-center flex-wrap gap-4">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Jadwal Ronda Malam Minggu</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Bulan <%= moment(year + '-' + month + '-01'
+                    <h3 class="text-2xl leading-6 font-bold text-gray-100 drop-shadow-lg flex items-center gap-3">
+                        <svg class="h-7 w-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Jadwal Ronda Malam Minggu
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-400 font-medium ml-10">Bulan <%= moment(year + '-' + month + '-01'
                             ).format('MMMM YYYY') %>
                     </p>
                 </div>
-                <form action="/ronda" method="GET" class="flex space-x-2">
+                <form action="/ronda" method="GET" class="flex flex-wrap items-center gap-3">
                     <select name="month"
-                        class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2 border">
+                        class="glass-input rounded-xl text-sm text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors">
                         <% moment.months().forEach((m, index)=> { %>
                             <option value="<%= index + 1 %>" <%=(index + 1)==month ? 'selected' : '' %>><%= m %>
                             </option>
                             <% }) %>
                     </select>
                     <select name="year"
-                        class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2 border">
+                        class="glass-input rounded-xl text-sm text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors">
                         <% for(let y=2024; y <=2030; y++) { %>
                             <option value="<%= y %>" <%=y==year ? 'selected' : '' %>><%= y %>
                             </option>
                             <% } %>
                     </select>
                     <button type="submit"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Lihat
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        🔍 Lihat
                     </button>
                     <% if(user.role==='admin' || user.role==='bendahara' ) { %>
+                        <div class="h-8 w-px bg-white/20 mx-1 hidden sm:block"></div>
+                        <a href="/ronda/control?month=<%= month %>&year=<%= year %>"
+                            class="glass-button text-gray-300 hover:bg-white/10 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-white/10">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            ⚙️ Control
+                        </a>
                         <a href="/ronda/teams"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Atur Tim
+                            class="glass-button text-gray-300 hover:bg-white/10 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-white/10">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            👥 Tim
                         </a>
                         <% } %>
                 </form>
@@ -44,11 +72,11 @@
 
                 0%,
                 100% {
-                    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3), 0 0 15px rgba(99, 102, 241, 0.2);
+                    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5), 0 0 10px rgba(239, 68, 68, 0.3), 0 0 15px rgba(239, 68, 68, 0.2);
                 }
 
                 50% {
-                    box-shadow: 0 0 10px rgba(99, 102, 241, 0.8), 0 0 20px rgba(99, 102, 241, 0.6), 0 0 30px rgba(99, 102, 241, 0.4);
+                    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.4);
                 }
             }
 
@@ -60,8 +88,23 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <% Object.keys(groupedSchedule).forEach(date=> {
                 const schedules = groupedSchedule[date];
-                const teamMember = schedules.find(s=> s.tim_ronda);
-                const teamName = teamMember ? teamMember.tim_ronda : null;
+
+                // Find dominant team (tim dengan anggota terbanyak hari ini)
+                const teamCounts = {};
+                schedules.forEach(s => {
+                if(s.tim_ronda) {
+                teamCounts[s.tim_ronda] = (teamCounts[s.tim_ronda] || 0) + 1;
+                }
+                });
+
+                let teamName = null;
+                let maxCount = 0;
+                Object.entries(teamCounts).forEach(([team, count]) => {
+                if(count > maxCount) {
+                maxCount = count;
+                teamName = team;
+                }
+                });
 
                 // Get all members of this team
                 const teamMembers = (teamName && teams[teamName]) ? teams[teamName] : [];
@@ -72,45 +115,51 @@
                 const isToday = moment(date).isSame(moment(), 'day');
                 const isThisWeek = moment(date).isSame(moment(), 'week');
                 %>
-                <div
-                    class="bg-white overflow-hidden shadow-lg rounded-lg divide-y divide-gray-200 <%= isThisWeek && !isPast ? 'ring-2 ring-indigo-500 glow-this-week' : '' %> <%= isToday ? 'ring-4 ring-green-500' : '' %> <%= isPast ? 'opacity-60' : '' %>">
+                <div id="card-<%= date %>"
+                    class="glass-card overflow-hidden divide-y divide-white/10 <%= isThisWeek && !isPast ? 'border-2 border-orange-400 bg-orange-500/10 glow-this-week' : '' %> <%= isToday ? 'border-2 border-green-400 bg-green-500/10 ring-4 ring-green-400/20' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.01]">
                     <div
-                        class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-gray-100' : (isToday ? 'bg-green-50' : (isThisWeek ? 'bg-indigo-100' : 'bg-indigo-50')) %>">
+                        class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-white/5' : (isToday ? 'bg-green-500/10' : (isThisWeek ? 'bg-orange-500/10' : 'bg-white/5')) %> backdrop-blur-sm">
                         <div class="flex justify-between items-start mb-3">
                             <div>
                                 <h3
-                                    class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-900' : 'text-indigo-900') %>">
+                                    class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-300' : 'text-indigo-300') %> drop-shadow-lg">
                                     <%= moment(date).format('dddd, DD MMMM YYYY') %>
                                 </h3>
                                 <% if(isToday) { %>
                                     <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600 text-white mt-1">
+                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600/90 text-white mt-1 shadow-sm">
                                         🔔 Hari Ini
                                     </span>
                                     <% } else if(isThisWeek && !isPast) { %>
                                         <span
-                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-600 text-white mt-1">
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-600/90 text-white mt-1 shadow-sm">
                                             📅 Minggu Ini
                                         </span>
                                         <% } %>
 
-                                            <% if(isToday || isThisWeek) { %>
+                                            <button onclick="shareSchedule('<%= date %>', this)"
+                                                class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-purple-600/90 text-white mt-1 hover:bg-purple-700 transition shadow-sm border border-purple-500/50"
+                                                title="View Fullscreen & Share">
+                                                👁️ View
+                                            </button>
+
+                                            <% if(user.role==='admin' || isToday || isThisWeek) { %>
                                                 <button onclick="openUploadConditionModal('<%= date %>')"
-                                                    class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-600 text-white mt-1 hover:bg-blue-700 transition shadow-sm">
+                                                    class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-600/90 text-white mt-1 hover:bg-blue-700 transition shadow-sm border border-blue-500/50">
                                                     📷 Kondisi
                                                 </button>
                                                 <% } %>
 
                                                     <% if(isPast) { %>
                                                         <span
-                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-400 text-white mt-1">
+                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-500/80 text-white mt-1 shadow-sm">
                                                             ✓ Selesai
                                                         </span>
                                                         <% } %>
                             </div>
                             <% if(teamName) { %>
                                 <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white' : 'bg-indigo-600 text-white' %> shadow-sm border <%= isPast ? 'border-gray-500' : 'border-indigo-700' %>">
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white' : 'bg-indigo-600 text-white' %> shadow-sm border <%= isPast ? 'border-gray-500' : 'border-indigo-400 glass-button' %>">
                                     Tim <%= teamName %>
                                 </span>
                                 <% } %>
@@ -118,9 +167,9 @@
 
                         <% if(teamMembers.length> 0) { %>
                             <div
-                                class="mt-2 pt-2 border-t <%= isPast ? 'border-gray-300' : (isToday ? 'border-green-200' : 'border-indigo-200') %>">
+                                class="mt-2 pt-2 border-t <%= isPast ? 'border-gray-300' : (isToday ? 'border-green-200/50' : 'border-indigo-200/50') %>">
                                 <div
-                                    class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : 'text-indigo-700') %> mb-1">
+                                    class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-300' : 'text-indigo-300') %> mb-1">
                                     Anggota Tim:</div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex flex-wrap gap-1">
@@ -133,42 +182,49 @@
                                     </div>
 
                                     <!-- Photos for the night -->
-                                    <% let allPhotos=[]; schedules.forEach(s=> { // 1. Individual photos
-                                        if (s.foto_bukti) {
-                                        try {
-                                        const p = JSON.parse(s.foto_bukti);
-                                        p.forEach(photo => allPhotos.push({src: photo, type: 'individual', uploader:
-                                        s.nama}));
-                                        } catch(e) {}
+                                    <% let allPhotos=[]; schedules.forEach(s=> {
+                                        if (s.parsedPhotos) {
+                                        s.parsedPhotos.forEach(photo => { if(typeof photo==='string')
+                                        allPhotos.push({src: photo, type: 'individual', uploader: s.nama}); });
                                         }
                                         });
-                                        // 2. Documentation photos
                                         if (groupedDocumentation && groupedDocumentation[date]) {
                                         groupedDocumentation[date].forEach(doc => {
-                                        try {
-                                        const p = JSON.parse(doc.foto);
-                                        p.forEach(photo => allPhotos.push({src: photo, type: 'condition', uploader:
-                                        'Kondisi'}));
-                                        } catch(e) {}
+                                        if (doc.parsedPhotos) {
+                                        doc.parsedPhotos.forEach(photo => { if(typeof photo==='string')
+                                        allPhotos.push({src: photo, type: 'condition', uploader: 'Kondisi'}); });
+                                        }
                                         });
                                         }
 
-                                        if(allPhotos.length > 0) {
-                                        const safePhotos = JSON.stringify(allPhotos.map(p => p.src)).replace(/\\/g,
-                                        '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                                        if(allPhotos && allPhotos.length > 0) {
+                                        const photoSources = allPhotos.map(p => p.src);
+                                        const safePhotosJson = JSON.stringify(photoSources).replace(/'/g, "&apos;");
                                         %>
                                         <div class="flex -space-x-2 overflow-hidden ml-4 cursor-pointer"
-                                            onclick="openCarousel('<%- safePhotos %>')">
-                                            <% allPhotos.slice(0, 5).forEach(photo=> { %>
-                                                <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
-                                                    src="/uploads/ronda/<%= photo.src %>" alt="">
-                                                <% }) %>
-                                                    <% if(allPhotos.length> 5) { %>
-                                                        <div
-                                                            class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-[10px] font-bold text-gray-600 ring-2 ring-white">
-                                                            +<%= allPhotos.length - 5 %>
-                                                        </div>
+                                            data-photos='<%- safePhotosJson %>' onclick="openCarouselFromData(this, 0)">
+                                            <% allPhotos.slice(0, 5).forEach(photo=> {
+                                                const isVideo = photo.src.match(/\.(mp4|mov|avi|webm)$/i);
+                                                %>
+                                                <% if(isVideo) { %>
+                                                    <div
+                                                        class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-black flex items-center justify-center relative overflow-hidden">
+                                                        <video src="/uploads/ronda/<%= photo.src %>#t=1.0"
+                                                            class="absolute inset-0 w-full h-full object-cover opacity-60"
+                                                            preload="metadata"></video>
+                                                        <span class="text-[8px] text-white font-bold z-10">▶</span>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
+                                                            src="/uploads/ronda/<%= photo.src %>" alt="">
                                                         <% } %>
+                                                            <% }) %>
+                                                                <% if(allPhotos.length> 5) { %>
+                                                                    <div
+                                                                        class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-[10px] font-bold text-gray-600 ring-2 ring-white">
+                                                                        +<%= allPhotos.length - 5 %>
+                                                                    </div>
+                                                                    <% } %>
                                         </div>
                                         <% } %>
                                 </div>
@@ -177,70 +233,139 @@
                     </div>
                     <div class="px-4 py-5 sm:p-6">
                         <ul class="space-y-4">
-                            <% schedules.forEach(s=> { %>
+                            <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
+                                loopItems = [...teamMembers];
+                                // Add anyone in schedules who is NOT in teamMembers (e.g. Rescheduled from other teams)
+                                const memberIds = new Set(teamMembers.map(m => m.id));
+                                schedules.forEach(sch => {
+                                if (!memberIds.has(sch.warga_id)) {
+                                loopItems.push(sch);
+                                }
+                                });
+                                } else {
+                                loopItems = schedules;
+                                }
+
+                                loopItems.forEach(item => {
+                                let s = schedules.find(sc => sc.warga_id === (item.warga_id || item.id));
+                                if (!s) {
+                                s = {
+                                id: '',
+                                warga_id: item.id,
+                                nama: item.nama,
+                                blok: item.blok,
+                                nomor_rumah: item.nomor_rumah,
+                                status: '',
+                                denda: 0,
+                                foto_bukti: []
+                                };
+                                }
+                                %>
                                 <li class="flex justify-between items-center">
                                     <div class="flex-grow">
-                                        <div class="text-sm font-medium text-gray-900">
+                                        <div class="text-sm font-medium text-gray-100">
                                             <%= s.nama %>
                                         </div>
-                                        <div class="text-xs text-gray-500">Blok <%= s.blok %>-<%= s.nomor_rumah %>
+                                        <div class="text-xs text-gray-400">Blok <%= s.blok %>-<%= s.nomor_rumah %>
                                         </div>
-                                        <% if(s.status !=='scheduled' ) { %>
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
+                                        <% const isGuest=teamMembers && teamMembers.length> 0 && !teamMembers.some(m =>
+                                            m.id === (item.warga_id || item.id));
+                                            if (isGuest) {
+                                            %>
+                                            <div class="text-[10px] text-red-500 font-bold mt-0.5">Ganti Hari Minggu
+                                                Kemarin</div>
+                                            <% } %>
+                                                <% if(s.status !=='scheduled' ) { %>
+                                                    <span
+                                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
                                         <%= s.status === 'hadir' ? 'bg-green-100 text-green-800' : 
                                            (s.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') %>">
-                                                <%= s.status %>
-                                            </span>
-                                            <% } %>
-                                                <% if(s.denda> 0) { %>
-                                                    <div class="text-xs text-red-600 font-bold mt-1">Denda: Rp <%=
-                                                            s.denda.toLocaleString('id-ID') %>
-                                                    </div>
+                                                        <%= s.status %>
+                                                    </span>
                                                     <% } %>
-
-                                                        <!-- Display Photos -->
-                                                        <% if(s.foto_bukti) { let photos=[]; try {
-                                                            photos=JSON.parse(s.foto_bukti); } catch(e) {}
-                                                            if(photos.length> 0) {
-                                                            const safePhotos = JSON.stringify(photos).replace(/\\/g,
-                                                            '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                                                            %>
-                                                            <div class="mt-2 flex overflow-x-auto space-x-2 pb-2">
-                                                                <% photos.forEach((photo, index)=> { %>
-                                                                    <img src="/uploads/ronda/<%= photo %>"
-                                                                        onclick="openCarousel('<%- safePhotos %>', <%= index %>)"
-                                                                        class="h-12 w-12 object-cover rounded-lg border
-                                                                        border-gray-200 hover:opacity-75
-                                                                        cursor-pointer">
-                                                                    <% }) %>
+                                                        <% if(s.denda> 0) { %>
+                                                            <div class="text-xs text-red-600 font-bold mt-1">Denda: Rp
+                                                                <%= s.denda.toLocaleString('id-ID') %>
                                                             </div>
-                                                            <% } } %>
+                                                            <% } %>
+
+                                                                <!-- Display Photos -->
+                                                                <% if(s.foto_bukti) { let photos=[]; try {
+                                                                    photos=(s.parsedPhotos||[]); } catch(e) {} if(photos
+                                                                    && photos.length> 0) {
+                                                                    const safePhotosJson =
+                                                                    JSON.stringify(photos).replace(/'/g,
+                                                                    "&apos;");
+                                                                    %>
+                                                                    <div
+                                                                        class="mt-2 text-[10px] text-gray-500 font-bold">
+                                                                        Files:
+                                                                        <%= photos.length %>
+                                                                    </div>
+                                                                    <div class="mt-2 flex overflow-x-auto space-x-2 pb-2"
+                                                                        data-photos='<%- safePhotosJson %>'>
+                                                                        <% photos.forEach((photo, index)=> {
+                                                                            if(!photo || typeof photo !== 'string')
+                                                                            return;
+                                                                            const isVideo =
+                                                                            photo.match(/\.(mp4|mov|avi|webm)$/i);
+                                                                            %>
+                                                                            <% if(isVideo) { %>
+                                                                                <div onclick="openCarouselFromData(this, <%= index %>)"
+                                                                                    class="h-12 w-12 relative cursor-pointer rounded-lg border border-gray-200 hover:opacity-75 bg-black flex items-center justify-center shrink-0">
+                                                                                    <video
+                                                                                        src="/uploads/ronda/<%= photo %>#t=1.0"
+                                                                                        class="h-full w-full object-cover opacity-60 absolute inset-0 z-0"
+                                                                                        preload="metadata"></video>
+                                                                                    <svg class="w-6 h-6 text-white z-10"
+                                                                                        fill="currentColor"
+                                                                                        viewBox="0 0 20 20">
+                                                                                        <path fill-rule="evenodd"
+                                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                                                                            clip-rule="evenodd" />
+                                                                                    </svg>
+                                                                                </div>
+                                                                                <% } else { %>
+                                                                                    <img src="/uploads/ronda/<%= photo %>"
+                                                                                        onclick="openCarouselFromData(this, <%= index %>)"
+                                                                                        class="h-12 w-12 object-cover rounded-lg border
+                                                                            border-gray-200 hover:opacity-75
+                                                                            cursor-pointer shrink-0">
+                                                                                    <% } %>
+                                                                                        <% }) %>
+                                                                    </div>
+                                                                    <% } } %>
                                     </div>
 
-                                    <div class="flex flex-col items-end space-y-2">
+                                    <div class="flex items-center gap-2">
                                         <% if(user.role !=='warga' || (user.warga_id===s.warga_id && (isToday ||
                                             isThisWeek))) { %>
-                                            <% if(s.status==='scheduled' || s.status==='reschedule' ) { %>
+                                            <% if((s.status==='scheduled' || s.status==='reschedule' || s.status==='' )
+                                                && s.id) { %>
                                                 <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
-                                                    class="text-indigo-600 hover:text-indigo-900 text-xs font-medium">Update</button>
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all">
+                                                    ✓ Absensi
+                                                </button>
                                                 <% } %>
                                                     <% if(s.denda> 0) { %>
                                                         <form action="/ronda/pay-fine" method="POST" class="inline"
                                                             onsubmit="return confirm('Bayar denda?')">
                                                             <input type="hidden" name="id" value="<%= s.id %>">
                                                             <button type="submit"
-                                                                class="text-green-600 hover:text-green-900 text-xs font-medium">Bayar</button>
+                                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all">
+                                                                💰 Bayar
+                                                            </button>
                                                         </form>
                                                         <% } %>
                                                             <% } %>
 
                                                                 <!-- Upload Foto Button -->
-                                                                <% if(isToday || isThisWeek || s.status==='hadir' ) { %>
+                                                                <% if((user.role==='admin' || isToday || isThisWeek ||
+                                                                    s.status==='hadir' ) && s.id) { %>
                                                                     <button
                                                                         onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
-                                                                        class="text-blue-600 hover:text-blue-900 text-xs font-medium">
-                                                                        📷 Upload
+                                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all">
+                                                                        📷 Capture
                                                                     </button>
                                                                     <% } %>
                                     </div>
@@ -255,7 +380,7 @@
         <!-- Status Modal -->
         <div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Update Status Ronda</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-4">Absensi Ronda</h3>
                 <form action="/ronda/update-status" method="POST">
                     <input type="hidden" id="scheduleId" name="id">
                     <div class="mb-4">
@@ -289,16 +414,16 @@
         <!-- Upload Modal -->
         <div id="uploadModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Upload Foto Bukti Ronda</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-4">Upload Foto Bukti Ronda</h3>
                 <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Nama: <span id="uploadWargaName"
                                 class="font-bold"></span></label>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Pilih Foto (Max 10)</label>
-                        <input type="file" name="foto_bukti" multiple accept="image/*" required
-                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        <label class="block text-sm font-medium text-gray-700">Pilih Foto/Video (Max 10)</label>
+                        <input type="file" name="foto_bukti" multiple accept="image/*,video/*" required
+                            class="mt-1 block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                     </div>
                     <div class="flex justify-end">
                         <button type="button" onclick="document.getElementById('uploadModal').classList.add('hidden')"
@@ -332,8 +457,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
             </button>
-            <div class="relative max-w-4xl max-h-screen p-4">
-                <img id="carouselImage" src="" class="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl">
+            <div class="relative max-w-4xl max-h-screen p-4 flex justify-center items-center">
+                <img id="carouselImage" src=""
+                    class="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl hidden">
+                <video id="carouselVideo" src=""
+                    class="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl hidden" controls></video>
                 <div id="carouselCounter"
                     class="absolute bottom-[-30px] left-1/2 transform -translate-x-1/2 text-white font-medium"></div>
 
@@ -360,6 +488,14 @@
 
 
 
+            function openCarouselFromData(element, index) {
+                const parent = element.closest('[data-photos]');
+                if (parent) {
+                    const photosJson = parent.getAttribute('data-photos');
+                    openCarousel(photosJson, index);
+                }
+            }
+
             function openCarousel(photosJson, startIndex = 0) {
                 try {
                     currentPhotos = JSON.parse(photosJson);
@@ -381,11 +517,28 @@
                 if (index < 0) index = currentPhotos.length - 1;
                 if (index >= currentPhotos.length) index = 0;
                 currentIndex = index;
-                document.getElementById('carouselImage').src = '/uploads/ronda/' + currentPhotos[currentIndex];
+
+                const filename = currentPhotos[currentIndex];
+                const isVideo = filename.match(/\.(mp4|mov|avi|webm)$/i);
+
+                const img = document.getElementById('carouselImage');
+                const vid = document.getElementById('carouselVideo');
+
+                vid.pause();
+
+                if (isVideo) {
+                    img.classList.add('hidden');
+                    vid.classList.remove('hidden');
+                    vid.src = '/uploads/ronda/' + filename;
+                } else {
+                    vid.classList.add('hidden');
+                    img.classList.remove('hidden');
+                    img.src = '/uploads/ronda/' + filename;
+                }
+
                 document.getElementById('carouselCounter').innerText = (currentIndex + 1) + ' / ' + currentPhotos.length;
 
                 // Update delete form filename
-                const filename = currentPhotos[currentIndex];
                 document.getElementById('deleteFilename').value = filename;
             }
 
@@ -421,6 +574,58 @@
                 document.getElementById('uploadForm').action = '/ronda/upload-condition/' + date;
                 document.getElementById('uploadWargaName').innerText = 'Kondisi Ronda (' + date + ')';
                 document.getElementById('uploadModal').classList.remove('hidden');
+            }
+        </script>
+
+        <script>
+            async function shareSchedule(date, btn) {
+                const originalText = btn.innerHTML;
+
+                if (typeof html2canvas === 'undefined') {
+                    alert('Fitur share sedang dimuat, coba sesaat lagi.');
+                    return;
+                }
+
+                const card = document.getElementById('card-' + date);
+                if (!card) return;
+
+                // Processing...
+                btn.innerHTML = '⏳ ...';
+                btn.disabled = true;
+
+                try {
+                    const canvas = await html2canvas(card, { scale: 2, useCORS: true, logging: false });
+
+                    canvas.toBlob(async (blob) => {
+                        const formData = new FormData();
+                        formData.append('image', blob, 'schedule-' + date + '.png');
+
+                        const response = await fetch('/ronda/share-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            if (result.shareId) {
+                                window.location.href = `/ronda/v/${result.shareId}`;
+                            } else {
+                                window.location.href = `/ronda/view?date=${date}&img=${result.filename}`;
+                            }
+                        } else {
+                            alert('Gagal generate view: ' + (result.error || 'Unknown error'));
+                        }
+
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 'image/png');
+
+                } catch (e) {
+                    console.error(e);
+                    alert('Error processing view');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         </script>
 

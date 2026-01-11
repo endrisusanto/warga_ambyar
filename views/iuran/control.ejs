@@ -1,0 +1,97 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="min-h-screen bg-gray-50 pb-20">
+            <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900">Monitoring Pembayaran <%= year %>
+                    </h1>
+                    <div class="flex space-x-2">
+                        <select onchange="window.location.href='/iuran/control?year='+this.value"
+                            class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            <% for(let y=2024; y <=parseInt(new Date().getFullYear()) + 1; y++) { %>
+                                <option value="<%= y %>" <%=y==year ? 'selected' : '' %>><%= y %>
+                                </option>
+                                <% } %>
+                        </select>
+                        <a href="/iuran"
+                            class="px-4 py-2 border border-gray-300 bg-white rounded-md text-gray-700 hover:bg-gray-50 text-sm font-medium">Kembali</a>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-3 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 w-48 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                                    Warga</th>
+                                <th
+                                    class="px-3 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-12 sticky left-48 bg-gray-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                                    Blok</th>
+                                <% ['Jan', 'Feb' , 'Mar' , 'Apr' , 'Mei' , 'Jun' , 'Jul' , 'Agt' , 'Sep' , 'Okt' , 'Nov'
+                                    , 'Des' ].forEach(m=> { %>
+                                    <th
+                                        class="px-2 py-3 text-center font-medium text-gray-500 uppercase tracking-wider border-l border-gray-100 min-w-[60px]">
+                                        <%= m %>
+                                    </th>
+                                    <% }) %>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% warga.forEach(w=> { %>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td
+                                        class="px-3 py-2 whitespace-nowrap font-medium text-gray-900 sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                                        <%= w.nama %>
+                                    </td>
+                                    <td
+                                        class="px-3 py-2 whitespace-nowrap text-gray-500 sticky left-48 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                                        <%= w.blok %>/<%= w.nomor_rumah %>
+                                    </td>
+
+                                    <% matrix[w.id].forEach(status=> { %>
+                                        <td class="px-2 py-2 whitespace-nowrap text-center border-l border-gray-300">
+                                            <div class="flex justify-center space-x-1">
+                                                <!-- KAS -->
+                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-sm
+                                        <%= status.kas === 'lunas' ? 'bg-green-500' : 
+                                            status.kas === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
+                                            status.kas ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                                    title="Kas: <%= status.kas ? status.kas.replace('_', ' ') : 'Belum Ditagih' %>">
+                                                    K
+                                                </div>
+                                                <!-- SAMPAH -->
+                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-sm
+                                        <%= status.sampah === 'lunas' ? 'bg-green-500' : 
+                                            status.sampah === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
+                                            status.sampah ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                                    title="Sampah: <%= status.sampah ? status.sampah.replace('_', ' ') : 'Belum Ditagih' %>">
+                                                    S
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <% }) %>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-500 bg-white p-4 rounded-lg shadow-sm">
+                    <div class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span> Lunas
+                    </div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
+                        Menunggu Konfirmasi</div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span> Belum
+                        Lunas (Ada Tagihan)</div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-gray-200 rounded-full mr-2"></span> Belum
+                        Ditagih</div>
+                    <div class="ml-4 font-bold">K = Keamanan/Kas, S = Sampah</div>
+                </div>
+
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

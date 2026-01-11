@@ -1,0 +1,185 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <style>
+            /* Custom Quill Editor Styling for Dark Theme */
+            .ql-toolbar.ql-snow {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .ql-container.ql-snow {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-top: none !important;
+                border-radius: 0 0 12px 12px;
+                color: #f3f4f6;
+            }
+
+            /* Toolbar buttons */
+            .ql-toolbar.ql-snow .ql-stroke {
+                stroke: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow .ql-fill {
+                fill: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow .ql-picker-label {
+                color: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow button:hover,
+            .ql-toolbar.ql-snow button:focus,
+            .ql-toolbar.ql-snow button.ql-active {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+            }
+
+            .ql-toolbar.ql-snow button:hover .ql-stroke,
+            .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+                stroke: #ffffff !important;
+            }
+
+            .ql-toolbar.ql-snow button:hover .ql-fill,
+            .ql-toolbar.ql-snow button.ql-active .ql-fill {
+                fill: #ffffff !important;
+            }
+
+            /* Dropdown menus */
+            .ql-snow .ql-picker-options {
+                background: rgba(30, 30, 40, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+            }
+
+            .ql-snow .ql-picker-item {
+                color: #e5e7eb;
+            }
+
+            .ql-snow .ql-picker-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: #ffffff;
+            }
+
+            /* Editor content area */
+            .ql-editor {
+                color: #f3f4f6;
+                min-height: 400px;
+            }
+
+            .ql-editor.ql-blank::before {
+                color: #9ca3af;
+            }
+
+            /* Tooltip */
+            .ql-snow .ql-tooltip {
+                background: rgba(30, 30, 40, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #e5e7eb;
+                border-radius: 8px;
+            }
+
+            .ql-snow .ql-tooltip input[type=text] {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #f3f4f6;
+                border-radius: 6px;
+                padding: 6px 10px;
+            }
+
+            .ql-snow .ql-tooltip a.ql-action::after,
+            .ql-snow .ql-tooltip a.ql-remove::before {
+                color: #60a5fa;
+            }
+        </style>
+
+        <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 m-4">
+                <h2 class="text-3xl font-bold text-gray-100 mb-8 flex items-center gap-3">
+                    <span class="text-4xl">📝</span>
+                    Tulis Info / Notulensi Musyawarah
+                </h2>
+
+                <form action="/musyawarah/store" method="POST" enctype="multipart/form-data">
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Judul / Topik</label>
+                        <input type="text" name="judul" required
+                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Tanggal Meeting</label>
+                        <input type="date" name="tanggal" required
+                            class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Konten / Hasil Meeting</label>
+                        <div id="editor" style="height: 400px;"
+                            class="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10"></div>
+                        <input type="hidden" name="konten" id="konten">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Lampiran (Bukti/Foto/PDF) -
+                            Optional</label>
+                        <input type="file" name="lampiran"
+                            class="glass-input w-full py-3 px-4 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                    </div>
+
+                    <div class="flex items-center justify-end gap-4">
+                        <a href="/musyawarah"
+                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg transform transition hover:-translate-y-0.5">
+                            💾 Simpan & Publish
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <script>
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                        ['blockquote', 'code-block'],
+
+                        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                        [{ 'direction': 'rtl' }],                         // text direction
+
+                        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+
+                        ['clean'],                                         // remove formatting button
+                        ['link', 'image'] // link and image
+                    ]
+                }
+            });
+
+            document.querySelector('form').onsubmit = function () {
+                // Populate hidden input with HTML content
+                document.querySelector('#konten').value = quill.root.innerHTML;
+            };
+        </script>
+
+        <%- include('../partials/footer') %>

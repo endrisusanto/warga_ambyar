@@ -84,6 +84,13 @@ const Iuran = {
             [warga_id]
         );
         return rows[0].unpaid === 0 ? 'lunas' : 'menunggak';
+    },
+    getUnpaidDetails: async (warga_id) => {
+        const [rows] = await db.query(
+            "SELECT periode, jenis, jumlah FROM iuran WHERE warga_id = ? AND status != 'lunas' ORDER BY periode DESC",
+            [warga_id]
+        );
+        return rows;
     }
 };
 

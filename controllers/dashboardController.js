@@ -4,6 +4,7 @@ const Iuran = require('../models/Iuran');
 const Ronda = require('../models/Ronda');
 
 exports.index = async (req, res) => {
+    console.log('===== DASHBOARD INDEX CALLED =====');
     const data = {
         title: 'Dashboard',
         saldo: 0,
@@ -65,10 +66,14 @@ exports.index = async (req, res) => {
 
                 // Determine status iuran
                 let status_iuran = 'lunas';
+                let unpaid_details = [];
                 const iuranTarget = house.head || (house.residents.length > 0 ? house.residents[0] : null);
                 if (iuranTarget) {
                     try {
                         status_iuran = await Iuran.getStatusByHouse(iuranTarget.id);
+                        if (status_iuran === 'menunggak') {
+                            unpaid_details = await Iuran.getUnpaidDetails(iuranTarget.id);
+                        }
                     } catch (e) {
                         console.error(`Error fetching Iuran for ${key}:`, e.message);
                         require('fs').appendFileSync('debug.log', `ERROR Iuran for ${key}: ${e.message}\n`);
@@ -89,17 +94,14 @@ exports.index = async (req, res) => {
                     residents: house.residents,
                     head_name: head ? head.nama : 'Unknown',
                     status_huni: (head ? head.status_huni : (house.residents.length > 0 ? house.residents[0].status_huni : 'kosong')).toLowerCase(),
-                    status_iuran: status_iuran
+                    status_iuran: status_iuran,
+                    unpaid_details: unpaid_details
                 });
             }
 
-            // require('fs').appendFileSync('debug.log', `DEBUG: mapData count: ${mapData.length}\n`); // Removed debug log
-            // if (mapData.length > 0) { // Removed debug log
-            //     require('fs').appendFileSync('debug.log', `DEBUG: mapData keys: ${mapData.map(m => `${m.blok}-${m.nomor_rumah}`).join(', ')}\n`); // Removed debug log
-            // }
 
-            // console.log('MapData count:', mapData.length); // Removed debug log
-            // console.log('Sample mapData:', mapData.slice(0, 3)); // Removed debug log
+            console.log('MapData count:', data.mapData.length);
+            console.log('Sample mapData:', data.mapData.slice(0, 3));
         } catch (e) {
             console.error('Error fetching Map data:', e.message);
             require('fs').appendFileSync('debug.log', `ERROR Map: ${e.message}\n`);
@@ -165,6 +167,35 @@ exports.addEvent = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal menambahkan event');
+        res.redirect('/dashboard');
+    }
+};
+
+exports.editEvent = async (req, res) => {
+    try {
+        const Event = require('../models/Event');
+        const { id } = req.params;
+        const { title, description, date, location } = req.body;
+        await Event.update(id, { title, description, date, location });
+        req.flash('success_msg', 'Event berhasil diperbarui');
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal memperbarui event');
+        res.redirect('/dashboard');
+    }
+};
+
+exports.deleteEvent = async (req, res) => {
+    try {
+        const Event = require('../models/Event');
+        const { id } = req.params;
+        await Event.delete(id);
+        req.flash('success_msg', 'Event berhasil dihapus');
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal menghapus event');
         res.redirect('/dashboard');
     }
 };

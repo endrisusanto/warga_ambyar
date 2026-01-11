@@ -1,15 +1,15 @@
 const db = require('../config/db');
 
 const Kas = {
-    add: async (tipe, jumlah, keterangan, tanggal) => {
+    add: async (tipe, jumlah, keterangan, tanggal, bukti_foto = null) => {
         const [result] = await db.query(
-            'INSERT INTO kas (tipe, jumlah, keterangan, tanggal) VALUES (?, ?, ?, ?)',
-            [tipe, jumlah, keterangan, tanggal]
+            'INSERT INTO kas (tipe, jumlah, keterangan, tanggal, bukti_foto) VALUES (?, ?, ?, ?, ?)',
+            [tipe, jumlah, keterangan, tanggal, bukti_foto]
         );
         return result.insertId;
     },
     getAll: async () => {
-        const [rows] = await db.query('SELECT * FROM kas ORDER BY tanggal DESC');
+        const [rows] = await db.query('SELECT * FROM kas ORDER BY tanggal DESC, id DESC');
         return rows;
     },
     getBalance: async () => {

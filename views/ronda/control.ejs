@@ -1,0 +1,130 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="flex items-center space-x-4">
+                        <a href="/ronda" class="text-gray-400 hover:text-gray-200 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                        </a>
+                        <h1 class="text-3xl font-bold text-gray-100 flex items-center gap-3">
+                            <span class="text-4xl">📋</span>
+                            Control Absensi Ronda
+                        </h1>
+                    </div>
+
+                    <form method="GET" class="flex space-x-2 glass-card p-3">
+                        <select name="month"
+                            class="glass-input block w-full px-3 py-2 text-sm text-gray-100 rounded-xl">
+                            <% moment.months().forEach((m, i)=> { %>
+                                <option value="<%= String(i + 1).padStart(2, '0') %>" <%=parseInt(month)===i + 1
+                                    ? 'selected' : '' %>><%= m %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <select name="year" class="glass-input block w-full px-3 py-2 text-sm text-gray-100 rounded-xl">
+                            <% for(let y=2024; y <=2030; y++) { %>
+                                <option value="<%= y %>" <%=parseInt(year)===y ? 'selected' : '' %>><%= y %>
+                                </option>
+                                <% } %>
+                        </select>
+                        <button type="submit"
+                            class="inline-flex items-center px-6 py-2 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg transition-all">
+                            🔍 Filter
+                        </button>
+                    </form>
+                </div>
+
+                <div class="glass-card p-0 overflow-hidden m-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white/10">
+                            <thead class="bg-white/5 backdrop-blur-xl">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider sticky left-0 bg-white/10 backdrop-blur-xl z-10 border-r border-white/10">
+                                        Warga
+                                    </th>
+                                    <% saturdays.forEach(d=> { %>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            <%= moment(d).format('DD MMM') %>
+                                        </th>
+                                        <% }) %>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white/5 backdrop-blur-xl divide-y divide-white/10">
+                                <% Object.keys(matrix).forEach(wId=> {
+                                    const row = matrix[wId];
+                                    %>
+                                    <tr class="hover:bg-white/10 transition-colors">
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap sticky left-0 bg-white/10 backdrop-blur-xl z-10 border-r border-white/10">
+                                            <div class="flex items-center">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-100">
+                                                        <%= row.info.nama %>
+                                                    </div>
+                                                    <div class="text-xs text-gray-400">
+                                                        Blok <%= row.info.blok %>-<%= row.info.nomor_rumah %>
+                                                                <span
+                                                                    class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                                                                    Tim <%= row.info.tim_ronda || '-' %>
+                                                                </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <% saturdays.forEach(d=> {
+                                            const cell = row.dates[d];
+                                            // Check rule: Scheduled, Absent, > 3 weeks late
+                                            const isLate = cell.status === 'scheduled' && moment(d).add(3,
+                                            'weeks').isBefore(moment(), 'day');
+                                            %>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                                <% if (cell.status) { %>
+                                                    <span class="inline-flex flex-col items-center">
+                                                        <span
+                                                            class="px-2 py-1 rounded text-xs font-bold uppercase
+                                            <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : 
+                                               (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' :
+                                               (cell.status === 'alpa' ? 'bg-red-100 text-red-800' : 
+                                               (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>">
+                                                            <%= cell.status %>
+                                                        </span>
+                                                        <% if (isLate) { %>
+                                                            <span
+                                                                class="text-[10px] text-red-600 font-bold mt-1 bg-red-50 px-1 rounded border border-red-200">
+                                                                ⚠ DENDA
+                                                            </span>
+                                                            <% } %>
+                                                                <% if (cell.denda> 0) { %>
+                                                                    <span class="text-[10px] text-red-500 mt-0.5">Rp<%=
+                                                                            cell.denda.toLocaleString() %></span>
+                                                                    <% } %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="text-gray-300">-</span>
+                                                        <% } %>
+                                            </td>
+                                            <% }) %>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                        <div class="text-xs text-gray-500">
+                            <strong>Aturan Denda:</strong> Warga yang tidak hadir jadwal ronda dan tidak melakukan
+                            reschedule sampai 3 minggu berikutnya akan dikenakan sanksi denda.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

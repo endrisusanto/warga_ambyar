@@ -1,13 +1,407 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title != 'undefined' ? title : 'Gang Ambyar' %></title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+
+    <!-- Primary Meta Tags -->
+    <title>
+        <%= typeof title !='undefined' ? title : 'Gang Ambyar' %>
+    </title>
+    <meta name="title"
+        content="<%= typeof title !='undefined' ? title : 'Gang Ambyar - Sistem Manajemen Warga Cerdas' %>">
+    <meta name="description"
+        content="<%= typeof description !='undefined' ? description : 'Sistem manajemen warga modern untuk pengelolaan iuran, jadwal ronda, keuangan, dan musyawarah komunitas. Kelola lingkungan Anda dengan lebih efisien.' %>">
+    <meta name="keywords"
+        content="manajemen warga, sistem RT/RW, iuran warga, jadwal ronda, keuangan komunitas, musyawarah">
+    <meta name="author" content="Gang Ambyar">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url"
+        content="<%= typeof ogUrl !='undefined' ? ogUrl : process.env.APP_URL || 'https://ambyar.endrisusanto.my.id' %>">
+    <meta property="og:title"
+        content="<%= typeof title !='undefined' ? title : 'Gang Ambyar - Sistem Manajemen Warga Cerdas' %>">
+    <meta property="og:description"
+        content="<%= typeof description !='undefined' ? description : 'Sistem manajemen warga modern untuk pengelolaan iuran, jadwal ronda, keuangan, dan musyawarah komunitas.' %>">
+    <meta property="og:image"
+        content="<%= typeof ogImage !='undefined' ? ogImage : (process.env.APP_URL || 'https://ambyar.endrisusanto.my.id') + '/og-image.png' %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url"
+        content="<%= typeof ogUrl !='undefined' ? ogUrl : process.env.APP_URL || 'https://ambyar.endrisusanto.my.id' %>">
+    <meta property="twitter:title"
+        content="<%= typeof title !='undefined' ? title : 'Gang Ambyar - Sistem Manajemen Warga Cerdas' %>">
+    <meta property="twitter:description"
+        content="<%= typeof description !='undefined' ? description : 'Sistem manajemen warga modern untuk pengelolaan iuran, jadwal ronda, keuangan, dan musyawarah komunitas.' %>">
+    <meta property="twitter:image"
+        content="<%= typeof ogImage !='undefined' ? ogImage : (process.env.APP_URL || 'https://ambyar.endrisusanto.my.id') + '/og-image.png' %>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-surface: rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #starfield-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .lens-flare {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(100, 200, 255, 0.1) 30%, transparent 70%);
+            filter: blur(20px);
+            mix-blend-mode: screen;
+        }
+
+        /* Monochrome Dark Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            transition: all 0.2s ease;
+            color: #e5e7eb;
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            outline: none;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            transition: all 0.2s ease;
+            color: #e5e7eb;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .glass-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .glass-table tr:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        /* Navbar & Footer */
+        nav.glass-nav {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer.glass-footer {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Typography - Monochrome */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: #f9fafb;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        p,
+        span,
+        div,
+        a {
+            color: #d1d5db;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Select Dropdown Styling */
+        select.glass-input,
+        select[class*="glass-input"] {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #f3f4f6;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23e5e7eb' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        /* Dropdown options */
+        select.glass-input option,
+        select[class*="glass-input"] option {
+            background-color: #1f2937;
+            color: #f3f4f6;
+            padding: 8px;
+        }
+
+        select.glass-input option:hover,
+        select[class*="glass-input"] option:hover {
+            background-color: #374151;
+        }
+
+        select.glass-input option:checked,
+        select[class*="glass-input"] option:checked {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+            html {
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+<body class="flex flex-col min-h-screen text-gray-800">
+    <!-- Starfield Canvas -->
+    <canvas id="starfield-canvas"></canvas>
+
+    <!-- Lens Flare Effect -->
+    <div class="lens-flare" id="lensFlare"></div>
+
+    <!-- Interactive Starfield Script -->
+    <script>
+        (function () {
+            const canvas = document.getElementById('starfield-canvas');
+            const ctx = canvas.getContext('2d');
+            const lensFlare = document.getElementById('lensFlare');
+
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            const stars = [];
+            const numStars = 200;
+            const mouse = { x: -1000, y: -1000 };
+            const avoidRadius = 150;
+
+            // Detect mobile
+            const isMobile = window.innerWidth < 768;
+            const sizeMultiplier = isMobile ? 0.5 : 1;
+
+            class Star {
+                constructor() {
+                    this.reset();
+                    this.y = Math.random() * height;
+                }
+
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+
+                    // Random direction for movement (360 degrees)
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 0.3 + 0.1;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+
+                    this.radius = (Math.random() * 1.5 + 0.5) * sizeMultiplier;
+                    this.opacity = Math.random() * 0.5 + 0.5;
+                    this.twinkleSpeed = Math.random() * 0.02 + 0.01;
+                    this.twinkle = 0;
+                }
+
+                update() {
+                    // Mouse avoidance
+                    const dx = this.x - mouse.x;
+                    const dy = this.y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < avoidRadius) {
+                        const force = (avoidRadius - dist) / avoidRadius;
+                        const angle = Math.atan2(dy, dx);
+                        this.vx += Math.cos(angle) * force * 0.5;
+                        this.vy += Math.sin(angle) * force * 0.5;
+                    }
+
+                    // Apply velocity with damping
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+
+                    // Add slight random drift to maintain movement
+                    this.vx += (Math.random() - 0.5) * 0.01;
+                    this.vy += (Math.random() - 0.5) * 0.01;
+
+                    // Twinkle effect
+                    this.twinkle += this.twinkleSpeed;
+
+                    // Wrap around edges (all directions)
+                    if (this.x < -10) this.x = width + 10;
+                    if (this.x > width + 10) this.x = -10;
+                    if (this.y < -10) this.y = height + 10;
+                    if (this.y > height + 10) this.y = -10;
+                }
+
+                draw() {
+                    const twinkleOpacity = this.opacity * (0.7 + Math.sin(this.twinkle) * 0.3);
+
+                    // Glow effect
+                    ctx.beginPath();
+                    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 3);
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${twinkleOpacity})`);
+                    gradient.addColorStop(0.3, `rgba(200, 220, 255, ${twinkleOpacity * 0.5})`);
+                    gradient.addColorStop(1, 'rgba(100, 150, 255, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Core
+                    ctx.beginPath();
+                    ctx.fillStyle = `rgba(255, 255, 255, ${twinkleOpacity})`;
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Initialize stars
+            for (let i = 0; i < numStars; i++) {
+                stars.push(new Star());
+            }
+
+            // Mouse tracking
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+
+                // Lens flare effect
+                lensFlare.style.left = (e.clientX - 150) + 'px';
+                lensFlare.style.top = (e.clientY - 150) + 'px';
+                lensFlare.style.opacity = '0.6';
+
+                clearTimeout(lensFlare.fadeTimer);
+                lensFlare.fadeTimer = setTimeout(() => {
+                    lensFlare.style.opacity = '0';
+                }, 100);
+            });
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                stars.forEach(star => {
+                    star.update();
+                    star.draw();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+
+                // Reinitialize stars on resize
+                const newIsMobile = window.innerWidth < 768;
+                if (newIsMobile !== isMobile) {
+                    stars.length = 0;
+                    for (let i = 0; i < numStars; i++) {
+                        stars.push(new Star());
+                    }
+                }
+            });
+
+            animate();
+        })();
+    </script>
+
+    <div
+        class="fixed inset-0 pointer-events-none z-[-1] bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 opacity-80 mix-blend-overlay">
+    </div>
