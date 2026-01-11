@@ -199,3 +199,64 @@ exports.deleteEvent = async (req, res) => {
         res.redirect('/dashboard');
     }
 };
+
+// Share Event Logic
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const shareDir = './public/uploads/shares/events/';
+if (!fs.existsSync(shareDir)) {
+    fs.mkdirSync(shareDir, { recursive: true });
+}
+
+const shareStorage = multer.diskStorage({
+    destination: shareDir,
+    filename: function (req, file, cb) {
+        cb(null, 'event-share-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+    }
+});
+const uploadShare = multer({ storage: shareStorage }).single('image');
+
+exports.uploadShareImage = (req, res) => {
+    uploadShare(req, res, async (err) => {
+        if (err) return res.json({ success: false, error: err.message });
+        if (!req.file) return res.json({ success: false, error: 'No file uploaded' });
+
+        try {
+            const Event = require('../models/Event');
+            // Check if we can link it to an event (optional, based on filename or passed ID if we adjust frontend)
+            // For now, let's just create the share record.
+            // Ideally we pass eventId in body.
+            const eventId = req.body.eventId || null;
+
+            const shareId = await Event.createShare(eventId, req.file.filename);
+            res.json({ success: true, filename: req.file.filename, shareId });
+        } catch (e) {
+            console.error(e);
+            res.json({ success: true, filename: req.file.filename }); // Fallback without DB record if error
+        }
+    });
+};
+
+exports.viewPublicEvent = async (req, res) => {
+    try {
+        const Event = require('../models/Event');
+        const shareId = req.params.id;
+        const share = await Event.getShare(shareId);
+
+        if (!share) {
+            return res.status(404).send('Link tidak valid atau sudah kadaluarsa');
+        }
+
+        const moment = require('moment');
+        res.render('dashboard/public_event', {
+            title: share.judul || 'Pengumuman Warga',
+            share,
+            moment
+        });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('Error loading page');
+    }
+};

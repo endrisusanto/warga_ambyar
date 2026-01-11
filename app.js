@@ -64,6 +64,7 @@ app.use('/dashboard', require('./routes/dashboard'));
 app.use('/activity', require('./routes/activity'));
 app.use('/keuangan', require('./routes/keuangan'));
 app.use('/musyawarah', require('./routes/musyawarah'));
+app.use('/share', require('./routes/share'));
 
 // Start Server
 app.listen(PORT, '0.0.0.0', () => {

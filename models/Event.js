@@ -30,6 +30,22 @@ const Event = {
     },
     delete: async (id) => {
         await db.query('DELETE FROM agenda WHERE id = ?', [id]);
+    },
+    createShare: async (eventId, filename) => {
+        const [result] = await db.query(
+            'INSERT INTO event_shares (event_id, image_filename) VALUES (?, ?)',
+            [eventId, filename]
+        );
+        return result.insertId;
+    },
+    getShare: async (id) => {
+        const [rows] = await db.query(`
+            SELECT es.*, a.judul, a.tanggal, a.lokasi, a.keterangan 
+            FROM event_shares es
+            LEFT JOIN agenda a ON es.event_id = a.id
+            WHERE es.id = ?
+        `, [id]);
+        return rows[0];
     }
 };
 

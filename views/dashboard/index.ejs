@@ -473,7 +473,62 @@
                             <div
                                 class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
                                 <button type="button" onclick="closeEventDetail()"
-                                    class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-200 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Tutup</button>
+                                    class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Tutup</button>
+
+                                <button type="button" onclick="shareEventViaWA(currentEvent)" id="btn-share-wa"
+                                    class="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-lg border border-green-500/30 px-4 py-2 bg-green-600/20 text-base font-bold text-green-400 hover:bg-green-600/30 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-all">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                                    </svg>
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Template for Capture -->
+                <div id="capture-container" class="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none w-[600px]">
+                    <div id="capture-card"
+                        class="bg-gray-900 border border-white/10 p-8 rounded-xl relative overflow-hidden">
+                        <!-- Branding -->
+                        <div class="absolute top-0 right-0 p-4">
+                            <div class="text-right">
+                                <h1 class="text-xl font-bold text-white tracking-widest uppercase">Warga Ambyar</h1>
+                                <p class="text-xs text-gray-400">Sistem Informasi RT</p>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Orbs -->
+                        <div
+                            class="absolute top-[-20%] left-[-10%] w-[150px] h-[150px] bg-indigo-500/30 rounded-full blur-[60px]">
+                        </div>
+                        <div
+                            class="absolute bottom-[-20%] right-[-10%] w-[150px] h-[150px] bg-purple-500/30 rounded-full blur-[60px]">
+                        </div>
+
+                        <!-- Content -->
+                        <div class="relative z-10 mt-8">
+                            <div class="inline-block px-3 py-1 rounded-md bg-white/10 text-indigo-300 text-xs font-bold uppercase tracking-wide mb-4 border border-white/5"
+                                id="capture-date"></div>
+
+                            <h2 class="text-3xl font-bold text-white mb-4 leading-tight" id="capture-title"></h2>
+
+                            <div class="flex items-center text-gray-400 mb-6 text-sm" id="capture-location-container">
+                                <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span id="capture-location"></span>
+                            </div>
+
+                            <div class="bg-white/5 p-6 rounded-lg border border-white/10 text-gray-200 text-base leading-relaxed whitespace-pre-wrap font-medium"
+                                id="capture-desc">
                             </div>
                         </div>
                     </div>
@@ -538,11 +593,15 @@
                     </div>
                 </div>
 
+                <script src="/js/html2canvas.min.js"></script>
                 <script>
                     function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); }
                     function closeEventModal() { document.getElementById('eventModal').classList.add('hidden'); }
 
+                    let currentEvent = null;
+
                     function openEventDetail(event) {
+                        currentEvent = event;
                         const modal = document.getElementById('eventDetailModal');
                         if (!modal) return;
                         document.getElementById('event-detail-title').innerText = event.judul;
@@ -576,7 +635,7 @@
                         modal.classList.remove('hidden');
                     }
 
-                    function closeEventDetail() { document.getElementById('eventDetailModal').classList.add('hidden'); }
+                    function closeEventDetail() { document.getElementById('eventDetailModal').classList.add('hidden'); currentEvent = null; }
                     function enableEditEvent() {
                         document.getElementById('form-edit-event').classList.remove('hidden');
                         document.getElementById('btn-edit-event').classList.add('hidden');
@@ -586,6 +645,74 @@
                         document.getElementById('form-edit-event').classList.add('hidden');
                         document.getElementById('btn-edit-event').classList.remove('hidden');
                         document.getElementById('form-delete-event').classList.remove('hidden');
+                    }
+
+                    async function shareEventViaWA(event) {
+                        if (!event) return;
+
+                        const btn = document.getElementById('btn-share-wa');
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '⏳ Generating...';
+                        btn.disabled = true;
+
+                        try {
+                            // Populate Capture Card
+                            const date = new Date(event.tanggal);
+                            const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+                            document.getElementById('capture-date').innerText = dateStr;
+                            document.getElementById('capture-title').innerText = event.judul;
+                            document.getElementById('capture-desc').innerText = (event.keterangan || '').substring(0, 300) + (event.keterangan && event.keterangan.length > 300 ? '...' : '');
+
+                            if (event.lokasi) {
+                                document.getElementById('capture-location').innerText = event.lokasi;
+                                document.getElementById('capture-location-container').classList.remove('hidden');
+                            } else {
+                                document.getElementById('capture-location-container').classList.add('hidden');
+                            }
+
+                            const captureEl = document.getElementById('capture-card');
+
+                            // Capture
+                            const canvas = await html2canvas(captureEl, {
+                                scale: 2,
+                                useCORS: true,
+                                logging: false,
+                                backgroundColor: null
+                            });
+
+                            canvas.toBlob(async (blob) => {
+                                const formData = new FormData();
+                                formData.append('image', blob, 'event-' + event.id + '.png');
+                                formData.append('eventId', event.id);
+
+                                const response = await fetch('/dashboard/share-image', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                const result = await response.json();
+                                if (result.success) {
+                                    // Generate WA Link
+                                    const publicUrl = `${window.location.origin}/dashboard/event/v/${result.shareId}`;
+                                    const text = `*PENGUMUMAN WARGA*\n\n${event.judul}\n📅 ${dateStr}\n\nLihat detail: ${publicUrl}`;
+                                    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+                                    window.open(waUrl, '_blank');
+                                } else {
+                                    alert('Gagal share: ' + (result.error || 'Unknown error'));
+                                }
+
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                            }, 'image/png');
+
+                        } catch (e) {
+                            console.error(e);
+                            alert('Gagal melakukan share');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
                     }
                 </script>
 
