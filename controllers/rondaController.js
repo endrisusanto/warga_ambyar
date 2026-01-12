@@ -434,6 +434,11 @@ exports.viewPublic = async (req, res) => {
             if (count > maxCount) { maxCount = count; teamName = team; }
         });
 
+        // Mark Ganti Hari
+        daySchedule.forEach(s => {
+            s.is_ganti_hari = (teamName && s.tim_ronda !== teamName);
+        });
+
         res.render('ronda/public_view', {
             title: 'Jadwal Ronda ' + mDate.format('DD MMM YYYY'),
             dateLabel: mDate.format('dddd, DD MMMM YYYY'),

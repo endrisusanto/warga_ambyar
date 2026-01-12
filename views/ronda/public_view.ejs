@@ -66,10 +66,11 @@
                                             </div>
                                             <div>
                                                 <div class="text-sm font-bold text-gray-200">
-                                                    <%= s.nama %>
-                                                </div>
-                                                <div class="text-[10px] text-gray-400">Blok <%= s.blok %>-<%=
-                                                            s.nomor_rumah %>
+                                                    <%= s.nama %> (<%= s.blok %>-<%= s.nomor_rumah %>)
+                                                                <% if(s.is_ganti_hari || s.status==='reschedule' ) { %>
+                                                                    <span class="text-red-400 font-bold ml-1">(Ganti
+                                                                        Hari)</span>
+                                                                    <% } %>
                                                 </div>
                                             </div>
                                         </div>
@@ -183,12 +184,12 @@
                             const url = encodeURIComponent(window.location.href);
 
                             // Build members list from EJS data
-                            let membersList = "Anggota Bertugas:\n";
+                            let membersList = "Anggota Bertugas <%= teamName ? '(Tim ' + teamName + ')' : '' %>:\n";
                         <% schedule.forEach((s, index) => { %>
-                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)\n";
+                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)<%= (s.is_ganti_hari || s.status === 'reschedule') ? ' *(Ganti Hari)*' : '' %>\n";
                             <% }) %>
 
-                                const text = encodeURIComponent('Cek Jadwal Ronda: ' + document.title + '\n\n' + membersList);
+                                const text = encodeURIComponent('Cek Jadwal Ronda: *' + document.title.replace('Jadwal Ronda ', '') + '*\n\n' + membersList);
                             window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
                         }
                     </script>

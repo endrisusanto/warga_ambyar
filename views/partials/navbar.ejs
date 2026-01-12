@@ -1,19 +1,18 @@
-<nav class="glass-nav sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="flex-shrink-0 flex items-center">
-                    <a href="/dashboard" class="text-xl font-bold text-gray-100 flex items-center gap-2">
-                        <span class="text-2xl">⚡</span> Gang Ambyar
-                    </a>
-                </div>
-                <% if(user) { %>
-                    <div class="hidden min-[950px]:ml-6 min-[950px]:flex min-[950px]:space-x-4">
-                        <% const path=currentPath || '' ; const isDashboard=path.startsWith('/dashboard') || path==='/'
-                            ; const isRonda=path.startsWith('/ronda'); const isIuran=path.startsWith('/iuran'); const
-                            isKeuangan=path.startsWith('/keuangan'); const isMusyawarah=path.startsWith('/musyawarah');
-                            %>
-
+<% const path=typeof currentPath !=='undefined' ? currentPath : '' ; const isDashboard=path.startsWith('/dashboard') ||
+    path==='/' ; const isRonda=path.startsWith('/ronda'); const isIuran=path.startsWith('/iuran'); const
+    isKeuangan=path.startsWith('/keuangan'); const isMusyawarah=path.startsWith('/musyawarah'); const
+    isProfile=path.startsWith('/profile'); %>
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/dashboard" class="text-xl font-bold text-gray-100 flex items-center gap-2">
+                            <span class="text-2xl">⚡</span> Gang Ambyar
+                        </a>
+                    </div>
+                    <% if(user) { %>
+                        <div class="hidden min-[950px]:ml-6 min-[950px]:flex min-[950px]:space-x-4">
                             <a href="/dashboard"
                                 class="<%= isDashboard ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isDashboard ? 'border-white/10' : 'hover:border-white/5' %>">Dashboard</a>
 
@@ -30,78 +29,74 @@
                             <a href="/musyawarah"
                                 class="<%= isMusyawarah ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isMusyawarah ? 'border-white/10' : 'hover:border-white/5' %>">Info
                                 Warga</a>
-                    </div>
-                    <% } %>
-            </div>
+                        </div>
+                        <% } %>
+                </div>
 
-            <div class="flex items-center">
-                <% if(user) { %>
-                    <!-- Mobile Menu Button - Right Side -->
-                    <button id="mobileMenuBtn"
-                        class="min-[950px]:hidden mr-2 p-2 rounded-lg text-gray-400 hover:bg-white/5 hover:text-gray-200 focus:outline-none transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                    <a href="/profile"
-                        class="text-sm font-medium text-gray-300 hidden min-[950px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
-                        <% if (user.foto_profil) { %>
-                            <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
-                                class="w-6 h-6 rounded-full border border-white/20 object-cover">
-                            <% } else { %>
-                                <div
-                                    class="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] text-gray-200 font-bold">
-                                    <%= user.username.charAt(0).toUpperCase() %>
-                                </div>
-                                <% } %>
-                                    <%= user.username %>
-                    </a>
-                    <% } else { %>
-                        <% const isLoginPage=currentPath && currentPath.includes('/auth/login'); %>
-                            <% const isRegisterPage=currentPath && currentPath.includes('/auth/register'); %>
-                                <a href="/auth/login"
-                                    class="px-4 py-2 rounded-lg text-sm font-medium <%= isLoginPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Login</a>
-                                <a href="/auth/register"
-                                    class="ml-2 px-4 py-2 rounded-lg text-sm font-medium <%= isRegisterPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Register</a>
-                                <% } %>
+                <div class="flex items-center">
+                    <% if(user) { %>
+                        <!-- Mobile Menu Button - Right Side -->
+                        <button id="mobileMenuBtn"
+                            class="min-[950px]:hidden mr-2 p-2 rounded-lg text-gray-400 hover:bg-white/5 hover:text-gray-200 focus:outline-none transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <a href="/profile"
+                            class="text-sm font-medium <%= isProfile ? 'bg-white/10 text-gray-100 border-white/10' : 'text-gray-300 hover:bg-white/5 border-transparent' %> hidden min-[950px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border hover:border-white/10">
+                            <% if (user.foto_profil) { %>
+                                <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
+                                    class="w-6 h-6 rounded-full border border-white/20 object-cover">
+                                <% } else { %>
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] text-gray-200 font-bold">
+                                        <%= user.username.charAt(0).toUpperCase() %>
+                                    </div>
+                                    <% } %>
+                                        <%= user.username %>
+                        </a>
+                        <% } else { %>
+                            <% const isLoginPage=currentPath && currentPath.includes('/auth/login'); %>
+                                <% const isRegisterPage=currentPath && currentPath.includes('/auth/register'); %>
+                                    <a href="/auth/login"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium <%= isLoginPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Login</a>
+                                    <a href="/auth/register"
+                                        class="ml-2 px-4 py-2 rounded-lg text-sm font-medium <%= isRegisterPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Register</a>
+                                    <% } %>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<% if(user) { %>
-    <!-- Mobile Menu Overlay Background -->
-    <div id="mobileMenuOverlay"
-        class="hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-    </div>
+    <% if(user) { %>
+        <!-- Mobile Menu Overlay Background -->
+        <div id="mobileMenuOverlay"
+            class="hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        </div>
 
-    <!-- Mobile Menu Grid - Full Screen Overlay -->
-    <div id="mobileMenuGrid"
-        class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-300 opacity-0 scale-95 overflow-y-auto p-4">
+        <!-- Mobile Menu Grid - Full Screen Overlay -->
+        <div id="mobileMenuGrid"
+            class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-300 opacity-0 scale-95 overflow-y-auto p-4">
 
-        <!-- Close button -->
-        <button id="closeMobileMenu"
-            class="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/10 text-gray-300 hover:text-white z-50">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                </path>
-            </svg>
-        </button>
+            <!-- Close button -->
+            <button id="closeMobileMenu"
+                class="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/10 text-gray-300 hover:text-white z-50">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
 
-        <!-- Grid Container -->
-        <div
-            class="w-full max-w-xs bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl transform transition-all">
-            <div class="grid grid-cols-2 gap-3 w-full">
-                <% const mPath=currentPath || '' ; const mIsDashboard=mPath.startsWith('/dashboard') || mPath==='/' ;
-                    const mIsRonda=mPath.startsWith('/ronda'); const mIsIuran=mPath.startsWith('/iuran'); const
-                    mIsKeuangan=mPath.startsWith('/keuangan'); const mIsMusyawarah=mPath.startsWith('/musyawarah'); %>
-
+            <!-- Grid Container -->
+            <div
+                class="w-full max-w-xs bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl transform transition-all">
+                <div class="grid grid-cols-2 gap-3 w-full">
                     <!-- Dashboard Button -->
                     <a href="/dashboard"
-                        class="<%= mIsDashboard ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isDashboard ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <div
-                            class="<%= mIsDashboard ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
+                            class="<%= isDashboard ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -109,14 +104,14 @@
                             </svg>
                         </div>
                         <span
-                            class="text-xs font-semibold <%= mIsDashboard ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Dashboard</span>
+                            class="text-xs font-semibold <%= isDashboard ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Dashboard</span>
                     </a>
 
                     <!-- Jadwal Ronda Button -->
                     <a href="/ronda"
-                        class="<%= mIsRonda ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isRonda ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <div
-                            class="<%= mIsRonda ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
+                            class="<%= isRonda ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -124,14 +119,14 @@
                             </svg>
                         </div>
                         <span
-                            class="text-xs font-semibold <%= mIsRonda ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Ronda</span>
+                            class="text-xs font-semibold <%= isRonda ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Ronda</span>
                     </a>
 
                     <!-- Iuran Button -->
                     <a href="/iuran"
-                        class="<%= mIsIuran ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isIuran ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <div
-                            class="<%= mIsIuran ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
+                            class="<%= isIuran ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
@@ -139,14 +134,14 @@
                             </svg>
                         </div>
                         <span
-                            class="text-xs font-semibold <%= mIsIuran ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Iuran</span>
+                            class="text-xs font-semibold <%= isIuran ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Iuran</span>
                     </a>
 
                     <!-- Keuangan Button -->
                     <a href="/keuangan"
-                        class="<%= mIsKeuangan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isKeuangan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <div
-                            class="<%= mIsKeuangan ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
+                            class="<%= isKeuangan ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
@@ -154,14 +149,14 @@
                             </svg>
                         </div>
                         <span
-                            class="text-xs font-semibold <%= mIsKeuangan ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Keuangan</span>
+                            class="text-xs font-semibold <%= isKeuangan ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Keuangan</span>
                     </a>
 
                     <!-- Info Warga Button -->
                     <a href="/musyawarah"
-                        class="<%= mIsMusyawarah ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isMusyawarah ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <div
-                            class="<%= mIsMusyawarah ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
+                            class="<%= isMusyawarah ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -169,13 +164,13 @@
                             </svg>
                         </div>
                         <span
-                            class="text-xs font-semibold <%= mIsMusyawarah ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Info
+                            class="text-xs font-semibold <%= isMusyawarah ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Info
                             Warga</span>
                     </a>
 
                     <!-- Profile Button -->
                     <a href="/profile"
-                        class="bg-white/5 border-white/10 p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                        class="<%= isProfile ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                         <% if (user.foto_profil) { %>
                             <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
                                 class="w-6 h-6 rounded-full border border-white/20 object-cover group-hover:border-indigo-400 transition-colors">
@@ -186,85 +181,86 @@
                                 </div>
                                 <% } %>
                                     <span
-                                        class="text-xs font-semibold text-gray-300 group-hover:text-white">Profile</span>
+                                        class="text-xs font-semibold <%= isProfile ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Profile</span>
                     </a>
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-        // Mobile Menu Controller - Simplified & Robust
-        (function () {
-            const menuBtn = document.getElementById('mobileMenuBtn');
-            const overlay = document.getElementById('mobileMenuOverlay');
-            const menuGrid = document.getElementById('mobileMenuGrid');
-            const closeBtn = document.getElementById('closeMobileMenu');
+        </div>
+        <script>
+            // Mobile Menu Controller - Simplified & Robust
+            (function () {
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                const overlay = document.getElementById('mobileMenuOverlay');
+                const menuGrid = document.getElementById('mobileMenuGrid');
+                const closeBtn = document.getElementById('closeMobileMenu');
 
-            function openMenu() {
-                // Show elements
-                overlay?.classList.remove('hidden');
-                menuGrid?.classList.remove('hidden');
+                function openMenu() {
+                    // Show elements
+                    overlay?.classList.remove('hidden');
+                    menuGrid?.classList.remove('hidden');
 
-                // Trigger animation in next tick
-                setTimeout(() => {
-                    overlay?.classList.remove('opacity-0');
-                    menuGrid?.classList.remove('opacity-0', 'scale-95');
-                    menuGrid?.classList.add('opacity-100', 'scale-100');
-                }, 10);
+                    // Trigger animation in next tick
+                    setTimeout(() => {
+                        overlay?.classList.remove('opacity-0');
+                        menuGrid?.classList.remove('opacity-0', 'scale-95');
+                        menuGrid?.classList.add('opacity-100', 'scale-100');
+                    }, 10);
 
-                // Lock body scroll
-                document.body.style.overflow = 'hidden';
-            }
+                    // Lock body scroll
+                    document.body.style.overflow = 'hidden';
+                }
 
-            function closeMenu() {
-                // Start hide animation
-                overlay?.classList.add('opacity-0');
-                menuGrid?.classList.remove('opacity-100', 'scale-100');
-                menuGrid?.classList.add('opacity-0', 'scale-95');
+                function closeMenu() {
+                    // Start hide animation
+                    overlay?.classList.add('opacity-0');
+                    menuGrid?.classList.remove('opacity-100', 'scale-100');
+                    menuGrid?.classList.add('opacity-0', 'scale-95');
 
-                // Wait for animation then hide
-                setTimeout(() => {
-                    overlay?.classList.add('hidden');
-                    menuGrid?.classList.add('hidden');
-                }, 300);
+                    // Wait for animation then hide
+                    setTimeout(() => {
+                        overlay?.classList.add('hidden');
+                        menuGrid?.classList.add('hidden');
+                    }, 300);
 
-                // Unlock body scroll
-                document.body.style.overflow = '';
-            }
+                    // Unlock body scroll
+                    document.body.style.overflow = '';
+                }
 
-            // Event listeners
-            menuBtn?.addEventListener('click', openMenu);
-            closeBtn?.addEventListener('click', closeMenu);
-            overlay?.addEventListener('click', closeMenu);
-        })();
-    </script>
-    <% } %>
+                // Event listeners
+                menuBtn?.addEventListener('click', openMenu);
+                closeBtn?.addEventListener('click', closeMenu);
+                overlay?.addEventListener('click', closeMenu);
+            })();
+        </script>
+        <% } %>
 
-        <div
-            class="<%= (typeof useWideContainer !== 'undefined' && useWideContainer) ? 'max-w-full' : 'max-w-7xl' %> mx-auto <%= (typeof noPadding !== 'undefined' && noPadding) ? '' : 'px-4 sm:px-6 lg:px-8' %> py-6 flex-grow w-full">
-            <% if(success_msg && success_msg.length> 0) { %>
-                <div class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
-                    role="alert">
-                    <strong class="font-bold">✨ Success!</strong>
-                    <span class="block sm:inline">
-                        <%= success_msg %>
-                    </span>
-                </div>
-                <% } %>
-                    <% if(error_msg && error_msg.length> 0) { %>
-                        <div class="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
-                            role="alert">
-                            <strong class="font-bold">⚠️ Error!</strong>
-                            <span class="block sm:inline">
-                                <%= error_msg %>
-                            </span>
-                        </div>
-                        <% } %>
-                            <% if(error && error.length> 0) { %>
-                                <div class="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
-                                    role="alert">
-                                    <strong class="font-bold">⚠️ Error!</strong>
-                                    <span class="block sm:inline">
-                                        <%= error %>
-                                    </span>
-                                </div>
-                                <% } %>
+            <div
+                class="<%= (typeof useWideContainer !== 'undefined' && useWideContainer) ? 'max-w-full' : 'max-w-7xl' %> mx-auto <%= (typeof noPadding !== 'undefined' && noPadding) ? '' : 'px-4 sm:px-6 lg:px-8' %> py-6 flex-grow w-full">
+                <% if(success_msg && success_msg.length> 0) { %>
+                    <div class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                        role="alert">
+                        <strong class="font-bold">✨ Success!</strong>
+                        <span class="block sm:inline">
+                            <%= success_msg %>
+                        </span>
+                    </div>
+                    <% } %>
+                        <% if(error_msg && error_msg.length> 0) { %>
+                            <div class="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                                role="alert">
+                                <strong class="font-bold">⚠️ Error!</strong>
+                                <span class="block sm:inline">
+                                    <%= error_msg %>
+                                </span>
+                            </div>
+                            <% } %>
+                                <% if(error && error.length> 0) { %>
+                                    <div class="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                                        role="alert">
+                                        <strong class="font-bold">⚠️ Error!</strong>
+                                        <span class="block sm:inline">
+                                            <%= error %>
+                                        </span>
+                                    </div>
+                                    <% } %>
