@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<%- include('../partials/head') %>
     <title>
         <%= title %>
     </title>
-
-    <!-- Open Graph -->
     <meta property="og:title" content="<%= title %>">
     <meta property="og:description" content="Jadwal Ronda dan Dokumentasi Warga Ambyar">
     <% if(ogImage) { %>
@@ -16,116 +9,190 @@
         <meta property="og:image:width" content="800">
         <meta property="og:image:height" content="400">
         <% } %>
+            </head>
 
-            <script src="https://cdn.tailwindcss.com"></script>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-                rel="stylesheet">
-            <style>
-                body {
-                    font-family: 'Inter', sans-serif;
-                }
-            </style>
-</head>
+            <body class="bg-gray-900 min-h-screen text-gray-100 font-sans selection:bg-indigo-500 selection:text-white">
 
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+                <!-- Background Effects -->
+                <div class="fixed inset-0 z-0 pointer-events-none">
+                    <div
+                        class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-900/20 via-gray-900 to-black">
+                    </div>
+                    <div
+                        class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px]">
+                    </div>
+                    <div
+                        class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px]">
+                    </div>
+                </div>
 
-    <div class="max-w-2xl w-full bg-white shadow-xl rounded-2xl overflow-hidden">
-        <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
-            <h1 class="text-sm font-bold">
-                <%= dateLabel %>
-            </h1>
-            <% if(teamName) { %>
-                <span class="px-3 py-1 bg-white text-indigo-600 rounded-full text-[10px] font-bold">Tim <%= teamName %>
-                </span>
-                <% } %>
-        </div>
+                <div
+                    class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen">
 
-        <div class="p-6">
-            <h2 class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-4">Anggota Bertugas</h2>
-            <ul class="space-y-4">
-                <% schedule.forEach(s=> { %>
-                    <li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
+                    <div class="w-full text-center mb-8">
+                        <h1
+                            class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-sm mb-2">
+                            <%= dateLabel %>
+                        </h1>
+                        <% if(teamName) { %>
                             <div
-                                class="w-2 h-2 rounded-full <%= s.status === 'hadir' ? 'bg-green-500' : (s.status === 'izin' ? 'bg-yellow-400' : (s.status === 'alpa' ? 'bg-red-500' : 'bg-gray-300')) %>">
+                                class="inline-flex items-center px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-200 text-sm font-bold backdrop-blur-sm shadow-lg mt-2">
+                                Tim <%= teamName %>
                             </div>
-                            <div>
-                                <div class="text-xs font-bold text-gray-800">
-                                    <%= s.nama %>
-                                </div>
-                                <div class="text-[9px] text-gray-500">Blok <%= s.blok %>-<%= s.nomor_rumah %>
-                                </div>
+                            <% } %>
+                    </div>
+
+                    <div
+                        class="glass-card w-full p-6 sm:p-8 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 backdrop-blur-md relative">
+
+                        <!-- Anggota Bertugas -->
+                        <div class="mb-8">
+                            <h2
+                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                                Anggota Bertugas
+                            </h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <% schedule.forEach(s=> { %>
+                                    <div
+                                        class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                                        <div class="flex items-center space-x-3">
+                                            <div
+                                                class="w-2.5 h-2.5 rounded-full shadow-lg shadow-current <%= s.status === 'hadir' ? 'bg-emerald-500 text-emerald-500' : (s.status === 'izin' ? 'bg-yellow-400 text-yellow-400' : (s.status === 'alpa' ? 'bg-red-500 text-red-500' : 'bg-gray-500 text-gray-500')) %>">
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-bold text-gray-200">
+                                                    <%= s.nama %>
+                                                </div>
+                                                <div class="text-[10px] text-gray-400">Blok <%= s.blok %>-<%=
+                                                            s.nomor_rumah %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% if(s.status && s.status !=='scheduled' ) { %>
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider <%= s.status === 'hadir' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30' %>">
+                                                <%= s.status %>
+                                            </span>
+                                            <% } %>
+                                    </div>
+                                    <% }) %>
                             </div>
                         </div>
-                        <% if(s.status && s.status !=='scheduled' ) { %>
-                            <span
-                                class="text-[9px] font-bold uppercase <%= s.status === 'hadir' ? 'text-green-600' : 'text-gray-500' %>">
-                                <%= s.status %>
-                            </span>
-                            <% } %>
-                    </li>
-                    <% }) %>
-            </ul>
 
-            <h2 class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-6 mb-4">Dokumentasi & Bukti</h2>
-            <% if(allPhotos && allPhotos.length> 0) { %>
-                <div class="grid grid-cols-4 gap-2">
-                    <% allPhotos.slice(0, 8).forEach(p=> { %>
-                        <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative border">
-                            <% if(p.src && String(p.src).match(/\.(mp4|mov|avi|webm)$/i)) { %>
-                                <video src="/uploads/ronda/<%= p.src %>#t=1.0"
-                                    class="w-full h-full object-cover"></video>
-                                <div
-                                    class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 text-white font-bold">
-                                    ▶</div>
+                        <!-- Dokumentasi -->
+                        <div>
+                            <h2
+                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Dokumentasi & Bukti
+                            </h2>
+                            <% if(allPhotos && allPhotos.length> 0) { %>
+                                <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                                    <% allPhotos.slice(0, 12).forEach(p=> { %>
+                                        <div
+                                            class="aspect-square bg-black/40 rounded-xl overflow-hidden relative border border-white/10 shadow-lg group">
+                                            <% if(p.src && String(p.src).match(/\.(mp4|mov|avi|webm)$/i)) { %>
+                                                <video src="/uploads/ronda/<%= p.src %>#t=1.0"
+                                                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"></video>
+                                                <div
+                                                    class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors">
+                                                    <div
+                                                        class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                                                        <span class="text-white text-xs">▶</span>
+                                                    </div>
+                                                </div>
+                                                <% } else { %>
+                                                    <img src="/uploads/ronda/<%= p.src %>"
+                                                        class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                                                    <% } %>
+                                        </div>
+                                        <% }) %>
+                                            <% if(allPhotos.length> 12) { %>
+                                                <div
+                                                    class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 backdrop-blur-sm">
+                                                    <span class="text-gray-400 text-xs font-bold">+<%= allPhotos.length
+                                                            - 12 %></span>
+                                                </div>
+                                                <% } %>
+                                </div>
                                 <% } else { %>
-                                    <img src="/uploads/ronda/<%= p.src %>" class="w-full h-full object-cover">
+                                    <div
+                                        class="text-center py-8 bg-white/5 rounded-xl border border-white/10 border-dashed">
+                                        <p class="text-gray-500 text-sm italic">Belum ada dokumentasi.</p>
+                                    </div>
                                     <% } %>
                         </div>
-                        <% }) %>
-                            <% if(allPhotos.length> 8) { %>
-                                <div
-                                    class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-[10px] font-bold">
-                                    +<%= allPhotos.length - 8 %>
-                                </div>
-                                <% } %>
-                </div>
-                <% } else { %>
-                    <p class="text-gray-400 text-xs italic border-l-2 border-gray-300 pl-3">Belum ada dokumentasi.</p>
-                    <% } %>
-        </div>
 
-        <div class="bg-gray-50 px-6 py-4 border-t flex justify-between items-center">
-            <div class="text-[10px] text-gray-400">Warga Ambyar System</div>
-            <div class="flex space-x-3">
-                <button onclick="copyLink()"
-                    class="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-[10px] font-medium hover:bg-gray-50 text-gray-700 transition">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    Copy Link
-                </button>
-                <button onclick="shareWa()"
-                    class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg shadow-sm text-[10px] font-medium hover:bg-green-600 transition">
-                    Share WA
-                </button>
-            </div>
-        </div>
-    </div>
+                        <!-- Action Buttons -->
+                        <div class="mt-8 pt-6 border-t border-white/10 flex gap-3">
+                            <button onclick="copyLink()"
+                                class="flex-1 flex justify-center items-center px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-gray-300 hover:text-white transition-all backdrop-blur-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Copy Link
+                            </button>
+                            <button onclick="shareWa()"
+                                class="flex-1 flex justify-center items-center px-4 py-3 bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-500/50 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-emerald-900/20 backdrop-blur-sm">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                </svg>
+                                Share WA
+                            </button>
+                        </div>
 
-    <script>
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
-        }
-        function shareWa() {
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent('Cek Jadwal Ronda: ' + document.title);
-            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-        }
-    </script>
+                    </div>
 
-</body>
+                    <!-- Home Button & Footer -->
+                    <div class="mt-8 flex flex-col items-center gap-4">
+                        <a href="/"
+                            class="flex items-center px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-bold text-gray-300 hover:text-white transition-all backdrop-blur-sm shadow-lg">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                </path>
+                            </svg>
+                            Home
+                        </a>
 
-</html>
+                        <div class="flex items-center gap-2 text-xs text-gray-500 font-medium tracking-wider uppercase">
+                            <span>Powered by</span>
+                            <span
+                                class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">Warga
+                                Ambyar</span>
+                        </div>
+                    </div>
+
+                    <script>
+                        function copyLink() {
+                            navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
+                        }
+                        function shareWa() {
+                            const url = encodeURIComponent(window.location.href);
+
+                            // Build members list from EJS data
+                            let membersList = "Anggota Bertugas:\n";
+                        <% schedule.forEach((s, index) => { %>
+                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)\n";
+                            <% }) %>
+
+                                const text = encodeURIComponent('Cek Jadwal Ronda: ' + document.title + '\n\n' + membersList);
+                            window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+                        }
+                    </script>
+
+            </body>
+
+            </html>

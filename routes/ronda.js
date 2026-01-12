@@ -9,6 +9,8 @@ router.post('/teams/update', ensureAuthenticated, rondaController.updateTeam);
 router.post('/manual-add', ensureAuthenticated, rondaController.addManualParticipant);
 router.post('/update-status', ensureAuthenticated, rondaController.updateStatus);
 router.post('/pay-fine', ensureAuthenticated, rondaController.payFine);
+router.post('/pay-fine-upload', ensureAuthenticated, rondaController.submitFine);
+router.post('/verify-fine', ensureAuthenticated, rondaController.verifyFine);
 router.post('/upload-photos/:id', ensureAuthenticated, rondaController.uploadPhotos);
 router.post('/upload-condition/:date', ensureAuthenticated, rondaController.uploadCondition);
 router.post('/delete-photo', ensureAuthenticated, rondaController.deletePhoto);

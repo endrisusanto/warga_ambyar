@@ -44,7 +44,10 @@ exports.index = async (req, res) => {
 
         // Get Iuran for selected Year
         const [rows] = await db.query(`
-            SELECT i.*, w.nama, w.blok, w.nomor_rumah 
+            SELECT i.*, w.nama, w.blok, w.nomor_rumah,
+                   (SELECT status_huni FROM warga w2 
+                    WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
+                    ORDER BY FIELD(status_huni, 'kontrak', 'tetap', 'kosong', 'tidak huni') LIMIT 1) as effective_status_huni
             FROM iuran i 
             JOIN warga w ON i.warga_id = w.id 
             WHERE YEAR(i.periode) = ?
@@ -61,6 +64,7 @@ exports.index = async (req, res) => {
                     nama: item.nama,
                     blok: item.blok,
                     nomor_rumah: item.nomor_rumah,
+                    status_huni: item.effective_status_huni,
                     periode: item.periode,
                     kas: null,
                     sampah: null
@@ -164,12 +168,13 @@ exports.processPayment = (req, res) => {
                 }
 
                 let bukti = req.file ? req.file.filename : null;
-                const jumlahPerItem = 25000;
 
                 for (const m of selectedMonths) {
                     const currentPeriode = m + '-01';
 
                     for (const jenisItem of jenis) {
+                        const jumlahPerItem = (jenisItem === 'kas') ? 10000 : 25000;
+
                         const [existing] = await db.query(
                             'SELECT * FROM iuran WHERE warga_id = ? AND periode = ? AND jenis = ?',
                             [warga_id, currentPeriode, jenisItem]

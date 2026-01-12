@@ -9,5 +9,6 @@ router.post('/edit-event/:id', ensureAuthenticated, dashboardController.editEven
 router.post('/delete-event/:id', ensureAuthenticated, dashboardController.deleteEvent);
 router.post('/share-image', ensureAuthenticated, dashboardController.uploadShareImage);
 router.get('/event/v/:id', dashboardController.viewPublicEvent);
+router.post('/reset-data', ensureAuthenticated, dashboardController.resetData);
 
 module.exports = router;

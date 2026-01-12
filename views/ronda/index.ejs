@@ -1,5 +1,5 @@
 <%- include('../partials/head') %>
-    <%- include('../partials/navbar') %>
+    <%- include('../partials/navbar', { useWideContainer: true }) %>
         <script src="/js/html2canvas.min.js"></script>
 
         <div class="glass-card mb-6">
@@ -19,7 +19,7 @@
                 <form action="/ronda" method="GET" class="flex flex-wrap items-center gap-3">
                     <select name="month"
                         class="glass-input rounded-xl text-sm text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors">
-                        <% moment.months().forEach((m, index)=> { %>
+                        <% moment.months().forEach(function(m, index) { %>
                             <option value="<%= index + 1 %>" <%=(index + 1)==month ? 'selected' : '' %>><%= m %>
                             </option>
                             <% }) %>
@@ -85,22 +85,12 @@
             }
         </style>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <% Object.keys(groupedSchedule).forEach(date=> {
-                const schedules = groupedSchedule[date];
 
-                // Find dominant team (tim dengan anggota terbanyak hari ini)
-                const teamCounts = {};
-                schedules.forEach(s => {
-                if(s.tim_ronda) {
-                teamCounts[s.tim_ronda] = (teamCounts[s.tim_ronda] || 0) + 1;
-                }
-                });
-
-                let teamName = null;
-                let maxCount = 0;
-                Object.entries(teamCounts).forEach(([team, count]) => {
-                if(count > maxCount) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <% Object.keys(groupedSchedule).forEach(function(date) { const schedules=groupedSchedule[date]; const
+                teamCounts={}; schedules.forEach(function(s) { if(s.tim_ronda) {
+                teamCounts[s.tim_ronda]=(teamCounts[s.tim_ronda] || 0) + 1; } }); let teamName=null; let maxCount=0;
+                Object.entries(teamCounts).forEach(function([team, count]) { if(count> maxCount) {
                 maxCount = count;
                 teamName = team;
                 }
@@ -116,7 +106,7 @@
                 const isThisWeek = moment(date).isSame(moment(), 'week');
                 %>
                 <div id="card-<%= date %>"
-                    class="glass-card overflow-hidden divide-y divide-white/10 <%= isThisWeek && !isPast ? 'border-2 border-orange-400 bg-orange-500/10 glow-this-week' : '' %> <%= isToday ? 'border-2 border-green-400 bg-green-500/10 ring-4 ring-green-400/20' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.01]">
+                    class="glass-card overflow-hidden divide-y divide-white/10 <%= isThisWeek && !isPast ? 'border-2 border-orange-400 bg-orange-500/10 glow-this-week scale-[1.02] shadow-2xl z-10' : '' %> <%= isToday ? 'border-2 border-green-400 bg-green-500/10 ring-4 ring-green-400/20 scale-[1.02] shadow-2xl z-10' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.03]">
                     <div
                         class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-white/5' : (isToday ? 'bg-green-500/10' : (isThisWeek ? 'bg-orange-500/10' : 'bg-white/5')) %> backdrop-blur-sm">
                         <div class="flex justify-between items-start mb-3">
@@ -125,37 +115,78 @@
                                     class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-300' : 'text-indigo-300') %> drop-shadow-lg">
                                     <%= moment(date).format('dddd, DD MMMM YYYY') %>
                                 </h3>
-                                <% if(isToday) { %>
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600/90 text-white mt-1 shadow-sm">
-                                        🔔 Hari Ini
-                                    </span>
-                                    <% } else if(isThisWeek && !isPast) { %>
+                                <!-- Mobile Version (Text Buttons) -->
+                                <div class="flex flex-wrap items-center gap-2 mt-1 lg:hidden">
+                                    <% if(isToday) { %>
                                         <span
-                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-600/90 text-white mt-1 shadow-sm">
-                                            📅 Minggu Ini
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600/90 text-white shadow-sm">
+                                            🔔 Hari Ini
                                         </span>
-                                        <% } %>
+                                        <% } else if(isThisWeek && !isPast) { %>
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white shadow-sm">
+                                                📅 Minggu Ini
+                                            </span>
+                                            <% } %>
 
-                                            <button onclick="shareSchedule('<%= date %>', this)"
-                                                class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-purple-600/90 text-white mt-1 hover:bg-purple-700 transition shadow-sm border border-purple-500/50"
-                                                title="View Fullscreen & Share">
-                                                👁️ View
-                                            </button>
-
-                                            <% if(user.role==='admin' || isToday || isThisWeek) { %>
-                                                <button onclick="openUploadConditionModal('<%= date %>')"
-                                                    class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-600/90 text-white mt-1 hover:bg-blue-700 transition shadow-sm border border-blue-500/50">
-                                                    📷 Kondisi
+                                                <button onclick="shareSchedule('<%= date %>', this)"
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-700/90 text-white hover:bg-gray-800 transition shadow-sm border border-gray-600/50">
+                                                    🔗 Share
                                                 </button>
-                                                <% } %>
 
-                                                    <% if(isPast) { %>
-                                                        <span
-                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-500/80 text-white mt-1 shadow-sm">
-                                                            ✓ Selesai
-                                                        </span>
-                                                        <% } %>
+                                                <% if(user.role==='admin' || isToday || isThisWeek) { %>
+                                                    <button onclick="openUploadConditionModal('<%= date %>')"
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white hover:bg-gray-700 transition shadow-sm border border-gray-500/50">
+                                                        📷 Foto
+                                                    </button>
+                                                    <% } %>
+
+                                                        <% if(isPast) { %>
+                                                            <span
+                                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-500/80 text-white shadow-sm">
+                                                                ✓ Selesai
+                                                            </span>
+                                                            <% } %>
+                                </div>
+
+                                <!-- Desktop Version (Icon Toolbar) -->
+                                <div class="hidden lg:flex items-center gap-1 mt-1">
+                                    <% if(isToday) { %>
+                                        <span
+                                            class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 text-green-300 border border-green-500/30"
+                                            title="Hari Ini">
+                                            🔔
+                                        </span>
+                                        <% } else if(isThisWeek && !isPast) { %>
+                                            <span
+                                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30"
+                                                title="Minggu Ini">
+                                                📅
+                                            </span>
+                                            <% } %>
+
+                                                <button onclick="shareSchedule('<%= date %>', this)"
+                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-colors"
+                                                    title="Share to WhatsApp">
+                                                    🔗
+                                                </button>
+
+                                                <% if(user.role==='admin' || isToday || isThisWeek) { %>
+                                                    <button onclick="openUploadConditionModal('<%= date %>')"
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-colors"
+                                                        title="Upload Foto Ronda">
+                                                        📷
+                                                    </button>
+                                                    <% } %>
+
+                                                        <% if(isPast) { %>
+                                                            <span
+                                                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                                                                title="Selesai">
+                                                                ✓
+                                                            </span>
+                                                            <% } %>
+                                </div>
                             </div>
                             <% if(teamName) { %>
                                 <span
@@ -169,59 +200,53 @@
                             <div
                                 class="mt-2 pt-2 border-t <%= isPast ? 'border-gray-300' : (isToday ? 'border-green-200/50' : 'border-indigo-200/50') %>">
                                 <div
-                                    class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-300' : 'text-indigo-300') %> mb-1">
+                                    class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-300' : 'text-indigo-300') %> mb-2">
                                     Anggota Tim:</div>
                                 <div class="flex items-center justify-between">
-                                    <div class="flex flex-wrap gap-1">
-                                        <% teamMembers.forEach(member=> { %>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <% teamMembers.forEach(function(member) { %>
                                             <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded text-xs <%= isPast ? 'bg-gray-200 text-gray-600 border-gray-300' : (isToday ? 'bg-white text-green-700 border-green-200' : 'bg-white text-indigo-700 border-indigo-200') %> border">
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm <%= isPast ? 'bg-gray-500/20 text-gray-300 border border-gray-500/30' : (isToday ? 'bg-green-500/20 text-green-200 border border-green-500/30' : 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/30') %> shadow-sm">
                                                 <%= member.nama %>
                                             </span>
                                             <% }) %>
                                     </div>
 
                                     <!-- Photos for the night -->
-                                    <% let allPhotos=[]; schedules.forEach(s=> {
-                                        if (s.parsedPhotos) {
-                                        s.parsedPhotos.forEach(photo => { if(typeof photo==='string')
-                                        allPhotos.push({src: photo, type: 'individual', uploader: s.nama}); });
-                                        }
-                                        });
+                                    <% let allPhotos=[]; schedules.forEach(function(s) { if (s.parsedPhotos) {
+                                        s.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
+                                        allPhotos.push({src: photo, type: 'individual' , uploader: s.nama}); } }); } });
                                         if (groupedDocumentation && groupedDocumentation[date]) {
-                                        groupedDocumentation[date].forEach(doc => {
-                                        if (doc.parsedPhotos) {
-                                        doc.parsedPhotos.forEach(photo => { if(typeof photo==='string')
-                                        allPhotos.push({src: photo, type: 'condition', uploader: 'Kondisi'}); });
-                                        }
-                                        });
-                                        }
-
-                                        if(allPhotos && allPhotos.length > 0) {
-                                        const photoSources = allPhotos.map(p => p.src);
+                                        groupedDocumentation[date].forEach(function(doc) { if (doc.parsedPhotos) {
+                                        doc.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
+                                        allPhotos.push({src: photo, type: 'condition' , uploader: 'Kondisi' }); } }); }
+                                        }); } if(allPhotos && allPhotos.length> 0) {
+                                        const photoSources = allPhotos.map(function(p) { return p.src; });
                                         const safePhotosJson = JSON.stringify(photoSources).replace(/'/g, "&apos;");
                                         %>
-                                        <div class="flex -space-x-2 overflow-hidden ml-4 cursor-pointer"
+                                        <div class="flex -space-x-2 ml-4 cursor-pointer"
                                             data-photos='<%- safePhotosJson %>' onclick="openCarouselFromData(this, 0)">
-                                            <% allPhotos.slice(0, 5).forEach(photo=> {
-                                                const isVideo = photo.src.match(/\.(mp4|mov|avi|webm)$/i);
-                                                %>
+                                            <% allPhotos.slice(0, 5).forEach(function(photo) { const
+                                                isVideo=photo.src.match(/\.(mp4|mov|avi|webm)$/i); %>
                                                 <% if(isVideo) { %>
                                                     <div
-                                                        class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-black flex items-center justify-center relative overflow-hidden">
+                                                        class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 bg-black flex items-center justify-center relative overflow-hidden">
                                                         <video src="/uploads/ronda/<%= photo.src %>#t=1.0"
                                                             class="absolute inset-0 w-full h-full object-cover opacity-60"
                                                             preload="metadata"></video>
                                                         <span class="text-[8px] text-white font-bold z-10">▶</span>
                                                     </div>
                                                     <% } else { %>
-                                                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
-                                                            src="/uploads/ronda/<%= photo.src %>" alt="">
+                                                        <div
+                                                            class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 overflow-hidden">
+                                                            <img class="w-full h-full object-cover"
+                                                                src="/uploads/ronda/<%= photo.src %>" alt="">
+                                                        </div>
                                                         <% } %>
                                                             <% }) %>
                                                                 <% if(allPhotos.length> 5) { %>
                                                                     <div
-                                                                        class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-[10px] font-bold text-gray-600 ring-2 ring-white">
+                                                                        class="inline-flex items-center justify-center w-8 h-8 aspect-square rounded-full bg-gray-700 text-[10px] font-bold text-white ring-2 ring-gray-900">
                                                                         +<%= allPhotos.length - 5 %>
                                                                     </div>
                                                                     <% } %>
@@ -232,12 +257,11 @@
                             <% } %>
                     </div>
                     <div class="px-4 py-5 sm:p-6">
-                        <ul class="space-y-4">
+                        <ul class="space-y-3">
                             <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
                                 loopItems = [...teamMembers];
-                                // Add anyone in schedules who is NOT in teamMembers (e.g. Rescheduled from other teams)
-                                const memberIds = new Set(teamMembers.map(m => m.id));
-                                schedules.forEach(sch => {
+                                const memberIds = new Set(teamMembers.map(function(m) { return m.id; }));
+                                schedules.forEach(function(sch) {
                                 if (!memberIds.has(sch.warga_id)) {
                                 loopItems.push(sch);
                                 }
@@ -246,8 +270,9 @@
                                 loopItems = schedules;
                                 }
 
-                                loopItems.forEach(item => {
-                                let s = schedules.find(sc => sc.warga_id === (item.warga_id || item.id));
+                                loopItems.forEach(function(item) {
+                                let s = schedules.find(function(sc) { return sc.warga_id === (item.warga_id ||
+                                item.id); });
                                 if (!s) {
                                 s = {
                                 id: '',
@@ -261,113 +286,158 @@
                                 };
                                 }
                                 %>
-                                <li class="flex justify-between items-center">
-                                    <div class="flex-grow">
-                                        <div class="text-sm font-medium text-gray-100">
-                                            <%= s.nama %>
+                                <li
+                                    class="flex justify-between items-center bg-white/5 rounded-2xl px-4 py-3 border border-white/5 hover:bg-white/10 transition-all group">
+                                    <div class="flex-grow min-w-0 mr-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="text-sm font-bold text-gray-100 truncate">
+                                                <%= s.nama %>
+                                            </div>
+                                            <% if(s.status !=='scheduled' ) { let statusText=s.status; let
+                                                statusClass='' ; if (s.status_bayar==='paid' ) { statusText='Pay Up' ;
+                                                statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                ; } else if (s.status==='hadir' ) {
+                                                statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                ; } else if (s.status==='izin' || s.status==='reschedule' ) {
+                                                statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                                ; } else {
+                                                statusClass='bg-red-500/20 text-red-300 border border-red-500/30' ; } %>
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
+                                                    <%= statusText %>
+                                                </span>
+                                                <% } %>
                                         </div>
-                                        <div class="text-xs text-gray-400">Blok <%= s.blok %>-<%= s.nomor_rumah %>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <div
+                                                class="text-xs text-gray-400 font-medium bg-black/20 px-2 py-0.5 rounded-md inline-block">
+                                                <%= s.blok %>-<%= s.nomor_rumah %>
+                                            </div>
+                                            <% const isGuest=teamMembers && teamMembers.length> 0 &&
+                                                !teamMembers.some(function(m) {
+                                                return m.id === (item.warga_id || item.id);
+                                                });
+                                                if (isGuest) {
+                                                %>
+                                                <div
+                                                    class="text-[10px] text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
+                                                    Ganti Hari
+                                                </div>
+                                                <% } %>
                                         </div>
-                                        <% const isGuest=teamMembers && teamMembers.length> 0 && !teamMembers.some(m =>
-                                            m.id === (item.warga_id || item.id));
-                                            if (isGuest) {
-                                            %>
-                                            <div class="text-[10px] text-red-500 font-bold mt-0.5">Ganti Hari Minggu
-                                                Kemarin</div>
-                                            <% } %>
-                                                <% if(s.status !=='scheduled' ) { %>
-                                                    <span
-                                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
-                                        <%= s.status === 'hadir' ? 'bg-green-100 text-green-800' : 
-                                           (s.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') %>">
-                                                        <%= s.status %>
-                                                    </span>
-                                                    <% } %>
-                                                        <% if(s.denda> 0) { %>
-                                                            <div class="text-xs text-red-600 font-bold mt-1">Denda: Rp
-                                                                <%= s.denda.toLocaleString('id-ID') %>
-                                                            </div>
-                                                            <% } %>
 
-                                                                <!-- Display Photos -->
-                                                                <% if(s.foto_bukti) { let photos=[]; try {
-                                                                    photos=(s.parsedPhotos||[]); } catch(e) {} if(photos
-                                                                    && photos.length> 0) {
-                                                                    const safePhotosJson =
-                                                                    JSON.stringify(photos).replace(/'/g,
-                                                                    "&apos;");
-                                                                    %>
-                                                                    <div
-                                                                        class="mt-2 text-[10px] text-gray-500 font-bold">
-                                                                        Files:
-                                                                        <%= photos.length %>
-                                                                    </div>
-                                                                    <div class="mt-2 flex overflow-x-auto space-x-2 pb-2"
-                                                                        data-photos='<%- safePhotosJson %>'>
-                                                                        <% photos.forEach((photo, index)=> {
-                                                                            if(!photo || typeof photo !== 'string')
-                                                                            return;
-                                                                            const isVideo =
-                                                                            photo.match(/\.(mp4|mov|avi|webm)$/i);
-                                                                            %>
-                                                                            <% if(isVideo) { %>
-                                                                                <div onclick="openCarouselFromData(this, <%= index %>)"
-                                                                                    class="h-12 w-12 relative cursor-pointer rounded-lg border border-gray-200 hover:opacity-75 bg-black flex items-center justify-center shrink-0">
-                                                                                    <video
-                                                                                        src="/uploads/ronda/<%= photo %>#t=1.0"
-                                                                                        class="h-full w-full object-cover opacity-60 absolute inset-0 z-0"
-                                                                                        preload="metadata"></video>
-                                                                                    <svg class="w-6 h-6 text-white z-10"
-                                                                                        fill="currentColor"
-                                                                                        viewBox="0 0 20 20">
-                                                                                        <path fill-rule="evenodd"
-                                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                                                                            clip-rule="evenodd" />
-                                                                                    </svg>
-                                                                                </div>
-                                                                                <% } else { %>
-                                                                                    <img src="/uploads/ronda/<%= photo %>"
-                                                                                        onclick="openCarouselFromData(this, <%= index %>)"
-                                                                                        class="h-12 w-12 object-cover rounded-lg border
-                                                                            border-gray-200 hover:opacity-75
-                                                                            cursor-pointer shrink-0">
-                                                                                    <% } %>
-                                                                                        <% }) %>
-                                                                    </div>
-                                                                    <% } } %>
+                                        <% if(s.denda> 0) { %>
+                                            <div class="text-xs text-red-400 font-bold mt-1 flex items-center gap-1">
+                                                <span>💸</span> Denda: Rp <%= s.denda.toLocaleString('id-ID') %>
+                                            </div>
+                                            <% } %>
+
+                                                <!-- Display Photos -->
+                                                <% if(s.foto_bukti) { let photos=[]; try { photos=(s.parsedPhotos||[]);
+                                                    } catch(e) {} if(photos && photos.length> 0) {
+                                                    const safePhotosJson =
+                                                    JSON.stringify(photos).replace(/'/g,
+                                                    "&apos;");
+                                                    %>
+                                                    <div class="mt-2 flex overflow-x-auto space-x-2 pb-1 scrollbar-hide"
+                                                        data-photos='<%- safePhotosJson %>'>
+                                                        <% photos.forEach(function(photo, index) { if(!photo || typeof
+                                                            photo !=='string' ) return; const
+                                                            isVideo=photo.match(/\.(mp4|mov|avi|webm)$/i); %>
+                                                            <% if(isVideo) { %>
+                                                                <div onclick="openCarouselFromData(this, <%= index %>)"
+                                                                    class="h-8 w-8 relative cursor-pointer rounded-lg border border-gray-600 hover:border-indigo-400 bg-black flex items-center justify-center shrink-0 transition-colors">
+                                                                    <span class="text-[8px]">▶</span>
+                                                                </div>
+                                                                <% } else { %>
+                                                                    <img src="/uploads/ronda/<%= photo %>"
+                                                                        onclick="openCarouselFromData(this, <%= index %>)"
+                                                                        class="h-8 w-8 object-cover rounded-lg border
+                                                                            border-gray-600 hover:border-indigo-400
+                                                                            cursor-pointer shrink-0 transition-colors">
+                                                                    <% } %>
+                                                                        <% }); %>
+                                                    </div>
+                                                    <% } } %>
                                     </div>
 
-                                    <div class="flex items-center gap-2">
-                                        <% if(user.role !=='warga' || (user.warga_id===s.warga_id && (isToday ||
-                                            isThisWeek))) { %>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <% if(user.role !=='warga' || user.warga_id==s.warga_id) { %>
                                             <% if((s.status==='scheduled' || s.status==='reschedule' || s.status==='' )
                                                 && s.id) { %>
                                                 <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
-                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all">
-                                                    ✓ Absensi
+                                                    class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
+                                                    title="Absensi">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
                                                 </button>
                                                 <% } %>
                                                     <% if(s.denda> 0) { %>
-                                                        <form action="/ronda/pay-fine" method="POST" class="inline"
-                                                            onsubmit="return confirm('Bayar denda?')">
-                                                            <input type="hidden" name="id" value="<%= s.id %>">
-                                                            <button type="submit"
-                                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all">
-                                                                💰 Bayar
-                                                            </button>
-                                                        </form>
-                                                        <% } %>
-                                                            <% } %>
-
-                                                                <!-- Upload Foto Button -->
-                                                                <% if((user.role==='admin' || isToday || isThisWeek ||
-                                                                    s.status==='hadir' ) && s.id) { %>
-                                                                    <button
-                                                                        onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
-                                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all">
-                                                                        📷 Capture
-                                                                    </button>
+                                                        <% if(s.status_bayar==='pending' ) { %>
+                                                            <% if(user.role==='admin' ) { %>
+                                                                <button
+                                                                    onclick="openVerifyFineModal('<%= s.id %>', '<%= s.bukti_bayar %>')"
+                                                                    class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all text-xs font-bold"
+                                                                    title="Verifikasi Pembayaran">
+                                                                    Verifikasi
+                                                                </button>
+                                                                <% } else { %>
+                                                                    <span
+                                                                        class="p-2 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold cursor-help"
+                                                                        title="Menunggu Verifikasi Admin">
+                                                                        ⏳
+                                                                    </span>
                                                                     <% } %>
+                                                                        <% } else { %>
+                                                                            <button
+                                                                                onclick="openPayFineModal('<%= s.id %>', '<%= s.denda %>')"
+                                                                                class="p-2 rounded-full bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all"
+                                                                                title="Bayar Denda">
+                                                                                <svg class="w-4 h-4" fill="none"
+                                                                                    stroke="currentColor"
+                                                                                    viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round"
+                                                                                        stroke-linejoin="round"
+                                                                                        stroke-width="2"
+                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                                    </path>
+                                                                                </svg>
+                                                                            </button>
+                                                                            <% } %>
+                                                                                <% } %>
+                                                                                    <% } %>
+
+                                                                                        <!-- Upload Foto Button -->
+                                                                                        <% if((user.role==='admin' ||
+                                                                                            isToday || isThisWeek ||
+                                                                                            s.status==='hadir' ) &&
+                                                                                            s.id) { %>
+                                                                                            <button
+                                                                                                onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
+                                                                                                class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all"
+                                                                                                title="Upload Foto">
+                                                                                                <svg class="w-4 h-4"
+                                                                                                    fill="none"
+                                                                                                    stroke="currentColor"
+                                                                                                    viewBox="0 0 24 24">
+                                                                                                    <path
+                                                                                                        stroke-linecap="round"
+                                                                                                        stroke-linejoin="round"
+                                                                                                        stroke-width="2"
+                                                                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                                                                    </path>
+                                                                                                    <path
+                                                                                                        stroke-linecap="round"
+                                                                                                        stroke-linejoin="round"
+                                                                                                        stroke-width="2"
+                                                                                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                            <% } %>
                                     </div>
                                 </li>
                                 <% }) %>
@@ -378,58 +448,112 @@
         </div>
 
         <!-- Status Modal -->
-        <div id="statusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <h3 class="text-sm font-medium text-gray-900 mb-4">Absensi Ronda</h3>
+        <div id="statusModal"
+            class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+            <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
+                <h3 class="text-lg font-bold text-gray-100 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Absensi Ronda
+                </h3>
                 <form action="/ronda/update-status" method="POST">
                     <input type="hidden" id="scheduleId" name="id">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Nama: <span id="wargaName"
-                                class="font-bold"></span></label>
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama
+                            Warga</label>
+                        <div id="wargaName"
+                            class="text-gray-100 font-bold bg-white/5 p-3 rounded-xl border border-white/10"></div>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Status
+                            Kehadiran</label>
                         <select name="status"
-                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
                             <option value="hadir">Hadir</option>
                             <option value="reschedule">Reschedule (Ganti Minggu Depan)</option>
                             <option value="alpa">Alpa (Denda 50rb)</option>
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Keterangan</label>
-                        <textarea name="keterangan" rows="3"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"></textarea>
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Keterangan
+                            (Opsional)</label>
+                        <textarea name="keterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..."
+                            class="glass-input mt-1 block w-full rounded-xl p-3 outline-none resize-none"></textarea>
                     </div>
-                    <div class="flex justify-end">
+                    <div class="flex justify-end gap-3">
                         <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')"
-                            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2">Batal</button>
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-gray-200 transition-colors">
+                            Batal
+                        </button>
                         <button type="submit"
-                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Simpan</button>
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg transition-all">
+                            Simpan
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Upload Modal -->
-        <div id="uploadModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <h3 class="text-sm font-medium text-gray-900 mb-4">Upload Foto Bukti Ronda</h3>
+        <div id="uploadModal"
+            class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+            <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
+                <h3 class="text-lg font-bold text-gray-100 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Upload Bukti Ronda
+                </h3>
                 <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Nama: <span id="uploadWargaName"
-                                class="font-bold"></span></label>
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama
+                            Warga /
+                            Kegiatan</label>
+                        <div id="uploadWargaName"
+                            class="text-gray-100 font-bold bg-white/5 p-3 rounded-xl border border-white/10"></div>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Pilih Foto/Video (Max 10)</label>
-                        <input type="file" name="foto_bukti" multiple accept="image/*,video/*" required
-                            class="mt-1 block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih
+                            File
+                            (Foto/Video)</label>
+                        <div
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-white/10 border-dashed rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48" aria-hidden="true">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-400">
+                                    <label for="file-upload"
+                                        class="relative cursor-pointer rounded-md font-bold text-blue-400 hover:text-blue-300">
+                                        <span>Upload files</span>
+                                        <input id="file-upload" name="foto_bukti" type="file" class="sr-only" multiple
+                                            accept="image/*,video/*" required onchange="updateFileName(this)">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, MP4 up to 10 files</p>
+                                <div id="file-name-display" class="text-xs text-indigo-400 font-bold mt-2"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex justify-end">
+                    <div class="flex justify-end gap-3">
                         <button type="button" onclick="document.getElementById('uploadModal').classList.add('hidden')"
-                            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2">Batal</button>
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-gray-200 transition-colors">
+                            Batal
+                        </button>
                         <button type="submit"
-                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Upload</button>
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg transition-all">
+                            Upload
+                        </button>
                     </div>
                 </form>
             </div>
@@ -448,7 +572,8 @@
             <button onclick="prevSlide()"
                 class="absolute left-4 text-white hover:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                    </path>
                 </svg>
             </button>
             <button onclick="nextSlide()"
@@ -463,7 +588,8 @@
                 <video id="carouselVideo" src=""
                     class="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl hidden" controls></video>
                 <div id="carouselCounter"
-                    class="absolute bottom-[-30px] left-1/2 transform -translate-x-1/2 text-white font-medium"></div>
+                    class="absolute bottom-[-30px] left-1/2 transform -translate-x-1/2 text-white font-medium">
+                </div>
 
                 <% if(user.role==='admin' || user.role==='ketua' || user.role==='warga' ) { %>
                     <form id="deletePhotoForm" action="/ronda/delete-photo" method="POST"
@@ -575,6 +701,15 @@
                 document.getElementById('uploadWargaName').innerText = 'Kondisi Ronda (' + date + ')';
                 document.getElementById('uploadModal').classList.remove('hidden');
             }
+
+            function updateFileName(input) {
+                const display = document.getElementById('file-name-display');
+                if (input.files && input.files.length > 0) {
+                    display.innerText = input.files.length + ' file(s) selected';
+                } else {
+                    display.innerText = '';
+                }
+            }
         </script>
 
         <script>
@@ -628,5 +763,121 @@
                 }
             }
         </script>
+
+        <!-- Pay Fine Modal -->
+        <div id="payFineModal" class="fixed inset-0 z-[10000] hidden overflow-y-auto" aria-labelledby="modal-title"
+            role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"
+                    onclick="closePayFineModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="inline-block align-bottom bg-gray-900/90 backdrop-blur-xl rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Bayar Denda Ronda</h3>
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-300 mb-4">Scan QRIS di bawah ini untuk membayar denda sebesar
+                                <span class="font-bold text-red-400" id="payFineAmount">Rp 50.000</span>
+                            </p>
+                            <div class="flex justify-center bg-white p-4 rounded-xl mx-auto w-fit">
+                                <canvas id="qrisCanvas"></canvas>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">NMID: ID1020020020020 (Warga Ambyar)</p>
+                        </div>
+                        <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-4">
+                            <input type="hidden" name="id" id="payFineId">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Upload Bukti
+                                    Transfer</label>
+                                <input type="file" name="foto_bukti" accept="image/*" required
+                                    class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                            </div>
+                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                <button type="submit"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:col-start-2 sm:text-sm">
+                                    Kirim Bukti
+                                </button>
+                                <button type="button" onclick="closePayFineModal()"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+        <script>
+            function openPayFineModal(id, denda) {
+                document.getElementById('payFineId').value = id;
+                document.getElementById('payFineAmount').innerText = 'Rp ' + parseInt(denda).toLocaleString('id-ID');
+                document.getElementById('payFineModal').classList.remove('hidden');
+
+                // Generate QRIS (Dummy String + ID for uniqueness)
+                const qrisData = "00020101021126570011ID.DANA.WWW011893600915320020020025204581253033605802ID5912Warga Ambyar6006Jakarta61051234562070703A016304" + id;
+
+                QRCode.toCanvas(document.getElementById('qrisCanvas'), qrisData, { width: 200, margin: 2 }, function (error) {
+                    if (error) console.error(error)
+                })
+            }
+
+            function closePayFineModal() {
+                document.getElementById('payFineModal').classList.add('hidden');
+            }
+
+            function openVerifyFineModal(id, proof) {
+                document.getElementById('verifyFineId').value = id;
+                document.getElementById('verifyProofImage').src = '/uploads/ronda/' + proof;
+                document.getElementById('verifyFineModal').classList.remove('hidden');
+            }
+
+            function closeVerifyFineModal() {
+                document.getElementById('verifyFineModal').classList.add('hidden');
+            }
+        </script>
+
+        <!-- Verify Fine Modal -->
+        <div id="verifyFineModal" class="fixed inset-0 z-[10000] hidden overflow-y-auto" aria-labelledby="modal-title"
+            role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"
+                    onclick="closeVerifyFineModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="inline-block align-bottom bg-gray-900/90 backdrop-blur-xl rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Verifikasi Pembayaran
+                            Denda</h3>
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-300 mb-4">Bukti Pembayaran:</p>
+                            <div class="flex justify-center bg-black/50 p-2 rounded-xl mx-auto w-fit mb-4">
+                                <img id="verifyProofImage" src="" class="max-h-[60vh] object-contain rounded-lg">
+                            </div>
+                        </div>
+                        <form action="/ronda/verify-fine" method="POST" class="mt-4">
+                            <input type="hidden" name="id" id="verifyFineId">
+                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                <button type="submit" name="action" value="approve"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:col-start-2 sm:text-sm">
+                                    Setujui (Lunas)
+                                </button>
+                                <button type="submit" name="action" value="reject"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                                    Tolak
+                                </button>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" onclick="closeVerifyFineModal()"
+                                    class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:text-sm">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <%- include('../partials/footer') %>

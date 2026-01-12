@@ -146,7 +146,11 @@ const Ronda = {
     },
 
     payFine: async (id) => {
-        await db.query("UPDATE ronda_jadwal SET denda = 0, status = 'hadir', keterangan = CONCAT(IFNULL(keterangan, ''), ' [Denda Lunas]') WHERE id = ?", [id]);
+        await db.query("UPDATE ronda_jadwal SET denda = 0, status = 'hadir', status_bayar = 'paid', keterangan = CONCAT(IFNULL(keterangan, ''), ' [Denda Lunas]') WHERE id = ?", [id]);
+    },
+
+    submitFinePayment: async (id, filename) => {
+        await db.query("UPDATE ronda_jadwal SET bukti_bayar = ?, status_bayar = 'pending' WHERE id = ?", [filename, id]);
     },
 
     getTeams: async () => {

@@ -8,11 +8,12 @@
                 <div class="md:flex md:items-center md:justify-between mb-8">
                     <div class="flex-1 min-w-0">
                         <h2
-                            class="text-2xl font-bold leading-7 text-gray-100 sm:text-3xl sm:truncate flex items-center">
-                            <span class="bg-white/10 text-gray-300 p-2 rounded-lg mr-3 border border-white/15">💰</span>
+                            class="text-2xl font-bold leading-7 text-emerald-400 sm:text-3xl sm:truncate flex items-center">
+                            <span
+                                class="bg-emerald-500/10 text-emerald-400 p-2 rounded-lg mr-3 border border-emerald-500/20">💰</span>
                             Laporan Keuangan
                         </h2>
-                        <p class="mt-2 text-sm text-gray-400 ml-1">
+                        <p class="mt-2 text-sm text-emerald-100/70 ml-1">
                             Neraca kas, rekapitulasi pemasukan warga, dan transparansi pengeluaran operasional.
                         </p>
                     </div>
@@ -32,7 +33,7 @@
                         </a>
                         <% if(user.role==='admin' || user.role==='bendahara' ) { %>
                             <button type="button" onclick="openModal()"
-                                class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-200 bg-white/10 hover:bg-white/15 transition border border-white/15">
+                                class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 bg-emerald-500/20 hover:bg-emerald-500/30 transition border border-emerald-500/30">
                                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -52,20 +53,18 @@
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
-                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
-                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
+                                    <div
+                                        class="rounded-full bg-emerald-500/10 w-16 h-16 flex items-center justify-center border border-emerald-500/20">
+                                        <span class="text-2xl font-bold text-emerald-400">Rp</span>
                                     </div>
                                 </div>
                                 <div class="ml-5 w-0 flex-1">
                                     <dl>
-                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                        <dt
+                                            class="text-sm font-medium text-emerald-400/80 truncate uppercase tracking-wide">
                                             Saldo Kas Saat Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-extrabold text-gray-100 mt-1">Rp <%=
+                                            <div class="text-3xl font-extrabold text-emerald-100 mt-1">Rp <%=
                                                     Number(saldo).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
@@ -81,8 +80,8 @@
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
-                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
-                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
+                                    <div class="rounded-full bg-emerald-500/10 p-4 border border-emerald-500/20">
+                                        <svg class="h-8 w-8 text-emerald-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -91,10 +90,11 @@
                                 </div>
                                 <div class="ml-5 w-0 flex-1">
                                     <dl>
-                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                        <dt
+                                            class="text-sm font-medium text-emerald-400/80 truncate uppercase tracking-wide">
                                             Pemasukan Bulan Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-bold text-gray-200 mt-1">+ Rp <%=
+                                            <div class="text-3xl font-bold text-emerald-200 mt-1">+ Rp <%=
                                                     Number(pemasukanBulanIni).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
@@ -110,8 +110,8 @@
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
-                                    <div class="rounded-full bg-white/10 p-4 border border-white/15">
-                                        <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor"
+                                    <div class="rounded-full bg-red-500/10 p-4 border border-red-500/20">
+                                        <svg class="h-8 w-8 text-red-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
@@ -120,10 +120,11 @@
                                 </div>
                                 <div class="ml-5 w-0 flex-1">
                                     <dl>
-                                        <dt class="text-sm font-medium text-gray-400 truncate uppercase tracking-wide">
+                                        <dt
+                                            class="text-sm font-medium text-red-400/80 truncate uppercase tracking-wide">
                                             Pengeluaran Bulan Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-bold text-gray-300 mt-1">- Rp <%=
+                                            <div class="text-3xl font-bold text-red-200 mt-1">- Rp <%=
                                                     Number(pengeluaranBulanIni).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
@@ -140,8 +141,10 @@
                     <!-- Financial Chart -->
                     <div class="glass-card rounded-xl p-6 w-full transition-shadow hover:bg-white/10">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold text-gray-100 flex items-center">
-                                <span class="bg-white/10 p-1.5 rounded-lg mr-2 border border-white/10">📊</span> Tren
+                            <h3 class="text-lg font-bold text-emerald-400 flex items-center">
+                                <span
+                                    class="bg-emerald-500/10 p-1.5 rounded-lg mr-2 border border-emerald-500/20">📊</span>
+                                Tren
                                 Keuangan (12 Bulan)
                             </h3>
                         </div>
@@ -153,24 +156,27 @@
                     <!-- Recent Transactions Table -->
                     <div
                         class="glass-card rounded-xl overflow-hidden flex flex-col h-[600px] w-full transition-shadow hover:bg-white/10">
-                        <div class="px-6 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
-                            <h3 class="text-lg font-bold text-gray-100 flex items-center">
-                                <span class="bg-white/10 p-1.5 rounded-lg mr-2 border border-white/10">📝</span> Mutasi
+                        <div
+                            class="px-6 py-4 border-b border-emerald-500/20 bg-emerald-500/5 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-emerald-400 flex items-center">
+                                <span
+                                    class="bg-emerald-500/10 p-1.5 rounded-lg mr-2 border border-emerald-500/20">📝</span>
+                                Mutasi
                                 Terakhir
                             </h3>
                         </div>
                         <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
-                            <table class="min-w-full divide-y divide-white/10">
-                                <thead class="bg-white/5 sticky top-0 z-10">
+                            <table class="min-w-full divide-y divide-emerald-500/10">
+                                <thead class="bg-emerald-500/10 sticky top-0 z-10">
                                     <tr>
                                         <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                            class="px-6 py-3 text-left text-xs font-bold text-emerald-400 uppercase tracking-wider">
                                             Keterangan</th>
                                         <th scope="col"
-                                            class="px-3 py-3 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">
+                                            class="px-3 py-3 text-right text-xs font-bold text-emerald-400 uppercase tracking-wider">
                                             Debit (Masuk)</th>
                                         <th scope="col"
-                                            class="px-3 py-3 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">
+                                            class="px-3 py-3 text-right text-xs font-bold text-red-400 uppercase tracking-wider">
                                             Kredit (Keluar)</th>
                                     </tr>
                                 </thead>
@@ -186,20 +192,20 @@
                                                         <%= moment(t.tanggal).format('DD MMM YYYY') %>
                                                     </span>
                                                     <% if(t.bukti_foto) { %>
-                                                        <button type="button"
-                                                            onclick="showProof('/uploads/keuangan/<%= t.bukti_foto %>')"
-                                                            class="px-2 py-0.5 rounded bg-white/10 text-gray-300 text-xs hover:bg-white/15 flex items-center gap-1 transition-colors border border-white/10">
-                                                            Bukti 👁️
-                                                        </button>
+                                                        <div class="mt-2">
+                                                            <img src="/uploads/keuangan/<%= t.bukti_foto %>" alt="Bukti"
+                                                                onclick="showProof('/uploads/keuangan/<%= t.bukti_foto %>')"
+                                                                class="w-12 h-12 rounded-lg object-cover cursor-pointer hover:opacity-80 border border-emerald-500/20 transition-opacity bg-black/20">
+                                                        </div>
                                                         <% } %>
                                                 </div>
                                             </td>
                                             <td
-                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-200">
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-emerald-300">
                                                 <%= t.tipe==='masuk' ? Number(t.jumlah).toLocaleString('id-ID') : '-' %>
                                             </td>
                                             <td
-                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-300">
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-red-300">
                                                 <%= t.tipe==='keluar' ? Number(t.jumlah).toLocaleString('id-ID') : '-'
                                                     %>
                                             </td>
@@ -242,19 +248,19 @@
 
                             <div class="mb-5">
                                 <label class="block text-sm font-bold text-gray-300 mb-2">Jenis Transaksi</label>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <label class="cursor-pointer">
+                                <div class="flex bg-black/20 p-1 rounded-lg border border-white/10">
+                                    <label class="flex-1 cursor-pointer">
                                         <input type="radio" name="tipe" value="masuk" class="peer sr-only" checked>
                                         <div
-                                            class="glass-card rounded-lg border-2 border-white/10 p-3 text-center peer-checked:border-white/30 peer-checked:bg-white/15 transition-all">
-                                            <div class="font-bold text-gray-300">📥 Pemasukan</div>
+                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
+                                            📥 Pemasukan
                                         </div>
                                     </label>
-                                    <label class="cursor-pointer">
+                                    <label class="flex-1 cursor-pointer">
                                         <input type="radio" name="tipe" value="keluar" class="peer sr-only">
                                         <div
-                                            class="glass-card rounded-lg border-2 border-white/10 p-3 text-center peer-checked:border-white/30 peer-checked:bg-white/15 transition-all">
-                                            <div class="font-bold text-gray-300">📤 Pengeluaran</div>
+                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-400 peer-checked:bg-red-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
+                                            📤 Pengeluaran
                                         </div>
                                     </label>
                                 </div>
@@ -273,10 +279,10 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-sm font-bold text-gray-300 mb-1">Tanggal</label>
-                                <input type="date" name="tanggal" required
+                                <label class="block text-sm font-bold text-gray-300 mb-1">Waktu Transaksi</label>
+                                <input type="datetime-local" name="tanggal" required
                                     class="glass-input block w-full sm:text-sm rounded-lg py-2 px-3"
-                                    value="<%= moment().format('YYYY-MM-DD') %>">
+                                    value="<%= moment().format('YYYY-MM-DDTHH:mm') %>">
                             </div>
 
                             <div class="mb-4">
@@ -367,12 +373,12 @@
                     const ctx = document.getElementById('financeChart').getContext('2d');
 
                     const gradientMasuk = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradientMasuk.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-                    gradientMasuk.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+                    gradientMasuk.addColorStop(0, 'rgba(16, 185, 129, 0.5)'); // Emerald-500
+                    gradientMasuk.addColorStop(1, 'rgba(16, 185, 129, 0.1)');
 
                     const gradientKeluar = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradientKeluar.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
-                    gradientKeluar.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+                    gradientKeluar.addColorStop(0, 'rgba(239, 68, 68, 0.5)'); // Red-500
+                    gradientKeluar.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
 
                     new Chart(ctx, {
                         type: 'bar',
@@ -383,7 +389,7 @@
                                     label: 'Pemasukan',
                                     data: chartData.income,
                                     backgroundColor: gradientMasuk,
-                                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                                    borderColor: '#10b981',
                                     borderWidth: 1,
                                     borderRadius: 6,
                                     barPercentage: 0.6,
@@ -392,7 +398,7 @@
                                     label: 'Pengeluaran',
                                     data: chartData.expense,
                                     backgroundColor: gradientKeluar,
-                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderColor: '#ef4444',
                                     borderWidth: 1,
                                     borderRadius: 6,
                                     barPercentage: 0.6,

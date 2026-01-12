@@ -49,11 +49,42 @@ exports.exportExcel = async (req, res) => {
 
 exports.index = async (req, res) => {
     try {
+        // Auto-reset names for unregistered warga (Temporary)
+        const db = require('../config/db');
+        // Drop unique constraint to allow multiple 'Blok - No' names per house
+        try { await db.query("ALTER TABLE warga DROP INDEX unique_rumah_person"); } catch (e) { }
+
+        // 1. Cleanup: Delete unregistered warga if there are duplicates in the same house
+        // Keep registered users, or the one with smallest ID if none are registered
+        await db.query(`
+            DELETE w1 FROM warga w1
+            LEFT JOIN users u1 ON w1.id = u1.warga_id
+            WHERE u1.id IS NULL
+            AND EXISTS (
+                SELECT 1 FROM (SELECT * FROM warga) w2
+                LEFT JOIN users u2 ON w2.id = u2.warga_id
+                WHERE w2.blok = w1.blok AND w2.nomor_rumah = w1.nomor_rumah
+                AND w2.id != w1.id
+                AND (
+                    u2.id IS NOT NULL
+                    OR w2.id < w1.id
+                )
+            )
+        `);
+
+        // 2. Reset Names: Update remaining unregistered warga to 'Blok - No'
+        await db.query(`
+            UPDATE warga w
+            LEFT JOIN users u ON w.id = u.warga_id
+            SET w.nama = CONCAT('Blok ', IFNULL(w.blok, '?'), ' - ', IFNULL(w.nomor_rumah, '?'))
+            WHERE u.id IS NULL
+        `);
+
         const warga = await Warga.getAll();
-        res.render('warga/index', { title: 'Data Warga', warga });
+        res.render('warga/index', { title: 'Data Warga', warga, useWideContainer: true, noPadding: true });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        res.status(500).send('Server Error: ' + err.message);
     }
 };
 
@@ -144,6 +175,19 @@ exports.reject = async (req, res) => {
     }
 };
 
+exports.updateApproval = async (req, res) => {
+    try {
+        const { approval_status } = req.body;
+        await Warga.updateApprovalStatus(req.params.id, approval_status);
+        req.flash('success_msg', `Status approval berhasil diupdate menjadi ${approval_status}`);
+        res.redirect('/warga');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal update approval status');
+        res.redirect('/warga');
+    }
+};
+
 exports.toggleRonda = async (req, res) => {
     try {
         await Warga.toggleRonda(req.params.id);
@@ -153,5 +197,21 @@ exports.toggleRonda = async (req, res) => {
         console.error(err);
         req.flash('error_msg', 'Gagal update status ronda');
         res.redirect('/warga');
+    }
+};
+
+exports.resetNames = async (req, res) => {
+    try {
+        const db = require('../config/db');
+        const [result] = await db.query(`
+            UPDATE warga w
+            LEFT JOIN users u ON w.id = u.warga_id
+            SET w.nama = CONCAT('Blok ', w.blok, ' - ', w.nomor_rumah)
+            WHERE u.id IS NULL
+        `);
+        res.send(`Reset names successful. Updated ${result.changedRows} rows.`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error resetting names: ' + err.message);
     }
 };

@@ -22,735 +22,812 @@
             </div>
             <% } %>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 auto-rows-min">
-
-                    <!-- 1. Finance Summary -->
-                    <div class="md:col-span-2 lg:col-span-2 glass-card p-6 flex flex-col justify-between h-full group">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Saldo Kas RT
-                                </h3>
-                                <div class="text-4xl font-bold text-gray-100 mt-2">
-                                    Rp <%= new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0 }).format(saldo) %>
-                                </div>
-                            </div>
-                            <div
-                                class="bg-white/5 p-3 rounded-lg backdrop-blur-sm border border-white/10 group-hover:bg-white/10 transition-all">
-                                <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                <% if(user.role==='admin' ) { %>
+                    <div class="flex justify-end mb-4">
+                        <form action="/dashboard/reset-data" method="POST"
+                            onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin mereset SEMUA data keuangan, denda, dan absen ronda? Tindakan ini tidak dapat dibatalkan!');">
+                            <button type="submit"
+                                class="glass-button px-4 py-2 rounded-lg text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                     </path>
                                 </svg>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mt-4">
-                            <div
-                                class="bg-white/5 p-4 rounded-lg border border-white/10 hover:bg-white/8 transition-colors">
-                                <div class="text-xs text-gray-400 font-medium mb-1">Pemasukan Bulan Ini</div>
-                                <div class="text-lg font-bold text-gray-200">
-                                    Rp <%= summary.pemasukan ? new Intl.NumberFormat('id-ID', { minimumFractionDigits:
-                                        0, maximumFractionDigits: 0 }).format(summary.pemasukan) : 0 %>
-                                </div>
-                            </div>
-                            <div
-                                class="bg-white/5 p-4 rounded-lg border border-white/10 hover:bg-white/8 transition-colors">
-                                <div class="text-xs text-gray-400 font-medium mb-1">Pengeluaran Bulan Ini</div>
-                                <div class="text-lg font-bold text-gray-200">
-                                    Rp <%= summary.pengeluaran ? new Intl.NumberFormat('id-ID', { minimumFractionDigits:
-                                        0, maximumFractionDigits: 0 }).format(summary.pengeluaran) : 0 %>
-                                </div>
-                            </div>
-                        </div>
+                                Reset Data
+                            </button>
+                        </form>
                     </div>
+                    <% } %>
 
-                    <!-- 2. Ronda Schedule -->
-                    <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
-                        <h3 class="font-bold text-lg mb-4 flex items-center text-gray-100">
-                            <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
-                                </path>
-                            </svg>
-                            Jadwal Ronda
-                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 auto-rows-min">
 
-                        <% const schedule=jadwalRonda.length> 0 ? jadwalRonda[0] : null; %>
+                            <!-- 1. Finance Summary -->
+                            <div
+                                class="md:col-span-2 lg:col-span-2 glass-card p-6 flex flex-col justify-between h-full group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Saldo
+                                            Kas RT
+                                        </h3>
+                                        <div class="text-4xl font-bold text-gray-100 mt-2">
+                                            Rp <%= new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0,
+                                                maximumFractionDigits: 0 }).format(saldo) %>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-white/5 w-12 h-12 flex items-center justify-center rounded-lg backdrop-blur-sm border border-white/10 group-hover:bg-white/10 transition-all">
+                                        <span class="text-lg font-bold text-gray-300">Rp</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div
+                                        class="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors">
+                                        <div class="text-xs text-emerald-400 font-medium mb-1">Pemasukan Bulan Ini</div>
+                                        <div class="text-lg font-bold text-emerald-100">
+                                            Rp <%= summary.pemasukan ? new Intl.NumberFormat('id-ID', {
+                                                minimumFractionDigits: 0, maximumFractionDigits: 0
+                                                }).format(summary.pemasukan) : 0 %>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-red-500/10 p-4 rounded-lg border border-red-500/30 hover:bg-red-500/20 transition-colors">
+                                        <div class="text-xs text-red-400 font-medium mb-1">Pengeluaran Bulan Ini</div>
+                                        <div class="text-lg font-bold text-red-100">
+                                            Rp <%= summary.pengeluaran ? new Intl.NumberFormat('id-ID', {
+                                                minimumFractionDigits: 0, maximumFractionDigits: 0
+                                                }).format(summary.pengeluaran) : 0 %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <div class="flex-grow">
+                            <!-- 2. Ronda Schedule -->
+                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
+                                <h3 class="font-bold text-lg mb-4 text-center text-gray-100">
+                                    Jadwal Ronda
+                                </h3>
+
+                                <% const schedule=jadwalRonda.length> 0 ? jadwalRonda[0] : null; %>
+
+                                    <div class="flex-grow">
+                                        <div class="flex flex-col items-center justify-center mb-6">
+                                            <div
+                                                class="text-gray-300 text-sm uppercase tracking-wider font-medium mb-2 text-center">
+                                                <%= schedule ? schedule.day : 'Tidak ada jadwal' %>
+                                            </div>
+                                            <% if(schedule && schedule.isUpcoming && schedule.date) { %>
+                                                <div id="ronda-countdown"
+                                                    class="bg-emerald-500/10 border border-emerald-500/20 px-4 py-1 rounded-full text-emerald-400 text-xs font-bold tracking-wide shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                                    Loading...
+                                                </div>
+                                                <script>
+                                                    (function () {
+                                                        const targetDate = new Date('<%= schedule.date %>');
+                                                        targetDate.setHours(23, 0, 0, 0); // Set to 23:00
+
+                                                        function updateCountdown() {
+                                                            const now = new Date();
+                                                            const diff = targetDate - now;
+
+                                                            if (diff <= 0) {
+                                                                const el = document.getElementById('ronda-countdown');
+                                                                if (el) el.innerText = 'Sekarang!';
+                                                                return;
+                                                            }
+
+                                                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                                                            let text = '';
+                                                            if (days > 0) text += days + 'h ';
+                                                            text += hours + 'j ' + minutes + 'm ' + seconds + 'd';
+
+                                                            const el = document.getElementById('ronda-countdown');
+                                                            if (el) el.innerText = text;
+                                                        }
+
+                                                        setInterval(updateCountdown, 1000);
+                                                        updateCountdown();
+                                                    })();
+                                                </script>
+                                                <% } %>
+                                        </div>
+
+                                        <% if(schedule && schedule.petugas.length> 0) { %>
+                                            <div class="relative">
+                                                <div id="ronda-carousel" class="overflow-hidden">
+                                                    <div id="ronda-carousel-track"
+                                                        class="flex transition-transform duration-500 ease-in-out">
+                                                        <% schedule.petugas.forEach((p, index)=> { %>
+                                                            <div class="w-full flex-shrink-0 px-2">
+                                                                <div
+                                                                    class="flex flex-col items-center bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-xl">
+                                                                    <div
+                                                                        class="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-bold mb-4 text-gray-200 overflow-hidden">
+                                                                        <% if(p.foto_profil) { %>
+                                                                            <img src="/uploads/profiles/<%= p.foto_profil %>"
+                                                                                alt="<%= p.nama %>"
+                                                                                class="w-full h-full object-cover grayscale">
+                                                                            <% } else { %>
+                                                                                <%= p.nama.charAt(0) %>
+                                                                                    <% } %>
+                                                                    </div>
+                                                                    <div class="text-center w-full">
+                                                                        <div
+                                                                            class="text-lg font-bold text-gray-100 truncate px-2">
+                                                                            <%= p.nama %>
+                                                                        </div>
+                                                                        <div
+                                                                            class="text-sm text-gray-400 mt-1 bg-white/5 py-1 px-3 rounded-full inline-block backdrop-blur-sm border border-white/10">
+                                                                            Blok <%= p.blok %>-<%= p.nomor_rumah %>
+                                                                        </div>
+                                                                        <% if(p.tim_ronda) { %>
+                                                                            <div
+                                                                                class="mt-3 inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                                                                                Tim <%= p.tim_ronda %>
+                                                                            </div>
+                                                                            <% } %>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% }) %>
+                                                    </div>
+                                                </div>
+
+                                                <% if(schedule.petugas.length> 1) { %>
+                                                    <button onclick="prevRondaSlide()"
+                                                        class="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 bg-white/10 hover:bg-white/20 text-gray-300 p-2 rounded-full transition backdrop-blur-sm border border-white/10">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                                        </svg>
+                                                    </button>
+                                                    <button onclick="nextRondaSlide()"
+                                                        class="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 bg-white/10 hover:bg-white/20 text-gray-300 p-2 rounded-full transition backdrop-blur-sm border border-white/10">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                    <div class="flex justify-center mt-4 space-x-2">
+                                                        <% schedule.petugas.forEach((p, index)=> { %>
+                                                            <button onclick="goToRondaSlide(<%= index %>)"
+                                                                class="ronda-indicator w-2 h-2 rounded-full bg-gray-400 transition-all <%= index === 0 ? 'bg-opacity-100 w-4' : 'bg-opacity-40 hover:bg-opacity-60' %>"></button>
+                                                            <% }) %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+
+                                            <a href="/ronda"
+                                                class="mt-5 w-full glass-button text-gray-200 text-center py-3 rounded-lg text-sm font-medium hover:bg-white/12 transition block border border-white/10">Lihat
+                                                Jadwal Lengkap</a>
+                                            <% } else { %>
+                                                <div
+                                                    class="text-center py-12 text-gray-400 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
+                                                    <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <p class="text-sm font-medium">Tidak ada jadwal ronda<br>dalam waktu
+                                                        dekat.
+                                                    </p>
+                                                </div>
+                                                <div class="mt-4 pt-4 border-t border-white/10">
+                                                    <a href="/ronda"
+                                                        class="text-sm text-gray-400 hover:text-gray-200 flex items-center justify-center font-medium transition-colors">Lihat
+                                                        Jadwal Lengkap &rarr;</a>
+                                                </div>
+                                                <% } %>
+                                    </div>
+                            </div>
+
+                            <!-- 3. Announcements -->
+                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-gray-100 text-lg flex items-center">
+                                        <span
+                                            class="bg-white/5 p-1.5 rounded-lg mr-2 text-gray-400 border border-white/10">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
+                                                </path>
+                                            </svg>
+                                        </span>
+                                        Pengumuman
+                                    </h3>
+                                    <button onclick="openEventModal()"
+                                        class="glass-button bg-white/5 hover:bg-white/10 text-gray-300 p-2 rounded-lg transition border border-white/10"
+                                        title="Tambah Pengumuman">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <% if (events && events.length> 0) { %>
+                                        <% events.forEach(event=> { %>
+                                            <div onclick="openEventDetail(<%= JSON.stringify(event) %>)"
+                                                class="glass-card bg-white/5 p-4 hover:bg-white/10 transition-all cursor-pointer group border border-white/10">
+                                                <div
+                                                    class="text-xs text-gray-400 font-medium mb-1.5 uppercase tracking-wide group-hover:text-gray-300 bg-white/5 inline-block px-2 py-0.5 rounded-md">
+                                                    <%= new Date(event.tanggal).toLocaleDateString('id-ID', {
+                                                        weekday: 'long' , day: 'numeric' , month: 'short' ,
+                                                        year: 'numeric' }) %>
+                                                </div>
+                                                <div
+                                                    class="text-sm font-semibold text-gray-200 group-hover:text-gray-100 mt-1 line-clamp-2">
+                                                    <%= event.judul %>
+                                                </div>
+                                                <% if(event.lokasi) { %>
+                                                    <div class="text-xs text-gray-400 mt-2 flex items-center">
+                                                        <svg class="w-3 h-3 mr-1 text-gray-500" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                        </svg>
+                                                        <%= event.lokasi %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <div
+                                                        class="text-center py-8 text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
+                                                        Belum ada pengumuman</div>
+                                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- 4. Map -->
+                            <div class="md:col-span-2 lg:col-span-3 glass-card rounded-xl overflow-hidden h-full">
+                                <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                                    <h3 class="font-bold text-gray-100">Peta Lingkungan</h3>
+                                    <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-xs">
+                                        <div class="flex items-center"><span
+                                                class="w-3 h-3 bg-blue-500/30 border border-blue-500/50 rounded mr-1"></span><span
+                                                class="text-gray-400">Tetap</span></div>
+                                        <div class="flex items-center"><span
+                                                class="w-3 h-3 bg-amber-500/30 border border-amber-500/50 rounded mr-1"></span><span
+                                                class="text-gray-400">Kontrak</span></div>
+                                        <div class="flex items-center"><span
+                                                class="w-3 h-3 bg-white/5 border border-white/20 rounded mr-1"></span><span
+                                                class="text-gray-400">Kosong</span></div>
+                                        <div class="flex items-center ml-2 border-l border-white/20 pl-2"><span
+                                                class="w-2 h-2 bg-emerald-500 rounded-full mr-1"></span><span
+                                                class="text-gray-400">Lunas</span></div>
+                                        <div class="flex items-center"><span
+                                                class="w-2 h-2 bg-red-500 rounded-full mr-1"></span><span
+                                                class="text-gray-400">Belum Bayar</span></div>
+                                    </div>
+                                </div>
+                                <div class="p-6 overflow-x-auto">
+                                    <div
+                                        class="flex flex-row md:flex-col items-center justify-center w-full gap-4 md:gap-0">
+                                        <!-- Blok F7 -->
+                                        <div class="flex-1 md:flex-none w-0 md:w-full md:mb-6 order-3 md:order-1">
+                                            <div
+                                                class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
+                                                Blok F7</div>
+                                            <div
+                                                class="flex flex-col md:flex-row gap-2 items-end md:items-center md:justify-center">
+                                                <% for(let i=36; i>=19; i--) {
+                                                    const house = mapData.find(h => h.blok == 'F7' &&
+                                                    parseInt(h.nomor_rumah) ==
+                                                    i);
+                                                    let bgClass = 'bg-white/5 glass-strong';
+                                                    let showBadge = false;
+                                                    let badgeColor = '';
+
+                                                    if (house) {
+                                                    const status = (house.status_huni || '').toLowerCase();
+                                                    if (status === 'kontrak') {
+                                                    bgClass = 'bg-amber-500/20 glass-strong border-amber-500/30';
+                                                    } else if (status === 'tetap' || status === 'isi') {
+                                                    bgClass = 'bg-blue-500/20 glass-strong border-blue-500/30';
+                                                    }
+
+                                                    if (status !== 'kosong' && status !== '') {
+                                                    showBadge = true;
+                                                    if (house.status_iuran === 'lunas') {
+                                                    badgeColor = 'bg-emerald-500';
+                                                    } else {
+                                                    badgeColor = 'bg-red-500';
+                                                    }
+                                                    }
+                                                    }
+                                                    %>
+                                                    <div onclick="openHouseDetail('F7', <%= i %>)"
+                                                        class="w-8 h-8 <%= bgClass %> border border-white/20 rounded-lg cursor-pointer hover:scale-110 hover:bg-white/25 transition-transform relative group flex items-center justify-center">
+                                                        <span class="text-[10px] font-bold text-gray-300">
+                                                            <%= i %>
+                                                        </span>
+                                                        <% if(showBadge) { %>
+                                                            <div
+                                                                class="absolute -top-1 -right-1 w-3 h-3 <%= badgeColor %> rounded-full border border-white/30">
+                                                            </div>
+                                                            <% } %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+
+                                        <!-- Road -->
+                                        <div
+                                            class="relative order-2 md:order-2 flex items-center justify-center w-12 h-auto min-h-[500px] md:min-h-0 md:h-12 md:w-full bg-white/5 glass rounded-xl border-2 border-dashed border-white/10 md:mb-6 overflow-hidden backdrop-blur-sm">
+                                            <div
+                                                class="absolute inset-0 flex md:hidden items-center justify-center opacity-20">
+                                                <div class="h-full border-l-4 border-dashed border-gray-400"></div>
+                                            </div>
+                                            <div
+                                                class="absolute inset-0 hidden md:flex items-center justify-center opacity-20">
+                                                <div class="w-full border-t-4 border-dashed border-gray-400"></div>
+                                            </div>
+                                            <div class="relative z-10 p-2 md:px-4">
+                                                <div
+                                                    class="md:hidden text-xs text-gray-400 font-bold tracking-widest uppercase transform -rotate-90 whitespace-nowrap">
+                                                    GANG AMBYAR</div>
+                                                <div
+                                                    class="hidden md:block text-xs text-gray-400 font-bold tracking-[0.5em] uppercase text-center">
+                                                    GANG AMBYAR</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Blok F8 -->
+                                        <div class="flex-1 md:flex-none w-0 md:w-full order-1 md:order-3">
+                                            <div
+                                                class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
+                                                Blok F8</div>
+                                            <div
+                                                class="flex flex-col md:flex-row gap-2 items-start md:items-center md:justify-center">
+                                                <% for(let i=1; i<=19; i++) { const house=mapData.find(h=> h.blok ==
+                                                    'F8' &&
+                                                    parseInt(h.nomor_rumah) == i);
+                                                    let bgClass = 'bg-white/5 glass-strong';
+                                                    let showBadge = false;
+                                                    let badgeColor = '';
+
+                                                    if (house) {
+                                                    const status = (house.status_huni || '').toLowerCase();
+                                                    if (status === 'kontrak') {
+                                                    bgClass = 'bg-amber-500/20 glass-strong border-amber-500/30';
+                                                    } else if (status === 'tetap' || status === 'isi') {
+                                                    bgClass = 'bg-blue-500/20 glass-strong border-blue-500/30';
+                                                    }
+
+                                                    if (status !== 'kosong' && status !== '') {
+                                                    showBadge = true;
+                                                    if (house.status_iuran === 'lunas') {
+                                                    badgeColor = 'bg-emerald-500';
+                                                    } else {
+                                                    badgeColor = 'bg-red-500';
+                                                    }
+                                                    }
+                                                    }
+                                                    %>
+                                                    <div onclick="openHouseDetail('F8', <%= i %>)"
+                                                        class="w-8 h-8 <%= bgClass %> border border-white/20 rounded-lg cursor-pointer hover:scale-110 hover:bg-white/25 transition-transform relative group flex items-center justify-center">
+                                                        <span class="text-[10px] font-bold text-gray-300">
+                                                            <%= i %>
+                                                        </span>
+                                                        <% if(showBadge) { %>
+                                                            <div
+                                                                class="absolute -top-1 -right-1 w-3 h-3 <%= badgeColor %> rounded-full border border-white/30">
+                                                            </div>
+                                                            <% } %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Chart -->
+                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 rounded-xl h-full">
+                                <h3 class="font-bold text-gray-100 mb-4">Grafik Keuangan</h3>
+                                <div class="h-40"><canvas id="kasChart"></canvas></div>
+                            </div>
+
+                        </div>
+
+                        <!-- House Modal -->
+                        <div id="houseModal"
+                            class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 backdrop-blur-sm">
+                            <div class="glass-card max-w-sm w-full mx-4 overflow-hidden transform transition-all">
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-xl font-bold text-gray-100" id="modalTitle">Detail Rumah</h3>
+                                        <button id="closeModal" class="text-gray-400 hover:text-gray-200"><svg
+                                                class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg></button>
+                                    </div>
+                                    <div id="modalContent" class="space-y-3 text-sm text-gray-300"></div>
+                                    <div id="modalStatus" class="mt-6"></div>
+                                </div>
+                                <div class="bg-white/5 px-6 py-4 border-t border-white/10">
+                                    <button id="okBtn"
+                                        class="w-full glass-button text-gray-200 py-2 rounded-lg font-medium hover:bg-white/12 transition border border-white/10">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Detail Modal -->
+                        <div id="eventDetailModal" class="fixed z-20 inset-0 overflow-y-auto hidden"
+                            aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                            <div
+                                class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm"
+                                    aria-hidden="true" onclick="closeEventDetail()"></div>
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                    aria-hidden="true">&#8203;</span>
                                 <div
-                                    class="text-gray-300 text-sm mb-4 uppercase tracking-wider font-medium flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></span>
-                                    <%= schedule ? schedule.day : 'Tidak ada jadwal' %>
+                                    class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                    <div class="p-6">
+                                        <div class="sm:flex sm:items-start">
+                                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-100 mb-2"
+                                                    id="event-detail-title"></h3>
+                                                <div class="text-sm text-gray-400 mb-4" id="event-detail-meta"></div>
+                                                <div class="text-sm text-gray-300 whitespace-pre-wrap"
+                                                    id="event-detail-desc">
+                                                </div>
+                                                <% if(user && user.role==='admin' ) { %>
+                                                    <div
+                                                        class="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+                                                        <button id="btn-edit-event" onclick="enableEditEvent()"
+                                                            class="w-full glass-button text-gray-200 px-4 py-2 rounded-lg text-sm font-medium border border-white/10">Edit</button>
+                                                        <form id="form-delete-event" method="POST" class="w-full"
+                                                            onsubmit="return confirm('Yakin ingin menghapus event ini?');">
+                                                            <button type="submit"
+                                                                class="w-full bg-white/10 hover:bg-white/15 text-gray-200 px-4 py-2 rounded-lg text-sm font-medium border border-white/10">Hapus</button>
+                                                        </form>
+                                                    </div>
+                                                    <form id="form-edit-event" method="POST"
+                                                        class="hidden mt-4 space-y-4">
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-300">Judul</label>
+                                                            <input type="text" name="title" id="edit-title" required
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-300">Tanggal</label>
+                                                            <input type="datetime-local" name="date" id="edit-date"
+                                                                required
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-300">Lokasi</label>
+                                                            <input type="text" name="location" id="edit-location"
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-300">Deskripsi</label>
+                                                            <textarea name="description" id="edit-description" rows="3"
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2 resize-none"></textarea>
+                                                        </div>
+                                                        <div class="flex justify-end space-x-2">
+                                                            <button type="button" onclick="cancelEditEvent()"
+                                                                class="bg-white/5 text-gray-300 px-4 py-2 rounded-lg text-sm border border-white/10">Batal</button>
+                                                            <button type="submit"
+                                                                class="glass-button text-gray-200 px-4 py-2 rounded-lg text-sm border border-white/10">Simpan
+                                                                Perubahan</button>
+                                                        </div>
+                                                    </form>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
+                                        <button type="button" onclick="closeEventDetail()"
+                                            class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Tutup</button>
+
+                                        <button type="button" onclick="shareEventViaWA(currentEvent)" id="btn-share-wa"
+                                            class="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-lg border border-green-500/30 px-4 py-2 bg-green-600/20 text-base font-bold text-green-400 hover:bg-green-600/30 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-all">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                                            </svg>
+                                            Share
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Template for Capture -->
+                        <div id="capture-container"
+                            class="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none w-[600px]">
+                            <div id="capture-card"
+                                class="bg-gray-900 border border-white/10 p-8 rounded-xl relative overflow-hidden">
+                                <!-- Branding -->
+                                <div class="absolute top-0 right-0 p-4">
+                                    <div class="text-right">
+                                        <h1 class="text-xl font-bold text-white tracking-widest uppercase">Warga Ambyar
+                                        </h1>
+                                        <p class="text-xs text-gray-400">Sistem Informasi RT</p>
+                                    </div>
                                 </div>
 
-                                <% if(schedule && schedule.petugas.length> 0) { %>
-                                    <div class="relative">
-                                        <div id="ronda-carousel" class="overflow-hidden">
-                                            <div id="ronda-carousel-track"
-                                                class="flex transition-transform duration-500 ease-in-out">
-                                                <% schedule.petugas.forEach((p, index)=> { %>
-                                                    <div class="w-full flex-shrink-0 px-2">
-                                                        <div
-                                                            class="flex flex-col items-center bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-xl">
-                                                            <div
-                                                                class="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center text-3xl font-bold mb-4 text-gray-200 overflow-hidden">
-                                                                <% if(p.foto_profil) { %>
-                                                                    <img src="/uploads/profiles/<%= p.foto_profil %>"
-                                                                        alt="<%= p.nama %>"
-                                                                        class="w-full h-full object-cover grayscale">
-                                                                    <% } else { %>
-                                                                        <%= p.nama.charAt(0) %>
-                                                                            <% } %>
-                                                            </div>
-                                                            <div class="text-center w-full">
-                                                                <div
-                                                                    class="text-lg font-bold text-gray-100 truncate px-2">
-                                                                    <%= p.nama %>
-                                                                </div>
-                                                                <div
-                                                                    class="text-sm text-gray-400 mt-1 bg-white/5 py-1 px-3 rounded-full inline-block backdrop-blur-sm border border-white/10">
-                                                                    Blok <%= p.blok %>-<%= p.nomor_rumah %>
-                                                                </div>
-                                                                <% if(p.tim_ronda) { %>
-                                                                    <div
-                                                                        class="mt-3 inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                                                                        Tim <%= p.tim_ronda %>
-                                                                    </div>
-                                                                    <% } %>
-                                                            </div>
+                                <!-- Gradient Orbs -->
+                                <div
+                                    class="absolute top-[-20%] left-[-10%] w-[150px] h-[150px] bg-indigo-500/30 rounded-full blur-[60px]">
+                                </div>
+                                <div
+                                    class="absolute bottom-[-20%] right-[-10%] w-[150px] h-[150px] bg-purple-500/30 rounded-full blur-[60px]">
+                                </div>
+
+                                <!-- Content -->
+                                <div class="relative z-10 mt-8">
+                                    <div class="inline-block px-3 py-1 rounded-md bg-white/10 text-indigo-300 text-xs font-bold uppercase tracking-wide mb-4 border border-white/5"
+                                        id="capture-date"></div>
+
+                                    <h2 class="text-3xl font-bold text-white mb-4 leading-tight" id="capture-title">
+                                    </h2>
+
+                                    <div class="flex items-center text-gray-400 mb-6 text-sm"
+                                        id="capture-location-container">
+                                        <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span id="capture-location"></span>
+                                    </div>
+
+                                    <div class="bg-white/5 p-6 rounded-lg border border-white/10 text-gray-200 text-base leading-relaxed whitespace-pre-wrap font-medium"
+                                        id="capture-desc">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Create Modal -->
+                        <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden"
+                            aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                            <div
+                                class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm"
+                                    aria-hidden="true" onclick="closeEventModal()"></div>
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                    aria-hidden="true">&#8203;</span>
+                                <div
+                                    class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                    <form action="/dashboard/add-event" method="POST">
+                                        <div class="p-6">
+                                            <div class="sm:flex sm:items-start">
+                                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                                    <h3 class="text-lg leading-6 font-medium text-gray-100"
+                                                        id="modal-title">
+                                                        Tambah Pengumuman / Event</h3>
+                                                    <div class="mt-2 space-y-4">
+                                                        <div>
+                                                            <label for="title"
+                                                                class="block text-sm font-medium text-gray-300">Judul</label>
+                                                            <input type="text" name="title" id="title" required
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label for="date"
+                                                                class="block text-sm font-medium text-gray-300">Tanggal</label>
+                                                            <input type="datetime-local" name="date" id="date" required
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label for="location"
+                                                                class="block text-sm font-medium text-gray-300">Lokasi
+                                                                (Opsional)</label>
+                                                            <input type="text" name="location" id="location"
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label for="description"
+                                                                class="block text-sm font-medium text-gray-300">Deskripsi
+                                                                (Opsional)</label>
+                                                            <textarea name="description" id="description" rows="3"
+                                                                class="glass-input mt-1 block w-full rounded-lg px-3 py-2 resize-none"></textarea>
                                                         </div>
                                                     </div>
-                                                    <% }) %>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <% if(schedule.petugas.length> 1) { %>
-                                            <button onclick="prevRondaSlide()"
-                                                class="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 bg-white/10 hover:bg-white/20 text-gray-300 p-2 rounded-full transition backdrop-blur-sm border border-white/10">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                                                </svg>
-                                            </button>
-                                            <button onclick="nextRondaSlide()"
-                                                class="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 bg-white/10 hover:bg-white/20 text-gray-300 p-2 rounded-full transition backdrop-blur-sm border border-white/10">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </button>
-                                            <div class="flex justify-center mt-4 space-x-2">
-                                                <% schedule.petugas.forEach((p, index)=> { %>
-                                                    <button onclick="goToRondaSlide(<%= index %>)"
-                                                        class="ronda-indicator w-2 h-2 rounded-full bg-gray-400 transition-all <%= index === 0 ? 'bg-opacity-100 w-4' : 'bg-opacity-40 hover:bg-opacity-60' %>"></button>
-                                                    <% }) %>
-                                            </div>
-                                            <% } %>
-                                    </div>
-
-                                    <a href="/ronda"
-                                        class="mt-5 w-full glass-button text-gray-200 text-center py-3 rounded-lg text-sm font-medium hover:bg-white/12 transition block border border-white/10">Lihat
-                                        Jadwal Lengkap</a>
-                                    <% } else { %>
-                                        <div
-                                            class="text-center py-12 text-gray-400 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
-                                            <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <p class="text-sm font-medium">Tidak ada jadwal ronda<br>dalam waktu dekat.
-                                            </p>
-                                        </div>
-                                        <div class="mt-4 pt-4 border-t border-white/10">
-                                            <a href="/ronda"
-                                                class="text-sm text-gray-400 hover:text-gray-200 flex items-center justify-center font-medium transition-colors">Lihat
-                                                Jadwal Lengkap &rarr;</a>
-                                        </div>
-                                        <% } %>
-                            </div>
-                    </div>
-
-                    <!-- 3. Announcements -->
-                    <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-gray-100 text-lg flex items-center">
-                                <span class="bg-white/5 p-1.5 rounded-lg mr-2 text-gray-400 border border-white/10">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
-                                        </path>
-                                    </svg>
-                                </span>
-                                Pengumuman
-                            </h3>
-                            <button onclick="openEventModal()"
-                                class="glass-button bg-white/5 hover:bg-white/10 text-gray-300 p-2 rounded-lg transition border border-white/10"
-                                title="Tambah Pengumuman">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                            <% if (events && events.length> 0) { %>
-                                <% events.forEach(event=> { %>
-                                    <div onclick="openEventDetail(<%= JSON.stringify(event) %>)"
-                                        class="glass-card bg-white/5 p-4 hover:bg-white/10 transition-all cursor-pointer group border border-white/10">
-                                        <div
-                                            class="text-xs text-gray-400 font-medium mb-1.5 uppercase tracking-wide group-hover:text-gray-300 bg-white/5 inline-block px-2 py-0.5 rounded-md">
-                                            <%= new Date(event.tanggal).toLocaleDateString('id-ID', { weekday: 'long' ,
-                                                day: 'numeric' , month: 'short' , year: 'numeric' }) %>
                                         </div>
                                         <div
-                                            class="text-sm font-semibold text-gray-200 group-hover:text-gray-100 mt-1 line-clamp-2">
-                                            <%= event.judul %>
+                                            class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
+                                            <button type="submit"
+                                                class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-200 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Simpan</button>
+                                            <button type="button" onclick="closeEventModal()"
+                                                class="mt-3 w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 bg-white/5 text-base font-medium text-gray-300 hover:bg-white/10 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Batal</button>
                                         </div>
-                                        <% if(event.lokasi) { %>
-                                            <div class="text-xs text-gray-400 mt-2 flex items-center">
-                                                <svg class="w-3 h-3 mr-1 text-gray-500" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                                    </path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                </svg>
-                                                <%= event.lokasi %>
-                                            </div>
-                                            <% } %>
-                                    </div>
-                                    <% }); %>
-                                        <% } else { %>
-                                            <div
-                                                class="text-center py-8 text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
-                                                Belum ada pengumuman</div>
-                                            <% } %>
-                        </div>
-                    </div>
-
-                    <!-- 4. Map -->
-                    <div class="md:col-span-2 lg:col-span-3 glass-card rounded-xl overflow-hidden h-full">
-                        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
-                            <h3 class="font-bold text-gray-100">Peta Lingkungan</h3>
-                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-xs">
-                                <div class="flex items-center"><span
-                                        class="w-3 h-3 bg-blue-500/30 border border-blue-500/50 rounded mr-1"></span><span
-                                        class="text-gray-400">Tetap</span></div>
-                                <div class="flex items-center"><span
-                                        class="w-3 h-3 bg-amber-500/30 border border-amber-500/50 rounded mr-1"></span><span
-                                        class="text-gray-400">Kontrak</span></div>
-                                <div class="flex items-center"><span
-                                        class="w-3 h-3 bg-white/5 border border-white/20 rounded mr-1"></span><span
-                                        class="text-gray-400">Kosong</span></div>
-                                <div class="flex items-center ml-2 border-l border-white/20 pl-2"><span
-                                        class="w-2 h-2 bg-emerald-500 rounded-full mr-1"></span><span
-                                        class="text-gray-400">Lunas</span></div>
-                                <div class="flex items-center"><span
-                                        class="w-2 h-2 bg-red-500 rounded-full mr-1"></span><span
-                                        class="text-gray-400">Belum Bayar</span></div>
-                            </div>
-                        </div>
-                        <div class="p-6 overflow-x-auto">
-                            <div class="flex flex-row md:flex-col items-center justify-center w-full gap-4 md:gap-0">
-                                <!-- Blok F7 -->
-                                <div class="flex-1 md:flex-none w-0 md:w-full md:mb-6 order-3 md:order-1">
-                                    <div
-                                        class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
-                                        Blok F7</div>
-                                    <div
-                                        class="flex flex-col md:flex-row gap-2 items-end md:items-center md:justify-center">
-                                        <% for(let i=36; i>=19; i--) {
-                                            const house = mapData.find(h => h.blok == 'F7' && parseInt(h.nomor_rumah) ==
-                                            i);
-                                            let bgClass = 'bg-white/5 glass-strong';
-                                            let showBadge = false;
-                                            let badgeColor = '';
-
-                                            if (house) {
-                                            const status = (house.status_huni || '').toLowerCase();
-                                            if (status === 'kontrak') {
-                                            bgClass = 'bg-amber-500/20 glass-strong border-amber-500/30';
-                                            } else if (status === 'tetap' || status === 'isi') {
-                                            bgClass = 'bg-blue-500/20 glass-strong border-blue-500/30';
-                                            }
-
-                                            if (status !== 'kosong' && status !== '') {
-                                            showBadge = true;
-                                            if (house.status_iuran === 'lunas') {
-                                            badgeColor = 'bg-emerald-500';
-                                            } else {
-                                            badgeColor = 'bg-red-500';
-                                            }
-                                            }
-                                            }
-                                            %>
-                                            <div onclick="openHouseDetail('F7', <%= i %>)"
-                                                class="w-8 h-8 <%= bgClass %> border border-white/20 rounded-lg cursor-pointer hover:scale-110 hover:bg-white/25 transition-transform relative group flex items-center justify-center">
-                                                <span class="text-[10px] font-bold text-gray-300">
-                                                    <%= i %>
-                                                </span>
-                                                <% if(showBadge) { %>
-                                                    <div
-                                                        class="absolute -top-1 -right-1 w-3 h-3 <%= badgeColor %> rounded-full border border-white/30">
-                                                    </div>
-                                                    <% } %>
-                                            </div>
-                                            <% } %>
-                                    </div>
-                                </div>
-
-                                <!-- Road -->
-                                <div
-                                    class="relative order-2 md:order-2 flex items-center justify-center w-12 h-auto min-h-[500px] md:min-h-0 md:h-12 md:w-full bg-white/5 glass rounded-xl border-2 border-dashed border-white/10 md:mb-6 overflow-hidden backdrop-blur-sm">
-                                    <div class="absolute inset-0 flex md:hidden items-center justify-center opacity-20">
-                                        <div class="h-full border-l-4 border-dashed border-gray-400"></div>
-                                    </div>
-                                    <div class="absolute inset-0 hidden md:flex items-center justify-center opacity-20">
-                                        <div class="w-full border-t-4 border-dashed border-gray-400"></div>
-                                    </div>
-                                    <div class="relative z-10 p-2 md:px-4">
-                                        <div
-                                            class="md:hidden text-xs text-gray-400 font-bold tracking-widest uppercase transform -rotate-90 whitespace-nowrap">
-                                            GANG AMBYAR</div>
-                                        <div
-                                            class="hidden md:block text-xs text-gray-400 font-bold tracking-[0.5em] uppercase text-center">
-                                            GANG AMBYAR</div>
-                                    </div>
-                                </div>
-
-                                <!-- Blok F8 -->
-                                <div class="flex-1 md:flex-none w-0 md:w-full order-1 md:order-3">
-                                    <div
-                                        class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
-                                        Blok F8</div>
-                                    <div
-                                        class="flex flex-col md:flex-row gap-2 items-start md:items-center md:justify-center">
-                                        <% for(let i=1; i<=19; i++) { const house=mapData.find(h=> h.blok == 'F8' &&
-                                            parseInt(h.nomor_rumah) == i);
-                                            let bgClass = 'bg-white/5 glass-strong';
-                                            let showBadge = false;
-                                            let badgeColor = '';
-
-                                            if (house) {
-                                            const status = (house.status_huni || '').toLowerCase();
-                                            if (status === 'kontrak') {
-                                            bgClass = 'bg-amber-500/20 glass-strong border-amber-500/30';
-                                            } else if (status === 'tetap' || status === 'isi') {
-                                            bgClass = 'bg-blue-500/20 glass-strong border-blue-500/30';
-                                            }
-
-                                            if (status !== 'kosong' && status !== '') {
-                                            showBadge = true;
-                                            if (house.status_iuran === 'lunas') {
-                                            badgeColor = 'bg-emerald-500';
-                                            } else {
-                                            badgeColor = 'bg-red-500';
-                                            }
-                                            }
-                                            }
-                                            %>
-                                            <div onclick="openHouseDetail('F8', <%= i %>)"
-                                                class="w-8 h-8 <%= bgClass %> border border-white/20 rounded-lg cursor-pointer hover:scale-110 hover:bg-white/25 transition-transform relative group flex items-center justify-center">
-                                                <span class="text-[10px] font-bold text-gray-300">
-                                                    <%= i %>
-                                                </span>
-                                                <% if(showBadge) { %>
-                                                    <div
-                                                        class="absolute -top-1 -right-1 w-3 h-3 <%= badgeColor %> rounded-full border border-white/30">
-                                                    </div>
-                                                    <% } %>
-                                            </div>
-                                            <% } %>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 5. Chart -->
-                    <div class="md:col-span-1 lg:col-span-1 glass-card p-6 rounded-xl h-full">
-                        <h3 class="font-bold text-gray-100 mb-4">Grafik Keuangan</h3>
-                        <div class="h-40"><canvas id="kasChart"></canvas></div>
-                    </div>
+                        <script src="/js/html2canvas.min.js"></script>
+                        <script>
+                            function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); }
+                            function closeEventModal() { document.getElementById('eventModal').classList.add('hidden'); }
 
-                </div>
+                            let currentEvent = null;
 
-                <!-- House Modal -->
-                <div id="houseModal"
-                    class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div class="glass-card max-w-sm w-full mx-4 overflow-hidden transform transition-all">
-                        <div class="p-6">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="text-xl font-bold text-gray-100" id="modalTitle">Detail Rumah</h3>
-                                <button id="closeModal" class="text-gray-400 hover:text-gray-200"><svg class="w-6 h-6"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg></button>
-                            </div>
-                            <div id="modalContent" class="space-y-3 text-sm text-gray-300"></div>
-                            <div id="modalStatus" class="mt-6"></div>
-                        </div>
-                        <div class="bg-white/5 px-6 py-4 border-t border-white/10">
-                            <button id="okBtn"
-                                class="w-full glass-button text-gray-200 py-2 rounded-lg font-medium hover:bg-white/12 transition border border-white/10">Tutup</button>
-                        </div>
-                    </div>
-                </div>
+                            function openEventDetail(event) {
+                                currentEvent = event;
+                                const modal = document.getElementById('eventDetailModal');
+                                if (!modal) return;
+                                document.getElementById('event-detail-title').innerText = event.judul;
+                                const date = new Date(event.tanggal);
+                                const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-                <!-- Event Detail Modal -->
-                <div id="eventDetailModal" class="fixed z-20 inset-0 overflow-y-auto hidden"
-                    aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                            onclick="closeEventDetail()"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                            aria-hidden="true">&#8203;</span>
-                        <div
-                            class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div class="p-6">
-                                <div class="sm:flex sm:items-start">
-                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-100 mb-2"
-                                            id="event-detail-title"></h3>
-                                        <div class="text-sm text-gray-400 mb-4" id="event-detail-meta"></div>
-                                        <div class="text-sm text-gray-300 whitespace-pre-wrap" id="event-detail-desc">
-                                        </div>
-                                        <% if(user && user.role==='admin' ) { %>
-                                            <div class="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
-                                                <button id="btn-edit-event" onclick="enableEditEvent()"
-                                                    class="w-full glass-button text-gray-200 px-4 py-2 rounded-lg text-sm font-medium border border-white/10">Edit</button>
-                                                <form id="form-delete-event" method="POST" class="w-full"
-                                                    onsubmit="return confirm('Yakin ingin menghapus event ini?');">
-                                                    <button type="submit"
-                                                        class="w-full bg-white/10 hover:bg-white/15 text-gray-200 px-4 py-2 rounded-lg text-sm font-medium border border-white/10">Hapus</button>
-                                                </form>
-                                            </div>
-                                            <form id="form-edit-event" method="POST" class="hidden mt-4 space-y-4">
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-300">Judul</label>
-                                                    <input type="text" name="title" id="edit-title" required
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-300">Tanggal</label>
-                                                    <input type="datetime-local" name="date" id="edit-date" required
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-300">Lokasi</label>
-                                                    <input type="text" name="location" id="edit-location"
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-300">Deskripsi</label>
-                                                    <textarea name="description" id="edit-description" rows="3"
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2 resize-none"></textarea>
-                                                </div>
-                                                <div class="flex justify-end space-x-2">
-                                                    <button type="button" onclick="cancelEditEvent()"
-                                                        class="bg-white/5 text-gray-300 px-4 py-2 rounded-lg text-sm border border-white/10">Batal</button>
-                                                    <button type="submit"
-                                                        class="glass-button text-gray-200 px-4 py-2 rounded-lg text-sm border border-white/10">Simpan
-                                                        Perubahan</button>
-                                                </div>
-                                            </form>
-                                            <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
-                                <button type="button" onclick="closeEventDetail()"
-                                    class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Tutup</button>
+                                let meta = `<div class="flex items-center mb-1"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>${dateStr} pukul ${timeStr}</div>`;
+                                if (event.lokasi) meta += `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${event.lokasi}</div>`;
 
-                                <button type="button" onclick="shareEventViaWA(currentEvent)" id="btn-share-wa"
-                                    class="mt-3 sm:mt-0 w-full inline-flex justify-center items-center gap-2 rounded-lg border border-green-500/30 px-4 py-2 bg-green-600/20 text-base font-bold text-green-400 hover:bg-green-600/30 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-all">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-                                    </svg>
-                                    Share
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                document.getElementById('event-detail-meta').innerHTML = meta;
+                                document.getElementById('event-detail-desc').innerText = event.keterangan || 'Tidak ada deskripsi';
 
-                <!-- Hidden Template for Capture -->
-                <div id="capture-container" class="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none w-[600px]">
-                    <div id="capture-card"
-                        class="bg-gray-900 border border-white/10 p-8 rounded-xl relative overflow-hidden">
-                        <!-- Branding -->
-                        <div class="absolute top-0 right-0 p-4">
-                            <div class="text-right">
-                                <h1 class="text-xl font-bold text-white tracking-widest uppercase">Warga Ambyar</h1>
-                                <p class="text-xs text-gray-400">Sistem Informasi RT</p>
-                            </div>
-                        </div>
-
-                        <!-- Gradient Orbs -->
-                        <div
-                            class="absolute top-[-20%] left-[-10%] w-[150px] h-[150px] bg-indigo-500/30 rounded-full blur-[60px]">
-                        </div>
-                        <div
-                            class="absolute bottom-[-20%] right-[-10%] w-[150px] h-[150px] bg-purple-500/30 rounded-full blur-[60px]">
-                        </div>
-
-                        <!-- Content -->
-                        <div class="relative z-10 mt-8">
-                            <div class="inline-block px-3 py-1 rounded-md bg-white/10 text-indigo-300 text-xs font-bold uppercase tracking-wide mb-4 border border-white/5"
-                                id="capture-date"></div>
-
-                            <h2 class="text-3xl font-bold text-white mb-4 leading-tight" id="capture-title"></h2>
-
-                            <div class="flex items-center text-gray-400 mb-6 text-sm" id="capture-location-container">
-                                <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span id="capture-location"></span>
-                            </div>
-
-                            <div class="bg-white/5 p-6 rounded-lg border border-white/10 text-gray-200 text-base leading-relaxed whitespace-pre-wrap font-medium"
-                                id="capture-desc">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Create Modal -->
-                <div id="eventModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title"
-                    role="dialog" aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                            onclick="closeEventModal()"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                            aria-hidden="true">&#8203;</span>
-                        <div
-                            class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <form action="/dashboard/add-event" method="POST">
-                                <div class="p-6">
-                                    <div class="sm:flex sm:items-start">
-                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-100" id="modal-title">
-                                                Tambah Pengumuman / Event</h3>
-                                            <div class="mt-2 space-y-4">
-                                                <div>
-                                                    <label for="title"
-                                                        class="block text-sm font-medium text-gray-300">Judul</label>
-                                                    <input type="text" name="title" id="title" required
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label for="date"
-                                                        class="block text-sm font-medium text-gray-300">Tanggal</label>
-                                                    <input type="datetime-local" name="date" id="date" required
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label for="location"
-                                                        class="block text-sm font-medium text-gray-300">Lokasi
-                                                        (Opsional)</label>
-                                                    <input type="text" name="location" id="location"
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2">
-                                                </div>
-                                                <div>
-                                                    <label for="description"
-                                                        class="block text-sm font-medium text-gray-300">Deskripsi
-                                                        (Opsional)</label>
-                                                    <textarea name="description" id="description" rows="3"
-                                                        class="glass-input mt-1 block w-full rounded-lg px-3 py-2 resize-none"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div
-                                    class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
-                                    <button type="submit"
-                                        class="w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 glass-button text-base font-medium text-gray-200 hover:bg-white/12 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">Simpan</button>
-                                    <button type="button" onclick="closeEventModal()"
-                                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-white/10 px-4 py-2 bg-white/5 text-base font-medium text-gray-300 hover:bg-white/10 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Batal</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <script src="/js/html2canvas.min.js"></script>
-                <script>
-                    function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); }
-                    function closeEventModal() { document.getElementById('eventModal').classList.add('hidden'); }
-
-                    let currentEvent = null;
-
-                    function openEventDetail(event) {
-                        currentEvent = event;
-                        const modal = document.getElementById('eventDetailModal');
-                        if (!modal) return;
-                        document.getElementById('event-detail-title').innerText = event.judul;
-                        const date = new Date(event.tanggal);
-                        const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                        const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-                        let meta = `<div class="flex items-center mb-1"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>${dateStr} pukul ${timeStr}</div>`;
-                        if (event.lokasi) meta += `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${event.lokasi}</div>`;
-
-                        document.getElementById('event-detail-meta').innerHTML = meta;
-                        document.getElementById('event-detail-desc').innerText = event.keterangan || 'Tidak ada deskripsi';
-
-                        const editForm = document.getElementById('form-edit-event');
-                        if (editForm) {
-                            editForm.action = `/dashboard/edit-event/${event.id}`;
-                            document.getElementById('edit-title').value = event.judul;
-                            const tzOffset = date.getTimezoneOffset() * 60000;
-                            const localISOTime = (new Date(date - tzOffset)).toISOString().slice(0, 16);
-                            document.getElementById('edit-date').value = localISOTime.substring(0, 16);
-                            document.getElementById('edit-location').value = event.lokasi || '';
-                            document.getElementById('edit-description').value = event.keterangan || '';
-                            editForm.classList.add('hidden');
-                            if (document.getElementById('btn-edit-event')) document.getElementById('btn-edit-event').classList.remove('hidden');
-                            if (document.getElementById('form-delete-event')) document.getElementById('form-delete-event').classList.remove('hidden');
-                        }
-
-                        const deleteForm = document.getElementById('form-delete-event');
-                        if (deleteForm) deleteForm.action = `/dashboard/delete-event/${event.id}`;
-
-                        modal.classList.remove('hidden');
-                    }
-
-                    function closeEventDetail() { document.getElementById('eventDetailModal').classList.add('hidden'); currentEvent = null; }
-                    function enableEditEvent() {
-                        document.getElementById('form-edit-event').classList.remove('hidden');
-                        document.getElementById('btn-edit-event').classList.add('hidden');
-                        document.getElementById('form-delete-event').classList.add('hidden');
-                    }
-                    function cancelEditEvent() {
-                        document.getElementById('form-edit-event').classList.add('hidden');
-                        document.getElementById('btn-edit-event').classList.remove('hidden');
-                        document.getElementById('form-delete-event').classList.remove('hidden');
-                    }
-
-                    async function shareEventViaWA(event) {
-                        if (!event) return;
-
-                        const btn = document.getElementById('btn-share-wa');
-                        const originalText = btn.innerHTML;
-                        btn.innerHTML = '⏳ Generating...';
-                        btn.disabled = true;
-
-                        try {
-                            // Populate Capture Card
-                            const date = new Date(event.tanggal);
-                            const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-                            document.getElementById('capture-date').innerText = dateStr;
-                            document.getElementById('capture-title').innerText = event.judul;
-                            document.getElementById('capture-desc').innerText = (event.keterangan || '').substring(0, 300) + (event.keterangan && event.keterangan.length > 300 ? '...' : '');
-
-                            if (event.lokasi) {
-                                document.getElementById('capture-location').innerText = event.lokasi;
-                                document.getElementById('capture-location-container').classList.remove('hidden');
-                            } else {
-                                document.getElementById('capture-location-container').classList.add('hidden');
-                            }
-
-                            const captureEl = document.getElementById('capture-card');
-
-                            // Capture
-                            const canvas = await html2canvas(captureEl, {
-                                scale: 2,
-                                useCORS: true,
-                                logging: false,
-                                backgroundColor: null
-                            });
-
-                            canvas.toBlob(async (blob) => {
-                                const formData = new FormData();
-                                formData.append('image', blob, 'event-' + event.id + '.png');
-                                formData.append('eventId', event.id);
-
-                                const response = await fetch('/dashboard/share-image', {
-                                    method: 'POST',
-                                    body: formData
-                                });
-
-                                const result = await response.json();
-                                if (result.success) {
-                                    // Generate WA Link
-                                    const publicUrl = `${window.location.origin}/dashboard/event/v/${result.shareId}`;
-                                    const text = `*PENGUMUMAN WARGA*\n\n${event.judul}\n📅 ${dateStr}\n\nLihat detail: ${publicUrl}`;
-                                    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-
-                                    window.open(waUrl, '_blank');
-                                } else {
-                                    alert('Gagal share: ' + (result.error || 'Unknown error'));
+                                const editForm = document.getElementById('form-edit-event');
+                                if (editForm) {
+                                    editForm.action = `/dashboard/edit-event/${event.id}`;
+                                    document.getElementById('edit-title').value = event.judul;
+                                    const tzOffset = date.getTimezoneOffset() * 60000;
+                                    const localISOTime = (new Date(date - tzOffset)).toISOString().slice(0, 16);
+                                    document.getElementById('edit-date').value = localISOTime.substring(0, 16);
+                                    document.getElementById('edit-location').value = event.lokasi || '';
+                                    document.getElementById('edit-description').value = event.keterangan || '';
+                                    editForm.classList.add('hidden');
+                                    if (document.getElementById('btn-edit-event')) document.getElementById('btn-edit-event').classList.remove('hidden');
+                                    if (document.getElementById('form-delete-event')) document.getElementById('form-delete-event').classList.remove('hidden');
                                 }
 
-                                btn.innerHTML = originalText;
-                                btn.disabled = false;
-                            }, 'image/png');
+                                const deleteForm = document.getElementById('form-delete-event');
+                                if (deleteForm) deleteForm.action = `/dashboard/delete-event/${event.id}`;
 
-                        } catch (e) {
-                            console.error(e);
-                            alert('Gagal melakukan share');
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        }
-                    }
-                </script>
+                                modal.classList.remove('hidden');
+                            }
 
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            function closeEventDetail() { document.getElementById('eventDetailModal').classList.add('hidden'); currentEvent = null; }
+                            function enableEditEvent() {
+                                document.getElementById('form-edit-event').classList.remove('hidden');
+                                document.getElementById('btn-edit-event').classList.add('hidden');
+                                document.getElementById('form-delete-event').classList.add('hidden');
+                            }
+                            function cancelEditEvent() {
+                                document.getElementById('form-edit-event').classList.add('hidden');
+                                document.getElementById('btn-edit-event').classList.remove('hidden');
+                                document.getElementById('form-delete-event').classList.remove('hidden');
+                            }
 
-                <div id="debugData" class="hidden"
-                    data-mapdata="<%= Buffer.from(JSON.stringify(mapData || [])).toString('base64') %>"
-                    data-chartdata="<%= Buffer.from(JSON.stringify(chartData || {})).toString('base64') %>">
-                </div>
+                            async function shareEventViaWA(event) {
+                                if (!event) return;
 
-                <script>
-                    const mapDataElement = document.getElementById('debugData');
-                    const mapDataRaw = mapDataElement ? mapDataElement.getAttribute('data-mapdata') : null;
-                    const mapData = mapDataRaw ? JSON.parse(atob(mapDataRaw)) : [];
+                                const btn = document.getElementById('btn-share-wa');
+                                const originalText = btn.innerHTML;
+                                btn.innerHTML = '⏳ Generating...';
+                                btn.disabled = true;
 
-                    window.openHouseDetail = function (blok, nomor) {
-                        try {
-                            const house = mapData.find(h =>
-                                String(h.blok).trim().toUpperCase() === String(blok).trim().toUpperCase() &&
-                                String(h.nomor_rumah).trim() === String(nomor).trim()
-                            );
-                            const modal = document.getElementById('houseModal');
-                            const title = document.getElementById('modalTitle');
-                            const content = document.getElementById('modalContent');
-                            const statusDiv = document.getElementById('modalStatus');
+                                try {
+                                    // Populate Capture Card
+                                    const date = new Date(event.tanggal);
+                                    const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-                            if (!modal) return;
+                                    document.getElementById('capture-date').innerText = dateStr;
+                                    document.getElementById('capture-title').innerText = event.judul;
+                                    document.getElementById('capture-desc').innerText = (event.keterangan || '').substring(0, 300) + (event.keterangan && event.keterangan.length > 300 ? '...' : '');
 
-                            if (!house || !house.status_huni || house.status_huni.toLowerCase() === 'kosong') {
-                                title.innerText = `Blok ${blok} No. ${nomor}`;
-                                content.innerHTML = `<p class='text-center text-gray-500 italic'>Rumah Kosong / Belum ada data.</p>`;
-                                statusDiv.innerHTML = `<div class="w-full text-center py-2 rounded-lg font-bold text-sm bg-white/5 text-gray-400 border border-white/10">Status: Kosong</div>`;
-                            } else {
-                                title.innerText = `Blok ${house.blok} No. ${house.nomor_rumah}`;
-                                let residentsHtml = '<ul class="space-y-2 mt-2">';
-                                if (house.residents && house.residents.length > 0) {
-                                    house.residents.forEach(r => {
-                                        residentsHtml += `
+                                    if (event.lokasi) {
+                                        document.getElementById('capture-location').innerText = event.lokasi;
+                                        document.getElementById('capture-location-container').classList.remove('hidden');
+                                    } else {
+                                        document.getElementById('capture-location-container').classList.add('hidden');
+                                    }
+
+                                    const captureEl = document.getElementById('capture-card');
+
+                                    // Capture
+                                    const canvas = await html2canvas(captureEl, {
+                                        scale: 2,
+                                        useCORS: true,
+                                        logging: false,
+                                        backgroundColor: null
+                                    });
+
+                                    canvas.toBlob(async (blob) => {
+                                        const formData = new FormData();
+                                        formData.append('image', blob, 'event-' + event.id + '.png');
+                                        formData.append('eventId', event.id);
+
+                                        const response = await fetch('/dashboard/share-image', {
+                                            method: 'POST',
+                                            body: formData
+                                        });
+
+                                        const result = await response.json();
+                                        if (result.success && result.shareId) {
+                                            // Generate WA Link
+                                            const publicUrl = `${window.location.origin}/dashboard/event/v/${result.shareId}`;
+                                            let text = `*PENGUMUMAN WARGA*\n\n${event.judul}\n${dateStr}`;
+
+                                            if (event.lokasi) {
+                                                text += `\nLokasi: ${event.lokasi}`;
+                                            }
+
+                                            text += `\n\nLihat detail: ${publicUrl}`;
+                                            const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+                                            window.open(waUrl, '_blank');
+                                        } else {
+                                            alert('Gagal share: ' + (result.error || 'Database error (shareId missing)'));
+                                        }
+
+                                        btn.innerHTML = originalText;
+                                        btn.disabled = false;
+                                    }, 'image/png');
+
+                                } catch (e) {
+                                    console.error(e);
+                                    alert('Gagal melakukan share');
+                                    btn.innerHTML = originalText;
+                                    btn.disabled = false;
+                                }
+                            }
+                        </script>
+
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                        <div id="debugData" class="hidden"
+                            data-mapdata="<%= Buffer.from(JSON.stringify(mapData || [])).toString('base64') %>"
+                            data-chartdata="<%= Buffer.from(JSON.stringify(chartData || {})).toString('base64') %>">
+                        </div>
+
+                        <script>
+                            const mapDataElement = document.getElementById('debugData');
+                            const mapDataRaw = mapDataElement ? mapDataElement.getAttribute('data-mapdata') : null;
+                            const mapData = mapDataRaw ? JSON.parse(atob(mapDataRaw)) : [];
+
+                            window.openHouseDetail = function (blok, nomor) {
+                                try {
+                                    const house = mapData.find(h =>
+                                        String(h.blok).trim().toUpperCase() === String(blok).trim().toUpperCase() &&
+                                        String(h.nomor_rumah).trim() === String(nomor).trim()
+                                    );
+                                    const modal = document.getElementById('houseModal');
+                                    const title = document.getElementById('modalTitle');
+                                    const content = document.getElementById('modalContent');
+                                    const statusDiv = document.getElementById('modalStatus');
+
+                                    if (!modal) return;
+
+                                    if (!house || !house.status_huni || house.status_huni.toLowerCase() === 'kosong') {
+                                        title.innerText = `Blok ${blok} No. ${nomor}`;
+                                        content.innerHTML = `<p class='text-center text-gray-500 italic'>Rumah Kosong / Belum ada data.</p>`;
+                                        statusDiv.innerHTML = `<div class="w-full text-center py-2 rounded-lg font-bold text-sm bg-white/5 text-gray-400 border border-white/10">Status: Kosong</div>`;
+                                    } else {
+                                        title.innerText = `Blok ${house.blok} No. ${house.nomor_rumah}`;
+                                        let residentsHtml = '<ul class="space-y-2 mt-2">';
+                                        if (house.residents && house.residents.length > 0) {
+                                            house.residents.forEach(r => {
+                                                residentsHtml += `
                     <li class="flex justify-between items-center border-b border-white/10 pb-1">
                         <div class="flex flex-col">
                             <span class="font-medium text-gray-200">${r.nama}</span>
@@ -758,13 +835,13 @@
                         </div>
                         <span class="text-xs text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">${r.status_keluarga}</span>
                     </li>`;
-                                    });
-                                } else {
-                                    residentsHtml += '<li class="text-gray-500 italic text-xs">Data anggota keluarga belum lengkap</li>';
-                                }
-                                residentsHtml += '</ul>';
+                                            });
+                                        } else {
+                                            residentsHtml += '<li class="text-gray-500 italic text-xs">Data anggota keluarga belum lengkap</li>';
+                                        }
+                                        residentsHtml += '</ul>';
 
-                                content.innerHTML = `
+                                        content.innerHTML = `
             <div class="mb-4">
                 <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Status Huni</div>
                 <div class="font-medium text-gray-200">${house.status_huni}</div>
@@ -774,120 +851,120 @@
                 ${residentsHtml}
             </div>`;
 
-                                // Status badge with colors
-                                let statusClass, statusText;
-                                if (house.status_iuran === 'lunas') {
-                                    statusClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-                                    statusText = '✓ Iuran Lunas';
-                                } else {
-                                    statusClass = 'bg-red-500/20 text-red-400 border-red-500/30';
-                                    statusText = '✗ Belum Bayar Iuran';
-                                }
-
-                                let iuranDetailsHtml = '';
-                                if (house.status_iuran !== 'lunas' && house.unpaid_details && house.unpaid_details.length > 0) {
-                                    iuranDetailsHtml = '<div class="mt-3 border-t border-white/10 pt-2"><p class="text-xs font-bold text-gray-500 uppercase mb-2">Rincian Belum Bayar:</p><ul class="space-y-1 text-xs max-h-32 overflow-y-auto pr-1 custom-scrollbar">';
-                                    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
-
-                                    house.unpaid_details.forEach(d => {
-                                        const date = new Date(d.periode);
-                                        const month = date.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-                                        const amount = formatter.format(d.jumlah);
-                                        iuranDetailsHtml += `<li class="flex justify-between text-gray-400 bg-white/5 p-1.5 rounded border border-white/10"><span class="font-medium">${month} (${d.jenis})</span><span>${amount}</span></li>`;
-                                    });
-                                    iuranDetailsHtml += '</ul></div>';
-                                }
-
-                                statusDiv.innerHTML = `<div class="w-full text-center py-2 rounded-lg font-bold text-sm ${statusClass} mb-2 border">${statusText}</div>${iuranDetailsHtml}`;
-                            }
-                            modal.classList.remove('hidden');
-                        } catch (error) {
-                            console.error('Error in openHouseDetail:', error);
-                        }
-                    };
-
-                    // Chart Logic - Monochrome
-                    try {
-                        const chartDataElement = document.getElementById('debugData');
-                        const chartDataRaw = chartDataElement ? chartDataElement.getAttribute('data-chartdata') : null;
-                        const chartData = chartDataRaw ? JSON.parse(atob(chartDataRaw)) : {};
-                        if (chartData && chartData.pemasukan && chartData.pengeluaran) {
-                            const ctx = document.getElementById('kasChart').getContext('2d');
-                            new Chart(ctx, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: ['Masuk', 'Keluar'],
-                                    datasets: [{
-                                        data: [
-                                            chartData.pemasukan.reduce((a, b) => a + b, 0),
-                                            chartData.pengeluaran.reduce((a, b) => a + b, 0)
-                                        ],
-                                        backgroundColor: ['rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.1)'],
-                                        borderColor: ['rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.3)'],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom',
-                                            labels: {
-                                                boxWidth: 12,
-                                                font: { size: 10 },
-                                                color: '#d1d5db'
-                                            }
+                                        // Status badge with colors
+                                        let statusClass, statusText;
+                                        if (house.status_iuran === 'lunas') {
+                                            statusClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                                            statusText = '✓ Iuran Lunas';
+                                        } else {
+                                            statusClass = 'bg-red-500/20 text-red-400 border-red-500/30';
+                                            statusText = '✗ Belum Bayar Iuran';
                                         }
-                                    },
-                                    cutout: '70%'
+
+                                        let iuranDetailsHtml = '';
+                                        if (house.status_iuran !== 'lunas' && house.unpaid_details && house.unpaid_details.length > 0) {
+                                            iuranDetailsHtml = '<div class="mt-3 border-t border-white/10 pt-2"><p class="text-xs font-bold text-gray-500 uppercase mb-2">Rincian Belum Bayar:</p><ul class="space-y-1 text-xs max-h-32 overflow-y-auto pr-1 custom-scrollbar">';
+                                            const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+
+                                            house.unpaid_details.forEach(d => {
+                                                const date = new Date(d.periode);
+                                                const month = date.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+                                                const amount = formatter.format(d.jumlah);
+                                                iuranDetailsHtml += `<li class="flex justify-between text-gray-400 bg-white/5 p-1.5 rounded border border-white/10"><span class="font-medium">${month} (${d.jenis})</span><span>${amount}</span></li>`;
+                                            });
+                                            iuranDetailsHtml += '</ul></div>';
+                                        }
+
+                                        statusDiv.innerHTML = `<div class="w-full text-center py-2 rounded-lg font-bold text-sm ${statusClass} mb-2 border">${statusText}</div>${iuranDetailsHtml}`;
+                                    }
+                                    modal.classList.remove('hidden');
+                                } catch (error) {
+                                    console.error('Error in openHouseDetail:', error);
                                 }
-                            });
-                        }
-                    } catch (e) { console.error("Chart error:", e); }
+                            };
 
-                    const closeModal = () => document.getElementById('houseModal').classList.add('hidden');
-                    document.getElementById('okBtn').addEventListener('click', closeModal);
-                    document.getElementById('closeModal').addEventListener('click', closeModal);
+                            // Chart Logic - Monochrome
+                            try {
+                                const chartDataElement = document.getElementById('debugData');
+                                const chartDataRaw = chartDataElement ? chartDataElement.getAttribute('data-chartdata') : null;
+                                const chartData = chartDataRaw ? JSON.parse(atob(chartDataRaw)) : {};
+                                if (chartData && chartData.pemasukan && chartData.pengeluaran) {
+                                    const ctx = document.getElementById('kasChart').getContext('2d');
+                                    new Chart(ctx, {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels: ['Masuk', 'Keluar'],
+                                            datasets: [{
+                                                data: [
+                                                    chartData.pemasukan.reduce((a, b) => a + b, 0),
+                                                    chartData.pengeluaran.reduce((a, b) => a + b, 0)
+                                                ],
+                                                backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(248, 113, 113, 0.8)'],
+                                                borderColor: ['rgba(52, 211, 153, 1)', 'rgba(248, 113, 113, 1)'],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'bottom',
+                                                    labels: {
+                                                        boxWidth: 12,
+                                                        font: { size: 10 },
+                                                        color: '#d1d5db'
+                                                    }
+                                                }
+                                            },
+                                            cutout: '70%'
+                                        }
+                                    });
+                                }
+                            } catch (e) { console.error("Chart error:", e); }
 
-                    // Ronda Carousel Control
-                    let currentRondaSlide = 0;
-                    const rondaTrack = document.getElementById('ronda-carousel-track');
-                    const rondaIndicators = document.querySelectorAll('.ronda-indicator');
-                    const totalRondaSlides = rondaIndicators.length;
+                            const closeModal = () => document.getElementById('houseModal').classList.add('hidden');
+                            document.getElementById('okBtn').addEventListener('click', closeModal);
+                            document.getElementById('closeModal').addEventListener('click', closeModal);
 
-                    function updateRondaCarousel() {
-                        if (!rondaTrack) return;
-                        rondaTrack.style.transform = `translateX(-${currentRondaSlide * 100}%)`;
-                        rondaIndicators.forEach((indicator, index) => {
-                            if (index === currentRondaSlide) {
-                                indicator.classList.remove('bg-opacity-30');
-                                indicator.classList.add('bg-opacity-100');
-                            } else {
-                                indicator.classList.remove('bg-opacity-100');
-                                indicator.classList.add('bg-opacity-30');
+                            // Ronda Carousel Control
+                            let currentRondaSlide = 0;
+                            const rondaTrack = document.getElementById('ronda-carousel-track');
+                            const rondaIndicators = document.querySelectorAll('.ronda-indicator');
+                            const totalRondaSlides = rondaIndicators.length;
+
+                            function updateRondaCarousel() {
+                                if (!rondaTrack) return;
+                                rondaTrack.style.transform = `translateX(-${currentRondaSlide * 100}%)`;
+                                rondaIndicators.forEach((indicator, index) => {
+                                    if (index === currentRondaSlide) {
+                                        indicator.classList.remove('bg-opacity-30');
+                                        indicator.classList.add('bg-opacity-100');
+                                    } else {
+                                        indicator.classList.remove('bg-opacity-100');
+                                        indicator.classList.add('bg-opacity-30');
+                                    }
+                                });
                             }
-                        });
-                    }
 
-                    function nextRondaSlide() {
-                        currentRondaSlide = (currentRondaSlide + 1) % totalRondaSlides;
-                        updateRondaCarousel();
-                    }
+                            function nextRondaSlide() {
+                                currentRondaSlide = (currentRondaSlide + 1) % totalRondaSlides;
+                                updateRondaCarousel();
+                            }
 
-                    function prevRondaSlide() {
-                        currentRondaSlide = (currentRondaSlide - 1 + totalRondaSlides) % totalRondaSlides;
-                        updateRondaCarousel();
-                    }
+                            function prevRondaSlide() {
+                                currentRondaSlide = (currentRondaSlide - 1 + totalRondaSlides) % totalRondaSlides;
+                                updateRondaCarousel();
+                            }
 
-                    function goToRondaSlide(index) {
-                        currentRondaSlide = index;
-                        updateRondaCarousel();
-                    }
+                            function goToRondaSlide(index) {
+                                currentRondaSlide = index;
+                                updateRondaCarousel();
+                            }
 
-                    if (totalRondaSlides > 1) {
-                        setInterval(nextRondaSlide, 5000);
-                    }
-                </script>
+                            if (totalRondaSlides > 1) {
+                                setInterval(nextRondaSlide, 5000);
+                            }
+                        </script>
 
-                <%- include('../partials/footer') %>
+                        <%- include('../partials/footer') %>

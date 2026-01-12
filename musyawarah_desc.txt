@@ -1,0 +1,10 @@
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+judul	varchar(255)	NO		NULL	
+konten	longtext	YES		NULL	
+lampiran	varchar(255)	YES		NULL	
+tanggal	date	NO		NULL	
+created_at	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+created_by	int	YES		NULL	
+updated_by	int	YES		NULL	
+updated_at	timestamp	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP

@@ -47,8 +47,9 @@ exports.store = (req, res) => {
         try {
             const { judul, konten, tanggal } = req.body;
             let lampiran = req.file ? req.file.filename : null;
+            const created_by = req.session.user.id;
 
-            await Musyawarah.create({ judul, konten, lampiran, tanggal });
+            await Musyawarah.create({ judul, konten, lampiran, tanggal, created_by });
             req.flash('success_msg', 'Info Musyawarah berhasil disimpan');
             res.redirect('/musyawarah');
         } catch (e) {
@@ -63,7 +64,16 @@ exports.show = async (req, res) => {
     try {
         const item = await Musyawarah.findById(req.params.id);
         if (!item) return res.status(404).send('Not found');
-        res.render('musyawarah/show', { title: item.judul, item, moment });
+        const comments = await Musyawarah.getComments(req.params.id);
+        const editHistory = await Musyawarah.getEditHistory(req.params.id);
+
+        // Merge comments and edit history into timeline
+        const timeline = [
+            ...comments.map(c => ({ ...c, type: 'comment', timestamp: c.created_at })),
+            ...editHistory.map(e => ({ ...e, type: 'edit', timestamp: e.edited_at }))
+        ].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        res.render('musyawarah/show', { title: item.judul, item, timeline, moment });
     } catch (e) {
         console.error(e);
         res.redirect('/musyawarah');
@@ -85,4 +95,69 @@ exports.delete = async (req, res) => {
         req.flash('error_msg', 'Error deleting');
         res.redirect('/musyawarah');
     }
-}
+};
+
+exports.edit = async (req, res) => {
+    try {
+        const item = await Musyawarah.findById(req.params.id);
+        if (!item) return res.status(404).send('Not found');
+        res.render('musyawarah/edit', { title: 'Edit Notulensi/Info', item, moment });
+    } catch (e) {
+        console.error(e);
+        res.redirect('/musyawarah');
+    }
+};
+
+exports.update = (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error(err);
+            req.flash('error_msg', 'Upload error: ' + err.message);
+            return res.redirect(`/musyawarah/edit/${req.params.id}`);
+        }
+        try {
+            const { id } = req.params;
+            const { judul, konten, tanggal } = req.body;
+            const updated_by = req.session.user.id;
+            const item = await Musyawarah.findById(id);
+
+            let lampiran = item.lampiran;
+            if (req.file) {
+                // Delete old file if exists
+                if (lampiran) {
+                    const oldPath = path.join('public/uploads/musyawarah', lampiran);
+                    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                }
+                lampiran = req.file.filename;
+            }
+
+            await Musyawarah.update(id, { judul, konten, lampiran, tanggal, updated_by });
+            req.flash('success_msg', 'Info Musyawarah berhasil diperbarui');
+            res.redirect(`/musyawarah/view/${id}`);
+        } catch (e) {
+            console.error(e);
+            req.flash('error_msg', 'Gagal memperbarui data');
+            res.redirect(`/musyawarah/edit/${req.params.id}`);
+        }
+    });
+};
+
+exports.addComment = async (req, res) => {
+    try {
+        const { musyawarah_id, konten, parent_id } = req.body;
+        const user_id = req.session.user.id;
+
+        if (!konten || konten.trim() === '<p><br></p>') {
+            req.flash('error_msg', 'Komentar tidak boleh kosong');
+            return res.redirect(`/musyawarah/view/${musyawarah_id}`);
+        }
+
+        await Musyawarah.addComment({ musyawarah_id, user_id, konten, parent_id });
+        req.flash('success_msg', 'Komentar berhasil ditambahkan');
+        res.redirect(`/musyawarah/view/${musyawarah_id}`);
+    } catch (e) {
+        console.error(e);
+        req.flash('error_msg', 'Gagal menambahkan komentar');
+        res.redirect(`/musyawarah/view/${req.body.musyawarah_id}`);
+    }
+};

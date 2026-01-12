@@ -58,7 +58,7 @@
                                 <input id="iuran_kas" name="jenis_iuran[]" value="kas" type="checkbox" checked
                                     class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
                                 <label for="iuran_kas" class="ml-2 block text-sm text-gray-100">
-                                    💰 Kas (25k)
+                                    💰 Kas (10k)
                                 </label>
                             </div>
                             <div class="flex items-center">
@@ -300,7 +300,11 @@
                 const count = selectedMonths.length;
 
                 let typePrice = 0;
-                typeCheckboxes.forEach(cb => { if (cb.checked) typePrice += 25000; });
+                typeCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        typePrice += (cb.value === 'kas') ? 10000 : 25000;
+                    }
+                });
 
                 const total = count * typePrice;
 

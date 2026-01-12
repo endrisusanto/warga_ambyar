@@ -19,5 +19,9 @@ router.post('/update-role/:id', ensureAuthenticated, isAdmin, wargaController.up
 // Approval (admin or ketua)
 router.get('/approve/:id', ensureAuthenticated, isAdminOrKetua, wargaController.approve);
 router.get('/reject/:id', ensureAuthenticated, isAdminOrKetua, wargaController.reject);
+router.post('/update-approval/:id', ensureAuthenticated, isAdminOrKetua, wargaController.updateApproval);
+
+// Temporary route for resetting names
+router.get('/reset-names-temp', ensureAuthenticated, isAdmin, wargaController.resetNames);
 
 module.exports = router;

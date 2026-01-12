@@ -77,3 +77,11 @@ CREATE TABLE settings (
 );
 
 INSERT INTO settings (kunci, nilai) VALUES ('ronda_offset', '0');
+
+CREATE TABLE event_shares (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT,
+    image_filename VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES agenda(id) ON DELETE CASCADE
+);

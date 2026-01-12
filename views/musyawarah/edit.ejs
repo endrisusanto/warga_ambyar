@@ -1,0 +1,196 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <style>
+            /* Custom Quill Editor Styling for Dark Theme */
+            .ql-toolbar.ql-snow {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 12px 12px 0 0;
+            }
+
+            .ql-container.ql-snow {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-top: none !important;
+                border-radius: 0 0 12px 12px;
+                color: #f3f4f6;
+            }
+
+            /* Toolbar buttons */
+            .ql-toolbar.ql-snow .ql-stroke {
+                stroke: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow .ql-fill {
+                fill: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow .ql-picker-label {
+                color: #e5e7eb !important;
+            }
+
+            .ql-toolbar.ql-snow button:hover,
+            .ql-toolbar.ql-snow button:focus,
+            .ql-toolbar.ql-snow button.ql-active {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+            }
+
+            .ql-toolbar.ql-snow button:hover .ql-stroke,
+            .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+                stroke: #ffffff !important;
+            }
+
+            .ql-toolbar.ql-snow button:hover .ql-fill,
+            .ql-toolbar.ql-snow button.ql-active .ql-fill {
+                fill: #ffffff !important;
+            }
+
+            /* Dropdown menus */
+            .ql-snow .ql-picker-options {
+                background: rgba(30, 30, 40, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+            }
+
+            .ql-snow .ql-picker-item {
+                color: #e5e7eb;
+            }
+
+            .ql-snow .ql-picker-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: #ffffff;
+            }
+
+            /* Editor content area */
+            .ql-editor {
+                color: #f3f4f6;
+                min-height: 400px;
+            }
+
+            .ql-editor.ql-blank::before {
+                color: #9ca3af;
+            }
+
+            /* Tooltip */
+            .ql-snow .ql-tooltip {
+                background: rgba(30, 30, 40, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #e5e7eb;
+                border-radius: 8px;
+            }
+
+            .ql-snow .ql-tooltip input[type=text] {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #f3f4f6;
+                border-radius: 6px;
+                padding: 6px 10px;
+            }
+
+            .ql-snow .ql-tooltip a.ql-action::after,
+            .ql-snow .ql-tooltip a.ql-remove::before {
+                color: #60a5fa;
+            }
+        </style>
+
+        <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-6 sm:p-10 shadow-2xl">
+                <h2 class="text-3xl font-black text-gray-100 mb-8 flex items-center gap-4">
+                    <span class="bg-white/5 p-3 rounded-2xl border border-white/10 text-4xl">📝</span>
+                    Edit Info Musyawarah
+                </h2>
+
+                <form action="/musyawarah/update/<%= item.id %>" method="POST" enctype="multipart/form-data">
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Judul /
+                            Topik</label>
+                        <input type="text" name="judul" value="<%= item.judul %>" required
+                            class="glass-input w-full py-3.5 px-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tanggal
+                            Meeting</label>
+                        <input type="date" name="tanggal" value="<%= moment(item.tanggal).format('YYYY-MM-DD') %>"
+                            required
+                            class="glass-input w-full py-3.5 px-5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Konten /
+                            Hasil Meeting</label>
+                        <div id="editor" style="height: 400px;"
+                            class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10"></div>
+                        <input type="hidden" name="konten" id="konten">
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Lampiran
+                            (Bukti/Foto/PDF)</label>
+                        <% if(item.lampiran) { %>
+                            <div
+                                class="mb-3 text-xs text-indigo-400 font-bold bg-indigo-500/10 px-3 py-2 rounded-lg border border-indigo-500/20 inline-block">
+                                Current file: <%= item.lampiran %>
+                            </div>
+                            <% } %>
+                                <input type="file" name="lampiran"
+                                    class="glass-input w-full py-3.5 px-5 text-gray-100 file:mr-4 file:py-2 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                                <p class="mt-2 text-[10px] text-gray-500">Biarkan kosong jika tidak ingin mengganti
+                                    lampiran.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-end gap-4 border-t border-white/10 pt-8">
+                        <a href="/musyawarah/view/<%= item.id %>"
+                            class="px-8 py-3.5 rounded-2xl text-sm font-bold text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-all border border-white/10">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="px-10 py-3.5 rounded-2xl text-sm font-black bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-xl shadow-indigo-500/20 transform transition hover:-translate-y-1 active:scale-95">
+                            💾 Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <script>
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                }
+            });
+
+            // Set initial content
+            quill.root.innerHTML = `<%- item.konten %>`;
+
+            document.querySelector('form').onsubmit = function () {
+                // Populate hidden input with HTML content
+                document.querySelector('#konten').value = quill.root.innerHTML;
+            };
+        </script>
+
+        <%- include('../partials/footer') %>

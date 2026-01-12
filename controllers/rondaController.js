@@ -4,6 +4,7 @@ const db = require('../config/db');
 const moment = require('moment');
 const multer = require('multer');
 const path = require('path');
+const Kas = require('../models/Kas');
 
 // Multer Config for Ronda
 const storage = multer.diskStorage({
@@ -172,6 +173,71 @@ exports.payFine = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal bayar denda');
+        res.redirect('/ronda');
+    }
+};
+
+exports.submitFine = (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            req.flash('error_msg', err);
+            return res.redirect('/ronda');
+        }
+        if (!req.files || req.files.length === 0) {
+            req.flash('error_msg', 'Upload bukti pembayaran!');
+            return res.redirect('/ronda');
+        }
+
+        try {
+            console.log('DEBUG submitFine BODY:', req.body);
+            console.log('DEBUG submitFine FILES:', req.files);
+            const { id } = req.body;
+            const filename = req.files[0].filename;
+
+            // Temporary Auto-Migration to ensure columns exist
+            try { await db.query("ALTER TABLE ronda_jadwal ADD COLUMN bukti_bayar VARCHAR(255) NULL"); } catch (e) { }
+            try { await db.query("ALTER TABLE ronda_jadwal ADD COLUMN status_bayar ENUM('pending', 'paid', 'rejected') DEFAULT NULL"); } catch (e) { }
+
+            await Ronda.submitFinePayment(id, filename);
+            req.flash('success_msg', 'Bukti pembayaran dikirim, menunggu verifikasi admin.');
+            res.redirect('/ronda');
+        } catch (error) {
+            console.error('DEBUG submitFine ERROR:', error);
+            req.flash('error_msg', 'Gagal mengirim bukti pembayaran: ' + error.message);
+            res.redirect('/ronda');
+        }
+    });
+};
+
+exports.verifyFine = async (req, res) => {
+    try {
+        const { id, action } = req.body;
+        if (action === 'approve') {
+            // Get fine details before resetting it
+            const [rows] = await db.query("SELECT r.denda, w.nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id = ?", [id]);
+
+            if (rows.length > 0) {
+                const { denda, nama } = rows[0];
+
+                await Ronda.payFine(id);
+
+                // Add to Kas
+                if (denda > 0) {
+                    await Kas.add('masuk', denda, `Denda Ronda - ${nama}`, new Date());
+                }
+
+                req.flash('success_msg', 'Pembayaran denda disetujui dan dicatat di Kas.');
+            }
+        } else if (action === 'reject') {
+            // Logic to reject (maybe reset status_bayar to null or 'rejected')
+            // For now, let's just keep it simple or add a reject method in model
+            // await Ronda.rejectFine(id); 
+            req.flash('info_msg', 'Pembayaran ditolak (Not implemented yet)');
+        }
+        res.redirect('/ronda');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal verifikasi pembayaran');
         res.redirect('/ronda');
     }
 };

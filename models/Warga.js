@@ -38,7 +38,15 @@ const Warga = {
         await db.query('DELETE FROM warga WHERE id = ?', [id]);
     },
     getHeadsOfFamily: async () => {
-        const [rows] = await db.query("SELECT * FROM warga WHERE status_keluarga = 'Kepala Keluarga' ORDER BY blok, nomor_rumah");
+        const [rows] = await db.query(`
+            SELECT w.*, 
+                   (SELECT status_huni FROM warga w2 
+                    WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
+                    ORDER BY FIELD(status_huni, 'kontrak', 'tetap', 'kosong', 'tidak huni') LIMIT 1) as status_huni
+            FROM warga w 
+            WHERE w.status_keluarga = 'Kepala Keluarga' 
+            ORDER BY w.blok, w.nomor_rumah
+        `);
         return rows;
     },
     getByHouse: async (blok, nomor_rumah) => {

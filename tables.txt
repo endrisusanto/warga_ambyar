@@ -1,0 +1,14 @@
+Tables_in_rt_rw_db
+agenda
+event_shares
+iuran
+kas
+musyawarah
+musyawarah_comments
+pengumuman
+ronda_dokumentasi
+ronda_jadwal
+ronda_shares
+settings
+users
+warga

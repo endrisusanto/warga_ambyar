@@ -60,15 +60,15 @@ const Iuran = {
         let count = 0;
         for (const h of heads) {
             try {
-                // Iuran Keamanan
+                // Iuran Kas
                 await db.query(
                     'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.id, periode, 'keamanan', 50000]
+                    [h.id, periode, 'kas', 10000]
                 );
                 // Iuran Sampah
                 await db.query(
                     'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.id, periode, 'sampah', 20000]
+                    [h.id, periode, 'sampah', 25000]
                 );
                 count += 2;
             } catch (e) {

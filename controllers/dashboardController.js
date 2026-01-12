@@ -81,19 +81,26 @@ exports.index = async (req, res) => {
                 }
 
                 // Determine status huni
-                // If residents exist, check status_huni of head, or default to 'Isi'
-                // If no residents (shouldn't happen with getAll unless empty houses are stored in warga? No, usually empty houses are not in warga table unless we have a House model. 
-                // But the prompt implies showing "Rumah Kosong". 
-                // If the house is not in Warga table, we won't see it here.
-                // However, the map loop in EJS iterates 1-20. So we need to handle "not found" in EJS as "Kosong".
-                // Here we just prepare data for occupied houses.
+                let effective_status_huni = 'kosong';
+                if (house.residents.length > 0) {
+                    const statuses = house.residents.map(r => r.status_huni.toLowerCase());
+                    if (statuses.includes('kontrak')) {
+                        effective_status_huni = 'kontrak';
+                    } else if (statuses.includes('tetap')) {
+                        effective_status_huni = 'tetap';
+                    } else if (statuses.includes('kosong')) {
+                        effective_status_huni = 'kosong';
+                    } else if (statuses.includes('tidak huni')) {
+                        effective_status_huni = 'tidak huni';
+                    }
+                }
 
                 data.mapData.push({
                     blok: house.blok ? house.blok.toUpperCase() : '',
                     nomor_rumah: house.nomor_rumah,
                     residents: house.residents,
                     head_name: head ? head.nama : 'Unknown',
-                    status_huni: (head ? head.status_huni : (house.residents.length > 0 ? house.residents[0].status_huni : 'kosong')).toLowerCase(),
+                    status_huni: effective_status_huni,
                     status_iuran: status_iuran,
                     unpaid_details: unpaid_details
                 });
@@ -131,8 +138,10 @@ exports.index = async (req, res) => {
                 const dateStr = `${scheduleDate.getDate()} ${monthsMap[scheduleDate.getMonth()]}`;
 
                 data.jadwalRonda.push({
-                    day: isUpcoming ? `${dayName}, ${dateStr} (Akan Datang)` : 'Malam Ini',
-                    petugas: todaySchedule
+                    day: isUpcoming ? `${dayName}, ${dateStr}` : 'Malam Ini',
+                    petugas: todaySchedule,
+                    date: scheduleDate,
+                    isUpcoming: isUpcoming
                 });
             }
         } catch (e) {
@@ -258,5 +267,40 @@ exports.viewPublicEvent = async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).send('Error loading page');
+    }
+};
+
+exports.resetData = async (req, res) => {
+    try {
+        if (req.session.user.role !== 'admin') {
+            req.flash('error_msg', 'Unauthorized');
+            return res.redirect('/dashboard');
+        }
+
+        const db = require('../config/db');
+
+        // Reset Keuangan
+        await db.query('TRUNCATE TABLE kas');
+
+        // Reset Ronda Attendance & Fines
+        await db.query(`
+            UPDATE ronda_jadwal 
+            SET status = 'scheduled', 
+                denda = 0, 
+                status_bayar = NULL, 
+                bukti_bayar = NULL, 
+                foto_bukti = NULL, 
+                keterangan = NULL
+        `);
+
+        // Clear Documentation
+        await db.query('TRUNCATE TABLE ronda_dokumentasi');
+
+        req.flash('success_msg', 'Data keuangan, denda, dan absen ronda berhasil direset.');
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Gagal mereset data.');
+        res.redirect('/dashboard');
     }
 };
