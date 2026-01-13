@@ -53,12 +53,19 @@
 
                     <div class="sm:col-span-6">
                         <label class="block text-sm font-medium text-gray-300 mb-3">Jenis Pembayaran</label>
-                        <div class="flex items-center space-x-6">
+                        <div class="flex flex-wrap items-center gap-4">
                             <div class="flex items-center">
-                                <input id="iuran_kas" name="jenis_iuran[]" value="kas" type="checkbox" checked
+                                <input id="iuran_kas_rt" name="jenis_iuran[]" value="kas_rt" type="checkbox" checked
                                     class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
-                                <label for="iuran_kas" class="ml-2 block text-sm text-gray-100">
-                                    💰 Kas (10k)
+                                <label for="iuran_kas_rt" class="ml-2 block text-sm text-gray-100">
+                                    💰 Kas RT (10k)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="iuran_kas_gang" name="jenis_iuran[]" value="kas_gang" type="checkbox" checked
+                                    class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
+                                <label for="iuran_kas_gang" class="ml-2 block text-sm text-gray-100">
+                                    🏘️ Kas Gang (10k)
                                 </label>
                             </div>
                             <div class="flex items-center">
@@ -302,7 +309,12 @@
                 let typePrice = 0;
                 typeCheckboxes.forEach(cb => {
                     if (cb.checked) {
-                        typePrice += (cb.value === 'kas') ? 10000 : 25000;
+                        // Kas RT and Kas Gang = 10k, Sampah = 25k
+                        if (cb.value === 'kas' || cb.value === 'kas_rt' || cb.value === 'kas_gang') {
+                            typePrice += 10000;
+                        } else if (cb.value === 'sampah') {
+                            typePrice += 25000;
+                        }
                     }
                 });
 

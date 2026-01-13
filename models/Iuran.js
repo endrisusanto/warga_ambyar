@@ -55,22 +55,54 @@ const Iuran = {
         return rows;
     },
     generateBillsForMonth: async (periode) => {
-        // Generate for Kepala Keluarga only
-        const [heads] = await db.query("SELECT id FROM warga WHERE status_keluarga = 'Kepala Keluarga'");
+        // Generate for ONE representative per house (prioritize Kepala Keluarga)
+        const [houses] = await db.query(`
+            SELECT 
+                w.blok, 
+                w.nomor_rumah,
+                (
+                    SELECT id FROM warga w2 
+                    WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
+                    ORDER BY CASE WHEN status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END, id ASC 
+                    LIMIT 1
+                ) as representative_id
+            FROM warga w
+            GROUP BY w.blok, w.nomor_rumah
+        `);
+
         let count = 0;
-        for (const h of heads) {
+        for (const h of houses) {
+            if (!h.representative_id) continue;
+
+            // Iuran Kas RT
             try {
-                // Iuran Kas
                 await db.query(
                     'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.id, periode, 'kas', 10000]
+                    [h.representative_id, periode, 'kas_rt', 10000]
                 );
-                // Iuran Sampah
+                count++;
+            } catch (e) {
+                // Ignore duplicates
+            }
+
+            // Iuran Kas Gang
+            try {
                 await db.query(
                     'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.id, periode, 'sampah', 25000]
+                    [h.representative_id, periode, 'kas_gang', 10000]
                 );
-                count += 2;
+                count++;
+            } catch (e) {
+                // Ignore duplicates
+            }
+
+            // Iuran Sampah
+            try {
+                await db.query(
+                    'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
+                    [h.representative_id, periode, 'sampah', 25000]
+                );
+                count++;
             } catch (e) {
                 // Ignore duplicates
             }

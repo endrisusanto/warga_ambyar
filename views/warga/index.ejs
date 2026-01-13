@@ -33,7 +33,7 @@
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Nama</th>
                                 <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Status Huni</th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -49,6 +49,9 @@
                                     No HP</th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Email</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                                     Ronda?</th>
                                 <th scope="col" class="relative px-6 py-3">
                                     <span class="sr-only">Edit</span>
@@ -71,7 +74,7 @@
                                             <%= w.nama %>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <% let huniClass='bg-white/10 text-gray-300' ; if(w.status_huni==='kosong' )
                                             huniClass='bg-gray-700 text-gray-300' ; if(w.status_huni==='kontrak' )
                                             huniClass='bg-amber-500/20 text-amber-500' ; if(w.status_huni==='tidak huni'
@@ -92,7 +95,8 @@
                                             <form action="/warga/update-role/<%= w.id %>" method="POST" class="inline">
                                                 <select name="role" onchange="this.form.submit()"
                                                     class="glass-input text-xs rounded-md">
-                                                    <option value="warga" <%=w.role==='warga' ? 'selected' : '' %>>Warga
+                                                    <option value="warga" <%=(w.role==='warga' || !w.role) ? 'selected'
+                                                        : '' %>>Warga
                                                     </option>
                                                     <option value="ketua" <%=w.role==='ketua' ? 'selected' : '' %>>Ketua
                                                     </option>
@@ -151,11 +155,12 @@
                                                 </svg>
                                                 <%= w.no_hp %>
                                             </a>
-                                            <% } else { %>
-                                                -
-                                                <% } %>
+                                            <% } %>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        <%= w.email || '-' %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <% if(user.role==='admin' ) { %>
                                             <form action="/warga/toggle-ronda/<%= w.id %>" method="POST" class="inline">
                                                 <button type="submit"

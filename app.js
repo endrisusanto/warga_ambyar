@@ -8,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Proxy (for Nginx/Cloudflare/Heroku)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -18,6 +21,10 @@ app.use(session({
     saveUninitialized: true,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
+const passport = require('passport');
+require('./config/passport')(passport);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash());
 
 // Global variables
@@ -27,12 +34,16 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user || null;
     res.locals.currentPath = req.path;
+    res.locals.adminPhone = app.locals.adminPhone || '6281234567890';
     next();
 });
 
 // View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Profile Check Middleware
+app.use(require('./middleware/checkProfile'));
 
 // Routes
 app.use('/', require('./routes/index'));
@@ -46,6 +57,23 @@ app.use('/activity', require('./routes/activity'));
 app.use('/keuangan', require('./routes/keuangan'));
 app.use('/musyawarah', require('./routes/musyawarah'));
 app.use('/share', require('./routes/share'));
+app.use('/cctv', require('./routes/cctv'));
+
+// Run Migrations
+require('./utils/googleAuthMigration')();
+require('./utils/photoMigration')();
+require('./utils/emailWargaMigration')();
+require('./utils/fixRoleColumn')();
+require('./utils/fixIuranStatus')();
+require('./utils/updateIuranJenis')();
+require('./utils/migrateOldKasData')();
+
+// Fetch Admin Contact
+const getAdminContact = require('./utils/getAdminContact');
+getAdminContact().then(phone => {
+    app.locals.adminPhone = phone;
+    console.log('Admin phone loaded:', phone);
+});
 
 // Start Server
 app.listen(PORT, '0.0.0.0', () => {

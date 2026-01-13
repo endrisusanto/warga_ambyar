@@ -16,6 +16,7 @@ exports.exportExcel = async (req, res) => {
             { header: 'Blok', key: 'blok', width: 8 },
             { header: 'No Rumah', key: 'nomor_rumah', width: 10 },
             { header: 'No HP', key: 'no_hp', width: 15 },
+            { header: 'Email', key: 'email', width: 25 },
             { header: 'Status Huni', key: 'status_huni', width: 15 },
             { header: 'Role', key: 'role', width: 10 }
         ];
@@ -30,6 +31,7 @@ exports.exportExcel = async (req, res) => {
                 blok: w.blok,
                 nomor_rumah: w.nomor_rumah,
                 no_hp: w.no_hp,
+                email: w.email,
                 status_huni: w.status_huni,
                 role: w.role
             });
@@ -145,8 +147,8 @@ exports.updateRole = async (req, res) => {
         req.flash('success_msg', 'Role berhasil diupdate');
         res.redirect('/warga');
     } catch (err) {
-        console.error(err);
-        req.flash('error_msg', 'Gagal update role');
+        console.error('Update Role Error:', err);
+        req.flash('error_msg', 'Gagal update role: ' + err.message);
         res.redirect('/warga');
     }
 };

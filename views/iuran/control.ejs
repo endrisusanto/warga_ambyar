@@ -54,21 +54,29 @@
                                     <% matrix[w.id].forEach(status=> { %>
                                         <td class="px-2 py-2 whitespace-nowrap text-center border-l border-gray-300">
                                             <div class="flex justify-center space-x-1">
-                                                <!-- KAS -->
-                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-sm
-                                        <%= status.kas === 'lunas' ? 'bg-green-500' : 
-                                            status.kas === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
-                                            status.kas ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
-                                                    title="Kas: <%= status.kas ? status.kas.replace('_', ' ') : 'Belum Ditagih' %>">
-                                                    K
+                                                <!-- KAS RT -->
+                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
+                                        <%= status.kas_rt === 'lunas' ? 'bg-green-500' : 
+                                            status.kas_rt === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
+                                            status.kas_rt ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                                    title="Kas RT: <%= status.kas_rt ? status.kas_rt.replace('_', ' ') : 'Belum Ditagih' %>">
+                                                    RT
+                                                </div>
+                                                <!-- KAS GANG -->
+                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
+                                        <%= status.kas_gang === 'lunas' ? 'bg-green-500' : 
+                                            status.kas_gang === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
+                                            status.kas_gang ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                                    title="Kas Gang: <%= status.kas_gang ? status.kas_gang.replace('_', ' ') : 'Belum Ditagih' %>">
+                                                    GG
                                                 </div>
                                                 <!-- SAMPAH -->
-                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-sm
+                                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
                                         <%= status.sampah === 'lunas' ? 'bg-green-500' : 
                                             status.sampah === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
                                             status.sampah ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
                                                     title="Sampah: <%= status.sampah ? status.sampah.replace('_', ' ') : 'Belum Ditagih' %>">
-                                                    S
+                                                    SP
                                                 </div>
                                             </div>
                                         </td>
@@ -88,7 +96,7 @@
                         Lunas (Ada Tagihan)</div>
                     <div class="flex items-center"><span class="w-3 h-3 bg-gray-200 rounded-full mr-2"></span> Belum
                         Ditagih</div>
-                    <div class="ml-4 font-bold">K = Keamanan/Kas, S = Sampah</div>
+                    <div class="ml-4 font-bold">RT = Kas RT, GG = Kas Gang, SP = Sampah</div>
                 </div>
 
             </div>

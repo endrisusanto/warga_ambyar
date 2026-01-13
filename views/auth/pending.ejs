@@ -1,0 +1,27 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 flex-grow">
+            <div class="max-w-md w-full space-y-8 glass-card p-10 m-4 text-center">
+                <div
+                    class="mx-auto h-20 w-20 bg-yellow-500/20 rounded-full flex items-center justify-center text-4xl shadow-sm backdrop-blur-sm animate-pulse border border-yellow-500/30">
+                    ⏳
+                </div>
+                <h2 class="mt-6 text-3xl font-extrabold text-gray-100 drop-shadow-lg">Menunggu Verifikasi</h2>
+                <p class="mt-2 text-sm text-gray-300">
+                    Akun Anda sedang dalam proses verifikasi oleh Admin. Mohon tunggu beberapa saat atau hubungi Admin
+                    jika butuh akses segera.
+                </p>
+
+                <div class="mt-8">
+                    <form action="/auth/logout" method="POST">
+                        <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-white/10 text-sm font-bold rounded-xl text-gray-300 bg-white/5 hover:bg-white/10 focus:outline-none transition-all">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

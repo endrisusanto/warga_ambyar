@@ -20,18 +20,18 @@ const Warga = {
         return rows[0];
     },
     create: async (data) => {
-        const { nama, blok, nomor_rumah, status_keluarga, no_hp, status_huni, is_ronda } = data;
+        const { nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status } = data;
         const [result] = await db.query(
-            'INSERT INTO warga (nama, blok, nomor_rumah, status_keluarga, no_hp, status_huni, is_ronda) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [nama, blok, nomor_rumah, status_keluarga, no_hp, status_huni, is_ronda ? 1 : 0]
+            'INSERT INTO warga (nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [nama, blok, nomor_rumah, status_keluarga, no_hp, email || null, status_huni, is_ronda ? 1 : 0, approval_status || 'approved']
         );
         return result.insertId;
     },
     update: async (id, data) => {
-        const { nama, blok, nomor_rumah, status_keluarga, no_hp, status_huni, is_ronda } = data;
+        const { nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda } = data;
         await db.query(
-            'UPDATE warga SET nama = ?, blok = ?, nomor_rumah = ?, status_keluarga = ?, no_hp = ?, status_huni = ?, is_ronda = ? WHERE id = ?',
-            [nama, blok, nomor_rumah, status_keluarga, no_hp, status_huni, is_ronda ? 1 : 0, id]
+            'UPDATE warga SET nama = ?, blok = ?, nomor_rumah = ?, status_keluarga = ?, no_hp = ?, email = ?, status_huni = ?, is_ronda = ? WHERE id = ?',
+            [nama, blok, nomor_rumah, status_keluarga, no_hp, email || null, status_huni, is_ronda ? 1 : 0, id]
         );
     },
     delete: async (id) => {
@@ -58,7 +58,31 @@ const Warga = {
         return rows;
     },
     updateRole: async (wargaId, role) => {
-        await db.query('UPDATE users SET role = ? WHERE warga_id = ?', [role, wargaId]);
+        try {
+            // Check if user exists
+            const [users] = await db.query('SELECT id FROM users WHERE warga_id = ?', [wargaId]);
+
+            if (users.length > 0) {
+                // Update existing user
+                await db.query('UPDATE users SET role = ? WHERE warga_id = ?', [role, wargaId]);
+            } else {
+                // Create placeholder user so role can be assigned
+                const username = `user_warga_${wargaId}`;
+                const password = '$2b$10$EpOu/yQ.d.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0'; // Dummy hash
+
+                // Use INSERT IGNORE to prevent race conditions, though unlikely
+                await db.query(
+                    'INSERT IGNORE INTO users (username, password, role, warga_id) VALUES (?, ?, ?, ?)',
+                    [username, password, role, wargaId]
+                );
+
+                // If INSERT IGNORE ignored it (because it exists now), update the role
+                await db.query('UPDATE users SET role = ? WHERE warga_id = ?', [role, wargaId]);
+            }
+        } catch (error) {
+            console.error('Error in Warga.updateRole:', error);
+            throw error;
+        }
     },
     updateApprovalStatus: async (id, status) => {
         await db.query('UPDATE warga SET approval_status = ? WHERE id = ?', [status, id]);

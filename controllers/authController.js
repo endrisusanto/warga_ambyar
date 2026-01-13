@@ -105,3 +105,58 @@ exports.logout = (req, res) => {
         res.redirect('/auth/login');
     });
 };
+
+exports.getCompleteProfile = (req, res) => {
+    // Prevent access if already completed
+    if (req.session.user.warga_id) {
+        return res.redirect('/dashboard');
+    }
+    res.render('auth/complete_profile', { title: 'Lengkapi Profil', user: req.session.user });
+};
+
+exports.postCompleteProfile = async (req, res) => {
+    const { nama, blok, nomor_rumah, status_keluarga, no_hp } = req.body;
+    const userId = req.session.user.id;
+
+    try {
+        const Warga = require('../models/Warga');
+        const db = require('../config/db');
+
+        // Create Warga
+        const wargaId = await Warga.create({
+            nama,
+            blok,
+            nomor_rumah,
+            status_keluarga,
+            no_hp,
+            email: req.session.user.email || null, // Auto-fill email from session
+            status_huni: 'Tetap',
+            is_ronda: status_keluarga === 'Kepala Keluarga' ? 1 : 0,
+            approval_status: 'pending' // Default pending for new Google users
+        });
+
+        // Link to User
+        await db.query('UPDATE users SET warga_id = ? WHERE id = ?', [wargaId, userId]);
+
+        // Update Session
+        const updatedUser = await User.findByUsername(req.session.user.username);
+        req.session.user = updatedUser;
+        // Explicitly set pending in session to trigger middleware
+        req.session.user.approval_status = 'pending';
+
+        req.flash('success_msg', 'Profil berhasil dilengkapi! Menunggu persetujuan admin.');
+        res.redirect('/dashboard');
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal menyimpan profil: ' + err.message);
+        res.redirect('/auth/complete-profile');
+    }
+};
+
+exports.getPending = (req, res) => {
+    if (req.session.user && req.session.user.approval_status === 'approved') {
+        return res.redirect('/dashboard');
+    }
+    res.render('auth/pending', { title: 'Menunggu Verifikasi' });
+};

@@ -3,7 +3,7 @@ const db = require('../config/db');
 const User = {
     findByUsername: async (username) => {
         const [rows] = await db.query(`
-            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil 
+            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url 
             FROM users u 
             LEFT JOIN warga w ON u.warga_id = w.id 
             WHERE u.username = ?

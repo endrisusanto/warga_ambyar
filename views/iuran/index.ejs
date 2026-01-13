@@ -49,24 +49,13 @@
                                         <% } %>
                                 </select>
 
-                                <!-- View Toggle -->
-                                <div
-                                    class="w-full md:w-auto bg-white/5 p-1 rounded-lg flex cursor-pointer border border-white/10">
-                                    <button onclick="switchView('table')" id="btn-table"
-                                        class="flex-1 md:flex-none px-3 py-1 rounded-md text-sm font-medium bg-emerald-500/20 text-emerald-400 text-center transition-all border border-emerald-500/30">
-                                        Table
-                                    </button>
-                                    <button onclick="switchView('grid')" id="btn-grid"
-                                        class="flex-1 md:flex-none px-3 py-1 rounded-md text-sm font-medium text-gray-400 hover:text-gray-200 text-center transition-all">
-                                        Grid
-                                    </button>
-                                </div>
+
 
                                 <!-- Empty House Filter Switch -->
                                 <div
-                                    class="flex items-center gap-2 bg-white/5 p-1.5 rounded-lg border border-white/10 h-[38px]">
+                                    class="flex items-center justify-center gap-2 bg-white/5 p-1.5 rounded-lg border border-white/10 h-[38px]">
                                     <span id="toggle-empty-label"
-                                        class="text-xs text-gray-400 font-medium whitespace-nowrap w-[45px] text-right">Huni</span>
+                                        class="text-xs text-gray-400 font-medium whitespace-nowrap w-[45px] text-center">Huni</span>
                                     <button id="toggle-empty-btn" onclick="toggleEmptyRows()" type="button"
                                         class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-emerald-500"
                                         role="switch" aria-checked="true">
@@ -182,20 +171,32 @@
                                             <td
                                                 class="px-2 py-2 whitespace-nowrap text-center border-l border-white/10">
                                                 <div class="flex justify-center space-x-1">
-                                                    <!-- KAS -->
-                                                    <div class="inline-block px-2 py-1.5 rounded-full text-[8px] font-bold text-gray-900 min-w-[24px] text-center
-                                    <%= status.kas && status.kas.status === 'lunas' ? 'bg-emerald-500' : 
-                                        status.kas && status.kas.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
-                                        status.kas ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
-                                    <%= status.kas ? 'cursor-pointer hover:opacity-80' : '' %>"
-                                                        title="<%= status.kas ? 'Kas: ' + status.kas.status.replace('_', ' ') : 'Belum Ditagih' %>"
+                                                    <!-- KAS RT -->
+                                                    <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
+                                    <%= status.kas_rt && status.kas_rt.status === 'lunas' ? 'bg-emerald-500' : 
+                                        status.kas_rt && status.kas_rt.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
+                                        status.kas_rt ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                    <%= status.kas_rt ? 'cursor-pointer hover:opacity-80' : '' %>"
+                                                        title="<%= status.kas_rt ? 'Kas RT: ' + status.kas_rt.status.replace('_', ' ') : 'Belum Ditagih' %>"
                                                         onclick="showDetail(this)"
-                                                        data-payment="<%- safeJson(status.kas) %>">
+                                                        data-payment="<%- safeJson(status.kas_rt) %>">
                                                         <span
-                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">Kas</span>
+                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">RT</span>
+                                                    </div>
+                                                    <!-- KAS GANG -->
+                                                    <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
+                                    <%= status.kas_gang && status.kas_gang.status === 'lunas' ? 'bg-emerald-500' : 
+                                        status.kas_gang && status.kas_gang.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
+                                        status.kas_gang ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                    <%= status.kas_gang ? 'cursor-pointer hover:opacity-80' : '' %>"
+                                                        title="<%= status.kas_gang ? 'Kas Gang: ' + status.kas_gang.status.replace('_', ' ') : 'Belum Ditagih' %>"
+                                                        onclick="showDetail(this)"
+                                                        data-payment="<%- safeJson(status.kas_gang) %>">
+                                                        <span
+                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">GG</span>
                                                     </div>
                                                     <!-- SAMPAH -->
-                                                    <div class="inline-block px-2 py-1.5 rounded-full text-[8px] font-bold text-gray-900 min-w-[32px] text-center
+                                                    <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
                                     <%= status.sampah && status.sampah.status === 'lunas' ? 'bg-emerald-500' : 
                                         status.sampah && status.sampah.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
                                         status.sampah ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
@@ -204,7 +205,7 @@
                                                         onclick="showDetail(this)"
                                                         data-payment="<%- safeJson(status.sampah) %>">
                                                         <span
-                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">Sampah</span>
+                                                            style="display: inline-block; transform: translateY(-0.5px); line-height: 1;">SP</span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -230,462 +231,391 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Grid View -->
-                <div id="view-grid" class="hidden mt-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <% iuran.forEach(item=> { %>
-                            <div class="glass-card p-4 hover:bg-white/10 transition-all">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h4 class="text-lg font-bold text-gray-100 flex items-center gap-2">
-                                            Blok <%= item.blok %>-<%= item.nomor_rumah %>
-                                                    <% if(item.status_huni !=='tetap' ) { %>
-                                                        <span
-                                                            class="text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold <%= item.status_huni === 'kosong' ? 'bg-gray-700 text-gray-300' : item.status_huni === 'tidak huni' ? 'bg-blue-500/20 text-blue-400' : 'bg-amber-500/20 text-amber-500' %>">
-                                                            <%= item.status_huni %>
-                                                        </span>
-                                                        <% } %>
-                                        </h4>
-                                        <p class="text-sm text-gray-400">
-                                            <%= item.nama %>
-                                        </p>
-                                    </div>
-                                    <span
-                                        class="px-2 py-1 bg-white/10 text-gray-300 text-xs rounded-md font-medium border border-white/10">
-                                        <%= moment(item.periode).format('MMM YYYY') %>
-                                    </span>
+            <!-- Payment Detail Modal -->
+            <div id="paymentModal" class="hidden fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
+                aria-modal="true">
+                <!-- Backdrop -->
+                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                    onclick="closePaymentModal()"></div>
+
+                <!-- Modal Container (Centered) -->
+                <div class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+                    <!-- Modal Content -->
+                    <div
+                        class="glass-card w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
+                        <div class="p-6 overflow-y-auto">
+                            <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
+                                Pembayaran</h3>
+                            <div class="space-y-3">
+                                <p class="text-sm text-gray-300" id="modal-warga"></p>
+                                <p class="text-sm text-gray-300" id="modal-jenis"></p>
+                                <p class="text-sm text-gray-300" id="modal-nominal"></p>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm text-gray-300">Status:</p>
+                                    <span id="modal-status-badge"
+                                        class="px-3 py-1 rounded-full text-xs font-semibold"></span>
                                 </div>
-
-                                <div class="space-y-3">
-                                    <!-- Kas Row -->
-                                    <div
-                                        class="flex justify-between items-center p-2 rounded-md <%= item.kas && item.kas.status === 'lunas' ? 'bg-white/10' : 'bg-white/5' %> border border-white/10">
-                                        <div class="flex items-center">
-                                            <span
-                                                class="w-2 h-2 rounded-full mr-2 <%= item.kas && item.kas.status === 'lunas' ? 'bg-emerald-500' : item.kas && item.kas.status === 'menunggu_konfirmasi' ? 'bg-amber-500' : 'bg-red-500' %>"></span>
-                                            <span class="text-sm font-medium text-gray-300">Kas RT</span>
-                                        </div>
-                                        <% if(item.kas) { %>
-                                            <div class="flex flex-col items-end">
-                                                <span
-                                                    class="cursor-pointer text-xs font-bold <%= item.kas.status === 'lunas' ? 'text-gray-200' : 'text-gray-400' %> hover:underline"
-                                                    onclick="showDetail(this)" data-payment="<%- safeJson(item.kas) %>"
-                                                    title="Lihat Detail">
-                                                    <%= item.kas.status==='lunas' ? 'LUNAS' :
-                                                        item.kas.status.replace('_', ' ' ).toUpperCase() %>
-                                                </span>
-                                                <div class="flex space-x-2 mt-1 items-center">
-                                                    <% if(item.kas.status==='menunggu_konfirmasi' &&
-                                                        (user.role==='admin' || user.role==='bendahara' )) { %>
-                                                        <a href="/iuran/confirm/<%= item.kas.id %>"
-                                                            class="text-[10px] font-medium text-gray-300 hover:text-gray-100 bg-white/10 px-2 py-0.5 rounded border border-white/10">
-                                                            Confirm
-                                                        </a>
-                                                        <% } %>
-                                                            <button onclick="showDetail(this)"
-                                                                data-payment="<%- safeJson(item.kas) %>"
-                                                                class="text-gray-400 hover:text-gray-200"
-                                                                title="Detail">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                </div>
-                                            </div>
-                                            <% } else { %>
-                                                <span class="text-xs text-gray-500">-</span>
-                                                <% } %>
-                                    </div>
-
-                                    <!-- Sampah Row -->
-                                    <div
-                                        class="flex justify-between items-center p-2 rounded-md <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-white/10' : 'bg-white/5' %> border border-white/10">
-                                        <div class="flex items-center">
-                                            <span
-                                                class="w-2 h-2 rounded-full mr-2 <%= item.sampah && item.sampah.status === 'lunas' ? 'bg-emerald-500' : item.sampah && item.sampah.status === 'menunggu_konfirmasi' ? 'bg-amber-500' : 'bg-red-500' %>"></span>
-                                            <span class="text-sm font-medium text-gray-300">Sampah</span>
-                                        </div>
-                                        <% if(item.sampah) { %>
-                                            <div class="flex flex-col items-end">
-                                                <span
-                                                    class="cursor-pointer text-xs font-bold <%= item.sampah.status === 'lunas' ? 'text-gray-200' : 'text-gray-400' %> hover:underline"
-                                                    onclick="showDetail(this)"
-                                                    data-payment="<%- safeJson(item.sampah) %>" title="Lihat Detail">
-                                                    <%= item.sampah.status==='lunas' ? 'LUNAS' :
-                                                        item.sampah.status.replace('_', ' ' ).toUpperCase() %>
-                                                </span>
-                                                <div class="flex space-x-2 mt-1 items-center">
-                                                    <% if(item.sampah.status==='menunggu_konfirmasi' &&
-                                                        (user.role==='admin' || user.role==='bendahara' )) { %>
-                                                        <a href="/iuran/confirm/<%= item.sampah.id %>"
-                                                            class="text-[10px] font-medium text-gray-300 hover:text-gray-100 bg-white/10 px-2 py-0.5 rounded border border-white/10">
-                                                            Confirm
-                                                        </a>
-                                                        <% } %>
-                                                            <button onclick="showDetail(this)"
-                                                                data-payment="<%- safeJson(item.sampah) %>"
-                                                                class="text-gray-400 hover:text-gray-200"
-                                                                title="Detail">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                </div>
-                                            </div>
-                                            <% } else { %>
-                                                <span class="text-xs text-gray-500">-</span>
-                                                <% } %>
-                                    </div>
+                                <div id="modal-proof" class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
+                                    <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
+                                    <img src="" class="w-full object-contain max-h-64 rounded">
+                                    <a href="#" target="_blank"
+                                        class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
+                                        Ukuran Penuh</a>
                                 </div>
                             </div>
-                            <% }) %>
-                    </div>
-                </div>
+                        </div>
+                        <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
+                            id="modal-actions">
+                            <button type="button"
+                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
+                                onclick="closePaymentModal()">Close</button>
 
-                <!-- Payment Detail Modal -->
-                <div id="paymentModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
-                    role="dialog" aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                            onclick="closePaymentModal()"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                            aria-hidden="true">&#8203;</span>
-                        <div
-                            class="inline-block align-bottom glass-card text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                            <div class="p-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
-                                    Pembayaran</h3>
-                                <div class="space-y-3">
-                                    <p class="text-sm text-gray-300" id="modal-warga"></p>
-                                    <p class="text-sm text-gray-300" id="modal-jenis"></p>
-                                    <p class="text-sm text-gray-300" id="modal-nominal"></p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm text-gray-300">Status:</p>
-                                        <span id="modal-status-badge"
-                                            class="px-3 py-1 rounded-full text-xs font-semibold"></span>
-                                    </div>
-                                    <div id="modal-proof"
-                                        class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
-                                        <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
-                                        <img src="" class="w-full object-contain max-h-64 rounded">
-                                        <a href="#" target="_blank"
-                                            class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
-                                            Ukuran Penuh</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
-                                id="modal-actions">
-                                <button type="button"
-                                    class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
-                                    onclick="closePaymentModal()">Close</button>
-                            </div>
+                            <% if (user && user.role==='admin' ) { %>
+                                <button type="button" id="btn-reset-payment"
+                                    class="hidden glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 focus:outline-none sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm border border-red-500/30"
+                                    onclick="resetPayment()">
+                                    Reset to Belum Ditagih
+                                </button>
+                                <% } %>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <script src="/js/html2canvas.min.js"></script>
-                <script>
-                    function showDetail(element) {
-                        const dataStr = element.getAttribute('data-payment');
-                        if (!dataStr || dataStr === 'null') return;
 
-                        try {
-                            const data = JSON.parse(dataStr);
-                            const modal = document.getElementById('paymentModal');
-                            if (!modal) return;
+            <script src="/js/html2canvas.min.js"></script>
+            <script>
+                let currentPaymentId = null;
 
-                            document.getElementById('modal-warga').innerText = `Warga: ${data.nama} (Blok ${data.blok}-${data.nomor_rumah})`;
-                            const date = new Date(data.periode);
-                            const monthYear = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                function showDetail(element) {
+                    const dataStr = element.getAttribute('data-payment');
+                    if (!dataStr || dataStr === 'null') return;
 
-                            // Map 'keamanan' to 'KAS' for display consistency
-                            const displayJenis = data.jenis === 'keamanan' ? 'KAS' : data.jenis.toUpperCase();
-                            document.getElementById('modal-jenis').innerText = `Jenis: ${displayJenis} - ${monthYear}`;
+                    try {
+                        const data = JSON.parse(dataStr);
+                        currentPaymentId = data.id;
 
-                            document.getElementById('modal-nominal').innerText = `Nominal: Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}`;
+                        const modal = document.getElementById('paymentModal');
+                        if (!modal) return;
 
-                            // Status badge with color
-                            const statusBadge = document.getElementById('modal-status-badge');
-                            const statusText = data.status.replace('_', ' ').toUpperCase();
-                            statusBadge.innerText = statusText;
-
-                            // Apply color based on status
-                            if (data.status === 'lunas') {
-                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                            } else if (data.status === 'menunggu_konfirmasi') {
-                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                            } else {
-                                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30';
-                            }
-
-                            const proofDiv = document.getElementById('modal-proof');
-                            const img = proofDiv.querySelector('img');
-                            const link = proofDiv.querySelector('a');
-
-                            if (data.bukti_bayar) {
-                                proofDiv.classList.remove('hidden');
-                                const src = data.bukti_bayar.startsWith('/uploads/') ? data.bukti_bayar : '/uploads/' + data.bukti_bayar;
-                                img.src = src;
-                                link.href = src;
-                            } else {
-                                proofDiv.classList.add('hidden');
-                            }
-
-                            const actionsDiv = document.getElementById('modal-actions');
-                            const userRole = "<%= user ? user.role : '' %>";
-
-                            let html = `<button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10" onclick="closePaymentModal()">Close</button>`;
-
-                            if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
-                                html = `
-                <a href="/iuran/confirm/${data.id}" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Approve</a>
-                <a href="/iuran/reject/${data.id}" onclick="return confirm('Tolak pembayaran?')" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/10 text-base font-medium text-gray-300 hover:bg-white/15 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Reject</a>
-            ` + html;
-                            }
-                            actionsDiv.innerHTML = html;
-
-                            modal.classList.remove('hidden');
-                        } catch (e) {
-                            console.error(e);
+                        document.getElementById('modal-warga').innerText = `Warga: ${data.nama} (Blok ${data.blok}-${data.nomor_rumah})`;
+                        if (data.payer_name) {
+                            const payerInfo = document.createElement('div');
+                            payerInfo.className = "text-xs text-emerald-400 mt-1 font-bold";
+                            payerInfo.innerText = `(Dibayar oleh: ${data.payer_name})`;
+                            document.getElementById('modal-warga').appendChild(payerInfo);
                         }
-                    }
+                        const date = new Date(data.periode);
+                        const monthYear = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
-                    function closePaymentModal() {
-                        document.getElementById('paymentModal').classList.add('hidden');
-                    }
+                        // Map 'keamanan' to 'KAS' for display consistency
+                        const displayJenis = data.jenis === 'keamanan' ? 'KAS' : data.jenis.toUpperCase();
+                        document.getElementById('modal-jenis').innerText = `Jenis: ${displayJenis} - ${monthYear}`;
 
-                    function toggleExportDropdown(event) {
-                        if (event) event.stopPropagation();
-                        const dropdown = document.getElementById('export-dropdown');
-                        dropdown.classList.toggle('hidden');
-                    }
+                        document.getElementById('modal-nominal').innerText = `Nominal: Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}`;
 
-                    function toggleFilters() {
-                        const container = document.getElementById('filter-container');
-                        const icon = document.getElementById('filter-icon');
-                        container.classList.toggle('hidden');
-                        // Reset rotation if hidden, rotate if shown
-                        if (container.classList.contains('hidden')) {
-                            icon.style.transform = 'rotate(0deg)';
+                        // Status badge with color
+                        const statusBadge = document.getElementById('modal-status-badge');
+                        const statusText = data.status.replace('_', ' ').toUpperCase();
+                        statusBadge.innerText = statusText;
+
+                        // Apply color based on status
+                        if (data.status === 'lunas') {
+                            statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                        } else if (data.status === 'menunggu_konfirmasi') {
+                            statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30';
                         } else {
-                            icon.style.transform = 'rotate(180deg)';
+                            statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30';
+                        }
+
+                        const proofDiv = document.getElementById('modal-proof');
+                        const img = proofDiv.querySelector('img');
+                        const link = proofDiv.querySelector('a');
+
+                        if (data.bukti_bayar) {
+                            proofDiv.classList.remove('hidden');
+                            const src = data.bukti_bayar.startsWith('/uploads/') ? data.bukti_bayar : '/uploads/' + data.bukti_bayar;
+                            img.src = src;
+                            link.href = src;
+                        } else {
+                            proofDiv.classList.add('hidden');
+                        }
+
+                        const actionsDiv = document.getElementById('modal-actions');
+                        const userRole = "<%= user ? user.role : '' %>";
+
+                        let buttonsHtml = `
+                            <button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10" onclick="closePaymentModal()">Close</button>
+                        `;
+
+                        if (userRole === 'admin') {
+                            buttonsHtml += `
+                                <button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 focus:outline-none sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm border border-red-500/30" onclick="resetPayment()">Reset to Belum Ditagih</button>
+                             `;
+                        }
+
+                        if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
+                            buttonsHtml = `
+                                <a href="/iuran/confirm/${data.id}" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Approve</a>
+                                <a href="/iuran/reject/${data.id}" onclick="return confirm('Tolak pembayaran?')" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/10 text-base font-medium text-gray-300 hover:bg-white/15 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Reject</a>
+                            ` + buttonsHtml;
+                        }
+
+                        actionsDiv.innerHTML = buttonsHtml;
+
+                        modal.classList.remove('hidden');
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                function closePaymentModal() {
+                    document.getElementById('paymentModal').classList.add('hidden');
+                }
+
+                async function resetPayment() {
+                    if (!currentPaymentId) return;
+                    if (!confirm('Apakah Anda yakin ingin mereset status pembayaran ini menjadi Belum Ditagih? Data pembayaran akan dihapus.')) return;
+
+                    try {
+                        const response = await fetch('/iuran/reset', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: currentPaymentId })
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('Status berhasil direset');
+                            location.reload();
+                        } else {
+                            alert('Gagal reset: ' + result.message);
+                        }
+                    } catch (err) {
+                        alert('Error: ' + err.message);
+                    }
+                }
+
+                function toggleExportDropdown(event) {
+                    if (event) event.stopPropagation();
+                    const dropdown = document.getElementById('export-dropdown');
+                    dropdown.classList.toggle('hidden');
+                }
+
+                function toggleFilters() {
+                    const container = document.getElementById('filter-container');
+                    const icon = document.getElementById('filter-icon');
+                    container.classList.toggle('hidden');
+                    // Reset rotation if hidden, rotate if shown
+                    if (container.classList.contains('hidden')) {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                }
+
+                // Close dropdown when clicking outside
+                window.onclick = function (event) {
+                    if (!event.target.closest('#menu-button') && !event.target.closest('#export-dropdown')) {
+                        const dropdown = document.getElementById('export-dropdown');
+                        if (dropdown && !dropdown.classList.contains('hidden')) {
+                            dropdown.classList.add('hidden');
                         }
                     }
+                }
 
-                    // Close dropdown when clicking outside
-                    window.onclick = function (event) {
-                        if (!event.target.closest('#menu-button') && !event.target.closest('#export-dropdown')) {
-                            const dropdown = document.getElementById('export-dropdown');
-                            if (dropdown && !dropdown.classList.contains('hidden')) {
-                                dropdown.classList.add('hidden');
-                            }
+                function exportToImage() {
+                    const tableElement = document.querySelector('#view-table table');
+
+                    if (!tableElement) return alert('Table not found');
+
+                    const btn = document.getElementById('menu-button');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '⏳ Processing...';
+
+                    html2canvas(tableElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: true,
+                        backgroundColor: '#0a0a0a'
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = 'Data_Iuran_' + new Date().getTime() + '.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        btn.innerHTML = originalText;
+                    }).catch(err => {
+                        console.error(err);
+                        alert('Gagal export image');
+                        btn.innerHTML = originalText;
+                    });
+                }
+
+                // Export to PDF function
+                async function exportToPDF() {
+                    const btn = document.getElementById('menu-button');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '⏳ Processing...';
+
+                    try {
+                        // Check if html2canvas is available
+                        if (typeof html2canvas === 'undefined') {
+                            throw new Error('html2canvas library not loaded');
                         }
-                    }
 
-                    function exportToImage() {
-                        const currentView = localStorage.getItem('iuranView') || 'table';
-                        if (currentView !== 'table') {
-                            if (confirm('Export hanya tersedia untuk Table View. Pindah ke Table View sekarang?')) {
-                                switchView('table');
-                            }
-                            return;
+                        // Load jsPDF library dynamically
+                        if (typeof window.jspdf === 'undefined') {
+                            const script = document.createElement('script');
+                            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                            document.head.appendChild(script);
+                            await new Promise((resolve, reject) => {
+                                script.onload = resolve;
+                                script.onerror = () => reject(new Error('Failed to load jsPDF'));
+                            });
                         }
 
-                        const tableElement = document.querySelector('#view-table table');
+                        const { jsPDF } = window.jspdf;
+                        const tableElement = document.getElementById('view-table');
 
-                        if (!tableElement) return alert('Table not found');
+                        if (!tableElement) {
+                            throw new Error('Table element not found');
+                        }
 
-                        const btn = document.getElementById('menu-button');
-                        const originalText = btn.innerHTML;
-                        btn.innerHTML = '⏳ Processing...';
-
-                        html2canvas(tableElement, {
+                        // Capture table as canvas
+                        const canvas = await html2canvas(tableElement, {
                             scale: 2,
                             useCORS: true,
-                            logging: true,
+                            logging: false,
                             backgroundColor: '#0a0a0a'
-                        }).then(canvas => {
-                            const link = document.createElement('a');
-                            link.download = 'Data_Iuran_' + new Date().getTime() + '.png';
-                            link.href = canvas.toDataURL('image/png');
-                            link.click();
-                            btn.innerHTML = originalText;
-                        }).catch(err => {
-                            console.error(err);
-                            alert('Gagal export image');
-                            btn.innerHTML = originalText;
                         });
-                    }
 
-                    function switchView(view) {
-                        const tableBtn = document.getElementById('btn-table');
-                        const gridBtn = document.getElementById('btn-grid');
-                        const tableView = document.getElementById('view-table');
-                        const gridView = document.getElementById('view-grid');
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgWidth = 210; // A4 width in mm
+                        const pageHeight = 297; // A4 height in mm
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                        if (view === 'table') {
-                            tableView.classList.remove('hidden');
-                            gridView.classList.add('hidden');
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        let heightLeft = imgHeight;
+                        let position = 0;
 
-                            tableBtn.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-                            tableBtn.classList.remove('text-gray-400');
+                        // Add first page
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
 
-                            gridBtn.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-                            gridBtn.classList.add('text-gray-400');
-                        } else {
-                            tableView.classList.add('hidden');
-                            gridView.classList.remove('hidden');
-
-                            gridBtn.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-                            gridBtn.classList.remove('text-gray-400');
-
-                            tableBtn.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-                            tableBtn.classList.add('text-gray-400');
-                        }
-
-                        localStorage.setItem('iuranView', view);
-                    }
-
-                    // Export to PDF function
-                    async function exportToPDF() {
-                        const btn = document.getElementById('menu-button');
-                        const originalText = btn.innerHTML;
-                        btn.innerHTML = '⏳ Processing...';
-
-                        try {
-                            // Check if html2canvas is available
-                            if (typeof html2canvas === 'undefined') {
-                                throw new Error('html2canvas library not loaded');
-                            }
-
-                            // Load jsPDF library dynamically
-                            if (typeof window.jspdf === 'undefined') {
-                                const script = document.createElement('script');
-                                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-                                document.head.appendChild(script);
-                                await new Promise((resolve, reject) => {
-                                    script.onload = resolve;
-                                    script.onerror = () => reject(new Error('Failed to load jsPDF'));
-                                });
-                            }
-
-                            const { jsPDF } = window.jspdf;
-                            const tableElement = document.getElementById('view-table');
-
-                            if (!tableElement) {
-                                throw new Error('Table element not found');
-                            }
-
-                            // Capture table as canvas
-                            const canvas = await html2canvas(tableElement, {
-                                scale: 2,
-                                useCORS: true,
-                                logging: false,
-                                backgroundColor: '#0a0a0a'
-                            });
-
-                            const imgData = canvas.toDataURL('image/png');
-                            const imgWidth = 210; // A4 width in mm
-                            const pageHeight = 297; // A4 height in mm
-                            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                            const pdf = new jsPDF('p', 'mm', 'a4');
-                            let heightLeft = imgHeight;
-                            let position = 0;
-
-                            // Add first page
+                        // Add additional pages if needed
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
                             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                             heightLeft -= pageHeight;
-
-                            // Add additional pages if needed
-                            while (heightLeft >= 0) {
-                                position = heightLeft - imgHeight;
-                                pdf.addPage();
-                                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                                heightLeft -= pageHeight;
-                            }
-
-                            // Download PDF
-                            const filename = 'Data_Iuran_' + new Date().toISOString().slice(0, 10) + '.pdf';
-                            pdf.save(filename);
-                            btn.innerHTML = originalText;
-                        } catch (err) {
-                            console.error('Export PDF Error:', err);
-                            alert('Gagal export PDF: ' + err.message);
-                            btn.innerHTML = originalText;
                         }
+
+                        // Download PDF
+                        const filename = 'Data_Iuran_' + new Date().toISOString().slice(0, 10) + '.pdf';
+                        pdf.save(filename);
+                        btn.innerHTML = originalText;
+                    } catch (err) {
+                        console.error('Export PDF Error:', err);
+                        alert('Gagal export PDF: ' + err.message);
+                        btn.innerHTML = originalText;
                     }
+                }
+            </script>
 
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const savedView = localStorage.getItem('iuranView') || 'table';
-                        switchView(savedView);
-                    });
-                </script>
+            <script>
+                let hideEmpty = true;
 
-                <script>
-                    let hideEmpty = true;
+                function toggleEmptyRows() {
+                    hideEmpty = !hideEmpty;
+                    updateEmptyRowsVisibility();
+                }
 
-                    function toggleEmptyRows() {
-                        hideEmpty = !hideEmpty;
-                        updateEmptyRowsVisibility();
-                    }
+                function updateEmptyRowsVisibility() {
+                    const btn = document.getElementById('toggle-empty-btn');
+                    const span = btn.querySelector('span');
+                    const label = document.getElementById('toggle-empty-label');
+                    const rows = document.querySelectorAll('.status-kosong, .status-tidak-huni');
 
-                    function updateEmptyRowsVisibility() {
-                        const btn = document.getElementById('toggle-empty-btn');
-                        const span = btn.querySelector('span');
-                        const label = document.getElementById('toggle-empty-label');
-                        const rows = document.querySelectorAll('.status-kosong, .status-tidak-huni');
-
-                        if (hideEmpty) {
-                            // Hidden state (Switch ON - Green) -> Show "Huni"
-                            btn.classList.remove('bg-gray-700');
-                            btn.classList.add('bg-emerald-500');
-                            span.classList.remove('translate-x-0');
-                            span.classList.add('translate-x-4');
-                            if (label) {
-                                label.innerText = 'Huni';
-                                label.classList.add('text-emerald-400');
-                                label.classList.remove('text-gray-400');
-                            }
-
-                            rows.forEach(r => r.classList.add('hidden'));
-                        } else {
-                            // Visible state (Switch OFF - Gray) -> Show "Semua"
-                            btn.classList.remove('bg-emerald-500');
-                            btn.classList.add('bg-gray-700');
-                            span.classList.remove('translate-x-4');
-                            span.classList.add('translate-x-0');
-                            if (label) {
-                                label.innerText = 'Semua';
-                                label.classList.remove('text-emerald-400');
-                                label.classList.add('text-gray-400');
-                            }
-
-                            rows.forEach(r => r.classList.remove('hidden'));
+                    if (hideEmpty) {
+                        // Hidden state (Switch ON - Green) -> Show "Huni"
+                        btn.classList.remove('bg-gray-700');
+                        btn.classList.add('bg-emerald-500');
+                        span.classList.remove('translate-x-0');
+                        span.classList.add('translate-x-4');
+                        if (label) {
+                            label.innerText = 'Huni';
+                            label.classList.add('text-emerald-400');
+                            label.classList.remove('text-gray-400');
                         }
-                        localStorage.setItem('hideEmptyRows', hideEmpty);
-                    }
 
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const saved = localStorage.getItem('hideEmptyRows');
-                        hideEmpty = saved === null ? true : saved === 'true'; // Default true
-                        updateEmptyRowsVisibility();
-                    });
-                </script>
-                <%- include('../partials/footer') %>
+                        rows.forEach(r => r.classList.add('hidden'));
+                    } else {
+                        // Visible state (Switch OFF - Gray) -> Show "Semua"
+                        btn.classList.remove('bg-emerald-500');
+                        btn.classList.add('bg-gray-700');
+                        span.classList.remove('translate-x-4');
+                        span.classList.add('translate-x-0');
+                        if (label) {
+                            label.innerText = 'Semua';
+                            label.classList.remove('text-emerald-400');
+                            label.classList.add('text-gray-400');
+                        }
+
+                        rows.forEach(r => r.classList.remove('hidden'));
+                    }
+                    localStorage.setItem('hideEmptyRows', hideEmpty);
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const saved = localStorage.getItem('hideEmptyRows');
+                    hideEmpty = saved === null ? true : saved === 'true'; // Default true
+                    updateEmptyRowsVisibility();
+                });
+            </script>
+            <!-- Payment Detail Modal (Moved to Root) -->
+            <div id="paymentModal" class="hidden fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
+                aria-modal="true">
+                <!-- Backdrop -->
+                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                    onclick="closePaymentModal()"></div>
+
+                <!-- Modal Container (Centered) -->
+                <div class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+                    <!-- Modal Content -->
+                    <div
+                        class="glass-card w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
+                        <div class="p-6 overflow-y-auto">
+                            <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
+                                Pembayaran</h3>
+                            <div class="space-y-3">
+                                <p class="text-sm text-gray-300" id="modal-warga"></p>
+                                <p class="text-sm text-gray-300" id="modal-jenis"></p>
+                                <p class="text-sm text-gray-300" id="modal-nominal"></p>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm text-gray-300">Status:</p>
+                                    <span id="modal-status-badge"
+                                        class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+                                </div>
+                                <div id="modal-proof" class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
+                                    <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
+                                    <img src="" class="w-full object-contain max-h-64 rounded">
+                                    <a href="#" target="_blank"
+                                        class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
+                                        Ukuran Penuh</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
+                            id="modal-actions">
+                            <button type="button"
+                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
+                                onclick="closePaymentModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include('../partials/footer') %>

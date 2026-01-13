@@ -48,21 +48,24 @@
                                             class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-indigo-500 to-cyan-500 mb-4 mx-auto">
                                             <div
                                                 class="w-full h-full rounded-full overflow-hidden bg-gray-900 border-4 border-gray-900">
-                                                <% const currentPhoto=warga ? warga.foto_profil : (userData ?
-                                                    userData.foto_profil : null); %>
+                                                <% let currentPhoto=warga ? warga.foto_profil : null; let
+                                                    googlePhoto=userData ? userData.profile_photo_url : null; %>
                                                     <% if(currentPhoto) { %>
                                                         <img class="h-full w-full object-cover"
                                                             src="/uploads/profiles/<%= currentPhoto %>" alt="Profile">
-                                                        <% } else { %>
-                                                            <div
-                                                                class="h-full w-full flex items-center justify-center bg-gray-800 text-gray-500">
-                                                                <svg class="w-16 h-16" fill="currentColor"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path
-                                                                        d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                                                                </svg>
-                                                            </div>
-                                                            <% } %>
+                                                        <% } else if (googlePhoto) { %>
+                                                            <img class="h-full w-full object-cover"
+                                                                src="<%= googlePhoto %>" alt="Profile">
+                                                            <% } else { %>
+                                                                <div
+                                                                    class="h-full w-full flex items-center justify-center bg-gray-800 text-gray-500">
+                                                                    <svg class="w-16 h-16" fill="currentColor"
+                                                                        viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <% } %>
                                             </div>
                                         </div>
 

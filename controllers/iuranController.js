@@ -36,7 +36,7 @@ function checkFileType(file, cb) {
 }
 
 exports.index = async (req, res) => {
-    try {
+    const runQuery = async () => {
         const year = req.query.year || moment().format('YYYY');
 
         // Get Heads of Family only (for Matrix Rows)
@@ -47,66 +47,99 @@ exports.index = async (req, res) => {
             SELECT i.*, w.nama, w.blok, w.nomor_rumah,
                    (SELECT status_huni FROM warga w2 
                     WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
-                    ORDER BY FIELD(status_huni, 'kontrak', 'tetap', 'kosong', 'tidak huni') LIMIT 1) as effective_status_huni
+                    ORDER BY FIELD(status_huni, 'kontrak', 'tetap', 'kosong', 'tidak huni') LIMIT 1) as effective_status_huni,
+                   p.nama as payer_name
             FROM iuran i 
             JOIN warga w ON i.warga_id = w.id 
+            LEFT JOIN warga p ON i.dibayar_oleh = p.id
             WHERE YEAR(i.periode) = ?
             ORDER BY w.blok ASC, w.nomor_rumah ASC, i.periode DESC
         `, [year]);
 
-        // Group for Grid View (List Card)
-        const groupedIuran = {};
-        rows.forEach(item => {
-            const key = `${item.warga_id}-${moment(item.periode).format('YYYY-MM')}`;
-            if (!groupedIuran[key]) {
-                groupedIuran[key] = {
-                    warga_id: item.warga_id,
-                    nama: item.nama,
-                    blok: item.blok,
-                    nomor_rumah: item.nomor_rumah,
-                    status_huni: item.effective_status_huni,
-                    periode: item.periode,
-                    kas: null,
-                    sampah: null
-                };
-            }
-            if (item.jenis === 'keamanan' || item.jenis === 'kas') {
-                groupedIuran[key].kas = item;
-            } else if (item.jenis === 'sampah') {
-                groupedIuran[key].sampah = item;
-            }
-        });
-        const iuranList = Object.values(groupedIuran);
+        return { rows, warga, year };
+    };
 
-        // Build Matrix for Table View
-        const matrix = {};
-        warga.forEach(w => {
-            matrix[w.id] = Array(12).fill(null).map(() => ({ kas: null, sampah: null }));
-        });
-
-        rows.forEach(r => {
-            if (matrix[r.warga_id]) {
-                const idx = moment(r.periode).month(); // 0-11
-                const type = (r.jenis === 'keamanan' || r.jenis === 'kas') ? 'kas' : 'sampah';
-                matrix[r.warga_id][idx][type] = r;
+    try {
+        try {
+            const data = await runQuery();
+            renderIndex(req, res, data);
+        } catch (err) {
+            if (err.code === 'ER_BAD_FIELD_ERROR' && err.sqlMessage.includes('dibayar_oleh')) {
+                console.log('Column dibayar_oleh missing, attempting to migrate...');
+                await db.query("ALTER TABLE iuran ADD COLUMN dibayar_oleh INT DEFAULT NULL");
+                await db.query("ALTER TABLE iuran ADD CONSTRAINT fk_iuran_payer FOREIGN KEY (dibayar_oleh) REFERENCES warga(id) ON DELETE SET NULL");
+                console.log('Migration successful, retrying query...');
+                const data = await runQuery();
+                renderIndex(req, res, data);
+            } else {
+                throw err;
             }
-        });
-
-        res.render('iuran/index', {
-            title: 'Data Iuran',
-            iuran: iuranList,
-            matrix,
-            warga,
-            year,
-            moment,
-            user: req.session.user,
-            useWideContainer: true
-        });
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        res.status(500).send('Server Error: ' + err.message);
     }
 };
+
+function renderIndex(req, res, { rows, warga, year }) {
+    // Group for Grid View (List Card)
+    const groupedIuran = {};
+    rows.forEach(item => {
+        const key = `${item.warga_id}-${moment(item.periode).format('YYYY-MM')}`;
+        if (!groupedIuran[key]) {
+            groupedIuran[key] = {
+                warga_id: item.warga_id,
+                nama: item.nama,
+                blok: item.blok,
+                nomor_rumah: item.nomor_rumah,
+                status_huni: item.effective_status_huni,
+                periode: item.periode,
+                kas_rt: null,
+                kas_gang: null,
+                sampah: null
+            };
+        }
+        // Group by type: kas_rt, kas_gang, sampah
+        if (item.jenis === 'keamanan' || item.jenis === 'kas' || item.jenis === 'kas_rt') {
+            groupedIuran[key].kas_rt = item;
+        } else if (item.jenis === 'kas_gang') {
+            groupedIuran[key].kas_gang = item;
+        } else if (item.jenis === 'sampah') {
+            groupedIuran[key].sampah = item;
+        }
+    });
+    const iuranList = Object.values(groupedIuran);
+
+    // Build Matrix for Table View (3 columns now)
+    const matrix = {};
+    warga.forEach(w => {
+        matrix[w.id] = Array(12).fill(null).map(() => ({ kas_rt: null, kas_gang: null, sampah: null }));
+    });
+
+    rows.forEach(r => {
+        if (matrix[r.warga_id]) {
+            const idx = moment(r.periode).month(); // 0-11
+            let type = 'sampah';
+            if (r.jenis === 'keamanan' || r.jenis === 'kas' || r.jenis === 'kas_rt') {
+                type = 'kas_rt';
+            } else if (r.jenis === 'kas_gang') {
+                type = 'kas_gang';
+            }
+            matrix[r.warga_id][idx][type] = r;
+        }
+    });
+
+    res.render('iuran/index', {
+        title: 'Data Iuran',
+        iuran: iuranList,
+        matrix,
+        warga,
+        year,
+        moment,
+        user: req.session.user,
+        useWideContainer: true
+    });
+}
 
 exports.generate = async (req, res) => {
     try {
@@ -125,10 +158,23 @@ exports.payForm = async (req, res) => {
     try {
         let warga;
 
-        // If user is regular warga (not admin/bendahara/ketua), show only their own house
+        // If user is regular warga (not admin/bendahara/ketua), show only their own house (Head of Family)
         if (req.session.user.role === 'warga' && req.session.user.warga_id) {
-            const [rows] = await db.query('SELECT * FROM warga WHERE id = ?', [req.session.user.warga_id]);
-            warga = rows;
+            // Find the Head of Family for this user's house
+            const [rows] = await db.query(`
+                SELECT w.* 
+                FROM warga w
+                JOIN warga u ON w.blok = u.blok AND w.nomor_rumah = u.nomor_rumah
+                WHERE u.id = ? AND w.status_keluarga = 'Kepala Keluarga'
+            `, [req.session.user.warga_id]);
+
+            if (rows.length > 0) {
+                warga = rows;
+            } else {
+                // Fallback: just show the user themselves if no Head found
+                const [self] = await db.query('SELECT * FROM warga WHERE id = ?', [req.session.user.warga_id]);
+                warga = self;
+            }
         } else {
             // Admin/bendahara/ketua can see all houses
             warga = await Warga.getHeadsOfFamily();
@@ -154,8 +200,14 @@ exports.processPayment = (req, res) => {
             try {
                 let { warga_id, months, jenis_iuran } = req.body;
 
+                console.log('=== PAYMENT SUBMISSION ===');
+                console.log('Raw jenis_iuran:', jenis_iuran);
+
                 const selectedMonths = Array.isArray(months) ? months : (months ? [months] : []);
                 const jenis = Array.isArray(jenis_iuran) ? jenis_iuran : (jenis_iuran ? [jenis_iuran] : []);
+
+                console.log('Processed jenis:', jenis);
+                console.log('Selected months:', selectedMonths);
 
                 if (selectedMonths.length === 0) {
                     req.flash('error_msg', 'Pilih minimal satu bulan');
@@ -167,13 +219,42 @@ exports.processPayment = (req, res) => {
                     return res.redirect('/iuran/pay');
                 }
 
+                // Security Check: Can this user pay for this warga_id?
+                let payer_id = null;
+                if (req.session.user.role === 'warga') {
+                    payer_id = req.session.user.warga_id;
+                    // Check if they are in the same house
+                    const [check] = await db.query(`
+                        SELECT 1 
+                        FROM warga target
+                        JOIN warga payer ON target.blok = payer.blok AND target.nomor_rumah = payer.nomor_rumah
+                        WHERE target.id = ? AND payer.id = ?
+                    `, [warga_id, payer_id]);
+
+                    if (check.length === 0) {
+                        req.flash('error_msg', 'Anda tidak berhak melakukan pembayaran untuk warga ini.');
+                        return res.redirect('/iuran/pay');
+                    }
+                } else if (req.session.user.warga_id) {
+                    // Admin/Bendahara also records who paid if they are a warga
+                    payer_id = req.session.user.warga_id;
+                }
+
                 let bukti = req.file ? req.file.filename : null;
 
                 for (const m of selectedMonths) {
                     const currentPeriode = m + '-01';
 
                     for (const jenisItem of jenis) {
-                        const jumlahPerItem = (jenisItem === 'kas') ? 10000 : 25000;
+                        // Determine amount based on type
+                        let jumlahPerItem = 25000; // default sampah
+                        if (jenisItem === 'kas' || jenisItem === 'kas_rt' || jenisItem === 'kas_gang') {
+                            jumlahPerItem = 10000;
+                        } else if (jenisItem === 'sampah') {
+                            jumlahPerItem = 25000;
+                        }
+
+                        console.log(`Processing payment: jenis=${jenisItem}, amount=${jumlahPerItem}`);
 
                         const [existing] = await db.query(
                             'SELECT * FROM iuran WHERE warga_id = ? AND periode = ? AND jenis = ?',
@@ -183,20 +264,39 @@ exports.processPayment = (req, res) => {
                         if (existing.length > 0) {
                             if (existing[0].status === 'lunas') continue;
                             await db.query(
-                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = NOW() WHERE id = ?',
-                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, existing[0].id]
+                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = NOW(), dibayar_oleh = ? WHERE id = ?',
+                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, payer_id, existing[0].id]
                             );
                         } else {
                             await db.query(
-                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti]
+                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar, dibayar_oleh) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)',
+                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti, payer_id]
                             );
                         }
                     }
                 }
 
+                // Get admin phone number
+                const getAdminContact = require('../utils/getAdminContact');
+                const adminPhone = await getAdminContact();
+
+                // Get warga name for the message
+                const [wargaInfo] = await db.query('SELECT nama, blok, nomor_rumah FROM warga WHERE id = ?', [warga_id]);
+                const wargaName = wargaInfo[0] ? wargaInfo[0].nama : 'Warga';
+                const rumah = wargaInfo[0] ? `${wargaInfo[0].blok}/${wargaInfo[0].nomor_rumah}` : '';
+
+                // Construct WhatsApp message
+                const jenisText = jenis.map(j => {
+                    if (j === 'kas' || j === 'kas_rt') return 'Kas RT';
+                    if (j === 'kas_gang') return 'Kas Gang';
+                    return 'Sampah';
+                }).join(' & ');
+                const monthsText = selectedMonths.map(m => moment(m, 'YYYY-MM').format('MMM YYYY')).join(', ');
+                const message = `Halo Admin, saya ${wargaName} (${rumah}) sudah melakukan pembayaran iuran ${jenisText} untuk bulan: ${monthsText}. Mohon verifikasi. Terima kasih.`;
+                const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
+
                 req.flash('success_msg', `Pembayaran untuk ${selectedMonths.length} bulan berhasil diinput.`);
-                res.redirect('/iuran');
+                res.redirect(waUrl);
 
             } catch (error) {
                 console.error('Payment error:', error);
@@ -236,8 +336,27 @@ exports.confirm = async (req, res) => {
         const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')}`;
         await Kas.add('masuk', bill.jumlah, ket, moment().format('YYYY-MM-DD'), bill.bukti_bayar);
 
-        req.flash('success_msg', 'Pembayaran dikonfirmasi lunas dan masuk kas.');
-        res.redirect('/iuran');
+        // Get warga phone and name for WhatsApp notification
+        const [wargaData] = await db.query('SELECT nama, no_hp FROM warga WHERE id = ?', [bill.warga_id]);
+
+        if (wargaData.length > 0 && wargaData[0].no_hp) {
+            const wargaPhone = wargaData[0].no_hp.replace(/^0/, '62').replace(/\D/g, '');
+            const wargaName = wargaData[0].nama;
+            let jenisName = 'Sampah';
+            if (bill.jenis === 'kas' || bill.jenis === 'kas_rt') {
+                jenisName = 'Kas RT';
+            } else if (bill.jenis === 'kas_gang') {
+                jenisName = 'Kas Gang';
+            }
+            const message = `Halo ${wargaName}, pembayaran iuran ${jenisName} untuk periode ${moment(bill.periode).format('MMMM YYYY')} sebesar Rp ${bill.jumlah.toLocaleString('id-ID')} telah diverifikasi dan diterima. Terima kasih!`;
+            const waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
+
+            req.flash('success_msg', 'Pembayaran dikonfirmasi lunas dan masuk kas.');
+            res.redirect(waUrl);
+        } else {
+            req.flash('success_msg', 'Pembayaran dikonfirmasi lunas dan masuk kas.');
+            res.redirect('/iuran');
+        }
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal konfirmasi');
@@ -245,15 +364,126 @@ exports.confirm = async (req, res) => {
     }
 };
 
+exports.reject = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Verify existence and get warga info
+        const [rows] = await db.query(`
+            SELECT i.*, w.nama, w.no_hp 
+            FROM iuran i 
+            JOIN warga w ON i.warga_id = w.id 
+            WHERE i.id = ?
+        `, [id]);
+
+        if (rows.length === 0) {
+            req.flash('error_msg', 'Tagihan tidak ditemukan');
+            return res.redirect('/iuran');
+        }
+
+        const bill = rows[0];
+
+        await db.query('UPDATE iuran SET status = ?, bukti_bayar = NULL WHERE id = ?', ['ditolak', id]);
+
+        // Send WhatsApp notification to warga
+        if (bill.no_hp) {
+            const wargaPhone = bill.no_hp.replace(/^0/, '62').replace(/\D/g, '');
+            let jenisName = 'Sampah';
+            if (bill.jenis === 'kas' || bill.jenis === 'kas_rt') {
+                jenisName = 'Kas RT';
+            } else if (bill.jenis === 'kas_gang') {
+                jenisName = 'Kas Gang';
+            }
+            const message = `Halo ${bill.nama}, pembayaran iuran ${jenisName} untuk periode ${moment(bill.periode).format('MMMM YYYY')} ditolak. Mohon upload ulang bukti pembayaran yang valid. Terima kasih.`;
+            const waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
+
+            req.flash('success_msg', 'Pembayaran ditolak. Warga harus upload ulang.');
+            res.redirect(waUrl);
+        } else {
+            req.flash('success_msg', 'Pembayaran ditolak. Warga harus upload ulang.');
+            res.redirect('/iuran');
+        }
+    } catch (err) {
+        console.error('Reject Payment Error:', err);
+        req.flash('error_msg', 'Gagal menolak pembayaran: ' + err.message);
+        res.redirect('/iuran');
+    }
+};
+
 exports.arrears = async (req, res) => {
     try {
         const tunggakan = await Iuran.getTunggakan();
-        res.render('iuran/arrears', { title: 'Laporan Tunggakan', tunggakan, moment });
+        const allWarga = await Warga.getAll();
+        res.render('iuran/arrears', { title: 'Laporan Tunggakan', tunggakan, allWarga, moment, user: req.session.user });
     } catch (err) {
         console.error(err);
         res.redirect('/iuran');
     }
+};
 
+exports.exportArrearsExcel = async (req, res) => {
+    try {
+        const tunggakan = await Iuran.getTunggakan();
+        const ExcelJS = require('exceljs');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Laporan Tunggakan');
+
+        // Columns
+        worksheet.columns = [
+            { header: 'Nama Warga', key: 'nama', width: 25 },
+            { header: 'Blok/No', key: 'rumah', width: 15 },
+            { header: 'Periode', key: 'periode', width: 15 },
+            { header: 'Jenis Iuran', key: 'jenis', width: 15 },
+            { header: 'Jumlah', key: 'jumlah', width: 15 },
+            { header: 'Status', key: 'status', width: 20 }
+        ];
+
+        // Style Header
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFEEEEEE' }
+        };
+
+        // Add Data
+        let total = 0;
+        tunggakan.forEach(item => {
+            let jenisLabel = 'Sampah';
+            if (item.jenis === 'kas_rt') jenisLabel = 'Kas RT';
+            if (item.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
+
+            worksheet.addRow({
+                nama: item.nama,
+                rumah: `${item.blok}/${item.nomor_rumah}`,
+                periode: moment(item.periode).format('MMM YYYY'),
+                jenis: jenisLabel,
+                jumlah: parseFloat(item.jumlah),
+                status: item.status.replace('_', ' ').toUpperCase()
+            });
+            total += parseFloat(item.jumlah);
+        });
+
+        // Total Row
+        worksheet.addRow({});
+        const totalRow = worksheet.addRow({
+            nama: 'TOTAL TUNGGAKAN',
+            jumlah: total
+        });
+        totalRow.font = { bold: true, color: { argb: 'FFFF0000' } };
+
+        // Response
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=Laporan_Tunggakan.xlsx');
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal export Excel');
+        res.redirect('/iuran/arrears');
+    }
 };
 
 const QrisGenerator = require('../utils/QrisGenerator');
@@ -278,6 +508,96 @@ exports.checkStatus = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false });
+    }
+};
+
+exports.cleanupDuplicates = async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            return res.status(403).send('Unauthorized');
+        }
+
+        // 1. Existing cleanup (Kas -> Kas RT)
+        const [oldKas] = await db.query("SELECT * FROM iuran WHERE jenis = 'kas' OR jenis = 'keamanan'");
+        let deleted = 0;
+        let migrated = 0;
+
+        for (const item of oldKas) {
+            // Use DATE() to compare dates ignoring time
+            const [existing] = await db.query(
+                "SELECT id FROM iuran WHERE warga_id = ? AND DATE(periode) = DATE(?) AND jenis = 'kas_rt'",
+                [item.warga_id, item.periode]
+            );
+
+            if (existing.length > 0) {
+                await db.query("DELETE FROM iuran WHERE id = ?", [item.id]);
+                deleted++;
+            } else {
+                await db.query("UPDATE iuran SET jenis = 'kas_rt' WHERE id = ?", [item.id]);
+                migrated++;
+            }
+        }
+
+        // 2. House-Level Duplicate Cleanup
+        // Find duplicates based on House + Period + Type (only unpaid)
+        const [duplicates] = await db.query(`
+            SELECT i.id, i.warga_id, i.periode, i.jenis, w.blok, w.nomor_rumah, w.status_keluarga
+            FROM iuran i
+            JOIN warga w ON i.warga_id = w.id
+            WHERE i.status != 'lunas'
+        `);
+
+        // Group by House+Period+Type
+        const groups = {};
+        duplicates.forEach(d => {
+            const key = `${d.blok}-${d.nomor_rumah}-${moment(d.periode).format('YYYY-MM')}-${d.jenis}`;
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(d);
+        });
+
+        let houseDuplicatesDeleted = 0;
+        for (const key in groups) {
+            const items = groups[key];
+            if (items.length > 1) {
+                // Sort to keep the best one: Prioritize 'Kepala Keluarga', then lowest ID
+                items.sort((a, b) => {
+                    if (a.status_keluarga === 'Kepala Keluarga' && b.status_keluarga !== 'Kepala Keluarga') return -1;
+                    if (b.status_keluarga === 'Kepala Keluarga' && a.status_keluarga !== 'Kepala Keluarga') return 1;
+                    return a.id - b.id;
+                });
+
+                // Keep items[0], delete the rest
+                const toDelete = items.slice(1);
+                for (const d of toDelete) {
+                    await db.query("DELETE FROM iuran WHERE id = ?", [d.id]);
+                    houseDuplicatesDeleted++;
+                }
+            }
+        }
+
+        req.flash('success_msg', `Cleanup complete. Legacy Deleted: ${deleted}, Migrated: ${migrated}, House Duplicates Deleted: ${houseDuplicatesDeleted}.`);
+        res.redirect('/iuran/arrears');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Cleanup failed: ' + err.message);
+        res.redirect('/iuran/arrears');
+    }
+};
+
+exports.resetPayment = async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
+        }
+        const { id } = req.body;
+
+        // Delete the iuran record to reset to "Belum Ditagih"
+        await db.query('DELETE FROM iuran WHERE id = ?', [id]);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
@@ -314,13 +634,13 @@ exports.control = async (req, res) => {
             WHERE YEAR(periode) = ?
         `, [year]);
 
-        // Initialize Matrix: wargaId -> Array[12] -> { kas: null, sampah: null }
+        // Initialize Matrix: wargaId -> Array[12] -> { kas_rt: null, kas_gang: null, sampah: null }
         const matrix = {};
         warga.forEach(w => {
             matrix[w.id] = [];
             for (let i = 0; i < 12; i++) {
                 // null = no bill, 'lunas', 'menunggu_konfirmasi', etc.
-                matrix[w.id].push({ kas: null, sampah: null });
+                matrix[w.id].push({ kas_rt: null, kas_gang: null, sampah: null });
             }
         });
 
@@ -329,7 +649,12 @@ exports.control = async (req, res) => {
             if (matrix[r.warga_id]) {
                 const idx = r.bulan_num - 1; // 0-11
                 if (idx >= 0 && idx < 12) {
-                    const type = (r.jenis === 'keamanan' || r.jenis === 'kas') ? 'kas' : 'sampah';
+                    let type = 'sampah';
+                    if (r.jenis === 'keamanan' || r.jenis === 'kas' || r.jenis === 'kas_rt') {
+                        type = 'kas_rt';
+                    } else if (r.jenis === 'kas_gang') {
+                        type = 'kas_gang';
+                    }
                     matrix[r.warga_id][idx][type] = r.status;
                 }
             }
