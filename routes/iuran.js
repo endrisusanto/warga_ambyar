@@ -10,6 +10,8 @@ router.post('/generate', ensureAuthenticated, iuranController.generate);
 router.get('/pay', ensureAuthenticated, iuranController.payForm);
 router.post('/pay', ensureAuthenticated, iuranController.processPayment);
 router.get('/confirm/:id', ensureAuthenticated, iuranController.confirm);
+router.post('/confirm-batch', ensureAuthenticated, iuranController.confirmBatch);
+router.post('/get-pending-items', ensureAuthenticated, iuranController.getPendingItems);
 router.get('/reject/:id', ensureAuthenticated, iuranController.reject);
 router.get('/arrears', ensureAuthenticated, iuranController.arrears);
 router.get('/arrears/export/excel', ensureAuthenticated, iuranController.exportArrearsExcel);

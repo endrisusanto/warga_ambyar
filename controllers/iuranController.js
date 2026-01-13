@@ -137,7 +137,9 @@ function renderIndex(req, res, { rows, warga, year }) {
         year,
         moment,
         user: req.session.user,
-        useWideContainer: true
+        useWideContainer: true,
+        newPaymentWaUrl: req.flash('new_payment_wa_url')[0],
+        allTransactions: rows
     });
 }
 
@@ -256,13 +258,28 @@ exports.processPayment = (req, res) => {
 
                         console.log(`Processing payment: jenis=${jenisItem}, amount=${jumlahPerItem}`);
 
-                        const [existing] = await db.query(
-                            'SELECT * FROM iuran WHERE warga_id = ? AND periode = ? AND jenis = ?',
-                            [warga_id, currentPeriode, jenisItem]
-                        );
+                        // Prevent Duplicates: Check by House (Blok & No Rumah) instead of just Warga ID
+                        // 1. Get Blok/No of the submitted warga_id
+                        const [wargaDetails] = await db.query('SELECT blok, nomor_rumah FROM warga WHERE id = ?', [warga_id]);
+
+                        let existing = [];
+                        if (wargaDetails.length > 0) {
+                            const { blok, nomor_rumah } = wargaDetails[0];
+                            // Find any bill for this house, period, and type
+                            [existing] = await db.query(`
+                                SELECT i.* 
+                                FROM iuran i
+                                JOIN warga w ON i.warga_id = w.id
+                                WHERE w.blok = ? AND w.nomor_rumah = ? 
+                                AND i.periode = ? AND i.jenis = ?
+                            `, [blok, nomor_rumah, currentPeriode, jenisItem]);
+                        }
 
                         if (existing.length > 0) {
                             if (existing[0].status === 'lunas') continue;
+                            // Update existing record (even if warga_id was different, we update it to the current payer context or keep it)
+                            // We should probably keep the original warga_id (Head of Family) or update it? 
+                            // Let's keep original warga_id but update payment details.
                             await db.query(
                                 'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = NOW(), dibayar_oleh = ? WHERE id = ?',
                                 [jumlahPerItem, 'menunggu_konfirmasi', bukti, payer_id, existing[0].id]
@@ -296,7 +313,8 @@ exports.processPayment = (req, res) => {
                 const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
 
                 req.flash('success_msg', `Pembayaran untuk ${selectedMonths.length} bulan berhasil diinput.`);
-                res.redirect(waUrl);
+                req.flash('new_payment_wa_url', waUrl);
+                res.redirect('/iuran');
 
             } catch (error) {
                 console.error('Payment error:', error);
@@ -352,7 +370,8 @@ exports.confirm = async (req, res) => {
             const waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
 
             req.flash('success_msg', 'Pembayaran dikonfirmasi lunas dan masuk kas.');
-            res.redirect(waUrl);
+            req.flash('new_payment_wa_url', waUrl);
+            res.redirect('/iuran');
         } else {
             req.flash('success_msg', 'Pembayaran dikonfirmasi lunas dan masuk kas.');
             res.redirect('/iuran');
@@ -398,7 +417,8 @@ exports.reject = async (req, res) => {
             const waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
 
             req.flash('success_msg', 'Pembayaran ditolak. Warga harus upload ulang.');
-            res.redirect(waUrl);
+            req.flash('new_payment_wa_url', waUrl);
+            res.redirect('/iuran');
         } else {
             req.flash('success_msg', 'Pembayaran ditolak. Warga harus upload ulang.');
             res.redirect('/iuran');
@@ -722,5 +742,75 @@ exports.exportExcel = async (req, res) => {
         console.error(err);
         req.flash('error_msg', 'Gagal export excel');
         res.redirect('/iuran');
+    }
+};
+
+exports.getPendingItems = async (req, res) => {
+    try {
+        const { warga_id } = req.body;
+        const [rows] = await db.query(`
+            SELECT * FROM iuran 
+            WHERE warga_id = ? AND status = 'menunggu_konfirmasi'
+            ORDER BY periode ASC
+        `, [warga_id]);
+        res.json({ success: true, items: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.confirmBatch = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.json({ success: false, message: 'No IDs provided' });
+        }
+
+        // Fetch details
+        const placeholders = ids.map(() => '?').join(',');
+        const [rows] = await db.query(`
+            SELECT i.*, w.nama, w.no_hp, w.blok, w.nomor_rumah 
+            FROM iuran i 
+            JOIN warga w ON i.warga_id = w.id 
+            WHERE i.id IN (${placeholders})
+        `, ids);
+
+        if (rows.length === 0) {
+            return res.json({ success: false, message: 'Data not found' });
+        }
+
+        // Update Status
+        await db.query(`UPDATE iuran SET status = 'lunas' WHERE id IN (${placeholders})`, ids);
+
+        // Add to Kas
+        for (const bill of rows) {
+            let jenisLabel = bill.jenis;
+            if (bill.jenis === 'kas_rt') jenisLabel = 'Kas RT';
+            if (bill.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
+
+            const ket = `Iuran ${jenisLabel} ${bill.blok}/${bill.nomor_rumah} ${moment(bill.periode).format('MMM YYYY')}`;
+            await Kas.add('masuk', bill.jumlah, ket, moment().format('YYYY-MM-DD'), bill.bukti_bayar);
+        }
+
+        // Prepare Response (WA URL)
+        const bill = rows[0];
+        let waUrl = null;
+        if (bill.no_hp) {
+            const wargaPhone = bill.no_hp.replace(/^0/, '62').replace(/\D/g, '');
+            const totalAmount = rows.reduce((sum, item) => sum + item.jumlah, 0);
+
+            // Format details
+            const periods = [...new Set(rows.map(r => moment(r.periode).format('MMM YY')))].join(', ');
+
+            const message = `Halo ${bill.nama}, pembayaran iuran total Rp ${totalAmount.toLocaleString('id-ID')} (Periode: ${periods}) telah diverifikasi. Terima kasih!`;
+            waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
+        }
+
+        res.json({ success: true, waUrl });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
     }
 };

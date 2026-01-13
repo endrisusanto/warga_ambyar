@@ -263,6 +263,13 @@
                                     <a href="#" target="_blank"
                                         class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
                                         Ukuran Penuh</a>
+
+                                    <div id="modal-related-transactions"
+                                        class="mt-3 pt-3 border-t border-white/10 hidden">
+                                        <p class="text-xs font-bold mb-2 text-emerald-400">Transaksi Terkait:</p>
+                                        <div id="modal-related-list"
+                                            class="space-y-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -339,6 +346,56 @@
                             const src = data.bukti_bayar.startsWith('/uploads/') ? data.bukti_bayar : '/uploads/' + data.bukti_bayar;
                             img.src = src;
                             link.href = src;
+
+                            // Populate related transactions
+                            const relatedDiv = document.getElementById('modal-related-transactions');
+                            const relatedList = document.getElementById('modal-related-list');
+
+                            if (relatedList) {
+                                relatedList.innerHTML = '';
+                                try {
+                                    const rawTrans = document.getElementById('allTransactionsData').getAttribute('data-transactions');
+                                    const allTrans = JSON.parse(rawTrans);
+
+                                    // Filter by same proof file
+                                    const related = allTrans.filter(t => t.bukti_bayar === data.bukti_bayar);
+
+                                    if (related.length > 0 && data.status === 'lunas') {
+                                        let total = 0;
+                                        related.forEach(t => {
+                                            const amount = parseInt(t.jumlah);
+                                            total += amount;
+                                            const date = new Date(t.periode).toLocaleDateString('id-ID', { month: 'short', year: '2-digit' });
+                                            const type = t.jenis === 'keamanan' ? 'Kas RT' : (t.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+
+                                            const div = document.createElement('div');
+                                            div.className = 'flex justify-between text-xs text-gray-300';
+                                            div.innerHTML = `
+                                            <span>${type} - ${date}</span>
+                                            <span class="font-bold text-emerald-400">Rp ${amount.toLocaleString('id-ID')}</span>
+                                        `;
+                                            relatedList.appendChild(div);
+                                        });
+
+                                        if (related.length > 1) {
+                                            const totalDiv = document.createElement('div');
+                                            totalDiv.className = 'flex justify-between text-xs font-bold text-white pt-1 border-t border-white/10 mt-1';
+                                            totalDiv.innerHTML = `
+                                            <span>Total</span>
+                                            <span>Rp ${total.toLocaleString('id-ID')}</span>
+                                        `;
+                                            relatedList.appendChild(totalDiv);
+                                        }
+                                        relatedDiv.classList.remove('hidden');
+                                    } else {
+                                        relatedDiv.classList.add('hidden');
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                    relatedDiv.classList.add('hidden');
+                                }
+                            }
+
                         } else {
                             proofDiv.classList.add('hidden');
                         }
@@ -365,9 +422,141 @@
 
                         actionsDiv.innerHTML = buttonsHtml;
 
+                        // Check for other pending items if this one is pending
+                        if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
+                            fetch('/iuran/get-pending-items', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ warga_id: data.warga_id })
+                            })
+                                .then(res => res.json())
+                                .then(resp => {
+                                    if (resp.success && resp.items.length > 1) {
+                                        // Show batch selection
+                                        const container = document.createElement('div');
+                                        container.className = "mt-4 p-3 bg-white/5 rounded-lg border border-white/10";
+
+                                        let totalAmount = 0;
+                                        let html = `<p class="text-xs font-bold text-gray-300 mb-2">Pembayaran Menunggu Konfirmasi Lainnya:</p>
+                                                    <div class="space-y-2 max-h-40 overflow-y-auto">`;
+
+                                        resp.items.forEach(item => {
+                                            const date = new Date(item.periode);
+                                            const mY = date.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' });
+                                            const j = item.jenis === 'keamanan' ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                                            const amount = parseInt(item.jumlah);
+                                            totalAmount += amount;
+
+                                            html += `
+                                                <label class="flex items-center space-x-2 cursor-pointer hover:bg-white/5 p-1 rounded">
+                                                    <input type="checkbox" name="batch_ids" value="${item.id}" data-amount="${amount}" checked onchange="updateBatchTotal()" class="rounded border-gray-500 text-emerald-500 focus:ring-emerald-500 bg-gray-700">
+                                                    <span class="text-xs text-gray-300 flex-1">${j} - ${mY}</span>
+                                                    <span class="text-xs text-gray-400">Rp ${amount.toLocaleString('id-ID')}</span>
+                                                </label>
+                                            `;
+                                        });
+
+                                        html += `</div>
+                                                 <div class="mt-3 pt-2 border-t border-white/10 flex justify-between items-center">
+                                                     <span class="text-xs font-bold text-gray-300">Grand Total:</span>
+                                                     <span id="batch-total" class="text-sm font-bold text-emerald-400">Rp ${totalAmount.toLocaleString('id-ID')}</span>
+                                                 </div>`;
+
+                                        container.innerHTML = html;
+
+                                        // Insert before actions
+                                        document.querySelector('#modal-actions').parentNode.insertBefore(container, document.querySelector('#modal-actions'));
+
+                                        // Update Approve Button
+                                        const approveBtn = actionsDiv.querySelector('a[href^="/iuran/confirm"]');
+                                        if (approveBtn) {
+                                            approveBtn.removeAttribute('href');
+                                            approveBtn.setAttribute('onclick', 'approveBatch()');
+                                            approveBtn.innerText = 'Approve Selected (' + resp.items.length + ')';
+                                            approveBtn.className = approveBtn.className.replace('bg-white/15', 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30').replace('text-gray-200', '');
+                                        }
+                                    }
+                                });
+                        }
+
                         modal.classList.remove('hidden');
                     } catch (e) {
                         console.error(e);
+                    }
+                }
+
+                async function approveBatch() {
+                    const checkboxes = document.querySelectorAll('input[name="batch_ids"]:checked');
+                    if (checkboxes.length === 0) return alert('Pilih minimal satu item');
+
+                    const ids = Array.from(checkboxes).map(cb => cb.value);
+                    if (!confirm(`Verifikasi ${ids.length} pembayaran terpilih?`)) return;
+
+                    const btn = document.querySelector('button[onclick="approveBatch()"]');
+                    if (btn) btn.innerText = 'Processing...';
+
+                    try {
+                        const response = await fetch('/iuran/confirm-batch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ids })
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            if (result.waUrl) {
+                                // Show Success Modal manually
+                                const modal = document.getElementById('successModal');
+                                const btn = document.getElementById('wa-link-btn');
+                                const backBtn = modal.querySelector('button'); // The "Kembali ke Web" button
+
+                                if (modal && btn) {
+                                    btn.href = result.waUrl;
+
+                                    // Update text for Admin context
+                                    modal.querySelector('h3').innerText = 'Verifikasi Berhasil';
+                                    modal.querySelector('p').innerText = 'Pembayaran telah diverifikasi. Kirim notifikasi ke Warga via WhatsApp?';
+
+                                    // Ensure closing reloads the page to update table
+                                    backBtn.onclick = function () { location.reload(); };
+                                    btn.onclick = function () {
+                                        setTimeout(() => location.reload(), 1000); // Reload after clicking WA
+                                    };
+
+                                    // Hide payment modal first
+                                    document.getElementById('paymentModal').classList.add('hidden');
+                                    modal.classList.remove('hidden');
+                                } else {
+                                    location.reload();
+                                }
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert('Gagal: ' + result.message);
+                        }
+                    } catch (e) {
+                        alert('Error: ' + e.message);
+                    }
+                }
+
+                function updateBatchTotal() {
+                    const checkboxes = document.querySelectorAll('input[name="batch_ids"]:checked');
+                    let total = 0;
+                    checkboxes.forEach(cb => {
+                        total += parseInt(cb.getAttribute('data-amount') || 0);
+                    });
+
+                    const totalEl = document.getElementById('batch-total');
+                    if (totalEl) totalEl.innerText = 'Rp ' + total.toLocaleString('id-ID');
+
+                    // Update button count
+                    const btn = document.querySelector('button[onclick="approveBatch()"]'); // It's actually an <a> tag converted to button-like
+                    // Or find by text content or class? The previous code modified the <a> tag.
+                    // Let's find the element that has onclick="approveBatch()"
+                    const approveBtn = document.querySelector('[onclick="approveBatch()"]');
+                    if (approveBtn) {
+                        approveBtn.innerText = 'Approve Selected (' + checkboxes.length + ')';
                     }
                 }
 
@@ -618,4 +807,60 @@
                     </div>
                 </div>
             </div>
-            <%- include('../partials/footer') %>
+            <!-- Success Notification Modal -->
+            <div id="successModal" class="hidden fixed inset-0 z-[60]" aria-labelledby="modal-title" role="dialog"
+                aria-modal="true">
+                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm"></div>
+                <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+                    <div class="glass-card w-full max-w-md transform overflow-hidden transition-all p-6 text-center">
+                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-100 mb-2">Pembayaran Berhasil Diinput</h3>
+                        <p class="text-sm text-gray-300 mb-6">
+                            Data pembayaran telah tersimpan. Apakah Anda ingin mengirim notifikasi ke Admin via WhatsApp
+                            sekarang?
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <a id="wa-link-btn" href="#" target="_blank" onclick="closeSuccessModal()"
+                                class="inline-flex justify-center px-4 py-2 text-sm font-bold rounded-xl text-white bg-[#25D366] hover:bg-[#128C7E] shadow-lg transition-all items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                                </svg>
+                                Kirim Notifikasi (WA)
+                            </a>
+                            <button type="button" onclick="closeSuccessModal()"
+                                class="inline-flex justify-center px-4 py-2 text-sm font-medium rounded-xl text-gray-300 bg-white/10 hover:bg-white/20 border border-white/10 transition-all">
+                                Kembali ke Web
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% if (typeof newPaymentWaUrl !=='undefined' && newPaymentWaUrl) { %>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const modal = document.getElementById('successModal');
+                        const btn = document.getElementById('wa-link-btn');
+                        if (modal && btn) {
+                            btn.href = "<%- newPaymentWaUrl %>";
+                            modal.classList.remove('hidden');
+                        }
+                    });
+
+                    function closeSuccessModal() {
+                        document.getElementById('successModal').classList.add('hidden');
+                    }
+                </script>
+                <% } %>
+
+                    <div id="allTransactionsData" data-transactions="<%= JSON.stringify(allTransactions) %>"
+                        class="hidden"></div>
+                    <%- include('../partials/footer') %>
+                        <div id="allTransactionsData" data-transactions="<%= JSON.stringify(allTransactions) %>"
+                            class="hidden"></div>

@@ -88,10 +88,11 @@
                                                 <%= log.keterangan || 'Tidak ada keterangan' %>
                                             </p>
                                         </div>
-                                        <% if(log.bukti_foto) { %>
+                                        <% if(log.bukti_foto) { let proofPath=log.bukti_foto.startsWith('bukti_bayar-')
+                                            ? '/uploads/' + log.bukti_foto : '/uploads/keuangan/' + log.bukti_foto; %>
                                             <div class="ml-4 flex-shrink-0">
-                                                <img src="/uploads/keuangan/<%= log.bukti_foto %>" alt="Bukti"
-                                                    onclick="openBuktiModal('/uploads/keuangan/<%= log.bukti_foto %>')"
+                                                <img src="<%= proofPath %>" alt="Bukti"
+                                                    onclick="openBuktiModal('<%= proofPath %>', '<%= log.bukti_foto %>')"
                                                     class="w-16 h-16 rounded-lg object-cover cursor-pointer hover:opacity-80 border border-white/10 transition-opacity bg-black/20">
                                             </div>
                                             <% } %>
@@ -133,7 +134,14 @@
                                 </h3>
                                 <div class="mt-4 flex justify-center bg-black/20 rounded-lg p-2">
                                     <img id="buktiImage" src="" alt="Bukti"
-                                        class="max-h-[70vh] w-auto rounded-md object-contain">
+                                        class="max-h-[60vh] w-auto rounded-md object-contain">
+                                </div>
+                                <div id="proofDetails" class="mt-4">
+                                    <h4 class="text-sm font-bold text-indigo-400 mb-2">Transaksi Terkait:</h4>
+                                    <div class="bg-black/20 rounded-lg p-3 max-h-40 overflow-y-auto custom-scrollbar space-y-2"
+                                        id="proofTransactionsList">
+                                        <!-- List populated by JS -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -148,8 +156,56 @@
             </div>
 
             <script>
-                function openBuktiModal(src) {
+                function openBuktiModal(src, filename) {
                     document.getElementById('buktiImage').src = src;
+
+                    // Populate related transactions
+                    const listContainer = document.getElementById('proofTransactionsList');
+                    listContainer.innerHTML = '';
+
+                    try {
+                        const rawLogs = document.getElementById('logsData').getAttribute('data-logs');
+                        const logs = JSON.parse(rawLogs);
+
+                        const related = logs.filter(l => l.bukti_foto === filename);
+
+                        if (related.length > 0) {
+                            let total = 0;
+                            related.forEach(l => {
+                                const amount = parseInt(l.jumlah);
+                                total += (l.tipe === 'masuk' ? amount : -amount);
+                                const date = new Date(l.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                                const div = document.createElement('div');
+                                div.className = 'flex justify-between items-start text-xs border-b border-white/5 pb-1 last:border-0';
+                                div.innerHTML = `
+                                <div class="text-gray-300">
+                                    <span class="text-gray-500 mr-2">${date}</span>
+                                    ${l.keterangan || '-'}
+                                </div>
+                                <div class="font-bold ${l.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400'}">
+                                    ${l.tipe === 'masuk' ? '+' : '-'} Rp ${amount.toLocaleString('id-ID')}
+                                </div>
+                            `;
+                                listContainer.appendChild(div);
+                            });
+
+                            if (related.length > 1) {
+                                const totalDiv = document.createElement('div');
+                                totalDiv.className = 'flex justify-between items-center text-sm font-bold pt-2 border-t border-white/10 mt-1';
+                                totalDiv.innerHTML = `
+                                <span class="text-gray-200">Total</span>
+                                <span class="${total >= 0 ? 'text-emerald-400' : 'text-red-400'}">Rp ${total.toLocaleString('id-ID')}</span>
+                            `;
+                                listContainer.appendChild(totalDiv);
+                            }
+                        } else {
+                            listContainer.innerHTML = '<p class="text-xs text-gray-500 italic">Tidak ada data transaksi terkait.</p>';
+                        }
+                    } catch (e) {
+                        console.error("Error parsing logs", e);
+                    }
+
                     document.getElementById('buktiModal').classList.remove('hidden');
                 }
 
@@ -159,3 +215,4 @@
             </script>
 
             <%- include('../partials/footer') %>
+                <div id="logsData" data-logs="<%= JSON.stringify(logs) %>" class="hidden"></div>
