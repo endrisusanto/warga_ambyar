@@ -230,12 +230,12 @@
         <!-- Modal Tambah Transaksi -->
         <div id="addModal" class="fixed inset-0 z-50 hidden overflow-y-auto font-sans" aria-labelledby="modal-title"
             role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
                 <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
                     onclick="closeModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
                 <div
-                    class="inline-block align-bottom glass-card rounded-2xl text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    class="relative inline-block align-bottom glass-card rounded-2xl text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
                     <form action="/keuangan/add" method="POST" enctype="multipart/form-data">
                         <div class="bg-white/10 px-4 py-4 sm:px-6 border-b border-white/10">
                             <h3 class="text-lg leading-6 font-bold text-gray-100 flex items-center" id="modal-title">
@@ -317,12 +317,12 @@
         <!-- Modal Preview Bukti -->
         <div id="proofModal" class="fixed inset-0 z-[60] hidden overflow-y-auto" aria-labelledby="modal-proof-title"
             role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
                 <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
                     onclick="closeProofModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
                 <div
-                    class="inline-block align-bottom glass-card rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                    class="relative inline-block align-bottom glass-card rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-3xl sm:w-full">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start sm:justify-between mb-4">
                             <h3 class="text-lg leading-6 font-medium text-gray-100" id="modal-proof-title">Preview Bukti

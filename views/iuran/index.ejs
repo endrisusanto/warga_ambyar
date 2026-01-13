@@ -234,62 +234,7 @@
             </div>
 
             <!-- Payment Detail Modal -->
-            <div id="paymentModal" class="hidden fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog"
-                aria-modal="true">
-                <!-- Backdrop -->
-                <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                    onclick="closePaymentModal()"></div>
-
-                <!-- Modal Container (Centered) -->
-                <div class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-                    <!-- Modal Content -->
-                    <div
-                        class="glass-card w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
-                        <div class="p-6 overflow-y-auto">
-                            <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
-                                Pembayaran</h3>
-                            <div class="space-y-3">
-                                <p class="text-sm text-gray-300" id="modal-warga"></p>
-                                <p class="text-sm text-gray-300" id="modal-jenis"></p>
-                                <p class="text-sm text-gray-300" id="modal-nominal"></p>
-                                <div class="flex items-center gap-2">
-                                    <p class="text-sm text-gray-300">Status:</p>
-                                    <span id="modal-status-badge"
-                                        class="px-3 py-1 rounded-full text-xs font-semibold"></span>
-                                </div>
-                                <div id="modal-proof" class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
-                                    <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
-                                    <img src="" class="w-full object-contain max-h-64 rounded">
-                                    <a href="#" target="_blank"
-                                        class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
-                                        Ukuran Penuh</a>
-
-                                    <div id="modal-related-transactions"
-                                        class="mt-3 pt-3 border-t border-white/10 hidden">
-                                        <p class="text-xs font-bold mb-2 text-emerald-400">Transaksi Terkait:</p>
-                                        <div id="modal-related-list"
-                                            class="space-y-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
-                            id="modal-actions">
-                            <button type="button"
-                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
-                                onclick="closePaymentModal()">Close</button>
-
-                            <% if (user && user.role==='admin' ) { %>
-                                <button type="button" id="btn-reset-payment"
-                                    class="hidden glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 focus:outline-none sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm border border-red-500/30"
-                                    onclick="resetPayment()">
-                                    Reset to Belum Ditagih
-                                </button>
-                                <% } %>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Payment Detail Modal moved to bottom -->
 
 
             <script src="/js/html2canvas.min.js"></script>
@@ -795,6 +740,13 @@
                                     <a href="#" target="_blank"
                                         class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
                                         Ukuran Penuh</a>
+
+                                    <div id="modal-related-transactions"
+                                        class="mt-3 pt-3 border-t border-white/10 hidden">
+                                        <p class="text-xs font-bold mb-2 text-emerald-400">Transaksi Terkait:</p>
+                                        <div id="modal-related-list"
+                                            class="space-y-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -803,6 +755,14 @@
                             <button type="button"
                                 class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
                                 onclick="closePaymentModal()">Close</button>
+
+                            <% if (user && user.role==='admin' ) { %>
+                                <button type="button" id="btn-reset-payment"
+                                    class="hidden glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 focus:outline-none sm:mt-0 sm:mr-3 sm:w-auto sm:text-sm border border-red-500/30"
+                                    onclick="resetPayment()">
+                                    Reset to Belum Ditagih
+                                </button>
+                                <% } %>
                         </div>
                     </div>
                 </div>
@@ -862,5 +822,3 @@
                     <div id="allTransactionsData" data-transactions="<%= JSON.stringify(allTransactions) %>"
                         class="hidden"></div>
                     <%- include('../partials/footer') %>
-                        <div id="allTransactionsData" data-transactions="<%= JSON.stringify(allTransactions) %>"
-                            class="hidden"></div>
