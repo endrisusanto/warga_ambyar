@@ -1,0 +1,5 @@
+Starting...
+Require failed: Cannot find module 'mysql2/promise'
+Require stack:
+- /home/endrisusanto/dev/warga_ambyar/config/db.js
+- /home/endrisusanto/dev/warga_ambyar/debug_db_connection.js
