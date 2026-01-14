@@ -296,25 +296,7 @@
                                         <div class="flex items-center gap-2">
                                             <div class="text-sm font-bold text-gray-100 truncate">
                                                 <%= s.nama %>
-                                                    <% if(isGuest || s.status==='reschedule' ) { %>
-                                                        <span class="text-[10px] text-red-400 font-bold ml-1">(Ganti
-                                                            Hari)</span>
-                                                        <% } %>
                                             </div>
-                                            <% if(s.status !=='scheduled' ) { let statusText=s.status; let
-                                                statusClass='' ; if (s.status_bayar==='paid' ) { statusText='Pay Up' ;
-                                                statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                ; } else if (s.status==='hadir' ) {
-                                                statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                ; } else if (s.status==='izin' || s.status==='reschedule' ) {
-                                                statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                                ; } else {
-                                                statusClass='bg-red-500/20 text-red-300 border border-red-500/30' ; } %>
-                                                <span
-                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
-                                                    <%= statusText %>
-                                                </span>
-                                                <% } %>
                                         </div>
                                         <div class="flex items-center gap-2 mt-0.5">
                                             <div
@@ -327,6 +309,22 @@
                                                     Ganti Hari
                                                 </div>
                                                 <% } %>
+                                                    <% if(s.status !=='scheduled' ) { let statusText=s.status; let
+                                                        statusClass='' ; if (s.status_bayar==='paid' ) {
+                                                        statusText='Pay Up' ;
+                                                        statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                        ; } else if (s.status==='hadir' ) {
+                                                        statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                        ; } else if (s.status==='izin' || s.status==='reschedule' ) {
+                                                        statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                                        ; } else {
+                                                        statusClass='bg-red-500/20 text-red-300 border border-red-500/30'
+                                                        ; } %>
+                                                        <span
+                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
+                                                            <%= statusText %>
+                                                        </span>
+                                                        <% } %>
                                         </div>
 
                                         <% if(s.denda> 0) { %>
