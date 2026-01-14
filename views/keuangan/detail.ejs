@@ -1,0 +1,289 @@
+<%- include('../partials/head') %>
+    <!-- Navbar removed for clean receipt view, or keep it? Let's keep it for navigation -->
+    <%- include('../partials/navbar') %>
+
+        <div class="min-h-screen pb-20 pt-10">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Breadcrumb -->
+                <nav class="flex mb-5" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-4">
+                        <li>
+                            <div>
+                                <a href="/keuangan" class="text-gray-400 hover:text-gray-200">
+                                    <svg class="flex-shrink-0 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path
+                                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                                    </svg>
+                                    <span class="sr-only">Home</span>
+                                </a>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="flex-shrink-0 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <a href="/keuangan"
+                                    class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-200">Keuangan</a>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="flex-shrink-0 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <a href="#" aria-current="page"
+                                    class="ml-4 text-sm font-medium text-emerald-500 font-bold">Detail Transaksi</a>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+
+                <div class="glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
+                    <!-- Header Pattern -->
+                    <div class="absolute top-0 inset-x-0 h-32 bg-gradient-to-br from-emerald-600/30 to-emerald-900/30">
+                    </div>
+
+                    <div class="relative px-6 py-10 sm:px-10">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                            <div>
+                                <h1 class="text-3xl font-bold text-white flex items-center">
+                                    <span
+                                        class="bg-emerald-500/20 p-2 rounded-xl mr-3 border border-emerald-500/30">🧾</span>
+                                    Detail Pembayaran
+                                </h1>
+                                <p class="text-emerald-200/70 mt-2 ml-1">ID Transaksi: #<%= iuran ? iuran.id : 'MANUAL'
+                                        %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (iuran && iuran.tanggal_bayar) { %>
+                        <div class="mb-8 flex justify-center">
+                            <div
+                                class="flex items-center bg-white/10 border border-white/10 rounded-full px-1 py-1 shadow-inner">
+                                <div class="flex items-center gap-2 px-3 py-1">
+                                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
+                                    <span class="text-xs text-gray-200">
+                                        <%= moment(iuran.tanggal_bayar).format('DD MMM YYYY, HH:mm') %>
+                                    </span>
+                                </div>
+
+                                <% if (iuran.tanggal_konfirmasi) { %>
+                                    <div class="px-1 text-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                                        <span
+                                            class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Approved</span>
+                                        <span class="text-xs text-emerald-300 font-medium">
+                                            <%= moment(iuran.tanggal_konfirmasi).format('DD MMM YYYY, HH:mm') %>
+                                        </span>
+                                    </div>
+                                    <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <!-- Info Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <!-- Left: Details -->
+                                <div class="space-y-6">
+                                    <% if(iuran) { %>
+                                        <div class="bg-white/5 rounded-xl p-5 border border-white/5 space-y-4">
+                                            <div>
+                                                <label
+                                                    class="block text-xs font-medium text-gray-400 uppercase tracking-wider">Warga</label>
+                                                <div class="mt-1 flex items-center">
+                                                    <div
+                                                        class="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mr-3 border border-emerald-500/20">
+                                                        <%= iuran.nama ? iuran.nama.charAt(0) : 'W' %>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-lg font-bold text-white">
+                                                            <%= iuran.warga_nama %>
+                                                        </div>
+                                                        <div class="text-sm text-gray-400">Blok <%= iuran.blok %>-<%=
+                                                                    iuran.nomor_rumah %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <% if (iuran.payer_nama) { %>
+                                                <div class="pt-3 border-t border-white/5">
+                                                    <label
+                                                        class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Dibayarkan
+                                                        Oleh</label>
+                                                    <div class="text-gray-200">
+                                                        <%= iuran.payer_nama %>
+                                                    </div>
+                                                </div>
+                                                <% } %>
+
+                                                    <div class="grid grid-cols-2 gap-4 pt-3 border-t border-white/5">
+                                                        <div>
+                                                            <label
+                                                                class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Periode</label>
+                                                            <div class="text-emerald-300 font-semibold">
+                                                                <%= moment(iuran.periode).format('MMMM YYYY') %>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Jenis</label>
+                                                            <div class="text-white font-medium capitalize">
+                                                                <%= iuran.jenis.replace('_', ' ' ) %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="bg-white/5 rounded-xl p-5 border border-white/5">
+                                                <p class="text-gray-400 italic">Informasi detail pembayar tidak tersedia
+                                                    (Transaksi Manual).</p>
+                                            </div>
+                                            <% } %>
+
+                                                <!-- Transaction Breakdown -->
+                                                <div class="bg-black/30 rounded-xl p-5 border border-white/5">
+                                                    <h3
+                                                        class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-4 border-b border-white/10 pb-2">
+                                                        Rincian Transaksi</h3>
+                                                    <div class="space-y-3">
+                                                        <% let total=0; %>
+                                                            <% kas.forEach(t=> {
+                                                                let amount = Number(t.jumlah);
+                                                                if(t.tipe === 'masuk') total += amount;
+                                                                else total -= amount;
+                                                                %>
+                                                                <div
+                                                                    class="flex justify-between items-start text-sm group hover:bg-white/5 p-1 rounded transition-colors">
+                                                                    <div class="flex-1">
+                                                                        <div class="text-gray-200 font-medium">
+                                                                            <%= t.keterangan %>
+                                                                        </div>
+                                                                        <div class="text-xs text-gray-500">
+                                                                            <%= moment(t.tanggal).format('DD MMM YYYY')
+                                                                                %>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div
+                                                                        class="font-bold font-mono pl-4 flex items-center <%= t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400' %>">
+                                                                        <%= t.tipe==='masuk' ? '+' : '-' %> Rp <%=
+                                                                                amount.toLocaleString('id-ID') %>
+                                                                                <% if(user && (user.role==='admin' ||
+                                                                                    user.role==='bendahara' )) { %>
+                                                                                    <form
+                                                                                        action="/keuangan/delete/<%= t.id %>"
+                                                                                        method="POST" class="ml-2"
+                                                                                        onsubmit="return confirm('Hapus elemen transaksi ini? (Tindakan ini tidak bisa dibatalkan)');">
+                                                                                        <button type="submit"
+                                                                                            class="text-red-500/50 hover:text-red-400 transition-colors p-1"
+                                                                                            title="Hapus item ini">
+                                                                                            <svg class="w-4 h-4"
+                                                                                                fill="none"
+                                                                                                stroke="currentColor"
+                                                                                                viewBox="0 0 24 24">
+                                                                                                <path
+                                                                                                    stroke-linecap="round"
+                                                                                                    stroke-linejoin="round"
+                                                                                                    stroke-width="2"
+                                                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                                                                </path>
+                                                                                            </svg>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                    <% } %>
+                                                                    </div>
+                                                                </div>
+                                                                <% }) %>
+
+                                                                    <% if(kas.length===0) { %>
+                                                                        <p
+                                                                            class="text-gray-500 italic text-sm text-center py-2">
+                                                                            Tidak ada data rincian.</p>
+                                                                        <% } %>
+
+                                                                            <div
+                                                                                class="border-t border-white/10 pt-3 flex justify-between items-center mt-2">
+                                                                                <span
+                                                                                    class="text-gray-400 font-bold">Total</span>
+                                                                                <span
+                                                                                    class="text-xl font-bold text-white">Rp
+                                                                                    <%= total.toLocaleString('id-ID') %>
+                                                                                </span>
+                                                                            </div>
+                                                    </div>
+                                                </div>
+                                </div>
+
+                                <!-- Right: Proof Image -->
+                                <div class="flex flex-col">
+                                    <label
+                                        class="block text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Bukti
+                                        Transfer</label>
+                                    <div
+                                        class="relative group rounded-2xl overflow-hidden border-4 border-white/5 bg-black/40 shadow-inner">
+                                        <% let filename=iuran ? iuran.bukti_bayar : (kas.length> 0 ? kas[0].bukti_foto :
+                                            '');
+                                            let proofUrl = filename.startsWith('bukti_bayar-') ? '/uploads/' + filename
+                                            :
+                                            '/uploads/keuangan/' + filename;
+                                            %>
+                                            <img src="<%= proofUrl %>"
+                                                class="w-full object-contain max-h-[600px] transition-transform duration-500 group-hover:scale-105"
+                                                alt="Bukti Transfer">
+
+                                            <a href="<%= proofUrl %>" target="_blank"
+                                                class="absolute bottom-4 right-4 bg-black/80 hover:bg-emerald-600 text-white rounded-lg px-4 py-2 text-sm font-medium backdrop-blur-md border border-white/10 transition-all flex items-center shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                                    </path>
+                                                </svg>
+                                                Download / Full Size
+                                            </a>
+                                    </div>
+                                    <div class="mt-4 text-center">
+                                        <p class="text-xs text-gray-500">Klik tombol di atas untuk melihat ukuran penuh
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="border-t border-white/10 pt-6 flex justify-center">
+                                <a href="/keuangan"
+                                    class="glass-button px-6 py-2 rounded-xl text-gray-300 hover:text-white border border-white/10 flex items-center transition-all bg-white/5 hover:bg-white/10">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                    Kembali ke Laporan
+                                </a>
+                            </div>
+
+                </div>
+            </div>
+
+        </div>
+        </div>
+
+        <%- include('../partials/footer') %>

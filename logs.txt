@@ -1,0 +1,34 @@
+
+up to date, audited 341 packages in 645ms
+
+50 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> gang-ambyar-rt-rw@1.0.0 dev
+> nodemon app.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node app.js`[39m
+/app/node_modules/passport-oauth2/lib/strategy.js:87
+  if (!options.clientID) { throw new TypeError('OAuth2Strategy requires a clientID option'); }
+                           ^
+
+TypeError: OAuth2Strategy requires a clientID option
+    at Strategy.OAuth2Strategy (/app/node_modules/passport-oauth2/lib/strategy.js:87:34)
+    at new Strategy (/app/node_modules/passport-google-oauth20/lib/strategy.js:52:18)
+    at module.exports (/app/config/passport.js:6:18)
+    at Object.<anonymous> (/app/app.js:25:29)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v18.20.8
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

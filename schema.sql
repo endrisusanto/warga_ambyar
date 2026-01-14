@@ -40,6 +40,7 @@ CREATE TABLE iuran (
     status ENUM('lunas', 'menunggu_konfirmasi', 'belum_bayar') DEFAULT 'belum_bayar',
     bukti_bayar VARCHAR(255),
     tanggal_bayar DATETIME,
+    tanggal_konfirmasi DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (warga_id) REFERENCES warga(id) ON DELETE CASCADE,
     UNIQUE KEY unique_tagihan (warga_id, periode, jenis)
@@ -50,7 +51,7 @@ CREATE TABLE kas (
     tipe ENUM('masuk', 'keluar') NOT NULL,
     jumlah DECIMAL(10, 2) NOT NULL,
     keterangan TEXT,
-    tanggal DATE NOT NULL,
+    tanggal DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -41,6 +41,17 @@ const Kas = {
             LIMIT 12
         `);
         return rows;
+    },
+    getByProof: async (filename) => {
+        const [rows] = await db.query('SELECT * FROM kas WHERE bukti_foto = ?', [filename]);
+        return rows;
+    },
+    delete: async (id) => {
+        await db.query('DELETE FROM kas WHERE id = ?', [id]);
+    },
+    getById: async (id) => {
+        const [rows] = await db.query('SELECT * FROM kas WHERE id = ?', [id]);
+        return rows[0];
     }
 };
 

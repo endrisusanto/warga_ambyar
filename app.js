@@ -14,7 +14,10 @@ app.set('trust proxy', 1);
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: '1d', // Cache static assets for 1 day to improve performance
+    etag: false
+}));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
@@ -67,6 +70,9 @@ require('./utils/fixRoleColumn')();
 require('./utils/fixIuranStatus')();
 require('./utils/updateIuranJenis')();
 require('./utils/migrateOldKasData')();
+require('./utils/addDibayarOlehCol')();
+require('./utils/fixKasTanggalType')();
+require('./utils/addTanggalKonfirmasiCol')();
 
 // Fetch Admin Contact
 const getAdminContact = require('./utils/getAdminContact');

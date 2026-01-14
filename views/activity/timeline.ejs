@@ -29,10 +29,8 @@
 
                         <% logs.forEach((log)=> {
                             const isMasuk = log.tipe === 'masuk';
-                            const dateObj = new Date(log.tanggal);
-                            const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year:
-                            'numeric' });
-                            const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            const dateStr = moment(log.tanggal).locale('id').format('DD MMMM YYYY');
+                            const timeStr = moment(log.tanggal).format('HH:mm');
                             %>
                             <div class="relative pl-8 md:pl-12 group">
                                 <!-- Dot -->

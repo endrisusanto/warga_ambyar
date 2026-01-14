@@ -243,6 +243,7 @@ exports.processPayment = (req, res) => {
                 }
 
                 let bukti = req.file ? req.file.filename : null;
+                const bayarTime = req.body.tanggal_bayar || moment().format('YYYY-MM-DD HH:mm:ss');
 
                 for (const m of selectedMonths) {
                     const currentPeriode = m + '-01';
@@ -281,13 +282,13 @@ exports.processPayment = (req, res) => {
                             // We should probably keep the original warga_id (Head of Family) or update it? 
                             // Let's keep original warga_id but update payment details.
                             await db.query(
-                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = NOW(), dibayar_oleh = ? WHERE id = ?',
-                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, payer_id, existing[0].id]
+                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = ?, dibayar_oleh = ? WHERE id = ?',
+                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id, existing[0].id]
                             );
                         } else {
                             await db.query(
-                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar, dibayar_oleh) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?)',
-                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti, payer_id]
+                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar, dibayar_oleh) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id]
                             );
                         }
                     }
@@ -352,7 +353,8 @@ exports.confirm = async (req, res) => {
 
         // Add to Kas with Block/House Number
         const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')}`;
-        await Kas.add('masuk', bill.jumlah, ket, moment().format('YYYY-MM-DD'), bill.bukti_bayar);
+        const kasDate = bill.tanggal_bayar ? moment(bill.tanggal_bayar).format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss');
+        await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
 
         // Get warga phone and name for WhatsApp notification
         const [wargaData] = await db.query('SELECT nama, no_hp FROM warga WHERE id = ?', [bill.warga_id]);
@@ -716,7 +718,8 @@ exports.exportExcel = async (req, res) => {
             { header: 'Jenis', key: 'jenis', width: 15 },
             { header: 'Jumlah', key: 'jumlah', width: 15 },
             { header: 'Status', key: 'status', width: 15 },
-            { header: 'Tgl Bayar', key: 'tanggal_bayar', width: 20 }
+            { header: 'Tgl Bayar', key: 'tanggal_bayar', width: 20 },
+            { header: 'Tgl Approved', key: 'tanggal_konfirmasi', width: 20 }
         ];
 
         rows.forEach((row, index) => {
@@ -729,7 +732,8 @@ exports.exportExcel = async (req, res) => {
                 jenis: row.jenis,
                 jumlah: row.jumlah,
                 status: row.status,
-                tanggal_bayar: row.tanggal_bayar ? moment(row.tanggal_bayar).format('DD-MM-YYYY HH:mm') : '-'
+                tanggal_bayar: row.tanggal_bayar ? moment(row.tanggal_bayar).format('DD-MM-YYYY HH:mm') : '-',
+                tanggal_konfirmasi: row.tanggal_konfirmasi ? moment(row.tanggal_konfirmasi).format('DD-MM-YYYY HH:mm') : '-'
             });
         });
 
@@ -781,7 +785,7 @@ exports.confirmBatch = async (req, res) => {
         }
 
         // Update Status
-        await db.query(`UPDATE iuran SET status = 'lunas' WHERE id IN (${placeholders})`, ids);
+        await db.query(`UPDATE iuran SET status = 'lunas', tanggal_konfirmasi = NOW() WHERE id IN (${placeholders})`, ids);
 
         // Add to Kas
         for (const bill of rows) {
@@ -790,7 +794,8 @@ exports.confirmBatch = async (req, res) => {
             if (bill.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
 
             const ket = `Iuran ${jenisLabel} ${bill.blok}/${bill.nomor_rumah} ${moment(bill.periode).format('MMM YYYY')}`;
-            await Kas.add('masuk', bill.jumlah, ket, moment().format('YYYY-MM-DD'), bill.bukti_bayar);
+            const kasDate = bill.tanggal_bayar ? moment(bill.tanggal_bayar).format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss');
+            await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
         }
 
         // Prepare Response (WA URL)

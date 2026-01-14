@@ -194,12 +194,42 @@
                                                     <% if(t.bukti_foto) { let
                                                         proofPath=t.bukti_foto.startsWith('bukti_bayar-') ? '/uploads/'
                                                         + t.bukti_foto : '/uploads/keuangan/' + t.bukti_foto; %>
-                                                        <div class="mt-2">
-                                                            <img src="<%= proofPath %>" alt="Bukti"
-                                                                onclick="showProof('<%= proofPath %>', '<%= t.bukti_foto %>')"
-                                                                class="w-12 h-12 rounded-lg object-cover cursor-pointer hover:opacity-80 border border-emerald-500/20 transition-opacity bg-black/20">
-                                                        </div>
+                                                        <a href="/keuangan/transaksi/<%= t.bukti_foto %>"
+                                                            target="_blank"
+                                                            class="ml-2 text-emerald-400 hover:text-emerald-300 text-xs flex items-center transition-colors px-2 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20">
+                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                                </path>
+                                                            </svg>
+                                                            Lihat Bukti
+                                                        </a>
                                                         <% } %>
+
+                                                            <% if(user && (user.role==='admin' ||
+                                                                user.role==='bendahara' )) { %>
+                                                                <form action="/keuangan/delete/<%= t.id %>"
+                                                                    method="POST" class="inline ml-2"
+                                                                    onsubmit="return confirm('Apakah anda yakin ingin menghapus transaksi ini?');">
+                                                                    <button type="submit"
+                                                                        class="text-red-400 hover:text-red-300 text-xs flex items-center transition-colors px-2 py-0.5 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20"
+                                                                        title="Hapus Transaksi">
+                                                                        <svg class="w-3 h-3" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2"
+                                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </form>
+                                                                <% } %>
+
                                                 </div>
                                             </td>
                                             <td
@@ -354,7 +384,11 @@
                     class="relative inline-block align-bottom glass-card rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-3xl sm:w-full">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start sm:justify-between mb-4">
-                            <h3 class="text-lg leading-6 font-medium text-gray-100" id="modal-proof-title">Preview Bukti
+                            <h3 class="text-lg leading-6 font-bold text-gray-100 flex items-center"
+                                id="modal-proof-title">
+                                <span
+                                    class="bg-emerald-500/10 text-emerald-400 p-1.5 rounded-lg mr-2 border border-emerald-500/20 text-xl">🧾</span>
+                                Detail Pembayaran
                             </h3>
                             <button type="button" class="text-gray-400 hover:text-gray-200" onclick="closeProofModal()">
                                 <span class="sr-only">Close</span>
@@ -364,15 +398,47 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="mt-2 flex justify-center bg-white/5 rounded p-2 border border-white/10">
-                            <img id="proofImage" src="" alt="Bukti"
-                                class="max-w-full max-h-[60vh] object-contain rounded">
+
+                        <!-- Loading State -->
+                        <div id="proofLoading" class="hidden py-10 text-center">
+                            <div
+                                class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500">
+                            </div>
+                            <p class="mt-2 text-sm text-gray-400">Memuat detail...</p>
                         </div>
-                        <div id="proofDetails" class="mt-4">
-                            <h4 class="text-sm font-bold text-emerald-400 mb-2">Transaksi Terkait:</h4>
-                            <div class="bg-black/20 rounded-lg p-3 max-h-40 overflow-y-auto custom-scrollbar space-y-2"
-                                id="proofTransactionsList">
-                                <!-- List populated by JS -->
+
+                        <div id="proofContent">
+                            <!-- Info Warga (Optional, inserted via JS) -->
+                            <div id="proofWargaInfo" class="mb-5 hidden space-y-3">
+                                <!-- Injected content -->
+                            </div>
+
+                            <div class="mb-2">
+                                <p class="text-sm font-bold text-gray-400 mb-1">Bukti Transfer:</p>
+                                <div
+                                    class="flex justify-center bg-black/40 rounded-lg p-2 border border-white/10 relative group">
+                                    <img id="proofImage" src="" alt="Bukti"
+                                        class="max-w-full max-h-[50vh] object-contain rounded cursor-pointer"
+                                        onclick="window.open(this.src, '_blank')">
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                        <span class="bg-black/70 text-white text-xs px-2 py-1 rounded">Klik untuk
+                                            perbesar</span>
+                                    </div>
+                                </div>
+                                <div class="text-right mt-1">
+                                    <a id="viewFullImage" href="#" target="_blank"
+                                        class="text-xs text-emerald-400 hover:underline">Lihat Ukuran Penuh</a>
+                                </div>
+                            </div>
+
+                            <div id="proofDetails" class="mt-4">
+                                <h4 class="text-sm font-bold text-emerald-400 mb-2 border-b border-white/10 pb-1">
+                                    Transaksi Terkait:</h4>
+                                <div class="bg-black/20 rounded-lg p-3 max-h-40 overflow-y-auto custom-scrollbar space-y-2"
+                                    id="proofTransactionsList">
+                                    <!-- List populated by JS -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -393,58 +459,128 @@
                 document.getElementById('addModal').classList.add('hidden');
             }
 
-            function showProof(src, filename) {
-                document.getElementById('proofImage').src = src;
-
-                // Populate related transactions
+            async function showProof(src, filename) {
+                const modal = document.getElementById('proofModal');
+                const loading = document.getElementById('proofLoading');
+                const content = document.getElementById('proofContent');
+                const infoDiv = document.getElementById('proofWargaInfo');
+                const img = document.getElementById('proofImage');
+                const fullLink = document.getElementById('viewFullImage');
                 const listContainer = document.getElementById('proofTransactionsList');
+
+                // Reset state
+                img.src = src;
+                fullLink.href = src;
+                infoDiv.innerHTML = '';
+                infoDiv.classList.add('hidden');
                 listContainer.innerHTML = '';
 
+                modal.classList.remove('hidden');
+                loading.classList.remove('hidden');
+                content.classList.add('hidden');
+
                 try {
+                    // Try fetch rich details
+                    const response = await fetch(`/keuangan/detail/${filename}`);
+                    const result = await response.json();
+
+                    if (result.success && result.data.iuran) {
+                        const iuran = result.data.iuran;
+                        // Format data
+                        const paidBy = iuran.payer_nama ? `(Dibayar oleh: ${iuran.payer_nama})` : '';
+                        const jenisNice = iuran.jenis.replace('_', ' ').toUpperCase() + ' - ' + new Date(iuran.periode).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                        const statusColor = iuran.status === 'lunas' ? 'text-emerald-400' : 'text-yellow-400';
+                        const statusText = iuran.status.toUpperCase();
+
+                        infoDiv.innerHTML = `
+                             <div class="grid grid-cols-1 gap-1 text-sm text-gray-300">
+                                <div class="font-bold text-lg text-emerald-100 border-b border-white/10 pb-2 mb-2">
+                                    Warga: ${iuran.warga_nama} <span class="text-sm text-gray-400 font-normal">(Blok ${iuran.blok}-${iuran.nomor_rumah})</span>
+                                    <div class="text-xs text-gray-500 font-normal italic mt-0.5">${paidBy}</div>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1">
+                                    <span class="text-gray-400">Jenis:</span>
+                                    <span class="font-semibold text-gray-200">${jenisNice}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1">
+                                    <span class="text-gray-400">Nominal:</span>
+                                    <span class="font-mono text-emerald-300">Rp ${Number(iuran.jumlah).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div class="flex justify-between pt-1">
+                                    <span class="text-gray-400">Status:</span>
+                                    <span class="font-bold tracking-wider ${statusColor}">${statusText}</span>
+                                </div>
+                             </div>
+                        `;
+                        infoDiv.classList.remove('hidden');
+
+                        // Use server provided trasactions if available
+                        if (result.data.kas && result.data.kas.length > 0) {
+                            renderTransactionsList(result.data.kas, listContainer);
+                        } else {
+                            // Fallback to local parsing or empty
+                            renderTransactionsList([], listContainer);
+                        }
+
+                    } else {
+                        // Fallback: Manual Transaction (Not found in Iuran)
+                        // Use local data from data-attribute
+                        const rawTrans = document.getElementById('transactionsData').getAttribute('data-transactions');
+                        const transactions = JSON.parse(rawTrans);
+                        const related = transactions.filter(t => t.bukti_foto === filename);
+                        renderTransactionsList(related, listContainer);
+
+                        infoDiv.innerHTML = `<p class="text-gray-400 italic text-center text-sm py-2">Transaksi Manual (Non-Iuran)</p>`;
+                        infoDiv.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error("Fetch details error", error);
+                    // Fallback to local data
                     const rawTrans = document.getElementById('transactionsData').getAttribute('data-transactions');
                     const transactions = JSON.parse(rawTrans);
-
                     const related = transactions.filter(t => t.bukti_foto === filename);
-
-                    if (related.length > 0) {
-                        let total = 0;
-                        related.forEach(t => {
-                            const amount = parseInt(t.jumlah);
-                            total += (t.tipe === 'masuk' ? amount : -amount);
-                            const date = new Date(t.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-
-                            const div = document.createElement('div');
-                            div.className = 'flex justify-between items-start text-xs border-b border-white/5 pb-1 last:border-0';
-                            div.innerHTML = `
-                                <div class="text-gray-300">
-                                    <span class="text-gray-500 mr-2">${date}</span>
-                                    ${t.keterangan}
-                                </div>
-                                <div class="font-bold ${t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400'}">
-                                    ${t.tipe === 'masuk' ? '+' : '-'} Rp ${amount.toLocaleString('id-ID')}
-                                </div>
-                            `;
-                            listContainer.appendChild(div);
-                        });
-
-                        // Add Total if more than 1
-                        if (related.length > 1) {
-                            const totalDiv = document.createElement('div');
-                            totalDiv.className = 'flex justify-between items-center text-sm font-bold pt-2 border-t border-white/10 mt-1';
-                            totalDiv.innerHTML = `
-                                <span class="text-emerald-100">Total Transaksi</span>
-                                <span class="text-emerald-400">Rp ${total.toLocaleString('id-ID')}</span>
-                            `;
-                            listContainer.appendChild(totalDiv);
-                        }
-                    } else {
-                        listContainer.innerHTML = '<p class="text-xs text-gray-500 italic">Tidak ada data transaksi terkait.</p>';
-                    }
-                } catch (e) {
-                    console.error("Error parsing transactions", e);
+                    renderTransactionsList(related, listContainer);
+                } finally {
+                    loading.classList.add('hidden');
+                    content.classList.remove('hidden');
                 }
+            }
 
-                document.getElementById('proofModal').classList.remove('hidden');
+            function renderTransactionsList(transactions, container) {
+                if (transactions.length > 0) {
+                    let total = 0;
+                    transactions.forEach(t => {
+                        const amount = parseInt(t.jumlah);
+                        total += (t.tipe === 'masuk' ? amount : -amount);
+                        const date = new Date(t.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-between items-start text-xs border-b border-white/5 pb-1 last:border-0';
+                        div.innerHTML = `
+                            <div class="text-gray-300">
+                                <span class="text-gray-500 mr-2">${date}</span>
+                                ${t.keterangan}
+                            </div>
+                            <div class="font-bold ${t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400'}">
+                                ${t.tipe === 'masuk' ? '+' : '-'} Rp ${amount.toLocaleString('id-ID')}
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+
+                    // Add Total if more than 1
+                    if (transactions.length > 1) {
+                        const totalDiv = document.createElement('div');
+                        totalDiv.className = 'flex justify-between items-center text-sm font-bold pt-2 border-t border-white/10 mt-1';
+                        totalDiv.innerHTML = `
+                            <span class="text-emerald-100">Total Transaksi</span>
+                            <span class="text-emerald-400">Rp ${total.toLocaleString('id-ID')}</span>
+                        `;
+                        container.appendChild(totalDiv);
+                    }
+                } else {
+                    container.innerHTML = '<p class="text-xs text-gray-500 italic">Tidak ada data transaksi terkait.</p>';
+                }
             }
 
             function closeProofModal() {

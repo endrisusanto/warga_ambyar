@@ -1,4 +1,5 @@
 const Kas = require('../models/Kas');
+const moment = require('moment');
 
 exports.timeline = async (req, res) => {
     try {
@@ -11,7 +12,8 @@ exports.timeline = async (req, res) => {
             title: 'Cash Flow Timeline',
             user: req.session.user,
             logs: logs,
-            currentPath: '/activity/timeline'
+            currentPath: '/activity/timeline',
+            moment: moment
         });
     } catch (error) {
         console.error('Error fetching timeline:', error);

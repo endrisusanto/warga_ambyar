@@ -10,6 +10,7 @@ services:
       - DB_NAME=rt_rw_db
       - PORT=9878
       - SESSION_SECRET=rahasia_super_aman
+      - TZ=Asia/Jakarta
     depends_on:
       - db
     volumes:
@@ -22,6 +23,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: rt_rw_db
+      TZ: Asia/Jakarta
     ports:
       - "3307:3306"
     volumes:

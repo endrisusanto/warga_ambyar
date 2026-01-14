@@ -268,6 +268,47 @@
 
                         document.getElementById('modal-nominal').innerText = `Nominal: Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}`;
 
+                        // Timeline Breadcrumb
+                        const timelineContainer = document.getElementById('modal-timeline');
+                        if (timelineContainer) {
+                            timelineContainer.innerHTML = '';
+                            if (data.tanggal_bayar) {
+                                const bayarObj = new Date(data.tanggal_bayar);
+                                const bayarStr = bayarObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+
+                                let html = `
+                                    <div class="flex items-center bg-white/10 border border-white/10 rounded-full px-1 py-1">
+                                        <div class="flex items-center gap-2 px-3 py-1">
+                                            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
+                                            <span class="text-xs text-gray-200">${bayarStr}</span>
+                                        </div>
+                                `;
+
+                                if (data.tanggal_konfirmasi) {
+                                    const approveObj = new Date(data.tanggal_konfirmasi);
+                                    const approveStr = approveObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+
+                                    html += `
+                                        <div class="px-1 text-gray-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/20">
+                                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Approved</span>
+                                            <span class="text-xs text-emerald-300 font-medium">${approveStr}</span>
+                                        </div>
+                                    `;
+                                }
+
+                                html += `</div>`;
+                                timelineContainer.innerHTML = html;
+                                timelineContainer.classList.remove('hidden');
+                            } else {
+                                timelineContainer.classList.add('hidden');
+                            }
+                        }
+
                         // Status badge with color
                         const statusBadge = document.getElementById('modal-status-badge');
                         const statusText = data.status.replace('_', ' ').toUpperCase();
@@ -729,7 +770,8 @@
                                 <p class="text-sm text-gray-300" id="modal-warga"></p>
                                 <p class="text-sm text-gray-300" id="modal-jenis"></p>
                                 <p class="text-sm text-gray-300" id="modal-nominal"></p>
-                                <div class="flex items-center gap-2">
+                                <div id="modal-timeline" class="hidden py-2 flex justify-center"></div>
+                                <div class="flex items-center gap-2 pt-1 justify-center">
                                     <p class="text-sm text-gray-300">Status:</p>
                                     <span id="modal-status-badge"
                                         class="px-3 py-1 rounded-full text-xs font-semibold"></span>

@@ -1,0 +1,84 @@
+
+up to date, audited 341 packages in 645ms
+
+50 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> gang-ambyar-rt-rw@1.0.0 dev
+> nodemon app.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node app.js`[39m
+/app/node_modules/passport-oauth2/lib/strategy.js:87
+  if (!options.clientID) { throw new TypeError('OAuth2Strategy requires a clientID option'); }
+                           ^
+
+TypeError: OAuth2Strategy requires a clientID option
+    at Strategy.OAuth2Strategy (/app/node_modules/passport-oauth2/lib/strategy.js:87:34)
+    at new Strategy (/app/node_modules/passport-google-oauth20/lib/strategy.js:52:18)
+    at module.exports (/app/config/passport.js:6:18)
+    at Object.<anonymous> (/app/app.js:25:29)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v18.20.8
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+
+up to date, audited 341 packages in 624ms
+
+50 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> gang-ambyar-rt-rw@1.0.0 dev
+> nodemon app.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node app.js`[39m
+Checking Google Auth schema...
+Checking profile_photo_url schema...
+Checking email column in warga table...
+Checking role column in users table...
+Checking status column in iuran table...
+Updating iuran jenis column to support Kas Gang...
+=== Starting migration of old "kas" entries to "kas_rt" ===
+Server running on port 9878
+Database connected successfully
+Ensuring password is nullable...
+profile_photo_url column already exists.
+Migration complete.
+email column already exists in warga table.
+Migration complete.
+Current jenis column: [
+  {
+    Field: 'jenis',
+    Type: 'varchar(50)',
+    Null: 'NO',
+    Key: '',
+    Default: null,
+    Extra: ''
+  }
+]
+Found 0 rows with old jenis values
+Admin phone loaded: 085176970180
+Iuran status column fixed.
+✅ Updated 0 rows from 'kas'/'keamanan' to 'kas_rt'
+✅ Fixed 0 kas_rt/kas_gang amounts to 10000
+✅ Fixed 0 sampah amounts to 25000
+=== Migration completed successfully ===
+Role column fixed.
+Iuran jenis column updated successfully.
+Google Auth schema check complete.

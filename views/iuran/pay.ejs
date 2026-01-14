@@ -125,6 +125,14 @@
 
 
                     <div class="sm:col-span-6">
+                        <label for="tanggal_bayar" class="block text-sm font-medium text-gray-300 mb-2">Waktu
+                            Pembayaran</label>
+                        <input type="datetime-local" name="tanggal_bayar" id="tanggal_bayar"
+                            class="glass-input block w-full sm:text-sm text-gray-100 rounded-xl p-3">
+                        <p class="mt-1 text-xs text-gray-400">Default adalah waktu sekarang (WIB).</p>
+                    </div>
+
+                    <div class="sm:col-span-6">
                         <label class="block text-sm font-medium text-gray-300 mb-3">Transfer E-Wallet</label>
                         <div
                             class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-white/5">
@@ -268,6 +276,14 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
         <script>
+            const tglBayarInput = document.getElementById('tanggal_bayar');
+            if (tglBayarInput) {
+                const now = new Date();
+                const offset = now.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+                tglBayarInput.value = localISOTime;
+            }
+
             const wargaSelect = document.getElementById('warga_id');
             const tahunSelect = document.getElementById('tahun');
             const monthGrid = document.getElementById('month-grid');

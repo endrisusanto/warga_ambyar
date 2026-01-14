@@ -36,7 +36,7 @@ const Iuran = {
         }
 
         if (status === 'lunas') {
-            query += ', tanggal_bayar = NOW()';
+            query += ', tanggal_konfirmasi = NOW()';
         }
 
         query += ' WHERE id = ?';
@@ -123,6 +123,19 @@ const Iuran = {
             [warga_id]
         );
         return rows;
+    },
+    getByProof: async (filename) => {
+        const [rows] = await db.query(`
+            SELECT i.*, 
+                   w.nama as warga_nama, w.blok, w.nomor_rumah,
+                   p.nama as payer_nama
+            FROM iuran i
+            JOIN warga w ON i.warga_id = w.id
+            LEFT JOIN warga p ON i.dibayar_oleh = p.id
+            WHERE i.bukti_bayar = ?
+            LIMIT 1
+        `, [filename]);
+        return rows[0];
     }
 };
 

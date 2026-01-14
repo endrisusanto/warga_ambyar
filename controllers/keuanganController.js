@@ -6,6 +6,8 @@ const multer = require('multer');
 const path = require('path');
 const ExcelJS = require('exceljs');
 
+
+
 // Multer Setup
 const storage = multer.diskStorage({
     destination: './public/uploads/keuangan/', // Make sure this dir exists
@@ -78,7 +80,7 @@ exports.add = (req, res) => {
             const { tipe, jumlah, keterangan, tanggal } = req.body;
             const bukti = req.file ? req.file.filename : null;
 
-            await Kas.add(tipe, jumlah, keterangan, tanggal || moment().format('YYYY-MM-DD'), bukti);
+            await Kas.add(tipe, jumlah, keterangan, tanggal || moment().format('YYYY-MM-DD HH:mm:ss'), bukti);
 
             req.flash('success_msg', 'Transaksi berhasil disimpan');
             res.redirect('/keuangan');
@@ -182,6 +184,85 @@ exports.export = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal export data');
+        res.redirect('/keuangan');
+    }
+};
+
+exports.getDetailByProof = async (req, res) => {
+    try {
+        const { filename } = req.params;
+
+        // 1. Get Iuran Details (Main Info)
+        const iuranDetail = await Iuran.getByProof(filename);
+
+        // 2. Get Related Kas Transactions
+        const kasTransactions = await Kas.getByProof(filename);
+
+        if (!iuranDetail && kasTransactions.length === 0) {
+            return res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+        }
+
+        const data = {
+            iuran: iuranDetail || null,
+            kas: kasTransactions
+        };
+
+        res.json({ success: true, data });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+exports.viewDetail = async (req, res) => {
+    try {
+        const { filename } = req.params;
+
+        // 1. Get Iuran Details (Main Info)
+        const iuranDetail = await Iuran.getByProof(filename);
+
+        // 2. Get Related Kas Transactions
+        const kasTransactions = await Kas.getByProof(filename);
+
+        if (!iuranDetail && kasTransactions.length === 0) {
+            req.flash('error_msg', 'Data transaksi tidak ditemukan.');
+            return res.redirect('/keuangan');
+        }
+
+        res.render('keuangan/detail', {
+            title: 'Detail Transaksi',
+            user: req.session.user,
+            iuran: iuranDetail || null,
+            kas: kasTransactions,
+            moment: moment
+        });
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Terjadi kesalahan sistem.');
+        res.redirect('/keuangan');
+    }
+};
+
+exports.delete = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const transaction = await Kas.getById(id);
+
+        if (!transaction) {
+            req.flash('error_msg', 'Data tidak ditemukan');
+            return res.redirect('/keuangan');
+        }
+
+        await Kas.delete(id);
+
+        req.flash('success_msg', 'Transaksi berhasil dihapus');
+        res.redirect('/keuangan');
+
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal menghapus transaksi');
         res.redirect('/keuangan');
     }
 };
