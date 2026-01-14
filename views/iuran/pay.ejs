@@ -52,29 +52,74 @@
                     </div>
 
                     <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-300 mb-3">Jenis Pembayaran</label>
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="flex items-center">
-                                <input id="iuran_kas_rt" name="jenis_iuran[]" value="kas_rt" type="checkbox" checked
-                                    class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
-                                <label for="iuran_kas_rt" class="ml-2 block text-sm text-gray-100">
-                                    💰 Kas RT (10k)
-                                </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="iuran_kas_gang" name="jenis_iuran[]" value="kas_gang" type="checkbox" checked
-                                    class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
-                                <label for="iuran_kas_gang" class="ml-2 block text-sm text-gray-100">
-                                    🏘️ Kas Gang (10k)
-                                </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="iuran_sampah" name="jenis_iuran[]" value="sampah" type="checkbox" checked
-                                    class="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-white/10 border-white/20 rounded">
-                                <label for="iuran_sampah" class="ml-2 block text-sm text-gray-100">
-                                    🗑️ Sampah (25k)
-                                </label>
-                            </div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3 text-center">Jenis Pembayaran</label>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
+                                <input type="checkbox" name="jenis_iuran[]" value="kas_rt" class="peer sr-only" checked>
+                                <div
+                                    class="px-4 py-3 h-full rounded-xl bg-white/5 border border-white/10 peer-checked:bg-emerald-500/20 peer-checked:border-emerald-500/50 peer-checked:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-emerald-500 peer-checked:[&_.check-ring]:border-emerald-500 peer-checked:[&_.status-text]:text-emerald-300 peer-checked:[&_.price-text]:text-emerald-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
+                                    <span
+                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">💰</span>
+                                    <div class="flex flex-col">
+                                        <span class="status-text text-sm font-bold text-gray-300 transition-colors">Kas
+                                            RT</span>
+                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                            10k</span>
+                                    </div>
+                                    <div
+                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
+                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
+                                <input type="checkbox" name="jenis_iuran[]" value="kas_gang" class="peer sr-only"
+                                    checked>
+                                <div
+                                    class="px-4 py-3 h-full rounded-xl bg-white/5 border border-white/10 peer-checked:bg-blue-500/20 peer-checked:border-blue-500/50 peer-checked:shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-blue-500 peer-checked:[&_.check-ring]:border-blue-500 peer-checked:[&_.status-text]:text-blue-300 peer-checked:[&_.price-text]:text-blue-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
+                                    <span
+                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">🏘️</span>
+                                    <div class="flex flex-col">
+                                        <span class="status-text text-sm font-bold text-gray-300 transition-colors">Kas
+                                            Gang</span>
+                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                            10k</span>
+                                    </div>
+                                    <div
+                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
+                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
+                                <input type="checkbox" name="jenis_iuran[]" value="sampah" class="peer sr-only" checked>
+                                <div
+                                    class="px-4 py-3 h-full rounded-xl bg-white/5 border border-white/10 peer-checked:bg-orange-500/20 peer-checked:border-orange-500/50 peer-checked:shadow-[0_0_15px_rgba(249,115,22,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-orange-500 peer-checked:[&_.check-ring]:border-orange-500 peer-checked:[&_.status-text]:text-orange-300 peer-checked:[&_.price-text]:text-orange-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
+                                    <span
+                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">🗑️</span>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="status-text text-sm font-bold text-gray-300 transition-colors">Sampah</span>
+                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                            25k</span>
+                                    </div>
+                                    <div
+                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
+                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </label>
                         </div>
                     </div>
 
@@ -112,49 +157,110 @@
                             Dana / Bukti Pembayaran QRIS
                             (Gambar)</label>
                         <div>
-                            <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" required
-                                class="glass-input block w-full sm:text-sm text-gray-100 rounded-xl p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/20 file:text-indigo-300 hover:file:bg-indigo-500/30">
+                            <div id="dropzone"
+                                class="relative border-2 border-dashed border-gray-500 hover:border-indigo-400 bg-white/5 rounded-2xl p-6 transition-all group cursor-pointer text-center">
+
+                                <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" class="hidden"
+                                    required>
+
+                                <!-- Default View -->
+                                <div id="dropzone-content" class="flex flex-col items-center justify-center space-y-3">
+                                    <div
+                                        class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                                        <svg class="w-8 h-8 text-gray-400 group-hover:text-indigo-400" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-gray-300 font-medium">Click to upload or drag & drop</div>
+                                    <div class="text-xs text-gray-400">SVG, PNG, JPG or GIF (MAX. 5MB)</div>
+                                </div>
+
+                                <!-- Preview View -->
+                                <div id="preview-container" class="hidden relative group/preview">
+                                    <img id="preview-image" src="" alt="Preview"
+                                        class="mx-auto max-h-64 rounded-lg shadow-lg object-contain">
+                                    <div
+                                        class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/preview:opacity-100 transition-opacity rounded-lg">
+                                        <button type="button" id="remove-file"
+                                            class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transform scale-90 hover:scale-110 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-400">Upload juga foto bukti transaksi jika bayar tunai
+                                langsung.</p>
                         </div>
-                        <p class="mt-2 text-sm text-gray-400">Upload juga foto bukti transaksi jika bayar tunai
-                            langsung.</p>
+
+                    </div>
+                </div> <!-- Real End of Grid -->
+
+                <!-- Bottom Section Wrapper -->
+                <div class="space-y-6 mt-8">
+
+                    <!-- Total Tagihan -->
+                    <div class="border-t border-white/10 pt-6">
+                        <div
+                            class="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-white/10 shadow-lg">
+                            <span class="text-gray-300 font-bold text-lg">Total Bayar</span>
+                            <span id="total-display" class="text-3xl font-extrabold text-indigo-400 drop-shadow-md">Rp
+                                0</span>
+                        </div>
                     </div>
 
-                </div>
+                    <!-- QRIS Area -->
+                    <div id="qris-container" class="hidden">
+                        <div
+                            class="flex flex-col items-center justify-center bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl">📱</span>
+                                <h3 class="text-lg font-bold text-white">Scan QRIS</h3>
+                            </div>
 
-                <div class="mt-6 border-t border-white/10 pt-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="text-lg font-bold text-gray-200">Total Tagihan:</div>
-                        <div id="total-display" class="text-2xl font-bold text-indigo-300">Rp 0</div>
+                            <div class="bg-white p-3 rounded-xl shadow-inner">
+                                <canvas id="qrcode-canvas"></canvas>
+                            </div>
+
+                            <div class="mt-4 text-center">
+                                <p class="text-xs text-gray-400 uppercase tracking-widest">Merchant</p>
+                                <p class="text-sm font-bold text-indigo-300 mt-1 font-mono" id="merchant-name-display">
+                                    --</p>
+                            </div>
+
+                            <button type="button" onclick="downloadQris()"
+                                class="mt-6 flex items-center px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-1">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Simpan QRIS
+                            </button>
+                        </div>
                     </div>
 
-                    <div id="qris-container"
-                        class="hidden flex flex-col items-center justify-center bg-white/5 backdrop-blur-xl p-6 rounded-xl border border-white/20">
-                        <p class="text-sm font-bold text-gray-200 mb-3 flex items-center gap-2">
-                            <span class="text-2xl">📱</span>
-                            Scan QRIS untuk Pembayaran
-                        </p>
-                        <canvas id="qrcode-canvas"></canvas>
-                        <p class="text-xs text-gray-400 mt-3">Merchant: <span id="merchant-name-display"></span></p>
-                        <button type="button" id="download-qris-btn" onclick="downloadQris()"
-                            class="mt-4 inline-flex items-center px-6 py-3 text-sm font-bold rounded-xl shadow-lg text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
+                        <a href="/iuran"
+                            class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-sm font-bold text-gray-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all group">
+                            <svg class="w-4 h-4 mr-2 text-gray-400 group-hover:text-white transition-colors transform group-hover:-translate-x-1 duration-200"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
-                            Download QRIS
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 shadow-xl shadow-indigo-500/20 transform hover:-translate-y-0.5 active:translate-y-0 transition-all">
+                            <span class="mr-2 text-lg">💳</span>
+                            Bayar Sekarang
                         </button>
                     </div>
-                </div>
-
-                <div class="mt-8 flex justify-end gap-3">
-                    <a href="/iuran"
-                        class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
-                        ← Batal
-                    </a>
-                    <button type="submit"
-                        class="inline-flex items-center justify-center px-8 py-3 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg transition-all">
-                        💳 Submit Payment
-                    </button>
                 </div>
             </form>
         </div>
@@ -211,14 +317,21 @@
                     ring.className = "absolute inset-0 border-2 border-transparent peer-checked:border-indigo-400 peer-checked:bg-indigo-500/10 rounded-xl pointer-events-none";
 
                     // Status indicator (dot)
+                    // Status indicator element container
+                    const statusContainer = document.createElement('div');
+                    statusContainer.id = `status-container-${value}`;
+                    statusContainer.className = "mt-1";
+
+                    // Default Dot (for unpaid/partial)
                     const dot = document.createElement('div');
-                    dot.id = `status-${value}`;
-                    dot.className = "w-2 h-2 rounded-full bg-gray-600 mt-1";
+                    dot.id = `status-dot-${value}`;
+                    dot.className = "w-2 h-2 rounded-full bg-gray-600";
+                    statusContainer.appendChild(dot);
 
                     label.appendChild(input);
                     label.appendChild(text);
                     label.appendChild(ring);
-                    label.appendChild(dot);
+                    label.appendChild(statusContainer);
 
                     monthGrid.appendChild(label);
                 });
@@ -307,25 +420,54 @@
                     }
 
                     // UI Update
+                    const statusContainer = label.querySelector(`#status-container-${ym}`);
+
+                    // Reset Styling
+                    label.className = "cursor-pointer border border-white/20 rounded-xl p-3 flex flex-col items-center justify-center transition-all hover:bg-white/10 bg-white/5 backdrop-blur-xl relative h-16 sm:h-20";
+                    statusContainer.innerHTML = ''; // Clear previous status
+
                     if (selectedTypes.length > 0 && isFullyPaid) {
                         cb.disabled = true;
-                        label.classList.add('opacity-50', 'bg-gray-100', 'cursor-not-allowed');
-                        label.classList.remove('bg-white', 'hover:bg-gray-50');
-                        dot.className = "w-2 h-2 rounded-full bg-green-500 mt-1"; // Green = Lunas
                         cb.checked = false;
+
+                        // Green Badge Style
+                        label.className = "cursor-not-allowed border border-emerald-500/30 rounded-xl p-2 flex flex-col items-center justify-center bg-emerald-500/10 backdrop-blur-xl relative h-16 sm:h-20";
+
+                        // Add Lunas Badge
+                        const badge = document.createElement('span');
+                        badge.className = "px-2 py-0.5 rounded-md bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg shadow-emerald-500/20";
+                        badge.innerText = "LUNAS";
+                        statusContainer.appendChild(badge);
+
                     } else if (isPending) {
-                        // Maybe disable?
-                        dot.className = "w-2 h-2 rounded-full bg-yellow-400 mt-1";
+                        // Pending / Verifikasi Style (Orange)
+                        label.className = "cursor-pointer border border-orange-500/30 rounded-xl p-2 flex flex-col items-center justify-center bg-orange-500/10 backdrop-blur-xl relative h-16 sm:h-20 hover:bg-orange-500/20 transition-all";
+
+                        // Add Proses Badge
+                        const badge = document.createElement('span');
+                        badge.className = "px-2 py-0.5 rounded-md bg-orange-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg shadow-orange-500/20";
+                        badge.innerText = "PROSES";
+                        statusContainer.appendChild(badge);
+
+                        // Dot for partial indication if needed, or just badge. PENDING usually means user submitted payment.
+                        dot.className = "hidden";
+
                     } else if (isPartiallyPaid) {
-                        // Warning/Orange? User can still pay remainder.
-                        dot.className = "w-2 h-2 rounded-full bg-orange-400 mt-1"; // Partial
-                        cb.disabled = false;
+                        // Partial - keep enabled but show indicator
                         label.classList.remove('opacity-50', 'bg-gray-100', 'cursor-not-allowed');
+
+                        const dot = document.createElement('div');
+                        dot.className = "w-2 h-2 rounded-full bg-orange-400";
+                        statusContainer.appendChild(dot);
+
+                        cb.disabled = false;
+
                     } else {
                         // Clean / Unpaid
                         cb.disabled = false;
-                        label.classList.remove('opacity-50', 'bg-gray-100', 'cursor-not-allowed');
-                        dot.className = "w-2 h-2 rounded-full bg-gray-200 mt-1";
+                        const dot = document.createElement('div');
+                        dot.className = "w-2 h-2 rounded-full bg-gray-600";
+                        statusContainer.appendChild(dot);
                     }
                 });
             }
@@ -460,6 +602,100 @@
                     alert('Nomor DANA berhasil disalin: ' + text);
                 });
             }
+
+            // Dropzone Logic
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('bukti_bayar');
+            const previewContainer = document.getElementById('preview-container');
+            const dropzoneContent = document.getElementById('dropzone-content');
+            const previewImage = document.getElementById('preview-image');
+            const removeBtn = document.getElementById('remove-file');
+
+            // Handle Drag Events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropzone.classList.add('border-indigo-500', 'bg-white/10');
+                dropzone.classList.remove('border-gray-500', 'bg-white/5');
+            }
+
+            function unhighlight(e) {
+                dropzone.classList.remove('border-indigo-500', 'bg-white/10');
+                dropzone.classList.add('border-gray-500', 'bg-white/5');
+            }
+
+            // Handle Drop
+            dropzone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            // Handle Click
+            dropzone.addEventListener('click', (e) => {
+                if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
+
+            fileInput.addEventListener('change', function () {
+                handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewImage.src = e.target.result;
+                            dropzoneContent.classList.add('hidden');
+                            previewContainer.classList.remove('hidden');
+                        }
+                        reader.readAsDataURL(file);
+
+                        // If files came from drop, async assign to input
+                        if (fileInput.files !== files) {
+                            // Can't directly assign FileList, but for form submission
+                            // standard usage is relying on input. 
+                            // If dropped, we need to manually put it in input?
+                            // modern browsers support: 
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            fileInput.files = dataTransfer.files;
+                        }
+                    } else {
+                        alert('Please upload an image file.');
+                    }
+                }
+            }
+
+            // Remove File
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                fileInput.value = ''; // Clear input
+                previewImage.src = '';
+                previewContainer.classList.add('hidden');
+                dropzoneContent.classList.remove('hidden');
+            });
 
             // Init
             refreshGrid();
