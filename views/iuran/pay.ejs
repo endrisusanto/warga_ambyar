@@ -155,13 +155,12 @@
                     <div class="sm:col-span-6">
                         <label for="bukti_bayar" class="block text-sm font-medium text-gray-300 mb-2">Bukti Transfer
                             Dana / Bukti Pembayaran QRIS
-                            (Gambar)</label>
+                            <span class="text-red-400 text-xs ml-1">(Wajib)</span></label>
                         <div>
                             <div id="dropzone"
                                 class="relative border-2 border-dashed border-gray-500 hover:border-indigo-400 bg-white/5 rounded-2xl p-6 transition-all group cursor-pointer text-center">
 
-                                <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" class="hidden"
-                                    required>
+                                <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" class="hidden">
 
                                 <!-- Default View -->
                                 <div id="dropzone-content" class="flex flex-col items-center justify-center space-y-3">
@@ -658,6 +657,24 @@
             fileInput.addEventListener('change', function () {
                 handleFiles(this.files);
             });
+
+            // Form Submit Validation
+            const paymentForm = document.querySelector('form[action="/iuran/pay"]');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', function (e) {
+                    if (fileInput.files.length === 0) {
+                        e.preventDefault();
+                        alert('Mohon upload bukti transfer dana / pembayaran QRIS (Wajib).');
+
+                        // Highlight dropzone
+                        dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        dropzone.classList.add('border-red-500', 'animate-pulse');
+                        setTimeout(() => {
+                            dropzone.classList.remove('border-red-500', 'animate-pulse');
+                        }, 2500);
+                    }
+                });
+            }
 
             function handleFiles(files) {
                 if (files.length > 0) {
