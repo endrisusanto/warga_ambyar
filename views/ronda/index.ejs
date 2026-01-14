@@ -815,8 +815,8 @@
                 document.getElementById('payFineAmount').innerText = 'Rp ' + parseInt(denda).toLocaleString('id-ID');
                 document.getElementById('payFineModal').classList.remove('hidden');
 
-                // Generate QRIS (Dummy String + ID for uniqueness)
-                const qrisData = "00020101021126570011ID.DANA.WWW011893600915320020020025204581253033605802ID5912Warga Ambyar6006Jakarta61051234562070703A016304" + id;
+                // Generate QRIS (Base String from ENV + ID for uniqueness)
+                const qrisData = "<%= typeof staticQris !== 'undefined' ? staticQris : '' %>" + id;
 
                 QRCode.toCanvas(document.getElementById('qrisCanvas'), qrisData, { width: 200, margin: 2 }, function (error) {
                     if (error) console.error(error)

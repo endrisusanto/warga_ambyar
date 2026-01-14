@@ -626,7 +626,7 @@ exports.resetPayment = async (req, res) => {
 exports.generateQris = (req, res) => {
     try {
         const { amount, merchantName } = req.body;
-        const baseString = process.env.STATIC_QRIS || "00020101021126570011ID.DANA.WWW011893600915319034402102091903440210303UMI51440014ID.CO.QRIS.WWW0215ID10254440170380303UMI5204573253033605802ID5914Endri Susanto 6015Kabupaten Bekas6105175406304CAAF";
+        const baseString = process.env.STATIC_QRIS;
 
         const qris = new QrisGenerator(baseString);
         qris.setAmount(amount);

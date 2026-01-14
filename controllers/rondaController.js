@@ -109,7 +109,8 @@ exports.index = async (req, res) => {
             month,
             year,
             moment,
-            user: req.session.user
+            user: req.session.user,
+            staticQris: process.env.QRIS_RONDA
         });
     } catch (err) {
         console.error(err);
