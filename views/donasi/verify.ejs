@@ -1,0 +1,112 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="mb-8 px-4 sm:px-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-100 flex items-center gap-3">
+                        <span class="text-4xl">✅</span>
+                        Verifikasi Donasi
+                    </h1>
+                    <p class="text-gray-400 mt-2">Periksa dan verifikasi donasi yang masuk</p>
+                </div>
+                <a href="/donasi"
+                    class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10 hover:border-white/20">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Kembali ke Donasi
+                </a>
+            </div>
+
+
+            <div class="px-4 sm:px-0">
+                <% if(pending.length===0) { %>
+                    <div class="glass-card p-12 rounded-lg border border-dashed border-white/10 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-300">Tidak ada donasi pending</h3>
+                        <p class="mt-1 text-sm text-gray-500">Semua donasi sudah diverifikasi</p>
+                    </div>
+                    <% } else { %>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <% pending.forEach(donasi=> { %>
+                                <div class="glass-card rounded-2xl overflow-hidden">
+                                    <div class="p-5">
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex-1">
+                                                <h3 class="font-bold text-gray-100 mb-1">
+                                                    <%= donasi.campaign_judul %>
+                                                </h3>
+                                                <p class="text-sm text-gray-400">
+                                                    <%= donasi.warga_nama || donasi.username %>
+                                                        <% if(donasi.is_anonim) { %>
+                                                            <span
+                                                                class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full ml-1">🕶️
+                                                                Anonim</span>
+                                                            <% } %>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-white/5 rounded-xl p-3 mb-4">
+                                            <p class="text-xs text-gray-400 mb-1">Jumlah Donasi</p>
+                                            <p class="text-2xl font-black text-green-400">
+                                                Rp <%= parseFloat(donasi.jumlah).toLocaleString('id-ID') %>
+                                            </p>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <p class="text-xs text-gray-400 mb-1">Metode Pembayaran</p>
+                                            <span
+                                                class="inline-block bg-white/10 text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase">
+                                                <%= donasi.metode_bayar %>
+                                            </span>
+                                        </div>
+
+                                        <% if(donasi.pesan) { %>
+                                            <div class="mb-4 bg-white/5 rounded-lg p-3">
+                                                <p class="text-xs text-gray-400 mb-1">Pesan</p>
+                                                <p class="text-sm text-gray-300 italic">"<%= donasi.pesan %>"</p>
+                                            </div>
+                                            <% } %>
+
+                                                <% if(donasi.bukti_bayar) { %>
+                                                    <div class="mb-4">
+                                                        <p class="text-xs text-gray-400 mb-2">Bukti Pembayaran</p>
+                                                        <img src="/uploads/donasi/bukti/<%= donasi.bukti_bayar %>"
+                                                            class="w-full h-48 object-cover rounded-lg border border-white/10 cursor-pointer hover:opacity-80 transition"
+                                                            onclick="window.open('/uploads/donasi/bukti/<%= donasi.bukti_bayar %>', '_blank')"
+                                                            alt="Bukti bayar">
+                                                    </div>
+                                                    <% } %>
+
+                                                        <div class="text-xs text-gray-500 mb-4">
+                                                            <%= moment(donasi.created_at).format('DD MMM YYYY, HH:mm')
+                                                                %>
+                                                        </div>
+
+                                                        <form action="/donasi/verify" method="POST" class="flex gap-2">
+                                                            <input type="hidden" name="id" value="<%= donasi.id %>">
+                                                            <button type="submit" name="action" value="reject"
+                                                                class="flex-1 py-2 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-all">
+                                                                ❌ Tolak
+                                                            </button>
+                                                            <button type="submit" name="action" value="approve"
+                                                                class="flex-1 py-2 px-4 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-400 font-bold border border-green-500/20 transition-all">
+                                                                ✅ Verifikasi
+                                                            </button>
+                                                        </form>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } %>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

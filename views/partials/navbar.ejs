@@ -1,7 +1,9 @@
 <% const path=typeof currentPath !=='undefined' ? currentPath : '' ; const isDashboard=path.startsWith('/dashboard') ||
     path==='/' ; const isRonda=path.startsWith('/ronda'); const isIuran=path.startsWith('/iuran'); const
     isKeuangan=path.startsWith('/keuangan'); const isMusyawarah=path.startsWith('/musyawarah'); const
-    isProfile=path.startsWith('/profile'); const isCCTV=path.startsWith('/cctv'); %>
+    isDonasi=path.startsWith('/donasi'); const isProfile=path.startsWith('/profile'); const
+    isCCTV=path.startsWith('/cctv'); %>
+
     <nav class="glass-nav sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -30,9 +32,14 @@
                                 class="<%= isMusyawarah ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isMusyawarah ? 'border-white/10' : 'hover:border-white/5' %>">Info
                                 Warga</a>
 
+                            <a href="/donasi"
+                                class="<%= isDonasi ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isDonasi ? 'border-white/10' : 'hover:border-white/5' %>">💝
+                                Donasi</a>
+
                             <a href="/cctv/monitor"
                                 class="<%= isCCTV ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isCCTV ? 'border-white/10' : 'hover:border-white/5' %>">📹
                                 CCTV</a>
+
                         </div>
                         <% } %>
                 </div>
@@ -230,12 +237,24 @@
                                     Warga</span>
                             </a>
 
+                            <!-- Donasi Button -->
+                            <a href="/donasi"
+                                class="<%= isDonasi ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                <div
+                                    class="<%= isDonasi ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
+                                    💝
+                                </div>
+                                <span
+                                    class="text-xs font-semibold <%= isDonasi ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Donasi</span>
+                            </a>
+
                             <!-- CCTV Button -->
                             <a href="/cctv/monitor"
                                 class="<%= isCCTV ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isCCTV ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
                                     📹
+
                                 </div>
                                 <span
                                     class="text-xs font-semibold <%= isCCTV ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">CCTV</span>

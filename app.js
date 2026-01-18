@@ -59,8 +59,10 @@ app.use('/dashboard', require('./routes/dashboard'));
 app.use('/activity', require('./routes/activity'));
 app.use('/keuangan', require('./routes/keuangan'));
 app.use('/musyawarah', require('./routes/musyawarah'));
+app.use('/donasi', require('./routes/donasi'));
 app.use('/share', require('./routes/share'));
 app.use('/cctv', require('./routes/cctv'));
+
 
 // Run Migrations
 require('./utils/googleAuthMigration')();

@@ -9,7 +9,7 @@ async function up() {
                 judul VARCHAR(255) NOT NULL,
                 konten LONGTEXT,
                 lampiran VARCHAR(255),
-                tanggal DATE NOT NULL,
+                tanggal DATETIME NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);

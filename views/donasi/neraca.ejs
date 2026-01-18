@@ -1,0 +1,163 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="mb-8 px-4 sm:px-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-100 flex items-center gap-3">
+                        <span class="text-4xl">💰</span>
+                        Neraca Campaign
+                    </h1>
+                    <p class="text-gray-400 mt-2">
+                        <%= campaign.judul %>
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/donasi/campaign/<%= campaign.id %>/neraca/export"
+                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-all">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Export Excel
+                    </a>
+                    <a href="/donasi/campaign/<%= campaign.id %>/pengeluaran/create"
+                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-bold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Input Pengeluaran
+                    </a>
+                    <a href="/donasi/campaign/<%= campaign.id %>"
+                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10 hover:border-white/20">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Kembali
+                    </a>
+                </div>
+            </div>
+
+            <div class="px-4 sm:px-0">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500">
+                        <p class="text-sm text-gray-400 mb-2">Total Pemasukan (Donasi)</p>
+                        <p class="text-3xl font-black text-green-400">
+                            Rp <%= neraca.pemasukan.toLocaleString('id-ID') %>
+                        </p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-red-500">
+                        <p class="text-sm text-gray-400 mb-2">Total Pengeluaran</p>
+                        <p class="text-3xl font-black text-red-400">
+                            Rp <%= neraca.pengeluaran.toLocaleString('id-ID') %>
+                        </p>
+                    </div>
+                    <div
+                        class="glass-card p-6 rounded-2xl border-l-4 <%= neraca.saldo >= 0 ? 'border-blue-500' : 'border-orange-500' %>">
+                        <p class="text-sm text-gray-400 mb-2">Saldo</p>
+                        <p class="text-3xl font-black <%= neraca.saldo >= 0 ? 'text-blue-400' : 'text-orange-400' %>">
+                            Rp <%= neraca.saldo.toLocaleString('id-ID') %>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Pengeluaran List -->
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="p-6 border-b border-white/10">
+                        <h2 class="text-xl font-bold text-gray-100">Rincian Pengeluaran</h2>
+                    </div>
+
+                    <% if(pengeluaran.length===0) { %>
+                        <div class="p-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-400">Belum ada pengeluaran tercatat</p>
+                        </div>
+                        <% } else { %>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-white/10">
+                                    <thead class="bg-white/5">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                                Tanggal</th>
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                                Deskripsi</th>
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                                Kategori</th>
+                                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase">
+                                                Jumlah</th>
+                                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-400 uppercase">
+                                                Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/10">
+                                        <% pengeluaran.forEach(p=> { %>
+                                            <tr class="hover:bg-white/5 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                                    <%= moment(p.tanggal).format('DD MMM YYYY') %>
+                                                        <br>
+                                                        <span class="text-xs text-gray-500">
+                                                            <%= moment(p.tanggal).format('HH:mm') %>
+                                                        </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-gray-300">
+                                                    <%= p.deskripsi %>
+                                                        <% if(p.bukti) { %>
+                                                            <a href="/uploads/donasi/pengeluaran/<%= p.bukti %>"
+                                                                target="_blank"
+                                                                class="ml-2 text-xs text-indigo-400 hover:text-indigo-300">
+                                                                📎 Bukti
+                                                            </a>
+                                                            <% } %>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <% if(p.kategori) { %>
+                                                        <span
+                                                            class="bg-white/10 text-gray-300 text-xs font-bold px-3 py-1 rounded-full">
+                                                            <%= p.kategori %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="text-gray-500 text-xs">-</span>
+                                                            <% } %>
+                                                </td>
+                                                <td
+                                                    class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-400 text-right">
+                                                    Rp <%= parseFloat(p.jumlah).toLocaleString('id-ID') %>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                                    <a href="/donasi/pengeluaran/<%= p.id %>/delete?campaign_id=<%= campaign.id %>"
+                                                        onclick="return confirm('Hapus pengeluaran ini?')"
+                                                        class="text-red-400 hover:text-red-300 font-bold">
+                                                        🗑️
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                    <tfoot class="bg-white/10">
+                                        <tr>
+                                            <td colspan="3"
+                                                class="px-6 py-4 text-sm font-bold text-gray-200 text-right">TOTAL
+                                                PENGELUARAN</td>
+                                            <td class="px-6 py-4 text-sm font-black text-red-400 text-right">
+                                                Rp <%= neraca.pengeluaran.toLocaleString('id-ID') %>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <% } %>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>

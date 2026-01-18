@@ -16,6 +16,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     command: sh -c "npm install && npm run dev"
 
   db:

@@ -1,0 +1,229 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 m-4">
+                <h2 class="text-3xl font-bold text-gray-100 mb-2 flex items-center gap-3">
+                    <span class="text-4xl">💝</span>
+                    Donasi untuk Campaign
+                </h2>
+                <h3 class="text-xl text-gray-400 mb-8">
+                    <%= campaign.judul %>
+                </h3>
+
+                <form action="/donasi/donate" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="campaign_id" value="<%= campaign.id %>">
+                    <input type="hidden" name="metode_bayar" value="transfer">
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Nama Donatur</label>
+                        <input type="text" name="nama_donatur" value="<%= user.username %>"
+                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                        <p class="text-xs text-gray-500 mt-1">Nama yang akan ditampilkan (jika tidak anonim)</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="is_anonim"
+                                class="w-5 h-5 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-2 focus:ring-indigo-500/50">
+                            <span class="ml-3 text-gray-300 font-medium">
+                                🕶️ Donasi sebagai Anonim (Hamba Allah)
+                            </span>
+                        </label>
+                        <p class="text-xs text-gray-500 mt-2 ml-8">
+                            Nama Anda akan ditampilkan sebagai "Hamba Allah" untuk publik,
+                            tetapi admin/ketua/bendahara tetap dapat melihat identitas asli Anda.
+                        </p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
+                        <input type="number" name="jumlah" id="jumlah" required min="1000" step="1000"
+                            placeholder="Contoh: 50000"
+                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-3">Transfer E-Wallet</label>
+                        <div
+                            class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-white/5">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-[#118EE9]/20 flex items-center justify-center border border-[#118EE9]/30 shadow-[0_0_15px_rgba(17,142,233,0.3)]">
+                                    <span class="text-lg font-bold text-[#118EE9]">D</span>
+                                </div>
+                                <div>
+                                    <p class="text-base font-bold text-gray-100">DANA</p>
+                                    <p class="text-xs text-gray-400">a.n. Karsidi</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="copyText('081222334261')"
+                                class="group flex items-center gap-3 bg-black/20 px-5 py-3 rounded-xl border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all active:scale-95 w-full sm:w-auto justify-between sm:justify-start">
+                                <span
+                                    class="text-lg font-mono font-bold text-[#118EE9] tracking-wider group-hover:text-[#40a9ff] transition-colors">081222334261</span>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Transfer sesuai nominal donasi Anda</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-3">Atau Scan QRIS Sesuai Nominal</label>
+                        <div id="qris-container" class="hidden">
+                            <div
+                                class="flex flex-col items-center justify-center bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="text-3xl">📱</span>
+                                    <h3 class="text-lg font-bold text-white">Scan QRIS</h3>
+                                </div>
+
+                                <div class="bg-white p-3 rounded-xl shadow-inner">
+                                    <canvas id="qrcode-canvas"></canvas>
+                                </div>
+
+                                <div class="mt-4 text-center">
+                                    <p class="text-xs text-gray-400 uppercase tracking-widest">Nominal</p>
+                                    <p class="text-2xl font-black text-green-400 mt-1" id="qris-amount-display">Rp 0</p>
+                                </div>
+
+                                <button type="button" onclick="downloadQris()"
+                                    class="mt-6 flex items-center px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-1">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Simpan QRIS
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">QRIS akan muncul setelah Anda memasukkan nominal donasi
+                        </p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Bukti Transfer DANA / Bukti Pembayaran
+                            QRIS
+                            <span class="text-red-400 text-xs ml-1">(Wajib)</span></label>
+                        <input type="file" name="bukti_bayar" required accept="image/*"
+                            class="glass-input w-full py-3 px-4 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                        <p class="text-xs text-gray-500 mt-1">Upload screenshot/foto bukti transfer</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Pesan/Doa (Opsional)</label>
+                        <textarea name="pesan" rows="3" placeholder="Tulis pesan atau doa untuk campaign ini..."
+                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-4">
+                        <a href="/donasi/campaign/<%= campaign.id %>"
+                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transform transition hover:-translate-y-0.5">
+                            💝 Kirim Donasi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- QRCode Lib -->
+        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+        <script>
+            const jumlahInput = document.getElementById('jumlah');
+            const qrisContainer = document.getElementById('qris-container');
+            const qrCanvas = document.getElementById('qrcode-canvas');
+            const qrisAmountDisplay = document.getElementById('qris-amount-display');
+
+            let qrisDebounce;
+
+            jumlahInput.addEventListener('input', function () {
+                const amount = parseInt(this.value) || 0;
+                if (amount >= 1000) {
+                    clearTimeout(qrisDebounce);
+                    qrisDebounce = setTimeout(() => generateQris(amount), 500);
+                } else {
+                    qrisContainer.classList.add('hidden');
+                }
+            });
+
+            async function generateQris(amount) {
+                qrisAmountDisplay.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+
+                const merchantName = `DONASI <%= campaign.judul.substring(0, 15).toUpperCase() %>`;
+
+                try {
+                    const response = await fetch('/iuran/generate-qris', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount, merchantName })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        qrisContainer.classList.remove('hidden');
+                        QRCode.toCanvas(qrCanvas, data.qr_string, { width: 250, margin: 2 }, function (error) {
+                            if (error) console.error(error);
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            function downloadQris() {
+                const merchantName = `DONASI_<%= campaign.judul.substring(0, 15).replace(/[^a-zA-Z0-9]/g, '_').toUpperCase() %>`;
+                const totalText = qrisAmountDisplay.innerText || 'Rp 0';
+                const compositeCanvas = document.createElement('canvas');
+                const ctx = compositeCanvas.getContext('2d');
+                const qrSize = 250;
+                const padding = 20;
+                const textHeight = 80;
+                compositeCanvas.width = qrSize + (padding * 2);
+                compositeCanvas.height = qrSize + textHeight + (padding * 2);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+                ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
+                ctx.fillStyle = '#1F2937';
+                ctx.font = 'bold 16px Arial, sans-serif';
+                ctx.textAlign = 'center';
+                const textY = qrSize + padding + 25;
+                ctx.fillText(merchantName, compositeCanvas.width / 2, textY);
+                ctx.fillStyle = '#10B981';
+                ctx.font = 'bold 20px Arial, sans-serif';
+                ctx.fillText(totalText, compositeCanvas.width / 2, textY + 30);
+                const filename = merchantName + '.png';
+                compositeCanvas.toBlob(function (blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            function copyText(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Nomor DANA berhasil disalin: ' + text);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("Copy");
+                    textArea.remove();
+                    alert('Nomor DANA berhasil disalin: ' + text);
+                });
+            }
+        </script>
+
+        <%- include('../partials/footer') %>

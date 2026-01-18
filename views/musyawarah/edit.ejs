@@ -118,10 +118,11 @@
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tanggal
                             Meeting</label>
-                        <input type="date" name="tanggal" value="<%= moment(item.tanggal).format('YYYY-MM-DD') %>"
-                            required
+                        <input type="datetime-local" name="tanggal"
+                            value="<%= moment(item.tanggal).format('YYYY-MM-DDTHH:mm') %>" required
                             class="glass-input w-full py-3.5 px-5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
                     </div>
+
 
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Konten /

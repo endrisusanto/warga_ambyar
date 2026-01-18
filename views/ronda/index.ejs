@@ -101,350 +101,362 @@
 
                 // Check if this is upcoming (today or future)
                 const isUpcoming = moment(date).isSameOrAfter(moment(), 'day');
-                const isPast = moment(date).isBefore(moment(), 'day');
-                const isToday = moment(date).isSame(moment(), 'day');
-                const isThisWeek = moment(date).isSame(moment(), 'week');
-                const isHighlighted = isThisWeek && !isPast;
-                %>
-                <div id="card-<%= date %>"
-                    class="glass-card overflow-hidden divide-y <%= isHighlighted ? 'divide-gray-200' : 'divide-white/10' %> <%= isHighlighted ? 'bg-slate-50 border-2 border-white shadow-2xl scale-[1.02] z-10' : '' %> <%= isToday ? '!border-green-400 !bg-green-50 ring-4 ring-green-400/20' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.03]">
-                    <div
-                        class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-white/5' : (isToday ? 'bg-green-100' : (isHighlighted ? 'bg-white border-b border-gray-200' : 'bg-white/5')) %> backdrop-blur-sm">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3
-                                    class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? 'text-gray-800' : 'text-indigo-300')) %> drop-shadow-lg">
-                                    <%= moment(date).format('dddd, DD MMMM YYYY') %>
-                                </h3>
-                                <!-- Mobile Version (Text Buttons) -->
-                                <div class="flex flex-wrap items-center gap-2 mt-1 lg:hidden">
-                                    <% if(isToday) { %>
-                                        <span
-                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600/90 text-white shadow-sm">
-                                            🔔 Hari Ini
-                                        </span>
-                                        <% } else if(isThisWeek && !isPast) { %>
+
+                // Special handling for Saturday night (Malam Minggu)
+                // Saturday night ronda should stay active until Sunday 6 AM
+                const now = moment();
+                const rondaDate = moment(date);
+                const isSaturday = rondaDate.day() === 6;
+                const isSunday = now.day() === 0;
+                const currentHour = now.hour();
+
+                let isPast;
+                if (isSaturday && isSunday && currentHour < 6) { isPast=false; } else {
+                    isPast=moment(date).isBefore(moment(), 'day' ); } const isToday=moment(date).isSame(moment(), 'day'
+                    ); let isThisWeek; if (isSaturday && isSunday && currentHour < 6) { isThisWeek=true; } else {
+                    isThisWeek=moment(date).isSame(moment(), 'week' ); } const isHighlighted=isThisWeek && !isPast; %>
+                    <div id="card-<%= date %>"
+                        class="glass-card overflow-hidden divide-y <%= isHighlighted ? 'divide-gray-200' : 'divide-white/10' %> <%= isHighlighted ? 'bg-slate-50 border-2 border-white shadow-2xl scale-[1.02] z-10' : '' %> <%= isToday ? '!border-green-400 !bg-green-50 ring-4 ring-green-400/20' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.03]">
+                        <div
+                            class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-white/5' : (isToday ? 'bg-green-100' : (isHighlighted ? 'bg-white border-b border-gray-200' : 'bg-white/5')) %> backdrop-blur-sm">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3
+                                        class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? 'text-gray-800' : 'text-indigo-300')) %> drop-shadow-lg">
+                                        <%= moment(date).format('dddd, DD MMMM YYYY') %>
+                                    </h3>
+                                    <!-- Mobile Version (Text Buttons) -->
+                                    <div class="flex flex-wrap items-center gap-2 mt-1 lg:hidden">
+                                        <% if(isToday) { %>
                                             <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white shadow-sm">
-                                                📅 Minggu Ini
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-600/90 text-white shadow-sm">
+                                                🔔 Hari Ini
                                             </span>
-                                            <% } %>
+                                            <% } else if(isThisWeek && !isPast) { %>
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white shadow-sm">
+                                                    📅 Minggu Ini
+                                                </span>
+                                                <% } %>
 
-                                                <button onclick="shareSchedule('<%= date %>', this)"
-                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-700/90 text-white hover:bg-gray-800 transition shadow-sm border border-gray-600/50">
-                                                    🔗 Share
-                                                </button>
-
-                                                <% if(user.role==='admin' || isToday || isThisWeek) { %>
-                                                    <button onclick="openUploadConditionModal('<%= date %>')"
-                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white hover:bg-gray-700 transition shadow-sm border border-gray-500/50">
-                                                        📷 Foto
+                                                    <button onclick="shareSchedule('<%= date %>', this)"
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-700/90 text-white hover:bg-gray-800 transition shadow-sm border border-gray-600/50">
+                                                        🔗 Share
                                                     </button>
-                                                    <% } %>
 
-                                                        <% if(isPast) { %>
-                                                            <span
-                                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-500/80 text-white shadow-sm">
-                                                                ✓ Selesai
-                                                            </span>
-                                                            <% } %>
-                                </div>
+                                                    <% if(user.role==='admin' || isToday || isThisWeek) { %>
+                                                        <button onclick="openUploadConditionModal('<%= date %>')"
+                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-600/90 text-white hover:bg-gray-700 transition shadow-sm border border-gray-500/50">
+                                                            📷 Foto
+                                                        </button>
+                                                        <% } %>
 
-                                <!-- Desktop Version (Icon Toolbar) -->
-                                <div class="hidden lg:flex items-center gap-1 mt-1">
-                                    <% if(isToday) { %>
-                                        <span
-                                            class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 text-green-300 border border-green-500/30"
-                                            title="Hari Ini">
-                                            🔔
-                                        </span>
-                                        <% } else if(isThisWeek && !isPast) { %>
+                                                            <% if(isPast) { %>
+                                                                <span
+                                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium bg-gray-500/80 text-white shadow-sm">
+                                                                    ✓ Selesai
+                                                                </span>
+                                                                <% } %>
+                                    </div>
+
+                                    <!-- Desktop Version (Icon Toolbar) -->
+                                    <div class="hidden lg:flex items-center gap-1 mt-1">
+                                        <% if(isToday) { %>
                                             <span
-                                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-600 border border-orange-200"
-                                                title="Minggu Ini">
-                                                📅
+                                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 text-green-300 border border-green-500/30"
+                                                title="Hari Ini">
+                                                🔔
                                             </span>
-                                            <% } %>
+                                            <% } else if(isThisWeek && !isPast) { %>
+                                                <span
+                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-600 border border-orange-200"
+                                                    title="Minggu Ini">
+                                                    📅
+                                                </span>
+                                                <% } %>
 
-                                                <button onclick="shareSchedule('<%= date %>', this)"
-                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
-                                                    title="Share to WhatsApp">
-                                                    🔗
-                                                </button>
-
-                                                <% if(user.role==='admin' || isToday || isThisWeek) { %>
-                                                    <button onclick="openUploadConditionModal('<%= date %>')"
+                                                    <button onclick="shareSchedule('<%= date %>', this)"
                                                         class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
-                                                        title="Upload Foto Ronda">
-                                                        📷
+                                                        title="Share to WhatsApp">
+                                                        🔗
                                                     </button>
-                                                    <% } %>
 
-                                                        <% if(isPast) { %>
-                                                            <span
-                                                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500/20 text-gray-400 border border-gray-500/30"
-                                                                title="Selesai">
-                                                                ✓
-                                                            </span>
-                                                            <% } %>
+                                                    <% if(user.role==='admin' || isToday || isThisWeek) { %>
+                                                        <button onclick="openUploadConditionModal('<%= date %>')"
+                                                            class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
+                                                            title="Upload Foto Ronda">
+                                                            📷
+                                                        </button>
+                                                        <% } %>
+
+                                                            <% if(isPast) { %>
+                                                                <span
+                                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                                                                    title="Selesai">
+                                                                    ✓
+                                                                </span>
+                                                                <% } %>
+                                    </div>
                                 </div>
+                                <% if(teamName) { %>
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white' : 'bg-indigo-600 text-white' %> shadow-sm border <%= isPast ? 'border-gray-500' : 'border-indigo-400 glass-button' %>">
+                                        Tim <%= teamName %>
+                                    </span>
+                                    <% } %>
                             </div>
-                            <% if(teamName) { %>
-                                <span
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white' : 'bg-indigo-600 text-white' %> shadow-sm border <%= isPast ? 'border-gray-500' : 'border-indigo-400 glass-button' %>">
-                                    Tim <%= teamName %>
-                                </span>
+
+                            <% if(teamMembers.length> 0) { %>
+                                <div
+                                    class="mt-2 pt-2 border-t <%= isPast ? 'border-gray-300' : (isToday ? 'border-green-200' : (isHighlighted ? 'border-gray-200' : 'border-indigo-200/50')) %>">
+                                    <div
+                                        class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? 'text-gray-600' : 'text-indigo-300')) %> mb-2">
+                                        Anggota Tim:</div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <% teamMembers.forEach(function(member) { %>
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm <%= isPast ? 'bg-gray-500/20 text-gray-300 border border-gray-500/30' : (isToday ? 'bg-green-100 text-green-800 border border-green-200' : (isHighlighted ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/30')) %> shadow-sm">
+                                                    <%= member.nama %>
+                                                </span>
+                                                <% }) %>
+                                        </div>
+
+                                        <!-- Photos for the night -->
+                                        <% let allPhotos=[]; schedules.forEach(function(s) { if (s.parsedPhotos) {
+                                            s.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
+                                            allPhotos.push({src: photo, type: 'individual' , uploader: s.nama}); } }); }
+                                            }); if (groupedDocumentation && groupedDocumentation[date]) {
+                                            groupedDocumentation[date].forEach(function(doc) { if (doc.parsedPhotos) {
+                                            doc.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
+                                            allPhotos.push({src: photo, type: 'condition' , uploader: 'Kondisi' }); }
+                                            }); } }); } if(allPhotos && allPhotos.length> 0) {
+                                            const photoSources = allPhotos.map(function(p) { return p.src; });
+                                            const safePhotosJson = JSON.stringify(photoSources).replace(/'/g, "&apos;");
+                                            %>
+                                            <div class="flex -space-x-2 ml-4 cursor-pointer"
+                                                data-photos='<%- safePhotosJson %>'
+                                                onclick="openCarouselFromData(this, 0)">
+                                                <% allPhotos.slice(0, 5).forEach(function(photo) { const
+                                                    isVideo=photo.src.match(/\.(mp4|mov|avi|webm)$/i); %>
+                                                    <% if(isVideo) { %>
+                                                        <div
+                                                            class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 bg-black flex items-center justify-center relative overflow-hidden">
+                                                            <video src="/uploads/ronda/<%= photo.src %>#t=1.0"
+                                                                class="absolute inset-0 w-full h-full object-cover opacity-60"
+                                                                preload="metadata"></video>
+                                                            <span class="text-[8px] text-white font-bold z-10">▶</span>
+                                                        </div>
+                                                        <% } else { %>
+                                                            <div
+                                                                class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 overflow-hidden">
+                                                                <img class="w-full h-full object-cover"
+                                                                    src="/uploads/ronda/<%= photo.src %>" alt="">
+                                                            </div>
+                                                            <% } %>
+                                                                <% }) %>
+                                                                    <% if(allPhotos.length> 5) { %>
+                                                                        <div
+                                                                            class="inline-flex items-center justify-center w-8 h-8 aspect-square rounded-full bg-gray-700 text-[10px] font-bold text-white ring-2 ring-gray-900">
+                                                                            +<%= allPhotos.length - 5 %>
+                                                                        </div>
+                                                                        <% } %>
+                                            </div>
+                                            <% } %>
+                                    </div>
+                                </div>
                                 <% } %>
                         </div>
+                        <div class="px-4 py-5 sm:p-6">
+                            <ul class="space-y-3">
+                                <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
+                                    loopItems = [...teamMembers];
+                                    const memberIds = new Set(teamMembers.map(function(m) { return m.id; }));
+                                    schedules.forEach(function(sch) {
+                                    if (!memberIds.has(sch.warga_id)) {
+                                    loopItems.push(sch);
+                                    }
+                                    });
+                                    } else {
+                                    loopItems = schedules;
+                                    }
 
-                        <% if(teamMembers.length> 0) { %>
-                            <div
-                                class="mt-2 pt-2 border-t <%= isPast ? 'border-gray-300' : (isToday ? 'border-green-200' : (isHighlighted ? 'border-gray-200' : 'border-indigo-200/50')) %>">
-                                <div
-                                    class="text-xs font-semibold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? 'text-gray-600' : 'text-indigo-300')) %> mb-2">
-                                    Anggota Tim:</div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex flex-wrap gap-1.5">
-                                        <% teamMembers.forEach(function(member) { %>
-                                            <span
-                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm <%= isPast ? 'bg-gray-500/20 text-gray-300 border border-gray-500/30' : (isToday ? 'bg-green-100 text-green-800 border border-green-200' : (isHighlighted ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/30')) %> shadow-sm">
-                                                <%= member.nama %>
-                                            </span>
-                                            <% }) %>
-                                    </div>
-
-                                    <!-- Photos for the night -->
-                                    <% let allPhotos=[]; schedules.forEach(function(s) { if (s.parsedPhotos) {
-                                        s.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
-                                        allPhotos.push({src: photo, type: 'individual' , uploader: s.nama}); } }); } });
-                                        if (groupedDocumentation && groupedDocumentation[date]) {
-                                        groupedDocumentation[date].forEach(function(doc) { if (doc.parsedPhotos) {
-                                        doc.parsedPhotos.forEach(function(photo) { if(typeof photo==='string' ) {
-                                        allPhotos.push({src: photo, type: 'condition' , uploader: 'Kondisi' }); } }); }
-                                        }); } if(allPhotos && allPhotos.length> 0) {
-                                        const photoSources = allPhotos.map(function(p) { return p.src; });
-                                        const safePhotosJson = JSON.stringify(photoSources).replace(/'/g, "&apos;");
-                                        %>
-                                        <div class="flex -space-x-2 ml-4 cursor-pointer"
-                                            data-photos='<%- safePhotosJson %>' onclick="openCarouselFromData(this, 0)">
-                                            <% allPhotos.slice(0, 5).forEach(function(photo) { const
-                                                isVideo=photo.src.match(/\.(mp4|mov|avi|webm)$/i); %>
-                                                <% if(isVideo) { %>
-                                                    <div
-                                                        class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 bg-black flex items-center justify-center relative overflow-hidden">
-                                                        <video src="/uploads/ronda/<%= photo.src %>#t=1.0"
-                                                            class="absolute inset-0 w-full h-full object-cover opacity-60"
-                                                            preload="metadata"></video>
-                                                        <span class="text-[8px] text-white font-bold z-10">▶</span>
-                                                    </div>
-                                                    <% } else { %>
-                                                        <div
-                                                            class="inline-block w-8 h-8 aspect-square rounded-full ring-2 ring-gray-900 overflow-hidden">
-                                                            <img class="w-full h-full object-cover"
-                                                                src="/uploads/ronda/<%= photo.src %>" alt="">
-                                                        </div>
-                                                        <% } %>
-                                                            <% }) %>
-                                                                <% if(allPhotos.length> 5) { %>
-                                                                    <div
-                                                                        class="inline-flex items-center justify-center w-8 h-8 aspect-square rounded-full bg-gray-700 text-[10px] font-bold text-white ring-2 ring-gray-900">
-                                                                        +<%= allPhotos.length - 5 %>
-                                                                    </div>
-                                                                    <% } %>
-                                        </div>
-                                        <% } %>
-                                </div>
-                            </div>
-                            <% } %>
-                    </div>
-                    <div class="px-4 py-5 sm:p-6">
-                        <ul class="space-y-3">
-                            <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
-                                loopItems = [...teamMembers];
-                                const memberIds = new Set(teamMembers.map(function(m) { return m.id; }));
-                                schedules.forEach(function(sch) {
-                                if (!memberIds.has(sch.warga_id)) {
-                                loopItems.push(sch);
-                                }
-                                });
-                                } else {
-                                loopItems = schedules;
-                                }
-
-                                loopItems.forEach(function(item) {
-                                let s = schedules.find(function(sc) { return sc.warga_id === (item.warga_id ||
-                                item.id); });
-                                if (!s) {
-                                s = {
-                                id: '',
-                                warga_id: item.id,
-                                nama: item.nama,
-                                blok: item.blok,
-                                nomor_rumah: item.nomor_rumah,
-                                status: '',
-                                denda: 0,
-                                foto_bukti: []
-                                };
-                                }
-                                const isGuest = teamMembers && teamMembers.length > 0 &&
-                                !teamMembers.some(function(m) {
-                                return m.id === (item.warga_id || item.id);
-                                });
-                                %>
-                                <li
-                                    class="flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-white/5 border-white/5 hover:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group">
-                                    <div class="flex-grow min-w-0 mr-3">
-                                        <div class="flex items-center gap-2">
-                                            <div
-                                                class="text-sm font-bold <%= isHighlighted ? 'text-gray-800' : 'text-gray-100' %> truncate">
-                                                <%= s.nama %>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <div
-                                                class="text-xs <%= isHighlighted ? 'text-gray-500 bg-gray-100' : 'text-gray-400 bg-black/20' %> font-medium px-2 py-0.5 rounded-md inline-block">
-                                                <%= s.blok %>-<%= s.nomor_rumah %>
-                                            </div>
-                                            <% if (isGuest) { %>
+                                    loopItems.forEach(function(item) {
+                                    let s = schedules.find(function(sc) { return sc.warga_id === (item.warga_id ||
+                                    item.id); });
+                                    if (!s) {
+                                    s = {
+                                    id: '',
+                                    warga_id: item.id,
+                                    nama: item.nama,
+                                    blok: item.blok,
+                                    nomor_rumah: item.nomor_rumah,
+                                    status: '',
+                                    denda: 0,
+                                    foto_bukti: []
+                                    };
+                                    }
+                                    const isGuest = teamMembers && teamMembers.length > 0 &&
+                                    !teamMembers.some(function(m) {
+                                    return m.id === (item.warga_id || item.id);
+                                    });
+                                    %>
+                                    <li
+                                        class="flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-white/5 border-white/5 hover:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group">
+                                        <div class="flex-grow min-w-0 mr-3">
+                                            <div class="flex items-center gap-2">
                                                 <div
-                                                    class="text-[10px] text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
-                                                    Ganti Hari
+                                                    class="text-sm font-bold <%= isHighlighted ? 'text-gray-800' : 'text-gray-100' %> truncate">
+                                                    <%= s.nama %>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 mt-0.5">
+                                                <div
+                                                    class="text-xs <%= isHighlighted ? 'text-gray-500 bg-gray-100' : 'text-gray-400 bg-black/20' %> font-medium px-2 py-0.5 rounded-md inline-block">
+                                                    <%= s.blok %>-<%= s.nomor_rumah %>
+                                                </div>
+                                                <% if (isGuest) { %>
+                                                    <div
+                                                        class="text-[10px] text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
+                                                        Ganti Hari
+                                                    </div>
+                                                    <% } %>
+                                                        <% if(s.status !=='scheduled' ) { let statusText=s.status; let
+                                                            statusClass='' ; if (s.status_bayar==='paid' ) {
+                                                            statusText='Pay Up' ;
+                                                            statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                            ; } else if (s.status==='hadir' ) {
+                                                            statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
+                                                            ; } else if (s.status==='izin' || s.status==='reschedule' )
+                                                            {
+                                                            statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                                            ; } else {
+                                                            statusClass='bg-red-500/20 text-red-300 border border-red-500/30'
+                                                            ; } %>
+                                                            <span
+                                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
+                                                                <%= statusText %>
+                                                            </span>
+                                                            <% } %>
+                                            </div>
+
+                                            <% if(s.denda> 0) { %>
+                                                <div
+                                                    class="text-xs text-red-400 font-bold mt-1 flex items-center gap-1">
+                                                    <span>💸</span> Denda: Rp <%= s.denda.toLocaleString('id-ID') %>
                                                 </div>
                                                 <% } %>
-                                                    <% if(s.status !=='scheduled' ) { let statusText=s.status; let
-                                                        statusClass='' ; if (s.status_bayar==='paid' ) {
-                                                        statusText='Pay Up' ;
-                                                        statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                        ; } else if (s.status==='hadir' ) {
-                                                        statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                        ; } else if (s.status==='izin' || s.status==='reschedule' ) {
-                                                        statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                                        ; } else {
-                                                        statusClass='bg-red-500/20 text-red-300 border border-red-500/30'
-                                                        ; } %>
-                                                        <span
-                                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
-                                                            <%= statusText %>
-                                                        </span>
-                                                        <% } %>
+
+                                                    <!-- Display Photos -->
+                                                    <% if(s.foto_bukti) { let photos=s.parsedPhotos || []; if(photos &&
+                                                        photos.length> 0) {
+                                                        const safePhotosJson = JSON.stringify(photos).replace(/'/g,
+                                                        "&apos;");
+                                                        %>
+                                                        <div class="mt-2 flex overflow-x-auto space-x-2 pb-1 scrollbar-hide"
+                                                            data-photos='<%- safePhotosJson %>'>
+                                                            <% photos.forEach(function(photo, index) { if(!photo ||
+                                                                typeof photo !=='string' ) return; const
+                                                                isVideo=photo.match(/\.(mp4|mov|avi|webm)$/i); %>
+                                                                <% if(isVideo) { %>
+                                                                    <div onclick="openCarouselFromData(this, <%= index %>)"
+                                                                        class="h-8 w-8 relative cursor-pointer rounded-lg border border-gray-600 hover:border-indigo-400 bg-black flex items-center justify-center shrink-0 transition-colors">
+                                                                        <span class="text-[8px]">▶</span>
+                                                                    </div>
+                                                                    <% } else { %>
+                                                                        <img src="/uploads/ronda/<%= photo %>"
+                                                                            onclick="openCarouselFromData(this, <%= index %>)"
+                                                                            class="h-8 w-8 object-cover rounded-lg border border-gray-600 hover:border-indigo-400 cursor-pointer shrink-0 transition-colors">
+                                                                        <% } %>
+                                                                            <% }); %>
+                                                        </div>
+                                                        <% } } %>
                                         </div>
 
-                                        <% if(s.denda> 0) { %>
-                                            <div class="text-xs text-red-400 font-bold mt-1 flex items-center gap-1">
-                                                <span>💸</span> Denda: Rp <%= s.denda.toLocaleString('id-ID') %>
-                                            </div>
-                                            <% } %>
-
-                                                <!-- Display Photos -->
-                                                <% if(s.foto_bukti) { let photos=s.parsedPhotos || []; if(photos &&
-                                                    photos.length> 0) {
-                                                    const safePhotosJson = JSON.stringify(photos).replace(/'/g,
-                                                    "&apos;");
-                                                    %>
-                                                    <div class="mt-2 flex overflow-x-auto space-x-2 pb-1 scrollbar-hide"
-                                                        data-photos='<%- safePhotosJson %>'>
-                                                        <% photos.forEach(function(photo, index) { if(!photo || typeof
-                                                            photo !=='string' ) return; const
-                                                            isVideo=photo.match(/\.(mp4|mov|avi|webm)$/i); %>
-                                                            <% if(isVideo) { %>
-                                                                <div onclick="openCarouselFromData(this, <%= index %>)"
-                                                                    class="h-8 w-8 relative cursor-pointer rounded-lg border border-gray-600 hover:border-indigo-400 bg-black flex items-center justify-center shrink-0 transition-colors">
-                                                                    <span class="text-[8px]">▶</span>
-                                                                </div>
-                                                                <% } else { %>
-                                                                    <img src="/uploads/ronda/<%= photo %>"
-                                                                        onclick="openCarouselFromData(this, <%= index %>)"
-                                                                        class="h-8 w-8 object-cover rounded-lg border border-gray-600 hover:border-indigo-400 cursor-pointer shrink-0 transition-colors">
-                                                                    <% } %>
-                                                                        <% }); %>
-                                                    </div>
-                                                    <% } } %>
-                                    </div>
-
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <% if(user.role !=='warga' || user.warga_id==s.warga_id) { %>
-                                            <% if((s.status==='scheduled' || s.status==='reschedule' || s.status==='' )
-                                                && s.id) { %>
-                                                <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
-                                                    class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
-                                                    title="Absensi">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                </button>
-                                                <% } %>
-                                                    <% if(s.denda> 0) { %>
-                                                        <% if(s.status_bayar==='pending' ) { %>
-                                                            <% if(user.role==='admin' ) { %>
-                                                                <button
-                                                                    onclick="openVerifyFineModal('<%= s.id %>', '<%= s.bukti_bayar %>')"
-                                                                    class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all text-xs font-bold"
-                                                                    title="Verifikasi Pembayaran">
-                                                                    Verifikasi
-                                                                </button>
-                                                                <% } else { %>
-                                                                    <span
-                                                                        class="p-2 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold cursor-help"
-                                                                        title="Menunggu Verifikasi Admin">
-                                                                        ⏳
-                                                                    </span>
-                                                                    <% } %>
-                                                                        <% } else { %>
-                                                                            <button
-                                                                                onclick="openPayFineModal('<%= s.id %>', '<%= s.denda %>')"
-                                                                                class="p-2 rounded-full bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all"
-                                                                                title="Bayar Denda">
-                                                                                <svg class="w-4 h-4" fill="none"
-                                                                                    stroke="currentColor"
-                                                                                    viewBox="0 0 24 24">
-                                                                                    <path stroke-linecap="round"
-                                                                                        stroke-linejoin="round"
-                                                                                        stroke-width="2"
-                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                                                    </path>
-                                                                                </svg>
-                                                                            </button>
-                                                                            <% } %>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <% if(user.role !=='warga' || user.warga_id==s.warga_id) { %>
+                                                <% if((s.status==='scheduled' || s.status==='reschedule' ||
+                                                    s.status==='' ) && s.id) { %>
+                                                    <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
+                                                        class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
+                                                        title="Absensi">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                    <% } %>
+                                                        <% if(s.denda> 0) { %>
+                                                            <% if(s.status_bayar==='pending' ) { %>
+                                                                <% if(user.role==='admin' ) { %>
+                                                                    <button
+                                                                        onclick="openVerifyFineModal('<%= s.id %>', '<%= s.bukti_bayar %>')"
+                                                                        class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all text-xs font-bold"
+                                                                        title="Verifikasi Pembayaran">
+                                                                        Verifikasi
+                                                                    </button>
+                                                                    <% } else { %>
+                                                                        <span
+                                                                            class="p-2 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold cursor-help"
+                                                                            title="Menunggu Verifikasi Admin">
+                                                                            ⏳
+                                                                        </span>
+                                                                        <% } %>
+                                                                            <% } else { %>
+                                                                                <button
+                                                                                    onclick="openPayFineModal('<%= s.id %>', '<%= s.denda %>')"
+                                                                                    class="p-2 rounded-full bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all"
+                                                                                    title="Bayar Denda">
+                                                                                    <svg class="w-4 h-4" fill="none"
+                                                                                        stroke="currentColor"
+                                                                                        viewBox="0 0 24 24">
+                                                                                        <path stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                            stroke-width="2"
+                                                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                </button>
                                                                                 <% } %>
                                                                                     <% } %>
+                                                                                        <% } %>
 
-                                                                                        <!-- Upload Foto Button -->
-                                                                                        <% if((user.role==='admin' ||
-                                                                                            isToday || isThisWeek ||
-                                                                                            s.status==='hadir' ) &&
-                                                                                            s.id) { %>
-                                                                                            <button
-                                                                                                onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
-                                                                                                class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all"
-                                                                                                title="Upload Foto">
-                                                                                                <svg class="w-4 h-4"
-                                                                                                    fill="none"
-                                                                                                    stroke="currentColor"
-                                                                                                    viewBox="0 0 24 24">
-                                                                                                    <path
-                                                                                                        stroke-linecap="round"
-                                                                                                        stroke-linejoin="round"
-                                                                                                        stroke-width="2"
-                                                                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                                                                                    </path>
-                                                                                                    <path
-                                                                                                        stroke-linecap="round"
-                                                                                                        stroke-linejoin="round"
-                                                                                                        stroke-width="2"
-                                                                                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
-                                                                                                    </path>
-                                                                                                </svg>
-                                                                                            </button>
-                                                                                            <% } %>
-                                    </div>
-                                </li>
-                                <% }) %>
-                        </ul>
+                                                                                            <!-- Upload Foto Button -->
+                                                                                            <% if((user.role==='admin'
+                                                                                                || isToday || isThisWeek
+                                                                                                || s.status==='hadir' )
+                                                                                                && s.id) { %>
+                                                                                                <button
+                                                                                                    onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
+                                                                                                    class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all"
+                                                                                                    title="Upload Foto">
+                                                                                                    <svg class="w-4 h-4"
+                                                                                                        fill="none"
+                                                                                                        stroke="currentColor"
+                                                                                                        viewBox="0 0 24 24">
+                                                                                                        <path
+                                                                                                            stroke-linecap="round"
+                                                                                                            stroke-linejoin="round"
+                                                                                                            stroke-width="2"
+                                                                                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                                                                        </path>
+                                                                                                        <path
+                                                                                                            stroke-linecap="round"
+                                                                                                            stroke-linejoin="round"
+                                                                                                            stroke-width="2"
+                                                                                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
+                                                                                                        </path>
+                                                                                                    </svg>
+                                                                                                </button>
+                                                                                                <% } %>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <% }) %>
+                    <% }) %>
         </div>
 
         <!-- Status Modal -->
