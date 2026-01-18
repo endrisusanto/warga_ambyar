@@ -30,8 +30,8 @@ async function setupDonasiFeature() {
         // 2. Connect to database with production-friendly config
         console.log('\n2. Connecting to database...');
 
-        // Use localhost for production, db for docker
-        const dbHost = process.env.DB_HOST === 'db' ? 'localhost' : (process.env.DB_HOST || 'localhost');
+        // Use configured host or default to localhost
+        const dbHost = process.env.DB_HOST || 'localhost';
 
         const dbConfig = {
             host: dbHost,
