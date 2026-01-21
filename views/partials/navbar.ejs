@@ -2,83 +2,136 @@
     path==='/' ; const isRonda=path.startsWith('/ronda'); const isIuran=path.startsWith('/iuran'); const
     isKeuangan=path.startsWith('/keuangan'); const isMusyawarah=path.startsWith('/musyawarah'); const
     isDonasi=path.startsWith('/donasi'); const isProfile=path.startsWith('/profile'); const
-    isCCTV=path.startsWith('/cctv'); %>
+    isCCTV=path.startsWith('/cctv'); const isPengaduan=path.startsWith('/pengaduan'); %>
 
     <nav class="glass-nav sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="/dashboard" class="text-xl font-bold text-gray-100 flex items-center gap-2">
-                            <span class="text-2xl">⚡</span> Gang Ambyar
-                        </a>
-                    </div>
-                    <% if(user) { %>
-                        <div class="hidden min-[950px]:ml-6 min-[950px]:flex min-[950px]:space-x-4">
-                            <a href="/dashboard"
-                                class="<%= isDashboard ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isDashboard ? 'border-white/10' : 'hover:border-white/5' %>">Dashboard</a>
-
-                            <a href="/ronda"
-                                class="<%= isRonda ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isRonda ? 'border-white/10' : 'hover:border-white/5' %>">Jadwal
-                                Ronda</a>
-
-                            <a href="/iuran"
-                                class="<%= isIuran ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isIuran ? 'border-white/10' : 'hover:border-white/5' %>">Iuran</a>
-
-                            <a href="/keuangan"
-                                class="<%= isKeuangan ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isKeuangan ? 'border-white/10' : 'hover:border-white/5' %>">Keuangan</a>
-
-                            <a href="/musyawarah"
-                                class="<%= isMusyawarah ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isMusyawarah ? 'border-white/10' : 'hover:border-white/5' %>">Info
-                                Warga</a>
-
-                            <a href="/donasi"
-                                class="<%= isDonasi ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isDonasi ? 'border-white/10' : 'hover:border-white/5' %>">💝
-                                Donasi</a>
-
-                            <a href="/cctv/monitor"
-                                class="<%= isCCTV ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center mt-3 mb-3 border border-transparent <%= isCCTV ? 'border-white/10' : 'hover:border-white/5' %>">📹
-                                CCTV</a>
-
-                        </div>
-                        <% } %>
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/dashboard" class="text-xl font-bold text-gray-100 flex items-center gap-2">
+                        <span class="text-2xl">⚡</span> Gang Ambyar
+                    </a>
                 </div>
-
-                <div class="flex items-center">
-                    <% if(user) { %>
-                        <!-- Mobile Menu Button - Right Side -->
-                        <button id="mobileMenuBtn"
-                            class="min-[950px]:hidden mr-2 p-2 rounded-lg text-gray-400 hover:bg-white/5 hover:text-gray-200 focus:outline-none transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <% if(user) { %>
+                    <div
+                        class="hidden min-[950px]:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center space-x-1">
+                        <a href="/dashboard"
+                            class="<%= isDashboard ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isDashboard ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                                </path>
                             </svg>
-                        </button>
-                        <a href="/profile"
-                            class="text-sm font-medium <%= isProfile ? 'bg-white/10 text-gray-100 border-white/10' : 'text-gray-300 hover:bg-white/5 border-transparent' %> hidden min-[950px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border hover:border-white/10">
-                            <% if (user.foto_profil) { %>
-                                <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
-                                    class="w-6 h-6 rounded-full border border-white/20 object-cover">
-                                <% } else if (user.profile_photo_url) { %>
-                                    <img src="<%= user.profile_photo_url %>" alt="Profile"
-                                        class="w-6 h-6 rounded-full border border-white/20 object-cover">
-                                    <% } else { %>
-                                        <div
-                                            class="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] text-gray-200 font-bold">
-                                            <%= user.username.charAt(0).toUpperCase() %>
-                                        </div>
-                                        <% } %>
-                                            <%= user.username %>
+                            Dashboard
                         </a>
-                        <% } else { %>
-                            <% const isLoginPage=currentPath && currentPath.includes('/auth/login'); %>
-                                <% const isRegisterPage=currentPath && currentPath.includes('/auth/register'); %>
-                                    <a href="/auth/login"
-                                        class="px-4 py-2 rounded-lg text-sm font-medium <%= isLoginPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Login</a>
-                                    <a href="/auth/register"
-                                        class="ml-2 px-4 py-2 rounded-lg text-sm font-medium <%= isRegisterPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Register</a>
-                                    <% } %>
-                </div>
+
+                        <a href="/ronda"
+                            class="<%= isRonda ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isRonda ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Ronda
+                        </a>
+
+                        <a href="/iuran"
+                            class="<%= isIuran ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isIuran ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            Iuran
+                        </a>
+
+                        <a href="/keuangan"
+                            class="<%= isKeuangan ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isKeuangan ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            Keuangan
+                        </a>
+
+                        <a href="/musyawarah"
+                            class="<%= isMusyawarah ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isMusyawarah ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            Info Warga
+                        </a>
+
+                        <a href="/donasi"
+                            class="<%= isDonasi ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isDonasi ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                            Donasi
+                        </a>
+
+                        <a href="/pengaduan"
+                            class="<%= isPengaduan ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isPengaduan ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z">
+                                </path>
+                            </svg>
+                            Pengaduan
+                        </a>
+
+                        <a href="/cctv/monitor"
+                            class="<%= isCCTV ? 'bg-white/10 text-gray-100' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isCCTV ? 'border-white/10' : 'hover:border-white/5' %>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            CCTV
+                        </a>
+
+                    </div>
+                    <% } %>
+                        <div class="flex items-center">
+                            <% if(user) { %>
+                                <!-- Mobile Menu Button - Right Side -->
+                                <button id="mobileMenuBtn"
+                                    class="min-[950px]:hidden mr-2 p-2 rounded-lg text-gray-400 hover:bg-white/5 hover:text-gray-200 focus:outline-none transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 6h16M4 12h16M4 18h16"></path>
+                                    </svg>
+                                </button>
+                                <a href="/profile"
+                                    class="text-sm font-medium <%= isProfile ? 'bg-white/10 text-gray-100 border-white/10' : 'text-gray-300 hover:bg-white/5 border-transparent' %> hidden min-[950px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border hover:border-white/10">
+                                    <% if (user.foto_profil) { %>
+                                        <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
+                                            class="w-6 h-6 rounded-full border border-white/20 object-cover">
+                                        <% } else if (user.profile_photo_url) { %>
+                                            <img src="<%= user.profile_photo_url %>" alt="Profile"
+                                                class="w-6 h-6 rounded-full border border-white/20 object-cover">
+                                            <% } else { %>
+                                                <div
+                                                    class="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] text-gray-200 font-bold">
+                                                    <%= user.username.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <% } %>
+                                                    <%= user.username %>
+                                </a>
+                                <% } else { %>
+                                    <% const isLoginPage=currentPath && currentPath.includes('/auth/login'); %>
+                                        <% const isRegisterPage=currentPath && currentPath.includes('/auth/register');
+                                            %>
+                                            <a href="/auth/login"
+                                                class="px-4 py-2 rounded-lg text-sm font-medium <%= isLoginPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Login</a>
+                                            <a href="/auth/register"
+                                                class="ml-2 px-4 py-2 rounded-lg text-sm font-medium <%= isRegisterPage ? 'bg-white/10 text-gray-100 border border-white/10' : 'text-gray-300 hover:bg-white/5' %> transition-all">Register</a>
+                                            <% } %>
+                        </div>
             </div>
         </div>
     </nav>
@@ -248,6 +301,17 @@
                                     class="text-xs font-semibold <%= isDonasi ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Donasi</span>
                             </a>
 
+                            <!-- Pengaduan Button -->
+                            <a href="/pengaduan"
+                                class="<%= isPengaduan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                <div
+                                    class="<%= isPengaduan ? 'text-indigo-400' : 'text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
+                                    📢
+                                </div>
+                                <span
+                                    class="text-xs font-semibold <%= isPengaduan ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white' %>">Aduan</span>
+                            </a>
+
                             <!-- CCTV Button -->
                             <a href="/cctv/monitor"
                                 class="<%= isCCTV ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
@@ -262,7 +326,7 @@
 
                             <!-- Profile Button -->
                             <a href="/profile"
-                                class="<%= isProfile ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="col-span-2 <%= isProfile ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white/5 border-white/10' %> p-3 rounded-xl border hover:bg-white/10 transition-all transform hover:scale-105 flex flex-row items-center justify-center gap-3 group">
                                 <% if (user.foto_profil) { %>
                                     <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
                                         class="w-6 h-6 rounded-full border border-white/20 object-cover group-hover:border-indigo-400 transition-colors">

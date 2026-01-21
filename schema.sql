@@ -86,3 +86,32 @@ CREATE TABLE event_shares (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES agenda(id) ON DELETE CASCADE
 );
+
+-- Pengaduan (Complaints) table
+CREATE TABLE IF NOT EXISTS pengaduan (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    warga_id INT,
+    judul VARCHAR(255) NOT NULL,
+    deskripsi TEXT NOT NULL,
+    foto VARCHAR(255),
+    is_anonim BOOLEAN DEFAULT FALSE,
+    status ENUM('pending', 'proses', 'selesai', 'ditolak') DEFAULT 'pending',
+    tanggapan TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (warga_id) REFERENCES warga(id) ON DELETE SET NULL
+);
+
+-- Pengaduan Comments/Timeline table
+CREATE TABLE IF NOT EXISTS pengaduan_comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pengaduan_id INT NOT NULL,
+    user_id INT,
+    parent_id INT,
+    konten TEXT NOT NULL,
+    type ENUM('comment', 'log') DEFAULT 'comment',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pengaduan_id) REFERENCES pengaduan(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (parent_id) REFERENCES pengaduan_comments(id) ON DELETE CASCADE
+);

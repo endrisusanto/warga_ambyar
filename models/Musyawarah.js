@@ -59,10 +59,10 @@ const Musyawarah = {
         return rows;
     },
     addComment: async (data) => {
-        const { musyawarah_id, user_id, konten, parent_id } = data;
+        const { musyawarah_id, user_id, konten, parent_id, lampiran } = data;
         const [result] = await db.query(
-            'INSERT INTO musyawarah_comments (musyawarah_id, user_id, parent_id, konten) VALUES (?, ?, ?, ?)',
-            [musyawarah_id, user_id, parent_id || null, konten]
+            'INSERT INTO musyawarah_comments (musyawarah_id, user_id, parent_id, konten, lampiran) VALUES (?, ?, ?, ?, ?)',
+            [musyawarah_id, user_id, parent_id || null, konten, lampiran || null]
         );
         return result.insertId;
     },

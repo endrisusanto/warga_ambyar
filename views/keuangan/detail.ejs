@@ -3,7 +3,7 @@
     <%- include('../partials/navbar') %>
 
         <div class="min-h-screen pb-20 pt-10">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <!-- Breadcrumb -->
                 <nav class="flex mb-5" aria-label="Breadcrumb">
@@ -49,20 +49,20 @@
 
                 <div class="glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
                     <!-- Header Pattern -->
-                    <div class="absolute top-0 inset-x-0 h-32 bg-gradient-to-br from-emerald-600/30 to-emerald-900/30">
+                    <div
+                        class="absolute top-0 inset-x-0 h-40 bg-gradient-to-br from-emerald-600/20 via-emerald-900/40 to-black/20">
                     </div>
 
-                    <div class="relative px-6 py-10 sm:px-10">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                    <div class="relative px-6 pt-12 pb-6 sm:px-10 sm:pt-16">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                             <div>
-                                <h1 class="text-3xl font-bold text-white flex items-center">
+                                <h1 class="text-3xl sm:text-4xl font-black text-white flex items-center tracking-tight">
                                     <span
-                                        class="bg-emerald-500/20 p-2 rounded-xl mr-3 border border-emerald-500/30">🧾</span>
+                                        class="bg-emerald-500/20 p-2.5 rounded-2xl mr-4 border border-emerald-500/30 shadow-lg shadow-emerald-500/10">🧾</span>
                                     Detail Pembayaran
                                 </h1>
-                                <p class="text-emerald-200/70 mt-2 ml-1">ID Transaksi: #<%= iuran ? iuran.id : 'MANUAL'
-                                        %>
-                                </p>
+                                <p class="text-emerald-300/60 mt-3 ml-2 text-sm font-medium">ID Transaksi: <span
+                                        class="text-emerald-400">#<%= iuran ? iuran.id : 'MANUAL_KAS' %></span></p>
                             </div>
                         </div>
                     </div>
@@ -100,9 +100,9 @@
                         <% } %>
 
                             <!-- Info Grid -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-10 px-6 sm:px-10 relative">
                                 <!-- Left: Details -->
-                                <div class="space-y-6">
+                                <div class="lg:col-span-7 space-y-8">
                                     <% if(iuran) { %>
                                         <div class="bg-white/5 rounded-xl p-5 border border-white/5 space-y-4">
                                             <div>
@@ -233,32 +233,37 @@
                                 </div>
 
                                 <!-- Right: Proof Image -->
-                                <div class="flex flex-col">
+                                <div class="lg:col-span-5 flex flex-col">
                                     <label
                                         class="block text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Bukti
                                         Transfer</label>
                                     <div
-                                        class="relative group rounded-2xl overflow-hidden border-4 border-white/5 bg-black/40 shadow-inner">
+                                        class="relative group rounded-3xl overflow-hidden border-8 border-white/5 bg-black/40 shadow-2xl transition-transform hover:scale-[1.01]">
                                         <% let filename=iuran ? iuran.bukti_bayar : (kas.length> 0 ? kas[0].bukti_foto :
                                             '');
-                                            let proofUrl = filename.startsWith('bukti_bayar-') ? '/uploads/' + filename
+                                            let proofUrl = filename && filename.startsWith('bukti_bayar-') ? '/uploads/'
+                                            + filename
                                             :
-                                            '/uploads/keuangan/' + filename;
+                                            (filename ? '/uploads/keuangan/' + filename : '/img/placeholder.png');
                                             %>
                                             <img src="<%= proofUrl %>"
-                                                class="w-full object-contain max-h-[600px] transition-transform duration-500 group-hover:scale-105"
+                                                class="w-full object-contain max-h-[700px] transition-transform duration-700 group-hover:scale-110"
                                                 alt="Bukti Transfer">
 
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            </div>
+
                                             <a href="<%= proofUrl %>" target="_blank"
-                                                class="absolute bottom-4 right-4 bg-black/80 hover:bg-emerald-600 text-white rounded-lg px-4 py-2 text-sm font-medium backdrop-blur-md border border-white/10 transition-all flex items-center shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white text-black hover:bg-emerald-500 hover:text-white rounded-2xl px-6 py-3 text-sm font-bold shadow-2xl transition-all flex items-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
+                                                        stroke-width="2.5"
                                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
                                                     </path>
                                                 </svg>
-                                                Download / Full Size
+                                                Lihat Full Size
                                             </a>
                                     </div>
                                     <div class="mt-4 text-center">
@@ -269,7 +274,7 @@
                             </div>
 
                             <!-- Footer -->
-                            <div class="border-t border-white/10 pt-6 flex justify-center">
+                            <div class="border-t border-white/10 pt-6 pb-10 flex justify-center">
                                 <a href="/keuangan"
                                     class="glass-button px-6 py-2 rounded-xl text-gray-300 hover:text-white border border-white/10 flex items-center transition-all bg-white/5 hover:bg-white/10">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

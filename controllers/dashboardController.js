@@ -2,6 +2,7 @@ const Kas = require('../models/Kas');
 const Warga = require('../models/Warga');
 const Iuran = require('../models/Iuran');
 const Ronda = require('../models/Ronda');
+const Pengaduan = require('../models/Pengaduan');
 
 exports.index = async (req, res) => {
     console.log('===== DASHBOARD INDEX CALLED =====');
@@ -12,6 +13,7 @@ exports.index = async (req, res) => {
         mapData: [],
         jadwalRonda: [],
         events: [],
+        complaints: [],
         chartData: { labels: [], pemasukan: [], pengeluaran: [] },
         user: req.session.user
     };
@@ -156,6 +158,14 @@ exports.index = async (req, res) => {
         } catch (e) {
             console.error('Error fetching Events:', e.message);
             require('fs').appendFileSync('debug.log', `ERROR Events: ${e.message}\n`);
+        }
+
+        // 5. Complaints for Modal
+        try {
+            const allComplaints = await Pengaduan.getAll();
+            data.complaints = allComplaints.filter(c => ['pending', 'proses'].includes(c.status));
+        } catch (e) {
+            console.error('Error fetching Complaints:', e.message);
         }
 
         res.render('dashboard/index', data);

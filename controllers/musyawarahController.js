@@ -142,22 +142,37 @@ exports.update = (req, res) => {
     });
 };
 
-exports.addComment = async (req, res) => {
-    try {
-        const { musyawarah_id, konten, parent_id } = req.body;
-        const user_id = req.session.user.id;
-
-        if (!konten || konten.trim() === '<p><br></p>') {
-            req.flash('error_msg', 'Komentar tidak boleh kosong');
-            return res.redirect(`/musyawarah/view/${musyawarah_id}`);
+exports.addComment = (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error(err);
+            req.flash('error_msg', 'Upload error: ' + err.message);
+            // We might not have musyawarah_id in body if multer fails early, but usually we do
+            // Defaulting to back if possible, or try to extract ID from referrer if needed.
+            return res.redirect('back');
         }
+        try {
+            const { musyawarah_id, konten, parent_id } = req.body;
+            const user_id = req.session.user.id;
+            const lampiran = req.file ? req.file.filename : null;
 
-        await Musyawarah.addComment({ musyawarah_id, user_id, konten, parent_id });
-        req.flash('success_msg', 'Komentar berhasil ditambahkan');
-        res.redirect(`/musyawarah/view/${musyawarah_id}`);
-    } catch (e) {
-        console.error(e);
-        req.flash('error_msg', 'Gagal menambahkan komentar');
-        res.redirect(`/musyawarah/view/${req.body.musyawarah_id}`);
-    }
+            if (!konten || konten.trim() === '<p><br></p>') {
+                // If there is an attachment, content can be optional-ish or we still require it?
+                // Usually comments should have content. Let's keep the check but relax it if there's a file?
+                // For now, keep strict check on content.
+                if (!lampiran) {
+                    req.flash('error_msg', 'Komentar tidak boleh kosong');
+                    return res.redirect(`/musyawarah/view/${musyawarah_id}`);
+                }
+            }
+
+            await Musyawarah.addComment({ musyawarah_id, user_id, konten, parent_id, lampiran });
+            req.flash('success_msg', 'Komentar berhasil ditambahkan');
+            res.redirect(`/musyawarah/view/${musyawarah_id}`);
+        } catch (e) {
+            console.error(e);
+            req.flash('error_msg', 'Gagal menambahkan komentar');
+            res.redirect(`/musyawarah/view/${req.body.musyawarah_id}`);
+        }
+    });
 };

@@ -24,7 +24,7 @@
             <% } %>
 
                 <% if(user.role==='admin' ) { %>
-                    <div class="flex justify-end mb-4">
+                    <!-- <div class="flex justify-end mb-4">
                         <form action="/dashboard/reset-data" method="POST"
                             onsubmit="return confirm('PERINGATAN: Apakah Anda yakin ingin mereset SEMUA data keuangan, denda, dan absen ronda? Tindakan ini tidak dapat dibatalkan!');">
                             <button type="submit"
@@ -37,7 +37,7 @@
                                 Reset Data
                             </button>
                         </form>
-                    </div>
+                    </div> -->
                     <% } %>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 auto-rows-min">
@@ -970,4 +970,236 @@
                             }
                         </script>
 
-                        <%- include('../partials/footer') %>
+                        <% if (typeof complaints !=='undefined' && complaints && complaints.length> 0) { %>
+                            <!-- Complaint Auto-Show Modal -->
+                            <div id="complaintModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title"
+                                role="dialog" aria-modal="true">
+                                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+                                    onclick="closeComplaintModal()"></div>
+                                <div class="fixed inset-0 z-10 overflow-y-auto">
+                                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                                        <div
+                                            class="relative transform overflow-hidden rounded-2xl bg-gray-900 border border-white/10 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg glass-card">
+                                            <div
+                                                class="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6">
+                                                <div class="flex items-center gap-2">
+                                                    <span
+                                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 text-red-400">
+                                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                                        </svg>
+                                                    </span>
+                                                    <h3 class="text-base font-semibold leading-6 text-white"
+                                                        id="modal-title">Aduan Warga Terbaru</h3>
+                                                </div>
+                                                <button type="button" class="text-gray-400 hover:text-gray-200"
+                                                    onclick="closeComplaintModal()">
+                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div class="px-4 py-5 sm:p-6 relative">
+                                                <div id="complaintCarousel" class="relative overflow-hidden"
+                                                    style="min-height: 200px;">
+                                                    <% complaints.forEach((c, index)=> { %>
+                                                        <div class="complaint-slide transition-all duration-500 absolute inset-0 opacity-0 translate-x-full"
+                                                            data-index="<%= index %>">
+                                                            <div class="flex flex-col h-full">
+                                                                <div class="flex items-center gap-3 mb-3">
+                                                                    <span
+                                                                        class="inline-flex items-center rounded-md bg-white/10 px-2 py-1 text-xs font-medium text-gray-400 ring-1 ring-inset ring-white/10">
+                                                                        <%= new
+                                                                            Date(c.created_at).toLocaleDateString('id-ID',
+                                                                            { day: 'numeric' , month: 'short' }) %>
+                                                                    </span>
+                                                                    <span
+                                                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium <%= c.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-blue-500/20 text-blue-500' %>">
+                                                                        <%= c.status.toUpperCase() %>
+                                                                    </span>
+                                                                </div>
+                                                                <h4
+                                                                    class="text-lg font-bold text-white mb-2 line-clamp-2">
+                                                                    <%= c.judul %>
+                                                                </h4>
+                                                                <div
+                                                                    class="flex-grow overflow-y-auto max-h-[150px] mb-4 custom-scrollbar">
+                                                                    <p class="text-sm text-gray-300 leading-relaxed">
+                                                                        <%= c.deskripsi %>
+                                                                    </p>
+                                                                </div>
+                                                                <% if(c.foto) { %>
+                                                                    <img src="<%= c.foto.startsWith('/') ? c.foto : '/uploads/pengaduan/' + c.foto %>"
+                                                                        class="w-full h-32 object-cover rounded-lg border border-white/10 mb-3"
+                                                                        alt="Bukti">
+                                                                    <% } %>
+                                                                        <div
+                                                                            class="mt-auto flex items-center justify-between text-xs text-gray-500 border-t border-white/10 pt-3">
+                                                                            <span>Oleh:
+                                                                                <% if (c.is_anonim && c.nama_warga) {
+                                                                                    const
+                                                                                    words=c.nama_warga.split(' ');
+                                                                                    const parts = words.map(w => {
+                                                                                        if (w.length <= 1) return { first: w, blur: '' };
+                                                                                        return { first: w[0], blur: w.substring(1) };
+                                                                                    });
+                                                                            %>
+                                                                                <% parts.forEach((part, idx) => { %><%= part.first %><% if (part.blur) { %><span class="blur-sm select-none" style="filter: blur(4px)"><%= part.blur %></span><% } %><% if (idx < parts.length - 1) { %> <% } %><% }); %>
+                                                                            <% } else { %>
+                                                                                <%= c.nama_warga || ' Warga' %>
+                                                                                    <% } %>
+                                                                            </span>
+                                                                            <a href="/pengaduan/<%= c.id %>"
+                                                                                class="text-indigo-400 hover:text-indigo-300 font-medium">Lihat
+                                                                                Detail &rarr;</a>
+                                                                        </div>
+                                                            </div>
+                                                        </div>
+                                                        <% }) %>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="bg-gray-800/50 border-t border-white/10 px-4 py-3 sm:px-6 flex flex-col items-center gap-3">
+                                                <!-- Don't Show Today Toggle Badge -->
+                                                <button type="button" id="dontShowTodayBtn" onclick="toggleDontShow()"
+                                                    class="group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 border-2 bg-white/5 border-white/10 hover:border-white/20">
+                                                    <span
+                                                        class="text-xs font-medium text-gray-400 group-hover:text-gray-300 transition-colors select-none">
+                                                        Jangan tampilkan hari ini
+                                                    </span>
+                                                    <div
+                                                        class="w-10 h-5 rounded-full bg-gray-700 relative transition-all duration-300 border border-gray-600 flex-shrink-0 flex items-center">
+                                                        <div id="toggleIndicator"
+                                                            class="absolute left-0.5 w-4 h-4 rounded-full bg-gray-400 transition-all duration-300">
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                                <% if (complaints.length> 1) { %>
+                                                    <div class="flex items-center gap-2 self-end sm:self-auto">
+                                                        <button onclick="prevComplaint()"
+                                                            class="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition border border-white/10">
+                                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                                stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M15 19l-7-7 7-7" />
+                                                            </svg>
+                                                        </button>
+                                                        <span class="text-xs text-gray-400 font-medium w-12 text-center"
+                                                            id="slideCounter">1 / <%= complaints.length %></span>
+                                                        <button onclick="nextComplaint()"
+                                                            class="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition border border-white/10">
+                                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                                stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                (function () {
+                                    const modal = document.getElementById('complaintModal');
+                                    if (!modal) return;
+
+                                    const slides = document.querySelectorAll('.complaint-slide');
+                                    const totalSlides = slides.length;
+                                    let currentSlide = 0;
+
+                                    function init() {
+                                        const hideDate = localStorage.getItem('hideComplaintsDate');
+                                        const today = new Date().toDateString();
+
+                                        // Debug logging
+                                        console.log('Complaint Modal Debug:', {
+                                            hideDate: hideDate,
+                                            today: today,
+                                            shouldHide: hideDate === today,
+                                            totalSlides: totalSlides
+                                        });
+
+                                        // Check if force show via URL parameter
+                                        const urlParams = new URLSearchParams(window.location.search);
+                                        const forceShow = urlParams.get('show_complaints') === 'true';
+
+                                        if (hideDate === today && !forceShow) {
+                                            console.log('Modal hidden due to localStorage preference');
+                                            return;
+                                        }
+
+                                        modal.classList.remove('hidden');
+                                        showSlide(0);
+                                        console.log('Modal shown');
+                                    }
+
+                                    function showSlide(index) {
+                                        slides.forEach((s, i) => {
+                                            if (i === index) {
+                                                s.classList.remove('opacity-0', 'translate-x-full', 'absolute', 'pointer-events-none');
+                                                s.classList.add('opacity-100', 'translate-x-0', 'relative');
+                                            } else {
+                                                s.classList.add('opacity-0', 'translate-x-full', 'absolute', 'pointer-events-none');
+                                                s.classList.remove('opacity-100', 'translate-x-0', 'relative');
+                                            }
+                                        });
+                                        currentSlide = index;
+                                        const counter = document.getElementById('slideCounter');
+                                        if (counter) counter.innerText = (currentSlide + 1) + ' / ' + totalSlides;
+                                    }
+
+                                    window.nextComplaint = function () {
+                                        let next = currentSlide + 1;
+                                        if (next >= totalSlides) next = 0;
+                                        showSlide(next);
+                                    }
+
+                                    window.prevComplaint = function () {
+                                        let prev = currentSlide - 1;
+                                        if (prev < 0) prev = totalSlides - 1;
+                                        showSlide(prev);
+                                    }
+
+                                    let dontShowEnabled = false;
+
+                                    window.toggleDontShow = function () {
+                                        dontShowEnabled = !dontShowEnabled;
+                                        const btn = document.getElementById('dontShowTodayBtn');
+                                        const indicator = document.getElementById('toggleIndicator');
+
+                                        if (dontShowEnabled) {
+                                            // Active state - green/emerald theme
+                                            btn.classList.remove('border-white/10', 'bg-white/5');
+                                            btn.classList.add('border-emerald-500/50', 'bg-emerald-500/10');
+                                            indicator.classList.remove('left-0.5', 'bg-gray-400');
+                                            indicator.classList.add('left-[1.375rem]', 'bg-emerald-500');
+                                        } else {
+                                            // Inactive state
+                                            btn.classList.add('border-white/10', 'bg-white/5');
+                                            btn.classList.remove('border-emerald-500/50', 'bg-emerald-500/10');
+                                            indicator.classList.add('left-0.5', 'bg-gray-400');
+                                            indicator.classList.remove('left-[1.375rem]', 'bg-emerald-500');
+                                        }
+                                    }
+
+                                    window.closeComplaintModal = function () {
+                                        modal.classList.add('hidden');
+                                        if (dontShowEnabled) {
+                                            localStorage.setItem('hideComplaintsDate', new Date().toDateString());
+                                        }
+                                    }
+
+                                    // Init on load
+                                    init();
+                                })();
+                            </script>
+                            <% } %>
+
+                                <%- include('../partials/footer') %>
