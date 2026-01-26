@@ -181,6 +181,11 @@
                 // Populate hidden input with HTML content
                 document.querySelector('#konten').value = quill.root.innerHTML;
             };
+
+            // Auto-pick current time for Tanggal Meeting
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.querySelector('input[name="tanggal"]').value = now.toISOString().slice(0, 16);
         </script>
 
         <%- include('../partials/footer') %>

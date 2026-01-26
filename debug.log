@@ -64,3 +64,7 @@ ERROR Ronda: Unknown column 'r.tanggal' in 'where clause'
 DEBUG: mapData count: 2
 DEBUG: mapData sample: {"blok":"F7","nomor_rumah":"1","residents":[{"id":2,"nama":"QA Tester","blok":"F7","nomor_rumah":1,"status_keluarga":"Kepala Keluarga","no_hp":"081234567890","status_huni":"tetap","is_ronda":0,"tim_ronda":null,"created_at":"2026-01-09T15:29:16.000Z","approval_status":"pending"},{"id":3,"nama":"Tester","blok":"F7","nomor_rumah":1,"status_keluarga":"Kepala Keluarga","no_hp":"1234567890","status_huni":"tetap","is_ronda":0,"tim_ronda":null,"created_at":"2026-01-09T15:40:16.000Z","approval_status":"pending"}],"head_name":"Tester","status_huni":"tetap","status_iuran":"menunggak","unpaid_details":[{"periode":"2026-01-01T00:00:00.000Z","jenis":"sampah","jumlah":"20000.00"},{"periode":"2026-01-01T00:00:00.000Z","jenis":"keamanan","jumlah":"50000.00"}]}
 ERROR Ronda: Unknown column 'r.tanggal' in 'where clause'
+ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist

@@ -544,18 +544,219 @@
         </script>
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
         <script>
+
+
+
+
+
+
+
+
+
+        </script>
+
+        <!-- Image Preview Modal -->
+        <div id="previewModal"
+            class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+            <button onclick="closePreview()"
+                class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <img id="previewImage" src=""
+                class="max-w-full max-h-full rounded-lg shadow-2xl transform transition-all duration-300 scale-95">
+        </div>
+
+        <!-- Giphy Modal -->
+        <div id="giphyModal"
+            class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div class="glass-card w-full max-w-lg p-0 overflow-hidden flex flex-col max-h-[80vh]">
+                <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+                    <h3 class="text-lg font-bold text-gray-100 flex items-center gap-2">
+                        <span class="text-xl">👾</span> Cari GIF
+                    </h3>
+                    <button onclick="closeGiphyModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-4 bg-black/20">
+                    <div class="relative">
+                        <input type="text" id="giphySearch" placeholder="Cari GIF lucu..."
+                            class="w-full glass-input py-2 px-4 rounded-lg pl-10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500/50"
+                            onkeyup="handleGiphySearch(event)">
+                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div id="giphyResults"
+                    class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-2 md:gap-4 custom-scrollbar min-h-[300px]">
+                    <!-- GIFs will appear here -->
+                    <div class="col-span-3 text-center text-gray-500 py-10">Ketik sesuatu untuk mencari GIF...</div>
+                </div>
+
+                <div class="p-2 border-t border-white/10 bg-white/5 text-center">
+                    <img src="https://developers.giphy.com/branch/master/static/header-logo-0fec0225d189bc0eae27dac3e3770582.gif"
+                        alt="Powered by Giphy" class="h-6 mx-auto opacity-70">
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Add a custom icon for the GIF button -->
+        <style>
+            .ql-snow .ql-picker.ql-header {
+                width: auto !important;
+            }
+
+            .ql-snow .ql-toolbar button.ql-gif {
+                width: 28px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .ql-snow .ql-toolbar button.ql-gif svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .gif-loading {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100px;
+                grid-column: span 3;
+                color: #a78bfa;
+            }
+        </style>
+
+        <script>
+            // Register GIF icon
+            var icons = Quill.import('ui/icons');
+            icons['gif'] = '<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 10h-.5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h.5"></path><path d="M9 13h-2"></path><path d="M13 10v6"></path><path d="M17 10v6"></path><path d="M17 10h1.5"></path><path d="M17 13h1.5"></path></svg>';
+
             var commentQuill = new Quill('#commentEditor', {
                 theme: 'snow',
                 placeholder: 'Tulis komentar...',
-                modules: { toolbar: [['bold', 'italic', 'underline'], ['link']] }
+                modules: {
+                    toolbar: {
+                        container: [
+                            ['bold', 'italic', 'underline'],
+                            ['link'],
+                            ['gif'] // Add custom GIF button
+                        ],
+                        handlers: {
+                            'gif': function () {
+                                openGiphyModal();
+                            }
+                        }
+                    }
+                }
             });
+
+            // GIPHY LOGIC
+            const GIPHY_API_KEY = 'SHdHxj0NpOMqzCEueq1puSL0fMN8RTLw';
+            let searchTimeout;
+
+            function openGiphyModal() {
+                document.getElementById('giphyModal').classList.remove('hidden');
+                document.getElementById('giphySearch').focus();
+                // Load trending if empty
+                if (document.getElementById('giphyResults').children.length <= 1) {
+                    searchGiphy('trending');
+                }
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeGiphyModal() {
+                document.getElementById('giphyModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // Close on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !document.getElementById('giphyModal').classList.contains('hidden')) {
+                    closeGiphyModal();
+                }
+            });
+
+            function handleGiphySearch(e) {
+                clearTimeout(searchTimeout);
+                const query = e.target.value;
+
+                searchTimeout = setTimeout(() => {
+                    searchGiphy(query);
+                }, 500);
+            }
+
+            async function searchGiphy(query) {
+                const container = document.getElementById('giphyResults');
+                container.innerHTML = '<div class="gif-loading"><svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>';
+
+                try {
+                    let url;
+                    if (!query || query === 'trending') {
+                        url = `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=12&rating=g`;
+                    } else {
+                        url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=12&rating=g`;
+                    }
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    container.innerHTML = '';
+
+                    if (data.data.length === 0) {
+                        container.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-10">Tidak ditemukan GIF...</div>';
+                        return;
+                    }
+
+                    data.data.forEach(gif => {
+                        const div = document.createElement('div');
+                        div.className = 'cursor-pointer rounded-lg overflow-hidden border border-white/5 hover:border-indigo-500/50 transition-all aspect-square relative group bg-black/20 p-1 m-1';
+
+                        const img = document.createElement('img');
+                        img.src = gif.images.fixed_height_small.url;
+                        img.className = 'w-full h-full object-cover rounded';
+
+                        div.onclick = () => insertGif(gif.images.downsized.url);
+
+                        div.appendChild(img);
+                        container.appendChild(div);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching Giphy:', error);
+                    container.innerHTML = '<div class="col-span-3 text-center text-red-400 py-10">Gagal memuat GIF.</div>';
+                }
+            }
+
+            function insertGif(url) {
+                const range = commentQuill.getSelection(true);
+                commentQuill.insertEmbed(range.index, 'image', url);
+                commentQuill.setSelection(range.index + 1);
+                closeGiphyModal();
+            }
 
             document.getElementById('commentForm').onsubmit = function () {
                 const fileInput = document.getElementById('lampiranInput');
+                // Check if Quill has content (images, text, etc)
+                const hasContent = commentQuill.getLength() > 1; // 1 because empty is newline
                 const hasFile = fileInput.files.length > 0;
-                const hasText = commentQuill.getText().trim().length > 0;
 
-                if (!hasText && !hasFile) {
+                if (!hasContent && !hasFile) {
                     alert('Mohon tulis komentar atau sertakan lampiran.');
                     return false;
                 }
@@ -571,11 +772,22 @@
 
                     // Get the content from the hidden div
                     const contentDiv = document.querySelector(`[data-comment-content-${commentId}]`);
-                    const content = contentDiv ? contentDiv.textContent.trim() : '';
+                    const content = contentDiv ? contentDiv.innerHTML : '';
 
                     document.getElementById('parentId').value = commentId;
                     document.getElementById('replyToName').textContent = userName;
-                    document.getElementById('replyPreview').textContent = content || '(konten tidak tersedia)';
+                    if (content) {
+                        document.getElementById('replyPreview').innerHTML = content;
+                        // Style images in preview
+                        const images = document.getElementById('replyPreview').getElementsByTagName('img');
+                        for (let img of images) {
+                            img.style.maxHeight = '60px';
+                            img.style.width = 'auto';
+                            img.style.borderRadius = '4px';
+                        }
+                    } else {
+                        document.getElementById('replyPreview').textContent = '(konten tidak tersedia)';
+                    }
                     document.getElementById('replyIndicator').classList.remove('hidden');
                     commentQuill.focus();
                 }
@@ -627,7 +839,8 @@
 
             // Handle Drag Events
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, preventDefaults, false);
+                // Ensure dropzone exists before adding listener
+                if (dropzone) dropzone.addEventListener(eventName, preventDefaults, false);
             });
 
             function preventDefaults(e) {
@@ -636,11 +849,11 @@
             }
 
             ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, highlight, false);
+                if (dropzone) dropzone.addEventListener(eventName, highlight, false);
             });
 
             ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, unhighlight, false);
+                if (dropzone) dropzone.addEventListener(eventName, unhighlight, false);
             });
 
             function highlight(e) {
@@ -654,7 +867,7 @@
             }
 
             // Handle Drop
-            dropzone.addEventListener('drop', handleDrop, false);
+            if (dropzone) dropzone.addEventListener('drop', handleDrop, false);
 
             function handleDrop(e) {
                 const dt = e.dataTransfer;
@@ -663,15 +876,19 @@
             }
 
             // Handle Click
-            dropzone.addEventListener('click', (e) => {
-                if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
-                    fileInput.click();
-                }
-            });
+            if (dropzone) {
+                dropzone.addEventListener('click', (e) => {
+                    if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
+                        fileInput.click();
+                    }
+                });
+            }
 
-            fileInput.addEventListener('change', function () {
-                handleFiles(this.files);
-            });
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    handleFiles(this.files);
+                });
+            }
 
             function handleFiles(files) {
                 if (files.length > 0) {
@@ -706,31 +923,18 @@
             }
 
             // Remove File
-            removeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileInput.value = ''; // Clear input
-                previewImage.src = '';
-                previewFilename.textContent = '';
-                previewImage.classList.add('hidden');
-                previewFile.classList.add('hidden');
-                previewContainer.classList.add('hidden');
-                dropzoneContent.classList.remove('hidden');
-            });
+            if (removeBtn) {
+                removeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileInput.value = ''; // Clear input
+                    previewImage.src = '';
+                    previewFilename.textContent = '';
+                    previewImage.classList.add('hidden');
+                    previewFile.classList.add('hidden');
+                    previewContainer.classList.add('hidden');
+                    dropzoneContent.classList.remove('hidden');
+                });
+            }
         </script>
-
-        <!-- Image Preview Modal -->
-        <div id="previewModal"
-            class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-            <button onclick="closePreview()"
-                class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-            <img id="previewImage" src=""
-                class="max-w-full max-h-full rounded-lg shadow-2xl transform transition-all duration-300 scale-95">
-        </div>
-
         <%- include('../partials/footer') %>

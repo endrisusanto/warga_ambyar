@@ -1,0 +1,1210 @@
+app-1  | 
+app-1  | > gang-ambyar-rt-rw@1.0.0 start
+app-1  | > node app.js
+app-1  | 
+app-1  | Checking Google Auth schema...
+app-1  | Checking profile_photo_url schema...
+app-1  | Checking email column in warga table...
+app-1  | Checking role column in users table...
+app-1  | Checking status column in iuran table...
+app-1  | Updating iuran jenis column to support Kas Gang...
+app-1  | === Starting migration of old "kas" entries to "kas_rt" ===
+app-1  | Checking kas table date column type...
+app-1  | Checking for tanggal_konfirmasi column in iuran table...
+app-1  | Server running on port 9878
+app-1  | Database connection failed, retrying in 5 seconds... connect ECONNREFUSED 192.168.128.2:3306
+app-1  | Error checking google_id: connect ECONNREFUSED 192.168.128.2:3306
+app-1  | Migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at migratePhoto (/app/utils/photoMigration.js:7:36)
+app-1  |     at Object.<anonymous> (/app/app.js:70:34)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at migrateEmailWarga (/app/utils/emailWargaMigration.js:7:36)
+app-1  |     at Object.<anonymous> (/app/app.js:71:39)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Role migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at fixRoleColumn (/app/utils/fixRoleColumn.js:8:36)
+app-1  |     at Object.<anonymous> (/app/app.js:72:33)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Iuran status migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at fixIuranStatus (/app/utils/fixIuranStatus.js:9:18)
+app-1  |     at Object.<anonymous> (/app/app.js:73:34)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Iuran jenis migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at updateIuranJenis (/app/utils/updateIuranJenis.js:8:36)
+app-1  |     at Object.<anonymous> (/app/app.js:74:36)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | ❌ Old data migration failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at migrateOldKasData (/app/utils/migrateOldKasData.js:8:40)
+app-1  |     at Object.<anonymous> (/app/app.js:75:37)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Migration addDibayarOlehCol failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at module.exports (/app/utils/addDibayarOlehCol.js:5:18)
+app-1  |     at Object.<anonymous> (/app/app.js:76:37)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Migration fixKasTanggalType failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at module.exports (/app/utils/fixKasTanggalType.js:6:33)
+app-1  |     at Object.<anonymous> (/app/app.js:77:37)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Migration addTanggalKonfirmasiCol failed: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at module.exports (/app/utils/addTanggalKonfirmasiCol.js:6:33)
+app-1  |     at Object.<anonymous> (/app/app.js:78:43)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Failed to fetch admin phone: Error: connect ECONNREFUSED 192.168.128.2:3306
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at module.exports (/app/utils/getAdminContact.js:5:33)
+app-1  |     at Object.<anonymous> (/app/app.js:82:1)
+app-1  |     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+app-1  |     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+app-1  |     at Module.load (node:internal/modules/cjs/loader:1203:32)
+app-1  |     at Module._load (node:internal/modules/cjs/loader:1019:12)
+app-1  |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+app-1  |     at node:internal/main/run_main_module:28:49 {
+app-1  |   code: 'ECONNREFUSED',
+app-1  |   errno: -111,
+app-1  |   sql: undefined,
+app-1  |   sqlState: undefined,
+app-1  |   sqlMessage: undefined
+app-1  | }
+app-1  | Admin phone loaded: 6281234567890
+app-1  | Error checking email: connect ECONNREFUSED 192.168.128.2:3306
+app-1  | Ensuring password is nullable...
+app-1  | Error modifying password column: connect ECONNREFUSED 192.168.128.2:3306
+app-1  | Google Auth schema check complete.
+app-1  | Database connected successfully
+app-1  | Error: Unknown column 'email' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Warga.js:24:35)
+app-1  |     at exports.postRegister (/app/controllers/authController.js:65:37)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO warga (nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status) VALUES ('Endri Susanto', 'F8', '5', 'Kepala Keluarga', '085176970180', NULL, 'Tetap', 1, 'approved')",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'email' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'email' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Warga.js:24:35)
+app-1  |     at exports.postRegister (/app/controllers/authController.js:65:37)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO warga (nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status) VALUES ('t', 'F8', '5', 'Anak', 't', NULL, 'Tetap', 0, 'approved')",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'email' in 'field list'"
+app-1  | }
+app-1  | DEBUG: User count: 0 number
+app-1  | DEBUG: Assigning role: admin
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 1
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '1',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 't',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'lunas',
+app-1  |     unpaid_details: []
+app-1  |   }
+app-1  | ]
+app-1  | Error fetching Ronda data: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+app-1  | Error: Table 'rt_rw_db.musyawarah' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAll (/app/models/Musyawarah.js:5:33)
+app-1  |     at exports.index (/app/controllers/musyawarahController.js:28:39)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: 'SELECT * FROM musyawarah ORDER BY tanggal DESC, created_at DESC',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.musyawarah' doesn't exist"
+app-1  | }
+app-1  | Error: Table 'rt_rw_db.donasi_campaign' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAllCampaigns (/app/models/Donasi.js:6:33)
+app-1  |     at exports.index (/app/controllers/donasiController.js:48:40)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT dc.*, \n' +
+app-1  |     '                   u.username as creator_name,\n' +
+app-1  |     "                   COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as terkumpul,\n" +
+app-1  |     "                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur\n" +
+app-1  |     '            FROM donasi_campaign dc\n' +
+app-1  |     '            LEFT JOIN users u ON dc.created_by = u.id\n' +
+app-1  |     '            LEFT JOIN donasi_transaksi dt ON dc.id = dt.campaign_id\n' +
+app-1  |     '            GROUP BY dc.id\n' +
+app-1  |     '            ORDER BY dc.created_at DESC\n' +
+app-1  |     '        ',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.donasi_campaign' doesn't exist"
+app-1  | }
+app-1  | Error: Table 'rt_rw_db.musyawarah' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAll (/app/models/Musyawarah.js:5:33)
+app-1  |     at exports.index (/app/controllers/musyawarahController.js:28:39)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: 'SELECT * FROM musyawarah ORDER BY tanggal DESC, created_at DESC',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.musyawarah' doesn't exist"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 1
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '1',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 't',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'lunas',
+app-1  |     unpaid_details: []
+app-1  |   }
+app-1  | ]
+app-1  | Error fetching Ronda data: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+app-1  | Error: Unknown column 'tim_ronda' in 'where clause'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.generateSchedule (/app/models/Ronda.js:36:40)
+app-1  |     at exports.index (/app/controllers/rondaController.js:42:21)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "SELECT id FROM warga WHERE tim_ronda = 'B' AND is_ronda = 1",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'tim_ronda' in 'where clause'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 1
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '1',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 't',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'lunas',
+app-1  |     unpaid_details: []
+app-1  |   }
+app-1  | ]
+app-1  | Error fetching Ronda data: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+app-1  | Error: Unknown column 'tim_ronda' in 'where clause'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.generateSchedule (/app/models/Ronda.js:36:40)
+app-1  |     at exports.index (/app/controllers/rondaController.js:42:21)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "SELECT id FROM warga WHERE tim_ronda = 'B' AND is_ronda = 1",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'tim_ronda' in 'where clause'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 1
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '1',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 't',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'lunas',
+app-1  |     unpaid_details: []
+app-1  |   }
+app-1  | ]
+app-1  | Error fetching Ronda data: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+app-1  | Error: Table 'rt_rw_db.musyawarah' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAll (/app/models/Musyawarah.js:5:33)
+app-1  |     at exports.index (/app/controllers/musyawarahController.js:28:39)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: 'SELECT * FROM musyawarah ORDER BY tanggal DESC, created_at DESC',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.musyawarah' doesn't exist"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 'endrisusanto'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 'endrisusanto'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 'endrisusanto'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = '1'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postRegister (/app/controllers/authController.js:57:41)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = '1'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postRegister (/app/controllers/authController.js:57:41)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'u.profile_photo_url' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.findByUsername (/app/models/User.js:5:33)
+app-1  |     at exports.postLogin (/app/controllers/authController.js:11:33)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at trim_prefix (/app/node_modules/express/lib/router/index.js:328:13)
+app-1  |     at /app/node_modules/express/lib/router/index.js:286:9
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT u.*, w.approval_status, w.nama, w.blok, w.nomor_rumah, w.foto_profil, u.profile_photo_url \n' +
+app-1  |     '            FROM users u \n' +
+app-1  |     '            LEFT JOIN warga w ON u.warga_id = w.id \n' +
+app-1  |     "            WHERE u.username = 't'\n" +
+app-1  |     '        ',
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'u.profile_photo_url' in 'field list'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Bistara',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: '',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Arbas',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | Error: Table 'rt_rw_db.donasi_campaign' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAllCampaigns (/app/models/Donasi.js:6:33)
+app-1  |     at exports.index (/app/controllers/donasiController.js:48:40)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT dc.*, \n' +
+app-1  |     '                   u.username as creator_name,\n' +
+app-1  |     "                   COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as terkumpul,\n" +
+app-1  |     "                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur\n" +
+app-1  |     '            FROM donasi_campaign dc\n' +
+app-1  |     '            LEFT JOIN users u ON dc.created_by = u.id\n' +
+app-1  |     '            LEFT JOIN donasi_transaksi dt ON dc.id = dt.campaign_id\n' +
+app-1  |     '            GROUP BY dc.id\n' +
+app-1  |     '            ORDER BY dc.created_at DESC\n' +
+app-1  |     '        ',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.donasi_campaign' doesn't exist"
+app-1  | }
+app-1  | Error: Table 'rt_rw_db.donasi_campaign' doesn't exist
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.getAllCampaigns (/app/models/Donasi.js:6:33)
+app-1  |     at exports.index (/app/controllers/donasiController.js:48:40)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at ensureAuthenticated (/app/middleware/auth.js:20:20)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at /app/node_modules/express/lib/router/index.js:284:15
+app-1  |     at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+app-1  |     at next (/app/node_modules/express/lib/router/index.js:280:10)
+app-1  |     at Function.handle (/app/node_modules/express/lib/router/index.js:175:3)
+app-1  |     at router (/app/node_modules/express/lib/router/index.js:47:12)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5) {
+app-1  |   code: 'ER_NO_SUCH_TABLE',
+app-1  |   errno: 1146,
+app-1  |   sql: '\n' +
+app-1  |     '            SELECT dc.*, \n' +
+app-1  |     '                   u.username as creator_name,\n' +
+app-1  |     "                   COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as terkumpul,\n" +
+app-1  |     "                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur\n" +
+app-1  |     '            FROM donasi_campaign dc\n' +
+app-1  |     '            LEFT JOIN users u ON dc.created_by = u.id\n' +
+app-1  |     '            LEFT JOIN donasi_transaksi dt ON dc.id = dt.campaign_id\n' +
+app-1  |     '            GROUP BY dc.id\n' +
+app-1  |     '            ORDER BY dc.created_at DESC\n' +
+app-1  |     '        ',
+app-1  |   sqlState: '42S02',
+app-1  |   sqlMessage: "Table 'rt_rw_db.donasi_campaign' doesn't exist"
+app-1  | }
+app-1  | Column dibayar_oleh missing, attempting to migrate...
+app-1  | Migration successful, retrying query...
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | Error: Data truncated for column 'jenis' at row 1
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at exports.cleanupDuplicates (/app/controllers/iuranController.js:558:26)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+app-1  |   code: 'WARN_DATA_TRUNCATED',
+app-1  |   errno: 1265,
+app-1  |   sql: "UPDATE iuran SET jenis = 'kas_rt' WHERE id = 3",
+app-1  |   sqlState: '01000',
+app-1  |   sqlMessage: "Data truncated for column 'jenis' at row 1"
+app-1  | }
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at /app/node_modules/multer/lib/make-middleware.js:157:11
+app-1  |     at WriteStream.<anonymous> (/app/node_modules/multer/storage/disk.js:43:9)
+app-1  |     at WriteStream.emit (node:events:529:35)
+app-1  |     at finish (node:internal/streams/writable:748:10)
+app-1  |     at finishMaybe (node:internal/streams/writable:733:9)
+app-1  |     at afterWrite (node:internal/streams/writable:507:3)
+app-1  |     at onwrite (node:internal/streams/writable:480:7)
+app-1  |     at node:internal/fs/streams:465:5
+app-1  |     at node:internal/fs/streams:421:7
+app-1  |     at FSReqCallback.wrapper [as oncomplete] (node:fs:822:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('test', '<p>test</p>', '1769395979788.png', '2026-01-26T09:52', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | === PAYMENT SUBMISSION ===
+app-1  | Raw jenis_iuran: [ 'kas_rt', 'kas_gang', 'sampah' ]
+app-1  | Processed jenis: [ 'kas_rt', 'kas_gang', 'sampah' ]
+app-1  | Selected months: [ '2026-01' ]
+app-1  | Processing payment: jenis=kas_rt, amount=10000
+app-1  | Processing payment: jenis=kas_gang, amount=10000
+app-1  | Processing payment: jenis=sampah, amount=25000
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | Error: Unknown column 'tanggal_konfirmasi' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at exports.confirmBatch (/app/controllers/iuranController.js:788:18)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "UPDATE iuran SET status = 'lunas', tanggal_konfirmasi = NOW() WHERE id IN ('68','497','498')",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'tanggal_konfirmasi' in 'field list'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at /app/node_modules/multer/lib/make-middleware.js:157:11
+app-1  |     at WriteStream.<anonymous> (/app/node_modules/multer/storage/disk.js:43:9)
+app-1  |     at WriteStream.emit (node:events:529:35)
+app-1  |     at finish (node:internal/streams/writable:748:10)
+app-1  |     at finishMaybe (node:internal/streams/writable:733:9)
+app-1  |     at afterWrite (node:internal/streams/writable:507:3)
+app-1  |     at onwrite (node:internal/streams/writable:480:7)
+app-1  |     at node:internal/fs/streams:465:5
+app-1  |     at node:internal/fs/streams:421:7
+app-1  |     at FSReqCallback.wrapper [as oncomplete] (node:fs:822:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('Rapat kajian', '<p>test</p>', '1769396543571.png', '2026-01-26T10:01', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at /app/node_modules/multer/lib/make-middleware.js:157:11
+app-1  |     at WriteStream.<anonymous> (/app/node_modules/multer/storage/disk.js:43:9)
+app-1  |     at WriteStream.emit (node:events:529:35)
+app-1  |     at finish (node:internal/streams/writable:748:10)
+app-1  |     at finishMaybe (node:internal/streams/writable:733:9)
+app-1  |     at afterWrite (node:internal/streams/writable:507:3)
+app-1  |     at onwrite (node:internal/streams/writable:480:7)
+app-1  |     at node:internal/fs/streams:465:5
+app-1  |     at node:internal/fs/streams:421:7
+app-1  |     at FSReqCallback.wrapper [as oncomplete] (node:fs:822:5) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('Rapat kajian', '<p>Rapat kajian</p>', '1769396817346.png', '2026-01-26T10:06', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at Multipart.<anonymous> (/app/node_modules/multer/lib/make-middleware.js:168:7)
+app-1  |     at Multipart.emit (node:events:517:28)
+app-1  |     at emitCloseNT (node:internal/streams/destroy:132:10)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:81:21) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('Rapat kajian', '<p>Rapat kajian</p>', NULL, '2026-01-26T10:07', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | ===== DASHBOARD INDEX CALLED =====
+app-1  | MapData count: 37
+app-1  | Sample mapData: [
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '17',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 17',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '19',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 19',
+app-1  |     status_huni: 'kosong',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   },
+app-1  |   {
+app-1  |     blok: 'F7',
+app-1  |     nomor_rumah: '20',
+app-1  |     residents: [ [Object] ],
+app-1  |     head_name: 'Blok F7 - 20',
+app-1  |     status_huni: 'tetap',
+app-1  |     status_iuran: 'menunggak',
+app-1  |     unpaid_details: [ [Object], [Object], [Object] ]
+app-1  |   }
+app-1  | ]
+app-1  | Error: Unknown column 'lampiran' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.addComment (/app/models/Pengaduan.js:69:18)
+app-1  |     at exports.postComment (/app/controllers/pengaduanController.js:107:25)
+app-1  |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+app-1  |     at next (/app/node_modules/express/lib/router/route.js:149:13)
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at Multipart.<anonymous> (/app/node_modules/multer/lib/make-middleware.js:168:7)
+app-1  |     at Multipart.emit (node:events:517:28)
+app-1  |     at emitCloseNT (node:internal/streams/destroy:132:10)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:81:21) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO pengaduan_comments (pengaduan_id, user_id, parent_id, konten, type, lampiran) VALUES ('1', 1, NULL, '<p>test</p>', 'comment', NULL)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'lampiran' in 'field list'"
+app-1  | }
+app-1  | Mon, 26 Jan 2026 03:07:42 GMT express deprecated res.location("back"): use res.location(req.get("Referrer") || "/") and refer to https://dub.sh/security-redirect for best practices at controllers/pengaduanController.js:120:13
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at Multipart.<anonymous> (/app/node_modules/multer/lib/make-middleware.js:168:7)
+app-1  |     at Multipart.emit (node:events:517:28)
+app-1  |     at emitCloseNT (node:internal/streams/destroy:132:10)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:81:21) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('Rapat kajian', '<p>Rapat kajian</p>', NULL, '2026-01-26T10:07', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at Multipart.<anonymous> (/app/node_modules/multer/lib/make-middleware.js:168:7)
+app-1  |     at Multipart.emit (node:events:517:28)
+app-1  |     at emitCloseNT (node:internal/streams/destroy:132:10)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:81:21) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('Rapat kajian', '<p>w</p>', NULL, '2026-01-26T10:18', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
+app-1  | Error: Unknown column 'created_by' in 'field list'
+app-1  |     at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+app-1  |     at Object.create (/app/models/Musyawarah.js:10:35)
+app-1  |     at /app/controllers/musyawarahController.js:52:30
+app-1  |     at done (/app/node_modules/multer/lib/make-middleware.js:47:7)
+app-1  |     at indicateDone (/app/node_modules/multer/lib/make-middleware.js:51:68)
+app-1  |     at Multipart.<anonymous> (/app/node_modules/multer/lib/make-middleware.js:168:7)
+app-1  |     at Multipart.emit (node:events:517:28)
+app-1  |     at emitCloseNT (node:internal/streams/destroy:132:10)
+app-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:81:21) {
+app-1  |   code: 'ER_BAD_FIELD_ERROR',
+app-1  |   errno: 1054,
+app-1  |   sql: "INSERT INTO musyawarah (judul, konten, lampiran, tanggal, created_by) VALUES ('sdf', '<p>sdf</p>', NULL, '2026-01-26T11:22', 1)",
+app-1  |   sqlState: '42S22',
+app-1  |   sqlMessage: "Unknown column 'created_by' in 'field list'"
+app-1  | }
