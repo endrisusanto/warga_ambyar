@@ -1,0 +1,685 @@
+<%- include('../partials/head') %>
+    <%- include('../partials/navbar') %>
+
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <% if (!user) { %>
+                <div
+                    class="mb-6 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-xl flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-sm font-medium">Anda sedang dalam mode tamu (Read-only). Silakan <a
+                            href="/auth/login" class="underline hover:text-blue-300">Login</a> untuk fitur
+                        lengkap.</span>
+                </div>
+                <% } %>
+                    <!-- Header Section -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h1
+                                class="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-3">
+                                <span class="text-4xl">🌊</span>
+                                Monitoring Banjir
+                            </h1>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1 font-medium">Real-time Water Level
+                                Monitoring System</p>
+                            <div class="mt-3 text-xs text-gray-500 flex flex-col sm:flex-row gap-1 sm:gap-0">
+                                <span>Source: <a href="https://ffws-bbwscitarum.id/page/waterlevel/waterlevel"
+                                        target="_blank"
+                                        class="text-blue-400 hover:text-blue-300 transition-colors">Official Citarum
+                                        River Flood
+                                        Forecasting and Warning System</a></span>
+                                <span class="hidden sm:inline mx-2 text-gray-700">|</span>
+                                <span>API: <a href="https://api.ffws-bbwscitarum.id/api-docs" target="_blank"
+                                        class="text-blue-400 hover:text-blue-300 transition-colors">FFWS API</a></span>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center gap-3 bg-gray-100 dark:bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm">
+                            <div class="relative flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                id="lastUpdated">Updating...</span>
+                            <div class="w-px h-4 bg-gray-300 dark:bg-white/20 mx-1"></div>
+                            <button onclick="shareAllToWA()"
+                                class="text-green-500 hover:text-green-400 transition-colors"
+                                title="Bagikan Ringkasan ke WhatsApp">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                        <!-- Station 1: Tanjungpura -->
+                        <div class="glass-card overflow-hidden group hover:border-blue-500/30 transition-all duration-500"
+                            id="station-tanjungpura">
+                            <div class="p-6 relative">
+                                <!-- Background Glow -->
+                                <div
+                                    class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none">
+                                </div>
+
+                                <!-- Header -->
+                                <div class="relative z-10 flex justify-between items-start mb-6">
+                                    <div>
+                                        <h2
+                                            class="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            Tanjungpura
+                                        </h2>
+                                        <p class="text-sm text-blue-400/80 font-medium mt-1">Sungai Citarum</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <a href="https://maps.app.goo.gl/kSsN4hojfjbSnQPn7" target="_blank"
+                                            class="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors group"
+                                            title="Lihat di Google Maps">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </a>
+                                        <button onclick="shareToWA('tanjungpura')"
+                                            class="p-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors group"
+                                            title="Bagikan ke WhatsApp">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                                            </svg>
+                                        </button>
+                                        <span
+                                            class="station-status px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 uppercase tracking-wider backdrop-blur-md">
+                                            Loading...
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Main Metrics Grid -->
+                                <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                                    <!-- TMA -->
+                                    <div>
+                                        <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
+                                            Tinggi Muka
+                                            Air</div>
+                                        <div class="flex items-baseline">
+                                            <span
+                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 font-mono tracking-tighter">--.--</span>
+                                            <span class="text-xl text-gray-500 font-bold ml-2">m</span>
+                                            <div
+                                                class="trend-indicator ml-4 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 transform scale-90 origin-left">
+                                                <span class="text-sm font-bold">--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Debit -->
+                                    <div class="sm:border-l sm:border-white/10 sm:pl-6">
+                                        <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
+                                            Debit Air
+                                        </div>
+                                        <div class="flex items-baseline">
+                                            <span
+                                                class="debit-value text-5xl font-black text-blue-600 dark:text-blue-400 font-mono tracking-tighter">--.--</span>
+                                            <span
+                                                class="text-lg text-blue-500 dark:text-blue-400/60 font-bold ml-2">m³/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Threshold Badges -->
+                                <div class="relative z-10 grid grid-cols-3 gap-2">
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 3</div>
+                                        <div class="text-sm font-bold text-yellow-500">9.12 m</div>
+                                    </div>
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 2</div>
+                                        <div class="text-sm font-bold text-orange-500">9.42 m</div>
+                                    </div>
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 1</div>
+                                        <div class="text-sm font-bold text-red-500">9.82 m</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart Container -->
+                            <div class="border-t border-white/5 bg-black/20 p-4">
+                                <div id="chart-tanjungpura" class="w-full h-[250px]"></div>
+                                <div id="chart-tanjungpura-brush" class="w-full h-[100px] -mt-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Station 2: SP. Cibeet -->
+                        <div class="glass-card overflow-hidden group hover:border-teal-500/30 transition-all duration-500"
+                            id="station-cibeet">
+                            <div class="p-6 relative">
+                                <!-- Background Glow -->
+                                <div
+                                    class="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none">
+                                </div>
+
+                                <!-- Header -->
+                                <div class="relative z-10 flex justify-between items-start mb-6">
+                                    <div>
+                                        <h2
+                                            class="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            Syphon Cibeet
+                                        </h2>
+                                        <p class="text-sm text-teal-400/80 font-medium mt-1">Sungai Cibeet</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <a href="https://maps.app.goo.gl/sGoDbYAAQySs7kcw7" target="_blank"
+                                            class="p-2 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 transition-colors group"
+                                            title="Lihat di Google Maps">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </a>
+                                        <button onclick="shareToWA('cibeet')"
+                                            class="p-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors group"
+                                            title="Bagikan ke WhatsApp">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                                            </svg>
+                                        </button>
+                                        <span
+                                            class="station-status px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 uppercase tracking-wider backdrop-blur-md">
+                                            Loading...
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Main Metrics Grid -->
+                                <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                                    <!-- TMA -->
+                                    <div>
+                                        <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
+                                            Tinggi Muka
+                                            Air</div>
+                                        <div class="flex items-baseline">
+                                            <span
+                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 font-mono tracking-tighter">--.--</span>
+                                            <span class="text-xl text-gray-500 font-bold ml-2">m</span>
+                                            <div
+                                                class="trend-indicator ml-4 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 transform scale-90 origin-left">
+                                                <span class="text-sm font-bold">--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Debit -->
+                                    <div class="sm:border-l sm:border-white/10 sm:pl-6">
+                                        <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
+                                            Debit Air
+                                        </div>
+                                        <div class="flex items-baseline">
+                                            <span
+                                                class="debit-value text-5xl font-black text-teal-600 dark:text-teal-400 font-mono tracking-tighter">--.--</span>
+                                            <span
+                                                class="text-lg text-teal-500 dark:text-teal-400/60 font-bold ml-2">m³/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Threshold Badges -->
+                                <div class="relative z-10 grid grid-cols-3 gap-2">
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 3</div>
+                                        <div class="text-sm font-bold text-yellow-500">12.42 m</div>
+                                    </div>
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 2</div>
+                                        <div class="text-sm font-bold text-orange-500">12.54 m</div>
+                                    </div>
+                                    <div
+                                        class="bg-white dark:bg-white/5 rounded-lg p-2 border border-gray-300 dark:border-white/10 text-center">
+                                        <div class="text-[10px] uppercase text-gray-500 font-bold mb-1">Siaga 1</div>
+                                        <div class="text-sm font-bold text-red-500">12.94 m</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart Container -->
+                            <div class="border-t border-white/5 bg-black/20 p-4">
+                                <div id="chart-cibeet" class="w-full h-[250px]"></div>
+                                <div id="chart-cibeet-brush" class="w-full h-[100px] -mt-2"></div>
+                            </div>
+                        </div>
+
+                    </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script>
+            // Utility Functions
+            const formatTime = (isoString) => {
+                const date = new Date(isoString);
+                return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            };
+
+            const getStatusColor = (status) => {
+                switch (status) {
+                    case 'siaga1': return 'bg-red-500/10 text-red-400 border-red-500/20';
+                    case 'siaga2': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+                    case 'siaga3': return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                    default: return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                }
+            };
+
+            const getStatusLabel = (status) => {
+                switch (status) {
+                    case 'siaga1': return 'BAHAYA (SIAGA 1)';
+                    case 'siaga2': return 'KRITIS (SIAGA 2)';
+                    case 'siaga3': return 'WASPADA (SIAGA 3)';
+                    default: return 'NORMAL (SIAGA 4)';
+                }
+            };
+
+            const getTrendIcon = (trend) => {
+                if (trend === 'rising') return '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg><span class="text-sm font-bold text-red-400">Naik</span>';
+                if (trend === 'falling') return '<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg><span class="text-sm font-bold text-emerald-400">Turun</span>';
+                return '<svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path></svg><span class="text-sm font-bold text-gray-600 dark:text-gray-400">Stabil</span>';
+            };
+
+            // Chart Configuration Factory
+            const createChartOptions = (id, data, thresholds, minY, maxY) => {
+                const uniqueId = `main-${id}`;
+                const brushId = `brush-${id}`;
+
+                const seriesTMA = data.map(d => ({
+                    x: new Date(d.date).getTime(),
+                    y: parseFloat(d.waterlevel).toFixed(2)
+                })).reverse();
+
+                const seriesFlow = data.map(d => ({
+                    x: new Date(d.date).getTime(),
+                    y: parseFloat(d.waterflow || 0).toFixed(0)
+                })).reverse();
+
+                const hasFlow = seriesFlow.some(d => d.y > 0);
+
+                // Main Chart Options
+                const mainOptions = {
+                    series: [{
+                        name: 'TMA',
+                        data: seriesTMA,
+                        type: 'area'
+                    }],
+                    chart: {
+                        id: uniqueId,
+                        type: 'line',
+                        height: 250,
+                        background: 'transparent',
+                        toolbar: {
+                            autoSelected: 'pan',
+                            show: false
+                        },
+                        animations: { enabled: true }
+                    },
+                    colors: ['#3b82f6', '#10b981'],
+                    fill: {
+                        type: ['gradient', 'solid'],
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.4,
+                            opacityTo: 0.05,
+                            stops: [0, 90, 100]
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: {
+                        curve: 'smooth',
+                        width: [2, 2]
+                    },
+                    xaxis: {
+                        type: 'datetime',
+                        reversed: true,
+                        tooltip: { enabled: false },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false },
+                        labels: {
+                            datetimeUTC: false,
+                            style: { colors: '#9ca3af', fontFamily: 'Inter' },
+                            datetimeFormatter: { hour: 'HH:mm' }
+                        }
+                    },
+                    yaxis: [
+                        {
+                            min: minY,
+                            max: maxY,
+                            tickAmount: 5,
+                            seriesName: 'TMA',
+                            labels: {
+                                style: { colors: '#3b82f6', fontFamily: 'Inter' },
+                                formatter: (val) => val.toFixed(2)
+                            },
+                            title: {
+                                text: 'TMA (m)',
+                                style: { color: '#3b82f6' }
+                            }
+                        },
+                        {
+                            opposite: true,
+                            show: hasFlow,
+                            seriesName: 'Debit',
+                            labels: {
+                                style: { colors: '#10b981', fontFamily: 'Inter' },
+                                formatter: (val) => val.toFixed(0)
+                            },
+                            title: {
+                                text: 'Debit (m³/s)',
+                                style: { color: '#10b981' }
+                            }
+                        }
+                    ],
+                    grid: {
+                        borderColor: 'rgba(255,255,255,0.05)',
+                        strokeDashArray: 4,
+                        xaxis: { lines: { show: true } }
+                    },
+                    theme: { mode: 'dark' },
+                    annotations: {
+                        yaxis: [
+                            {
+                                y: thresholds.siaga3,
+                                borderColor: '#eab308',
+                                strokeDashArray: 4,
+                                label: {
+                                    text: 'Siaga 3',
+                                    style: { color: '#000', background: '#eab308' }
+                                }
+                            },
+                            {
+                                y: thresholds.siaga2,
+                                borderColor: '#f97316',
+                                strokeDashArray: 4,
+                                label: {
+                                    text: 'Siaga 2',
+                                    style: { color: '#fff', background: '#f97316' }
+                                }
+                            },
+                            {
+                                y: thresholds.siaga1,
+                                borderColor: '#ef4444',
+                                label: {
+                                    text: 'Siaga 1',
+                                    style: { color: '#fff', background: '#ef4444' }
+                                }
+                            }
+                        ]
+                    },
+                    tooltip: {
+                        theme: 'dark',
+                        x: { format: 'dd MMM HH:mm' }
+                    }
+                };
+
+                if (hasFlow) {
+                    mainOptions.series.push({
+                        name: 'Debit',
+                        data: seriesFlow,
+                        type: 'line'
+                    });
+                }
+
+                // Brush Chart Options
+                const brushOptions = {
+                    series: [{
+                        data: seriesTMA
+                    }],
+                    chart: {
+                        id: brushId,
+                        height: 100,
+                        type: 'area',
+                        brush: {
+                            target: uniqueId,
+                            enabled: true
+                        },
+                        selection: {
+                            enabled: true
+                        },
+                        toolbar: { show: false }
+                    },
+                    colors: ['#3b82f6'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            opacityFrom: 0.8,
+                            opacityTo: 0.1,
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: { width: 1 },
+                    xaxis: {
+                        type: 'datetime',
+                        reversed: true,
+                        tooltip: { enabled: false },
+                        labels: {
+                            datetimeUTC: false,
+                            style: { colors: '#9ca3af' }
+                        }
+                    },
+                    yaxis: {
+                        tickAmount: 2,
+                        labels: { show: false }
+                    },
+                    theme: { mode: 'dark' }
+                };
+
+                return { main: mainOptions, brush: brushOptions };
+            };
+
+            let charts = {};
+            let globalData = {};
+
+            async function fetchData() {
+                try {
+                    const response = await fetch('/banjir/api/data');
+                    const json = await response.json();
+
+                    if (!json.success) throw new Error(json.error);
+
+                    const data = json.data;
+                    globalData = data; // Store globally for share
+
+                    document.getElementById('lastUpdated').textContent = 'Updated: ' + formatTime(new Date());
+
+                    // Update Tanjungpura
+                    updateStationUI('tanjungpura', data.tanjungpura);
+                    renderChart('tanjungpura', data.tanjungpura, 8, 11); // Custom Y-axis range for visual clarity
+
+                    // Update Cibeet
+                    updateStationUI('cibeet', data.cibeet);
+                    renderChart('cibeet', data.cibeet, 10, 14);
+
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                }
+            }
+
+            function updateStationUI(id, data) {
+                const el = document.getElementById(`station-${id}`);
+                const badges = getStatusColor(data.alert_status);
+
+                // Update Badge
+                const statusEl = el.querySelector('.station-status');
+                statusEl.className = `station-status px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 uppercase tracking-wider backdrop-blur-md transition-colors duration-500 ${badges}`;
+                statusEl.innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                    ${getStatusLabel(data.alert_status)}
+                `;
+
+                // Update Metric
+                el.querySelector('.tma-value').textContent = data.current_level.toFixed(2);
+                el.querySelector('.debit-value').textContent = (data.current_flow || 0).toFixed(2);
+
+                // Update Trend
+                el.querySelector('.trend-indicator').innerHTML = getTrendIcon(data.trend);
+
+                // Active Card Border Color based on Status (via class replacement or inline style)
+                // We'll trust the generic hover effect for cleanliness, but could enforce border color here.
+            }
+
+            function renderChart(id, data, minY, maxY) {
+                const options = createChartOptions(id, data.data, data.thresholds, minY, maxY);
+
+                // Destroy existing
+                if (charts[id]) {
+                    if (charts[id].main) charts[id].main.destroy();
+                    if (charts[id].brush) charts[id].brush.destroy();
+                }
+
+                // Create new
+                const chartMain = new ApexCharts(document.querySelector(`#chart-${id}`), options.main);
+                const chartBrush = new ApexCharts(document.querySelector(`#chart-${id}-brush`), options.brush);
+
+                chartMain.render();
+                chartBrush.render();
+
+                charts[id] = { main: chartMain, brush: chartBrush };
+            }
+
+            // Initial Fetch
+            fetchData();
+
+            // Refresh every 5 minutes
+            setInterval(fetchData, 300000);
+
+            // Share to WhatsApp
+            function shareToWA(id) {
+                const el = document.getElementById(`station-${id}`);
+                const data = globalData[id];
+                if (!el || !data) return;
+
+                const statusEl = el.querySelector('.station-status');
+                statusEl.innerText = 'Capturing...';
+
+                html2canvas(el, {
+                    backgroundColor: null,
+                    scale: 2,
+                    useCORS: true,
+                    onclone: (clonedDoc) => {
+                        const clonedEl = clonedDoc.getElementById(`station-${id}`);
+
+                        // Remove Under Glow (blur-3xl)
+                        const glows = clonedEl.querySelectorAll('.blur-3xl');
+                        glows.forEach(g => g.remove());
+
+                        // Remove Text Gradients (TMA Value)
+                        const gradients = clonedEl.querySelectorAll('.text-transparent');
+                        gradients.forEach(g => {
+                            g.classList.remove('text-transparent', 'bg-clip-text', 'bg-gradient-to-b', 'from-white', 'to-gray-400');
+                            g.style.backgroundImage = 'none'; // Ensure no bg image
+
+                            // Check for dark mode to set appropriate color if needed, 
+                            // or just default to the computed style text color if available.
+                            // But usually removing text-transparent reveals the 'color' property.
+                            // Given the design seems to be dark-ish or using specific colors:
+                            // The original was 'from-white'.
+                            // We'll set it to match the main text color or just white/black depending on context.
+                            // For safety let's try to detect or force a high contrast color?
+                            // Actually, simply removing the classes usually reverts to the parent's color or the element's base color.
+                            // But let's force a solid color that matches the intent (white-ish or gray-ish).
+                            // Let's assume white for now as it was 'from-white'.
+                            // However, if the user sees black text in light mode...
+
+                            // Let's just remove the classes.
+                        });
+                    }
+                }).then(canvas => {
+                    canvas.toBlob(blob => {
+                        const formData = new FormData();
+                        formData.append('image', blob, `banjir-${id}.png`);
+
+                        fetch('/banjir/share-image', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(r => r.json())
+                            .then(res => {
+                                updateStationUI(id, data);
+                                if (res.success) {
+                                    const pageUrl = `${window.location.origin}/banjir/v/${res.filename}`;
+                                    const text = `*MONITORING BANJIR*\n\n` +
+                                        `📍 Station: ${data.station_name}\n` +
+                                        `⚠️ Status: ${getStatusLabel(data.alert_status)}\n` +
+                                        `🌊 TMA: ${data.current_level.toFixed(2)} m\n` +
+                                        `💧 Debit: ${(data.current_flow || 0).toFixed(2)} m³/s\n` +
+                                        `⏱ Waktu: ${formatTime(new Date())}\n\n` +
+                                        `🔗 kartu: ${pageUrl}`;
+                                    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                                    window.open(url, '_blank');
+                                } else {
+                                    alert('Gagal share gambar.');
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                updateStationUI(id, data);
+                            });
+                    }, 'image/png');
+                });
+            }
+            function shareAllToWA() {
+                if (!globalData.tanjungpura || !globalData.cibeet) return;
+
+                const tp = globalData.tanjungpura;
+                const cb = globalData.cibeet;
+                const now = formatTime(new Date());
+                const url = window.location.href;
+
+                const text = `*MONITORING RISIKO BANJIR* 🌊\n` +
+                    `🕒 Updated: ${now}\n\n` +
+                    `*1. Tanjungpura (Citarum)*\n` +
+                    `   🌊 TMA: ${tp.current_level.toFixed(2)} m\n` +
+                    `   ⚠️ Status: ${getStatusLabel(tp.alert_status)}\n` +
+                    `   💧 Debit: ${(tp.current_flow || 0).toFixed(2)} m³/s\n\n` +
+                    `*2. Syphon Cibeet (Cibeet)*\n` +
+                    `   🌊 TMA: ${cb.current_level.toFixed(2)} m\n` +
+                    `   ⚠️ Status: ${getStatusLabel(cb.alert_status)}\n` +
+                    `   💧 Debit: ${(cb.current_flow || 0).toFixed(2)} m³/s\n\n` +
+                    `🔗 Pantau detail: ${url}`;
+
+                const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.open(waUrl, '_blank');
+            }
+        </script>
+        <%- include('../partials/footer') %>

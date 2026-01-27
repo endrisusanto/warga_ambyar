@@ -9,8 +9,8 @@
                         class="mx-auto h-16 w-16 bg-indigo-500/20 rounded-full flex items-center justify-center text-3xl shadow-sm backdrop-blur-sm mb-4 border border-indigo-500/30">
                         📝
                     </div>
-                    <h2 class="text-3xl font-extrabold text-gray-100 drop-shadow-lg">Lengkapi Profil</h2>
-                    <p class="mt-2 text-sm text-gray-300">
+                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 drop-shadow-lg">Lengkapi Profil</h2>
+                    <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                         Halo <strong>
                             <%= user.username %>
                         </strong>! Mohon lengkapi data diri Anda untuk melanjutkan.
@@ -21,37 +21,37 @@
                     <div class="space-y-4">
                         <!-- Nama (Pre-filled but editable) -->
                         <div>
-                            <label for="nama" class="block text-sm font-medium text-gray-300 mb-1">Nama Lengkap</label>
+                            <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
                             <input id="nama" name="nama" type="text" required value="<%= user.username %>"
-                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         </div>
 
                         <!-- Blok & No Rumah -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="blok" class="block text-sm font-medium text-gray-300 mb-1">Blok</label>
+                                <label for="blok" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Blok</label>
                                 <select id="blok" name="blok" required
-                                    class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     <option value="" disabled selected>Pilih Blok</option>
                                     <option value="F7">F7</option>
                                     <option value="F8">F8</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="nomor_rumah" class="block text-sm font-medium text-gray-300 mb-1">No.
+                                <label for="nomor_rumah" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No.
                                     Rumah</label>
                                 <input id="nomor_rumah" name="nomor_rumah" type="number" required
-                                    class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                     placeholder="Contoh: 12">
                             </div>
                         </div>
 
                         <!-- Status Keluarga -->
                         <div>
-                            <label for="status_keluarga" class="block text-sm font-medium text-gray-300 mb-1">Status
+                            <label for="status_keluarga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status
                                 Keluarga</label>
                             <select id="status_keluarga" name="status_keluarga" required
-                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 <option value="" disabled selected>Pilih Status</option>
                                 <option value="Kepala Keluarga">Kepala Keluarga</option>
                                 <option value="Istri">Istri</option>
@@ -64,10 +64,10 @@
 
                         <!-- No HP -->
                         <div>
-                            <label for="no_hp" class="block text-sm font-medium text-gray-300 mb-1">Nomor
+                            <label for="no_hp" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomor
                                 WhatsApp</label>
                             <input id="no_hp" name="no_hp" type="tel" required
-                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="08xxxxxxxxxx">
                         </div>
                     </div>

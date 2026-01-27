@@ -8,7 +8,7 @@
                 <h1
                     class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
                     Profile Saya</h1>
-                <p class="text-gray-400 text-sm mt-1">Kelola informasi pribadi dan keamanan akun Anda.</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Kelola informasi pribadi dan keamanan akun Anda.</p>
             </div>
 
             <!-- Notifications -->
@@ -80,11 +80,11 @@
                                         <% if(warga) { %>
                                             <div class="flex flex-wrap justify-center gap-2 mt-2">
                                                 <span
-                                                    class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
+                                                    class="px-3 py-1 rounded-full bg-gray-100 dark:bg-white/5 border border-white/10 text-xs text-gray-700 dark:text-gray-300">
                                                     Blok <%= warga.blok %>-<%= warga.nomor_rumah %>
                                                 </span>
                                                 <span
-                                                    class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
+                                                    class="px-3 py-1 rounded-full bg-gray-100 dark:bg-white/5 border border-white/10 text-xs text-gray-700 dark:text-gray-300">
                                                     Tim <%= warga.tim_ronda || '-' %>
                                                 </span>
                                             </div>
@@ -112,7 +112,7 @@
                                             <!-- Name Input -->
                                             <div class="col-span-2 md:col-span-1">
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Nama
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Nama
                                                     Lengkap</label>
                                                 <input type="text" name="nama"
                                                     value="<%= warga ? warga.nama : (userData ? userData.nama || userData.username : '') %>"
@@ -123,16 +123,16 @@
                                             <!-- Photo Input -->
                                             <div class="col-span-2 md:col-span-1">
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Foto
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Foto
                                                     Profile</label>
                                                 <div class="relative">
                                                     <input type="file" name="foto_profil" id="foto_profil"
                                                         class="hidden" accept="image/*" onchange="previewImage(this)">
                                                     <label for="foto_profil"
-                                                        class="glass-input w-full rounded-xl px-4 py-3 text-sm flex items-center justify-between cursor-pointer hover:bg-white/5 transition-all group">
-                                                        <span class="text-gray-400 group-hover:text-indigo-300 truncate"
+                                                        class="glass-input w-full rounded-xl px-4 py-3 text-sm flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:bg-white/5 transition-all group">
+                                                        <span class="text-gray-600 dark:text-gray-400 group-hover:text-indigo-300 truncate"
                                                             id="file-name">Klik untuk upload foto baru</span>
-                                                        <svg class="h-5 w-5 text-gray-400 group-hover:text-indigo-400"
+                                                        <svg class="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400"
                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2"
@@ -176,21 +176,21 @@
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Password
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Password
                                                     Lama</label>
                                                 <input type="password" name="current_password" required
                                                     class="glass-input w-full rounded-xl px-4 py-2.5 text-sm">
                                             </div>
                                             <div>
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Password
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Password
                                                     Baru</label>
                                                 <input type="password" name="new_password" required minlength="6"
                                                     class="glass-input w-full rounded-xl px-4 py-2.5 text-sm">
                                             </div>
                                             <div>
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Konfirmasi</label>
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Konfirmasi</label>
                                                 <input type="password" name="confirm_password" required minlength="6"
                                                     class="glass-input w-full rounded-xl px-4 py-2.5 text-sm">
                                             </div>
@@ -198,7 +198,7 @@
 
                                         <div class="pt-4 flex justify-end">
                                             <button type="submit"
-                                                class="bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                                                class="bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 border border-white/10 text-gray-700 dark:text-gray-300 hover:text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -223,7 +223,7 @@
                                         </svg>
                                         Keluar Sesi
                                     </h3>
-                                    <p class="text-sm text-gray-400 mb-6">Akhiri sesi Anda saat ini dengan aman.</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Akhiri sesi Anda saat ini dengan aman.</p>
 
                                     <form action="/auth/logout" method="POST" class="mt-auto">
                                         <button type="submit"
@@ -257,7 +257,7 @@
                         const fileNameSpan = document.getElementById('file-name');
                         if (fileNameSpan) {
                             fileNameSpan.textContent = input.files[0].name;
-                            fileNameSpan.classList.remove('text-gray-400');
+                            fileNameSpan.classList.remove('text-gray-600 dark:text-gray-400');
                             fileNameSpan.classList.add('text-indigo-300');
                         }
                     }

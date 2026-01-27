@@ -46,22 +46,67 @@
         content="<%= typeof ogImage !='undefined' ? ogImage : (process.env.APP_URL || 'https://gang.endrisusanto.my.id') + '/og-image.png' %>">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Check local storage and preference
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <style>
         :root {
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-surface: rgba(255, 255, 255, 0.25);
+            /* Light Mode Variables */
+            --bg-start: #f0f9ff;
+            --bg-end: #e0f2fe;
+            --text-main: #1f2937;
+            --text-secondary: #4b5563;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --heading-color: #111827;
+            --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark {
+            /* Dark Mode Variables */
+            --bg-start: #1B2735;
+            --bg-end: #090A0F;
+            --text-main: #d1d5db;
+            --text-secondary: #9ca3af;
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            --heading-color: #f9fafb;
+            --card-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            background: radial-gradient(ellipse at bottom, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
+        /* Starfield only in Dark Mode */
         #starfield-canvas {
             position: fixed;
             top: 0;
@@ -70,8 +115,15 @@
             height: 100%;
             z-index: -1;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
+        .dark #starfield-canvas {
+            opacity: 1;
+        }
+
+        /* Lens Flare only in Dark Mode */
         .lens-flare {
             position: fixed;
             width: 300px;
@@ -84,160 +136,86 @@
             background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(100, 200, 255, 0.1) 30%, transparent 70%);
             filter: blur(20px);
             mix-blend-mode: screen;
+            display: none;
         }
 
-        /* Monochrome Dark Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        .dark .lens-flare {
+            display: block;
         }
 
-        .glass-strong {
-            background: rgba(255, 255, 255, 0.12);
+        /* Glassmorphism */
+        .glass,
+        .glass-card,
+        .glass-nav,
+        .glass-footer {
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.2s ease;
         }
 
         .glass-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--card-hover-shadow);
         }
 
-        .glass-input {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        /* Inputs */
+        .glass-input,
+        .glass-button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
             transition: all 0.2s ease;
-            color: #e5e7eb;
+            color: var(--text-main);
         }
 
         .glass-input:focus {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
             outline: none;
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
-        }
-
-        .glass-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .glass-button {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            transition: all 0.2s ease;
-            color: #e5e7eb;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .glass-button:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-1px);
+            filter: brightness(1.05);
         }
 
-        .glass-table tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .glass-table tr:hover {
-            background: rgba(255, 255, 255, 0.08) !important;
-        }
-
-        /* Navbar & Footer */
-        nav.glass-nav {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        footer.glass-footer {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Typography - Monochrome */
+        /* Typography Override */
         h1,
         h2,
         h3,
         h4,
         h5,
         h6 {
-            color: #f9fafb;
-            font-weight: 600;
-            letter-spacing: -0.02em;
+            color: var(--heading-color) !important;
         }
 
         p,
         span,
         div,
         a {
-            color: #d1d5db;
+            color: inherit;
         }
+
+        /* Mobile Menu adjustment handled by classes */
 
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(156, 163, 175, 0.5);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* Select Dropdown Styling */
-        select.glass-input,
-        select[class*="glass-input"] {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #f3f4f6;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23e5e7eb' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-        }
-
-        /* Dropdown options */
-        select.glass-input option,
-        select[class*="glass-input"] option {
-            background-color: #1f2937;
-            color: #f3f4f6;
-            padding: 8px;
-        }
-
-        select.glass-input option:hover,
-        select[class*="glass-input"] option:hover {
-            background-color: #374151;
-        }
-
-        select.glass-input option:checked,
-        select[class*="glass-input"] option:checked {
-            background-color: #4f46e5;
-            color: #ffffff;
+            background: rgba(156, 163, 175, 0.8);
         }
 
         @media (max-width: 640px) {
@@ -246,7 +224,230 @@
             }
         }
 
-        /* Mobile Menu Animation handled by Tailwind classes in navbar.ejs */
+        /* === AUTOMATIC LIGHT MODE VISIBILITY FIXES === */
+        /* Force dark text on light mode for elements defined as white/light-gray */
+        html:not(.dark) .text-white:not(.group-hover\:text-white):not(:hover),
+        html:not(.dark) .text-gray-50,
+        html:not(.dark) .text-gray-100,
+        html:not(.dark) .text-gray-200 {
+            color: #111827 !important;
+        }
+
+        html:not(.dark) .text-gray-300,
+        html:not(.dark) .text-gray-400,
+        html:not(.dark) .text-gray-500 {
+            color: #374151 !important;
+        }
+
+        /* Borders */
+        html:not(.dark) .border-white\/10,
+        html:not(.dark) .border-white\/20,
+        html:not(.dark) .border-white\/5,
+        html:not(.dark) .border-white\/30 {
+            border-color: #d1d5db !important;
+        }
+
+        /* EXCEPTIONS: Keep White Text on Solid/Colored Backgrounds */
+        html:not(.dark) .bg-indigo-600 .text-white,
+        html:not(.dark) .bg-blue-600 .text-white,
+        html:not(.dark) .bg-blue-500 .text-white,
+        html:not(.dark) .bg-red-600 .text-white,
+        html:not(.dark) .bg-red-500 .text-white,
+        html:not(.dark) .bg-emerald-600 .text-white,
+        html:not(.dark) .bg-emerald-500 .text-white,
+        html:not(.dark) .bg-green-600 .text-white,
+        html:not(.dark) .bg-teal-600 .text-white,
+        html:not(.dark) .bg-gray-900 .text-white,
+        html:not(.dark) .bg-gray-800 .text-white,
+        html:not(.dark) .bg-black .text-white,
+
+        /* Selectors for buttons */
+        html:not(.dark) button[class*="bg-"] .text-white,
+        html:not(.dark) a[class*="bg-indigo"] .text-white,
+        html:not(.dark) a[class*="bg-blue"] .text-white,
+        html:not(.dark) a[class*="bg-red"] .text-white,
+        html:not(.dark) input[type="submit"] {
+            color: #ffffff !important;
+        }
+
+        /* LIGHT MODE SPECIFIC ADJUSTMENTS */
+
+        /* 1. Inputs & Dropdowns */
+        html:not(.dark) .glass-input,
+        html:not(.dark) select.glass-input {
+            background-color: #f9fafb !important;
+            border-color: #9ca3af !important;
+            color: #111827 !important;
+        }
+
+        html:not(.dark) .glass-input:focus {
+            border-color: #4f46e5 !important;
+            background-color: #ffffff !important;
+        }
+
+        /* 2. Badges - Darken Text */
+        html:not(.dark) [class*="text-green-400"] {
+            color: #15803d !important;
+        }
+
+        html:not(.dark) [class*="text-red-400"] {
+            color: #b91c1c !important;
+        }
+
+        html:not(.dark) [class*="text-yellow-400"] {
+            color: #a16207 !important;
+        }
+
+        html:not(.dark) [class*="text-blue-400"] {
+            color: #1d4ed8 !important;
+        }
+
+        html:not(.dark) [class*="text-indigo-400"] {
+            color: #4338ca !important;
+        }
+
+        html:not(.dark) [class*="text-emerald-400"] {
+            color: #047857 !important;
+        }
+
+        html:not(.dark) [class*="text-cyan-400"] {
+            color: #0891b2 !important;
+        }
+
+        html:not(.dark) [class*="text-amber-400"] {
+            color: #b45309 !important;
+        }
+
+        /* 3. Badges - Lighten Backgrounds */
+        html:not(.dark) [class*="bg-green-500\/10"] {
+            background-color: #dcfce7 !important;
+        }
+
+        html:not(.dark) [class*="bg-red-500\/10"] {
+            background-color: #fee2e2 !important;
+        }
+
+        html:not(.dark) [class*="bg-yellow-500\/10"] {
+            background-color: #fef9c3 !important;
+        }
+
+        html:not(.dark) [class*="bg-blue-500\/10"] {
+            background-color: #dbeafe !important;
+        }
+
+        html:not(.dark) [class*="bg-indigo-500\/10"] {
+            background-color: #e0e7ff !important;
+        }
+
+        html:not(.dark) [class*="bg-emerald-500\/10"] {
+            background-color: #d1fae5 !important;
+        }
+
+        html:not(.dark) [class*="bg-amber-500\/10"] {
+            background-color: #fef3c7 !important;
+        }
+
+        html:not(.dark) [class*="bg-cyan-500\/20"] {
+            background-color: #cffafe !important;
+        }
+
+        html:not(.dark) [class*="bg-black\/20"] {
+            background-color: #f3f4f6 !important;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* 4. Arrears Container Override */
+        html:not(.dark) .min-h-screen.bg-gradient-to-br.from-gray-900 {
+            background: radial-gradient(ellipse at bottom, var(--bg-start) 0%, var(--bg-end) 100%) !important;
+        }
+
+        /* 5. Banjir Chart & Gradient */
+        html:not(.dark) [id^="chart-"] {
+            background-color: white !important;
+        }
+
+        html:not(.dark) .from-white {
+            --tw-gradient-from: #111827 !important;
+            color: #111827 !important;
+        }
+
+        /* 6. CCTV Overlay Exception */
+        html:not(.dark) .cctv-overlay .text-white {
+            color: #ffffff !important;
+        }
+
+        /* 7. Iuran Table Sticky Column Fixes */
+        html:not(.dark) .bg-\[\#0f1115\],
+        html:not(.dark) .bg-\[\#1a1500\],
+        html:not(.dark) .bg-\[\#000d1a\] {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* 8. Empty Row & Badge Fixes */
+        html:not(.dark) .bg-black\/40 {
+            background-color: #f3f4f6 !important;
+            /* Light Gray row */
+            color: #9ca3af !important;
+            /* Muted text for empty house */
+        }
+
+        /* Badge Fix */
+        html:not(.dark) .bg-gray-700 {
+            background-color: #e5e7eb !important;
+            /* Gray-200 */
+            color: #374151 !important;
+            /* Gray-700 */
+        }
+
+        /* 9. Empty House Row Specifics */
+        html:not(.dark) .status-kosong .sticky,
+        html:not(.dark) .status-kosong {
+            background-color: #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        html:not(.dark) .status-kosong .text-gray-200 {
+            color: #ffffff !important;
+        }
+
+        /* 10. Empty Row Text Fixes */
+        html:not(.dark) .status-kosong .sticky .text-gray-500 {
+            color: #d1d5db !important;
+            /* Light Gray for Block Number ONLY */
+        }
+
+        /* 11. Button Hover Outlines */
+        html:not(.dark) .glass-button:hover,
+        html:not(.dark) a.glass-button:hover {
+            border-color: #059669 !important;
+            /* Emerald-600 */
+            box-shadow: 0 0 0 1px #059669;
+            /* Crisp Outline */
+        }
+
+        /* 12. Global Layout Fixes */
+        .glass-card {
+            border-radius: 12px !important;
+        }
+
+        /* 13. Text Visibility Fixes */
+        html:not(.dark) .text-emerald-100,
+        html:not(.dark) .text-emerald-100\/70 {
+            color: #4b5563 !important;
+            /* Gray-600 */
+        }
+
+        /* 14. Fix Indigo Backgrounds */
+        html:not(.dark) .bg-indigo-600 {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+        }
+
+        html:not(.dark) .bg-indigo-700 {
+            background-color: #4338ca !important;
+        }
     </style>
 </head>
 

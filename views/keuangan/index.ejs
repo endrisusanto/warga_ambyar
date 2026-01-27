@@ -19,13 +19,14 @@
                     </div>
                     <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
                         <a href="/activity/timeline"
-                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition border border-white/10">
+                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
                             <span class="mr-2">🕒</span> Log
                         </a>
                         <a href="/keuangan/export" target="_blank"
-                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-300 transition border border-white/10">
-                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
+                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-600 dark:text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -49,7 +50,7 @@
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
                     <!-- Saldo -->
                     <div
-                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-gray-200 dark:bg-white/10 transition duration-300">
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
@@ -64,8 +65,9 @@
                                             class="text-sm font-medium text-emerald-400/80 truncate uppercase tracking-wide">
                                             Saldo Kas Saat Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-extrabold text-emerald-100 mt-1">Rp <%=
-                                                    Number(saldo).toLocaleString('id-ID') %>
+                                            <div
+                                                class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-100 mt-1">
+                                                Rp <%= Number(saldo).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
                                     </dl>
@@ -76,7 +78,7 @@
 
                     <!-- Pemasukan -->
                     <div
-                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-gray-200 dark:bg-white/10 transition duration-300">
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
@@ -94,8 +96,8 @@
                                             class="text-sm font-medium text-emerald-400/80 truncate uppercase tracking-wide">
                                             Pemasukan Bulan Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-bold text-emerald-200 mt-1">+ Rp <%=
-                                                    Number(pemasukanBulanIni).toLocaleString('id-ID') %>
+                                            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-200 mt-1">
+                                                + Rp <%= Number(pemasukanBulanIni).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
                                     </dl>
@@ -106,7 +108,7 @@
 
                     <!-- Pengeluaran -->
                     <div
-                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-white/10 transition duration-300">
+                        class="glass-card overflow-hidden rounded-xl border-t-2 border-white/20 hover:bg-gray-200 dark:bg-white/10 transition duration-300">
                         <div class="p-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
@@ -124,7 +126,7 @@
                                             class="text-sm font-medium text-red-400/80 truncate uppercase tracking-wide">
                                             Pengeluaran Bulan Ini</dt>
                                         <dd>
-                                            <div class="text-3xl font-bold text-red-200 mt-1">- Rp <%=
+                                            <div class="text-3xl font-bold text-red-600 dark:text-red-200 mt-1">- Rp <%=
                                                     Number(pengeluaranBulanIni).toLocaleString('id-ID') %>
                                             </div>
                                         </dd>
@@ -139,7 +141,7 @@
                 <div class="grid grid-cols-1 gap-8">
 
                     <!-- Financial Chart -->
-                    <div class="glass-card rounded-xl p-6 w-full transition-shadow hover:bg-white/10">
+                    <div class="glass-card rounded-xl p-6 w-full transition-shadow hover:bg-gray-200 dark:bg-white/10">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-bold text-emerald-400 flex items-center">
                                 <span
@@ -155,7 +157,7 @@
 
                     <!-- Recent Transactions Table -->
                     <div
-                        class="glass-card rounded-xl overflow-hidden flex flex-col h-[600px] w-full transition-shadow hover:bg-white/10">
+                        class="glass-card rounded-xl overflow-hidden flex flex-col w-full transition-shadow hover:bg-gray-200 dark:bg-white/10">
                         <div
                             class="px-6 py-4 border-b border-emerald-500/20 bg-emerald-500/5 flex justify-between items-center">
                             <h3 class="text-lg font-bold text-emerald-400 flex items-center">
@@ -165,7 +167,7 @@
                                 Terakhir
                             </h3>
                         </div>
-                        <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
+                        <div class="p-0">
                             <table class="min-w-full divide-y divide-emerald-500/10">
                                 <thead class="bg-emerald-500/10 sticky top-0 z-10">
                                     <tr>
@@ -173,16 +175,16 @@
                                             class="px-6 py-3 text-left text-xs font-bold text-emerald-400 uppercase tracking-wider">
                                             Keterangan</th>
                                         <th scope="col"
-                                            class="px-3 py-3 text-right text-xs font-bold text-emerald-400 uppercase tracking-wider">
+                                            class="px-3 py-3 text-right text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                                             Debit (Masuk)</th>
                                         <th scope="col"
-                                            class="px-3 py-3 text-right text-xs font-bold text-red-400 uppercase tracking-wider">
+                                            class="px-3 py-3 text-right text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">
                                             Kredit (Keluar)</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white/5 divide-y divide-white/10">
+                                <tbody class="bg-gray-100 dark:bg-white/5 divide-y divide-white/10">
                                     <% transactions.forEach(t=> { %>
-                                        <tr class="hover:bg-white/10 transition-colors">
+                                        <tr class="hover:bg-gray-200 dark:bg-white/10 transition-colors">
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-semibold text-gray-200">
                                                     <%= t.keterangan %>
@@ -232,11 +234,11 @@
                                                 </div>
                                             </td>
                                             <td
-                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-emerald-300">
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-300">
                                                 <%= t.tipe==='masuk' ? Number(t.jumlah).toLocaleString('id-ID') : '-' %>
                                             </td>
                                             <td
-                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-red-300">
+                                                class="px-3 py-4 whitespace-nowrap text-right text-sm font-bold text-red-600 dark:text-red-300">
                                                 <%= t.tipe==='keluar' ? Number(t.jumlah).toLocaleString('id-ID') : '-'
                                                     %>
                                             </td>
@@ -266,8 +268,9 @@
                 <div
                     class="relative inline-block align-bottom glass-card rounded-2xl text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
                     <form action="/keuangan/add" method="POST" enctype="multipart/form-data">
-                        <div class="bg-white/10 px-4 py-4 sm:px-6 border-b border-white/10">
-                            <h3 class="text-lg leading-6 font-bold text-gray-100 flex items-center" id="modal-title">
+                        <div class="bg-gray-200 dark:bg-white/10 px-4 py-4 sm:px-6 border-b border-white/10">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100 flex items-center"
+                                id="modal-title">
                                 <svg class="h-6 w-6 mr-2 text-emerald-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -279,19 +282,20 @@
                         <div class="px-4 pt-5 pb-4 sm:p-6">
 
                             <div class="mb-5">
-                                <label class="block text-sm font-bold text-gray-300 mb-2">Jenis Transaksi</label>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Jenis
+                                    Transaksi</label>
                                 <div class="flex bg-black/20 p-1 rounded-lg border border-white/10">
                                     <label class="flex-1 cursor-pointer">
                                         <input type="radio" name="tipe" value="masuk" class="peer sr-only" checked>
                                         <div
-                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
+                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-600 dark:text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
                                             📥 Pemasukan
                                         </div>
                                     </label>
                                     <label class="flex-1 cursor-pointer">
                                         <input type="radio" name="tipe" value="keluar" class="peer sr-only">
                                         <div
-                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-400 peer-checked:bg-red-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
+                                            class="py-2 text-center rounded-md text-sm font-bold text-gray-600 dark:text-gray-400 peer-checked:bg-red-500 peer-checked:text-white peer-checked:shadow-lg transition-all">
                                             📤 Pengeluaran
                                         </div>
                                     </label>
@@ -299,10 +303,11 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-sm font-bold text-gray-300 mb-1">Nominal (Rp)</label>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Nominal
+                                    (Rp)</label>
                                 <div class="relative rounded-md">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-400 sm:text-sm">Rp</span>
+                                        <span class="text-gray-600 dark:text-gray-400 sm:text-sm">Rp</span>
                                     </div>
                                     <input type="number" name="jumlah" required
                                         class="glass-input block w-full pl-10 sm:text-sm rounded-lg py-2"
@@ -311,14 +316,16 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-sm font-bold text-gray-300 mb-1">Waktu Transaksi</label>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Waktu
+                                    Transaksi</label>
                                 <input type="datetime-local" name="tanggal" required
                                     class="glass-input block w-full sm:text-sm rounded-lg py-2 px-3"
                                     value="<%= moment().utcOffset(7).format('YYYY-MM-DDTHH:mm') %>">
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-sm font-bold text-gray-300 mb-1">Keterangan</label>
+                                <label
+                                    class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Keterangan</label>
                                 <textarea name="keterangan" rows="3" required
                                     class="glass-input block w-full sm:text-sm rounded-lg py-2 px-3"
                                     placeholder="Deskripsi transaksi..."></textarea>
@@ -326,10 +333,11 @@
 
                             <div class="mb-4">
                                 <div class="mb-4">
-                                    <label class="block text-sm font-bold text-gray-300 mb-2">Bukti Foto / Struk
+                                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Bukti
+                                        Foto / Struk
                                         <span class="text-red-400 text-xs ml-1">(Wajib)</span></label>
                                     <div id="trx-dropzone"
-                                        class="relative border-2 border-dashed border-gray-600 hover:border-emerald-400 bg-white/5 rounded-xl p-6 transition-all group cursor-pointer text-center">
+                                        class="relative border-2 border-dashed border-gray-600 hover:border-emerald-400 bg-gray-100 dark:bg-white/5 rounded-xl p-6 transition-all group cursor-pointer text-center">
                                         <input type="file" name="bukti_foto" id="trx-file-input"
                                             accept="image/*,application/pdf" multiple class="sr-only" required>
 
@@ -337,8 +345,8 @@
                                         <div id="trx-dropzone-prompt"
                                             class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
                                             <div
-                                                class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                                                <svg class="w-6 h-6 text-gray-400 group-hover:text-emerald-400"
+                                                class="w-12 h-12 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                <svg class="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-emerald-400"
                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
@@ -346,7 +354,8 @@
                                                     </path>
                                                 </svg>
                                             </div>
-                                            <p class="text-sm text-gray-300 font-medium">Click or Drag files here</p>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Click or
+                                                Drag files here</p>
                                             <p class="text-xs text-gray-500">Support Multiple Files (Images/PDF)</p>
                                         </div>
 
@@ -360,12 +369,12 @@
 
                             </div>
                             <div
-                                class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
+                                class="bg-gray-100 dark:bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
                                 <button type="submit"
-                                    class="glass-button w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Simpan
+                                    class="w-full inline-flex justify-center rounded-lg px-4 py-2 border border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-400 dark:hover:bg-emerald-900/20 text-base font-medium sm:ml-3 sm:w-auto sm:text-sm transition-all">Simpan
                                     Transaksi</button>
                                 <button type="button" onclick="closeModal()"
-                                    class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/10 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Batal</button>
+                                    class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-white/10 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Batal</button>
                             </div>
                     </form>
                 </div>
@@ -383,13 +392,14 @@
                     class="relative inline-block align-bottom glass-card rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-3xl sm:w-full">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start sm:justify-between mb-4">
-                            <h3 class="text-lg leading-6 font-bold text-gray-100 flex items-center"
+                            <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-gray-100 flex items-center"
                                 id="modal-proof-title">
                                 <span
                                     class="bg-emerald-500/10 text-emerald-400 p-1.5 rounded-lg mr-2 border border-emerald-500/20 text-xl">🧾</span>
                                 Detail Pembayaran
                             </h3>
-                            <button type="button" class="text-gray-400 hover:text-gray-200" onclick="closeProofModal()">
+                            <button type="button" class="text-gray-600 dark:text-gray-400 hover:text-gray-200"
+                                onclick="closeProofModal()">
                                 <span class="sr-only">Close</span>
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -403,7 +413,7 @@
                             <div
                                 class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500">
                             </div>
-                            <p class="mt-2 text-sm text-gray-400">Memuat detail...</p>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Memuat detail...</p>
                         </div>
 
                         <div id="proofContent">
@@ -413,7 +423,7 @@
                             </div>
 
                             <div class="mb-2">
-                                <p class="text-sm font-bold text-gray-400 mb-1">Bukti Transfer:</p>
+                                <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-1">Bukti Transfer:</p>
                                 <div
                                     class="flex justify-center bg-black/40 rounded-lg p-2 border border-white/10 relative group">
                                     <img id="proofImage" src="" alt="Bukti"
@@ -488,25 +498,25 @@
                         // Format data
                         const paidBy = iuran.payer_nama ? `(Dibayar oleh: ${iuran.payer_nama})` : '';
                         const jenisNice = iuran.jenis.replace('_', ' ').toUpperCase() + ' - ' + new Date(iuran.periode).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-                        const statusColor = iuran.status === 'lunas' ? 'text-emerald-400' : 'text-yellow-400';
+                        const statusColor = iuran.status === 'lunas' ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-600 dark:text-yellow-400';
                         const statusText = iuran.status.toUpperCase();
 
                         infoDiv.innerHTML = `
-                             <div class="grid grid-cols-1 gap-1 text-sm text-gray-300">
+                             <div class="grid grid-cols-1 gap-1 text-sm text-gray-700 dark:text-gray-300">
                                 <div class="font-bold text-lg text-emerald-100 border-b border-white/10 pb-2 mb-2">
-                                    Warga: ${iuran.warga_nama} <span class="text-sm text-gray-400 font-normal">(Blok ${iuran.blok}-${iuran.nomor_rumah})</span>
+                                    Warga: ${iuran.warga_nama} <span class="text-sm text-gray-600 dark:text-gray-400 font-normal">(Blok ${iuran.blok}-${iuran.nomor_rumah})</span>
                                     <div class="text-xs text-gray-500 font-normal italic mt-0.5">${paidBy}</div>
                                 </div>
                                 <div class="flex justify-between border-b border-white/5 pb-1">
-                                    <span class="text-gray-400">Jenis:</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Jenis:</span>
                                     <span class="font-semibold text-gray-200">${jenisNice}</span>
                                 </div>
                                 <div class="flex justify-between border-b border-white/5 pb-1">
-                                    <span class="text-gray-400">Nominal:</span>
-                                    <span class="font-mono text-emerald-300">Rp ${Number(iuran.jumlah).toLocaleString('id-ID')}</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Nominal:</span>
+                                    <span class="font-mono text-emerald-600 dark:text-emerald-300">Rp ${Number(iuran.jumlah).toLocaleString('id-ID')}</span>
                                 </div>
                                 <div class="flex justify-between pt-1">
-                                    <span class="text-gray-400">Status:</span>
+                                    <span class="text-gray-600 dark:text-gray-400">Status:</span>
                                     <span class="font-bold tracking-wider ${statusColor}">${statusText}</span>
                                 </div>
                              </div>
@@ -529,7 +539,7 @@
                         const related = transactions.filter(t => t.bukti_foto === filename);
                         renderTransactionsList(related, listContainer);
 
-                        infoDiv.innerHTML = `<p class="text-gray-400 italic text-center text-sm py-2">Transaksi Manual (Non-Iuran)</p>`;
+                        infoDiv.innerHTML = `<p class="text-gray-600 dark:text-gray-400 italic text-center text-sm py-2">Transaksi Manual (Non-Iuran)</p>`;
                         infoDiv.classList.remove('hidden');
                     }
                 } catch (error) {
@@ -556,11 +566,11 @@
                         const div = document.createElement('div');
                         div.className = 'flex justify-between items-start text-xs border-b border-white/5 pb-1 last:border-0';
                         div.innerHTML = `
-                            <div class="text-gray-300">
+                            <div class="text-gray-700 dark:text-gray-300">
                                 <span class="text-gray-500 mr-2">${date}</span>
                                 ${t.keterangan}
                             </div>
-                            <div class="font-bold ${t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400'}">
+                            <div class="font-bold ${t.tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}">
                                 ${t.tipe === 'masuk' ? '+' : '-'} Rp ${amount.toLocaleString('id-ID')}
                             </div>
                         `;
@@ -573,7 +583,7 @@
                         totalDiv.className = 'flex justify-between items-center text-sm font-bold pt-2 border-t border-white/10 mt-1';
                         totalDiv.innerHTML = `
                             <span class="text-emerald-100">Total Transaksi</span>
-                            <span class="text-emerald-400">Rp ${total.toLocaleString('id-ID')}</span>
+                            <span class="text-emerald-600 dark:text-emerald-400">Rp ${total.toLocaleString('id-ID')}</span>
                         `;
                         container.appendChild(totalDiv);
                     }
@@ -635,7 +645,7 @@
                                 legend: {
                                     position: 'top',
                                     labels: {
-                                        color: '#d1d5db'
+                                        color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
                                     }
                                 },
                                 tooltip: {
@@ -662,7 +672,7 @@
                                             return 'Rp ' + (value / 1000).toLocaleString('id-ID') + 'k';
                                         },
                                         font: { size: 10 },
-                                        color: '#9ca3af'
+                                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
                                     }
                                 },
                                 x: {
@@ -699,7 +709,7 @@
                 trxDropzone.addEventListener(eventName, (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    trxDropzone.classList.add('border-emerald-500', 'bg-white/10');
+                    trxDropzone.classList.add('border-emerald-500', 'bg-gray-200 dark:bg-white/10');
                 }, false);
             });
 
@@ -707,7 +717,7 @@
                 trxDropzone.addEventListener(eventName, (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    trxDropzone.classList.remove('border-emerald-500', 'bg-white/10');
+                    trxDropzone.classList.remove('border-emerald-500', 'bg-gray-200 dark:bg-white/10');
                 }, false);
             });
 
@@ -787,8 +797,8 @@
                             // Generic file icon
                             div.innerHTML += `
                                 <div class="text-center p-2">
-                                    <svg class="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    <p class="text-[10px] truncate w-full text-gray-300">${file.name}</p>
+                                    <svg class="w-8 h-8 mx-auto text-gray-600 dark:text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <p class="text-[10px] truncate w-full text-gray-700 dark:text-gray-300">${file.name}</p>
                                 </div>
                             `;
                             div.appendChild(removeBtn); // Re-append logic if overwritten

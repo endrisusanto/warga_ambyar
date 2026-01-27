@@ -48,317 +48,329 @@
 
             <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pb-20 text-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-                    <!-- Header & Toolbar -->
-                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                        <div>
-                            <h1
-                                class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                                Laporan Tunggakan
-                            </h1>
-                            <p class="mt-1 text-sm text-gray-400">Daftar rumah yang belum melunasi iuran.</p>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <!-- Search -->
-                            <div class="relative">
-                                <input type="text" id="searchInput" onkeyup="filterTable()"
-                                    placeholder="Cari nama atau blok..."
-                                    class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 placeholder-gray-500 backdrop-blur-sm transition-all">
-                                <svg class="w-5 h-5 text-gray-500 absolute right-3 top-2.5" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                            <div>
+                                <h1
+                                    class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                                    Laporan Tunggakan
+                                </h1>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Daftar rumah yang belum
+                                    melunasi iuran.</p>
                             </div>
 
-                            <a href="/iuran"
-                                class="px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-gray-300 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
-                                Kembali
-                            </a>
-
-                            <!-- Fix Data Button (Admin Only) -->
-                            <% if (user && user.role==='admin' ) { %>
-                                <a href="/iuran/cleanup-duplicates"
-                                    class="px-4 py-2 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl text-amber-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print"
-                                    onclick="return confirm('Proses ini akan menghapus data duplikat (KAS lama) yang sudah digantikan oleh Kas RT. Lanjutkan?')">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <!-- Search -->
+                                <div class="relative">
+                                    <input type="text" id="searchInput" onkeyup="filterTable()"
+                                        placeholder="Cari nama atau blok..."
+                                        class="w-full sm:w-64 bg-gray-100 dark:bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 placeholder-gray-500 backdrop-blur-sm transition-all">
+                                    <svg class="w-5 h-5 text-gray-500 absolute right-3 top-2.5" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
-                                    Fix Data
+                                </div>
+
+                                <a href="/iuran"
+                                    class="px-4 py-2 border border-white/10 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 rounded-xl text-gray-700 dark:text-gray-300 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
+                                    Kembali
                                 </a>
-                                <% } %>
 
-                                    <!-- Export Buttons -->
-                                    <a href="/iuran/arrears/export/excel"
-                                        class="px-4 py-2 border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl text-emerald-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
+                                <!-- Fix Data Button (Admin Only) -->
+                                <% if (user && user.role==='admin' ) { %>
+                                    <a href="/iuran/cleanup-duplicates"
+                                        class="px-4 py-2 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl text-amber-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print"
+                                        onclick="return confirm('Proses ini akan menghapus data duplikat (KAS lama) yang sudah digantikan oleh Kas RT. Lanjutkan?')">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                            </path>
+                                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                         </svg>
-                                        Excel
+                                        Fix Data
                                     </a>
+                                    <% } %>
 
-                                    <button onclick="window.print()"
-                                        class="px-4 py-2 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                        PDF
-                                    </button>
+                                        <!-- Export Buttons -->
+                                        <a href="/iuran/arrears/export/excel"
+                                            class="px-4 py-2 border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl text-emerald-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                </path>
+                                            </svg>
+                                            Excel
+                                        </a>
+
+                                        <button onclick="window.print()"
+                                            class="px-4 py-2 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-400 text-sm font-medium transition-all backdrop-blur-sm flex items-center justify-center no-print">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                            PDF
+                                        </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Print Header (Hidden on Screen) -->
-                    <div class="hidden print:block mb-8 text-center text-black">
-                        <h1 class="text-2xl font-bold">Laporan Tunggakan Iuran Warga</h1>
-                        <p class="text-sm">Dicetak pada: <%= moment().format('DD MMMM YYYY HH:mm') %>
-                        </p>
-                    </div>
+                        <!-- Print Header (Hidden on Screen) -->
+                        <div class="hidden print:block mb-8 text-center text-black">
+                            <h1 class="text-2xl font-bold">Laporan Tunggakan Iuran Warga</h1>
+                            <p class="text-sm">Dicetak pada: <%= moment().format('DD MMMM YYYY HH:mm') %>
+                            </p>
+                        </div>
 
-                    <style>
-                        @media print {
-                            .no-print {
-                                display: none !important;
+                        <style>
+                            @media print {
+                                .no-print {
+                                    display: none !important;
+                                }
+
+                                body {
+                                    background: white !important;
+                                    color: black !important;
+                                }
+
+                                .glass-card {
+                                    background: white !important;
+                                    border: 1px solid #ddd !important;
+                                    box-shadow: none !important;
+                                    border-radius: 0 !important;
+                                }
+
+                                table {
+                                    color: black !important;
+                                }
+
+                                th {
+                                    color: black !important;
+                                    background: #f3f4f6 !important;
+                                }
+
+                                td {
+                                    color: black !important;
+                                    border-bottom: 1px solid #ddd !important;
+                                }
+
+                                .text-white,
+                                .text-gray-200,
+                                .text-gray-700 dark:text-gray-300,
+                                .text-gray-600 dark:text-gray-400,
+                                .text-emerald-400 {
+                                    color: black !important;
+                                }
+
+                                .bg-black\/20 {
+                                    background: transparent !important;
+                                }
+
+                                /* Badges */
+                                .bg-blue-500\/20 {
+                                    background: #dbeafe !important;
+                                    color: #1e40af !important;
+                                    border: 1px solid #bfdbfe !important;
+                                }
+
+                                .bg-indigo-500\/20 {
+                                    background: #e0e7ff !important;
+                                    color: #3730a3 !important;
+                                    border: 1px solid #c7d2fe !important;
+                                }
+
+                                .bg-orange-500\/20 {
+                                    background: #ffedd5 !important;
+                                    color: #9a3412 !important;
+                                    border: 1px solid #fed7aa !important;
+                                }
+
+                                /* Hide Navbar */
+                                nav {
+                                    display: none !important;
+                                }
+
+                                /* Reset layout */
+                                .min-h-screen {
+                                    min-height: auto !important;
+                                    padding-bottom: 0 !important;
+                                }
+
+                                .max-w-7xl {
+                                    max-width: 100% !important;
+                                    padding: 0 !important;
+                                }
                             }
 
-                            body {
-                                background: white !important;
-                                color: black !important;
+                            th.sortable {
+                                cursor: pointer;
+                                user-select: none;
                             }
 
-                            .glass-card {
-                                background: white !important;
-                                border: 1px solid #ddd !important;
-                                box-shadow: none !important;
-                                border-radius: 0 !important;
+                            th.sortable:hover {
+                                background-color: rgba(255, 255, 255, 0.05);
                             }
 
-                            table {
-                                color: black !important;
+                            th.sortable::after {
+                                content: ' ↕';
+                                font-size: 0.8em;
+                                opacity: 0.5;
                             }
+                        </style>
 
-                            th {
-                                color: black !important;
-                                background: #f3f4f6 !important;
-                            }
-
-                            td {
-                                color: black !important;
-                                border-bottom: 1px solid #ddd !important;
-                            }
-
-                            .text-white,
-                            .text-gray-200,
-                            .text-gray-300,
-                            .text-gray-400,
-                            .text-emerald-400 {
-                                color: black !important;
-                            }
-
-                            .bg-black\/20 {
-                                background: transparent !important;
-                            }
-
-                            /* Badges */
-                            .bg-blue-500\/20 {
-                                background: #dbeafe !important;
-                                color: #1e40af !important;
-                                border: 1px solid #bfdbfe !important;
-                            }
-
-                            .bg-indigo-500\/20 {
-                                background: #e0e7ff !important;
-                                color: #3730a3 !important;
-                                border: 1px solid #c7d2fe !important;
-                            }
-
-                            .bg-orange-500\/20 {
-                                background: #ffedd5 !important;
-                                color: #9a3412 !important;
-                                border: 1px solid #fed7aa !important;
-                            }
-
-                            /* Hide Navbar */
-                            nav {
-                                display: none !important;
-                            }
-
-                            /* Reset layout */
-                            .min-h-screen {
-                                min-height: auto !important;
-                                padding-bottom: 0 !important;
-                            }
-
-                            .max-w-7xl {
-                                max-width: 100% !important;
-                                padding: 0 !important;
-                            }
-                        }
-
-                        th.sortable {
-                            cursor: pointer;
-                            user-select: none;
-                        }
-
-                        th.sortable:hover {
-                            background-color: rgba(255, 255, 255, 0.05);
-                        }
-
-                        th.sortable::after {
-                            content: ' ↕';
-                            font-size: 0.8em;
-                            opacity: 0.5;
-                        }
-                    </style>
-
-                    <!-- Glass Table Container -->
-                    <div
-                        class="glass-card overflow-hidden rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl bg-white/5">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-white/10" id="arrearsTable">
-                                <thead class="bg-black/20">
-                                    <tr>
-                                        <th scope="col" onclick="sortTable(0)"
-                                            class="sortable px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
-                                            Rumah</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
-                                            Detail Tunggakan</th>
-                                        <th scope="col" onclick="sortTable(2)"
-                                            class="sortable px-6 py-4 text-right text-xs font-medium text-emerald-400 uppercase tracking-wider">
-                                            Total</th>
-                                        <th scope="col" onclick="sortTable(3)"
-                                            class="sortable px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
-                                            Warga</th>
-                                        <th scope="col"
-                                            class="px-6 py-4 text-right text-xs font-medium text-emerald-400 uppercase tracking-wider">
-                                            Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-white/5 text-gray-300">
-                                    <% if (groupedArray.length===0) { %>
+                        <!-- Glass Table Container -->
+                        <div
+                            class="glass-card overflow-hidden rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl bg-gray-100 dark:bg-white/5">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-white/10" id="arrearsTable">
+                                    <thead class="bg-black/20">
                                         <tr>
-                                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                                <div class="flex flex-col items-center">
-                                                    <svg class="w-12 h-12 mb-3 text-gray-600" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    <span class="text-lg font-medium">Tidak ada tunggakan!</span>
-                                                    <span class="text-sm">Semua warga rajin membayar iuran.</span>
-                                                </div>
-                                            </td>
+                                            <th scope="col" onclick="sortTable(0)"
+                                                class="sortable px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                                                Rumah</th>
+                                            <th scope="col"
+                                                class="px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                                                Detail Tunggakan</th>
+                                            <th scope="col" onclick="sortTable(2)"
+                                                class="sortable px-6 py-4 text-right text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                                                Total</th>
+                                            <th scope="col" onclick="sortTable(3)"
+                                                class="sortable px-6 py-4 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                                                Warga</th>
+                                            <th scope="col"
+                                                class="px-6 py-4 text-right text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                                                Aksi</th>
                                         </tr>
-                                        <% } else { %>
-                                            <% groupedArray.forEach(house=> { %>
-                                                <tr class="hover:bg-white/5 transition-colors group">
-                                                    <!-- Rumah Info -->
-                                                    <td class="px-6 py-4 whitespace-nowrap align-top">
-                                                        <div class="text-sm font-bold text-white search-blok">
-                                                            <%= house.blok %>/<%= house.nomor_rumah %>
-                                                        </div>
-                                                    </td>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/5 text-gray-700 dark:text-gray-300">
+                                        <% if (groupedArray.length===0) { %>
+                                            <tr>
+                                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                                    <div class="flex flex-col items-center">
+                                                        <svg class="w-12 h-12 mb-3 text-gray-600" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                            </path>
+                                                        </svg>
+                                                        <span class="text-lg font-medium">Tidak ada tunggakan!</span>
+                                                        <span class="text-sm">Semua warga rajin membayar iuran.</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% } else { %>
+                                                <% groupedArray.forEach(house=> { %>
+                                                    <tr
+                                                        class="hover:bg-gray-100 dark:bg-white/5 transition-colors group">
+                                                        <!-- Rumah Info -->
+                                                        <td class="px-6 py-4 whitespace-nowrap align-top">
+                                                            <div class="text-sm font-bold text-white search-blok">
+                                                                <%= house.blok %>/<%= house.nomor_rumah %>
+                                                            </div>
+                                                        </td>
 
-                                                    <!-- Detail Items -->
-                                                    <td class="px-6 py-4 align-top">
-                                                        <div class="flex flex-col gap-2">
-                                                            <% house.items.forEach(item=> { %>
-                                                                <div
-                                                                    class="flex items-center text-xs bg-black/20 rounded-lg px-3 py-1.5 border border-white/5 w-fit">
-                                                                    <span class="text-gray-400 w-24">
-                                                                        <%= moment(item.periode).format('MMM YYYY') %>
-                                                                    </span>
-                                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase mx-2 min-w-[60px] text-center
+                                                        <!-- Detail Items -->
+                                                        <td class="px-6 py-4 align-top">
+                                                            <div class="flex flex-col gap-2">
+                                                                <% house.items.forEach(item=> { %>
+                                                                    <div
+                                                                        class="flex items-center text-xs bg-black/20 rounded-lg px-3 py-1.5 border border-white/5 w-fit">
+                                                                        <span
+                                                                            class="text-gray-600 dark:text-gray-400 w-24">
+                                                                            <%= moment(item.periode).format('MMM YYYY')
+                                                                                %>
+                                                                        </span>
+                                                                        <span
+                                                                            class="px-2 py-0.5 rounded text-[10px] font-bold uppercase mx-2 min-w-[60px] text-center
                                                                 <%= item.jenis === 'kas_rt' ? 'bg-blue-500/20 text-blue-300' : 
                                                                     item.jenis === 'kas_gang' ? 'bg-indigo-500/20 text-indigo-300' : 
                                                                     item.jenis === 'sampah' ? 'bg-orange-500/20 text-orange-300' :
-                                                                    'bg-gray-500/20 text-gray-300' %>">
-                                                                        <%= item.jenis==='kas_rt' ? 'Kas RT' :
-                                                                            item.jenis==='kas_gang' ? 'Kas Gang' :
-                                                                            item.jenis==='sampah' ? 'Sampah' :
-                                                                            item.jenis.replace('_', ' ' ).toUpperCase()
-                                                                            %>
-                                                                    </span>
-                                                                    <span class="text-gray-300 font-mono ml-auto">Rp <%=
-                                                                            parseInt(item.jumlah).toLocaleString('id-ID')
-                                                                            %></span>
-                                                                </div>
-                                                                <% }) %>
-                                                        </div>
-                                                    </td>
-
-                                                    <!-- Total -->
-                                                    <td class="px-6 py-4 whitespace-nowrap text-right align-top">
-                                                        <div class="text-sm font-bold text-red-400 search-total"
-                                                            data-value="<%= house.total %>">
-                                                            Rp <%= house.total.toLocaleString('id-ID') %>
-                                                        </div>
-                                                        <div class="text-xs text-gray-500 mt-1">
-                                                            <%= house.items.length %> tagihan
-                                                        </div>
-                                                    </td>
-
-                                                    <!-- Warga Info (Moved) -->
-                                                    <td class="px-6 py-4 align-top">
-                                                        <div class="flex flex-col gap-2">
-                                                            <% Object.values(house.residents).forEach(resident=> { %>
-                                                                <div class="flex items-center">
-                                                                    <div
-                                                                        class="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center text-emerald-400 text-xs font-bold border border-white/10">
-                                                                        <%= resident.nama.charAt(0) %>
+                                                                    'bg-gray-500/20 text-gray-700 dark:text-gray-300' %>">
+                                                                            <%= item.jenis==='kas_rt' ? 'Kas RT' :
+                                                                                item.jenis==='kas_gang' ? 'Kas Gang' :
+                                                                                item.jenis==='sampah' ? 'Sampah' :
+                                                                                item.jenis.replace('_', ' '
+                                                                                ).toUpperCase() %>
+                                                                        </span>
+                                                                        <span
+                                                                            class="text-gray-700 dark:text-gray-300 font-mono ml-auto">Rp
+                                                                            <%= parseInt(item.jumlah).toLocaleString('id-ID')
+                                                                                %></span>
                                                                     </div>
-                                                                    <div class="ml-3">
+                                                                    <% }) %>
+                                                            </div>
+                                                        </td>
+
+                                                        <!-- Total -->
+                                                        <td class="px-6 py-4 whitespace-nowrap text-right align-top">
+                                                            <div class="text-sm font-bold text-red-400 search-total"
+                                                                data-value="<%= house.total %>">
+                                                                Rp <%= house.total.toLocaleString('id-ID') %>
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 mt-1">
+                                                                <%= house.items.length %> tagihan
+                                                            </div>
+                                                        </td>
+
+                                                        <!-- Warga Info (Moved) -->
+                                                        <td class="px-6 py-4 align-top">
+                                                            <div class="flex flex-col gap-2">
+                                                                <% Object.values(house.residents).forEach(resident=> {
+                                                                    %>
+                                                                    <div class="flex items-center">
                                                                         <div
-                                                                            class="text-sm font-medium text-white search-name">
-                                                                            <%= resident.nama %>
+                                                                            class="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center text-emerald-400 text-xs font-bold border border-white/10">
+                                                                            <%= resident.nama.charAt(0) %>
+                                                                        </div>
+                                                                        <div class="ml-3">
+                                                                            <div
+                                                                                class="text-sm font-medium text-white search-name">
+                                                                                <%= resident.nama %>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                                <% }) %>
-                                                        </div>
-                                                    </td>
+                                                                    <% }) %>
+                                                            </div>
+                                                        </td>
 
-                                                    <!-- Action -->
-                                                    <td class="px-6 py-4 whitespace-nowrap text-right align-top">
-                                                        <div class="flex flex-col gap-2 items-end">
-                                                            <% Object.values(house.residents).forEach(resident=> { %>
-                                                                <% if (resident.no_hp) { const
-                                                                    phone=resident.no_hp.replace(/^0/, '62'
-                                                                    ).replace(/\D/g, '' ); let msg=`Halo
-                                                                    ${resident.nama}, berikut rekap tunggakan iuran
-                                                                    untuk rumah
-                                                                    ${house.blok}/${house.nomor_rumah}:\n\n`;
-                                                                    house.items.forEach(item=> {
-                                                                    const j = item.jenis === 'kas_rt' ? 'Kas RT' :
-                                                                    item.jenis === 'kas_gang' ? 'Kas Gang' : item.jenis
-                                                                    === 'sampah' ? 'Sampah' : item.jenis;
-                                                                    msg += `- ${moment(item.periode).format('MMM YYYY')}
-                                                                    (${j}): Rp
-                                                                    ${parseInt(item.jumlah).toLocaleString('id-ID')}\n`;
-                                                                    });
-                                                                    msg += `\n*Total: Rp
-                                                                    ${house.total.toLocaleString('id-ID')}*\n\nMohon
-                                                                    segera dilunasi. Terima kasih.`;
-
-                                                                    const waUrl =
-                                                                    `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                                                        <!-- Action -->
+                                                        <td class="px-6 py-4 whitespace-nowrap text-right align-top">
+                                                            <div class="flex flex-col gap-2 items-end">
+                                                                <% Object.values(house.residents).forEach(resident=> {
                                                                     %>
-                                                                    <a href="<%= waUrl %>" target="_blank"
-                                                                        class="inline-flex items-center px-3 py-1.5 border border-emerald-500/30 rounded-lg text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all shadow-lg shadow-emerald-500/10"
-                                                                        title="Hubungi <%= resident.nama %>">
-                                                                        <svg class="w-4 h-4 mr-1.5" fill="currentColor"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path
-                                                                                d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-                                                                        </svg>
-                                                                        Ingatkan <%= resident.nama.split(' ')[0] %>
+                                                                    <% if (resident.no_hp) { const
+                                                                        phone=resident.no_hp.replace(/^0/, '62'
+                                                                        ).replace(/\D/g, '' ); let msg=`Halo
+                                                                        ${resident.nama}, berikut rekap tunggakan iuran
+                                                                        untuk rumah
+                                                                        ${house.blok}/${house.nomor_rumah}:\n\n`;
+                                                                        house.items.forEach(item=> {
+                                                                        const j = item.jenis === 'kas_rt' ? 'Kas RT' :
+                                                                        item.jenis === 'kas_gang' ? 'Kas Gang' :
+                                                                        item.jenis
+                                                                        === 'sampah' ? 'Sampah' : item.jenis;
+                                                                        msg += `- ${moment(item.periode).format('MMM
+                                                                        YYYY')}
+                                                                        (${j}): Rp
+                                                                        ${parseInt(item.jumlah).toLocaleString('id-ID')}\n`;
+                                                                        });
+                                                                        msg += `\n*Total: Rp
+                                                                        ${house.total.toLocaleString('id-ID')}*\n\nMohon
+                                                                        segera dilunasi. Terima kasih.`;
+
+                                                                        const waUrl =
+                                                                        `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                                                                        %>
+                                                                        <a href="<%= waUrl %>" target="_blank"
+                                                                            class="inline-flex items-center px-3 py-1.5 border border-emerald-500/30 rounded-lg text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all shadow-lg shadow-emerald-500/10"
+                                                                            title="Hubungi <%= resident.nama %>">
+                                                                            <svg class="w-4 h-4 mr-1.5"
+                                                                                fill="currentColor" viewBox="0 0 24 24">
+                                                                                <path
+                                                                                    d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                                                                            </svg>
+                                                                            Ingatkan <%= resident.nama.split(' ')[0] %>
                                                                     </a>
                                                                 <% } %>
                                                             <% }) %>
@@ -370,17 +382,17 @@
                                 </tbody>
                                 <tfoot class="bg-black/20 border-t border-white/10">
                                     <tr>
-                                        <td colspan="2" class="px-6 py-4 text-right font-bold text-gray-300">Grand Total
+                                        <td colspan="2" class="px-6 py-4 text-right font-bold text-gray-700 dark:text-gray-300">Grand Total
                                             Tunggakan:</td>
                                         <td colspan="3" class="px-6 py-4 text-left font-bold text-red-400 text-lg">
-                                            Rp <%= grandTotal.toLocaleString('id-ID') %>
-                                                    </td>
-                                                </tr>
-                                                </tfoot>
-                            </table>
+                                            Rp <%= grandTotal.toLocaleString(' id-ID') %>
+                                                        </td>
+                                                    </tr>
+                                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 

@@ -26,7 +26,7 @@
                                 Input Bayar
                             </a>
                             <button onclick="toggleFilters()"
-                                class="w-full glass-button inline-flex justify-between items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-300 border border-white/10 bg-white/5">
+                                class="w-full glass-button inline-flex justify-between items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 border border-white/10 bg-gray-100 dark:bg-white/5">
                                 <span>Filters & Options</span>
                                 <svg id="filter-icon" class="w-5 h-5 transform transition-transform duration-200"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,9 +53,9 @@
 
                                 <!-- Empty House Filter Switch -->
                                 <div
-                                    class="flex items-center justify-center gap-2 bg-white/5 p-1.5 rounded-lg border border-white/10 h-[38px]">
+                                    class="flex items-center justify-center gap-2 bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg border border-white/10 h-[38px]">
                                     <span id="toggle-empty-label"
-                                        class="text-xs text-gray-400 font-medium whitespace-nowrap w-[45px] text-center">Huni</span>
+                                        class="text-xs text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap w-[45px] text-center">Huni</span>
                                     <button id="toggle-empty-btn" onclick="toggleEmptyRows()" type="button"
                                         class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-emerald-500"
                                         role="switch" aria-checked="true">
@@ -67,7 +67,7 @@
                                 <!-- Export Dropdown -->
                                 <div class="relative inline-block text-left w-full md:w-auto">
                                     <button onclick="toggleExportDropdown(event)" type="button"
-                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 transition-colors border border-white/10"
+                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 transition-colors border border-white/10"
                                         id="menu-button" aria-expanded="true" aria-haspopup="true">
                                         Export
                                         <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
@@ -79,25 +79,25 @@
                                     </button>
 
                                     <div id="export-dropdown"
-                                        class="hidden origin-top-right absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-gray-900/95 backdrop-blur-xl border border-white/20 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        class="hidden origin-top-right absolute right-0 mt-2 w-36 rounded-xl shadow-2xl bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden"
                                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
                                         tabindex="-1">
                                         <div class="py-1" role="none">
                                             <button onclick="exportToImage(); toggleExportDropdown(event)"
-                                                class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                class="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 block px-4 py-2.5 text-sm w-full text-left transition-colors font-medium border-b border-gray-100 dark:border-white/5"
                                                 role="menuitem" tabindex="-1">
-                                                Image
+                                                📷 Image
                                             </button>
                                             <button onclick="exportToPDF(); toggleExportDropdown(event)"
-                                                class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                class="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 block px-4 py-2.5 text-sm w-full text-left transition-colors font-medium border-b border-gray-100 dark:border-white/5"
                                                 role="menuitem" tabindex="-1">
-                                                PDF
+                                                📄 PDF
                                             </button>
                                             <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
                                                 <a href="/iuran/export"
-                                                    class="text-gray-300 hover:bg-white/10 block px-4 py-2 text-sm w-full text-left"
+                                                    class="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 block px-4 py-2.5 text-sm w-full text-left transition-colors font-medium"
                                                     role="menuitem" tabindex="-1">
-                                                    Excel
+                                                    📊 Excel
                                                 </a>
                                                 <% } %>
                                         </div>
@@ -107,12 +107,12 @@
                                 <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
                                     <form action="/iuran/generate" method="POST" class="w-full md:w-auto">
                                         <button type="submit"
-                                            class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 transition-colors border border-white/10">
+                                            class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 transition-colors border border-white/10">
                                             Generate
                                         </button>
                                     </form>
                                     <a href="/iuran/arrears"
-                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-300 bg-white/10 hover:bg-white/15 transition-colors border border-white/15">
+                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-white/10 hover:bg-white/15 transition-colors border border-white/15">
                                         Tunggakan
                                     </a>
                                     <% } %>
@@ -120,7 +120,7 @@
 
                             <!-- Desktop Input Bayar (Hidden on Mobile) -->
                             <a href="/iuran/pay"
-                                class="hidden md:inline-flex glass-button items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-200 bg-white/10 hover:bg-white/15 border border-white/15 ml-2">
+                                class="hidden md:inline-flex glass-button items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-200 bg-gray-200 dark:bg-white/10 hover:bg-white/15 border border-white/15 ml-2">
                                 Input Bayar
                             </a>
                         </div>
@@ -145,10 +145,10 @@
                                         <% }) %>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white/5 divide-y divide-white/10">
+                            <tbody class="bg-white dark:bg-white/5 divide-y divide-white/10">
                                 <% warga.forEach(w=> { %>
                                     <tr
-                                        class="transition-colors border-l-2 status-<%= w.status_huni.replace(/\s+/g, '-') %> <%= w.status_huni === 'kosong' ? 'bg-black/40 border-l-gray-600 hover:bg-black/60' : w.status_huni === 'kontrak' ? 'bg-amber-500/10 border-l-amber-500 hover:bg-amber-500/20' : w.status_huni === 'tidak huni' ? 'bg-blue-500/5 border-l-blue-500 hover:bg-blue-500/10' : 'hover:bg-white/10 border-l-transparent' %>">
+                                        class="transition-colors border-l-2 status-<%= w.status_huni.replace(/\s+/g, '-') %> <%= w.status_huni === 'kosong' ? 'bg-black/40 border-l-gray-600 hover:bg-black/60' : w.status_huni === 'kontrak' ? 'bg-amber-500/10 border-l-amber-500 hover:bg-amber-500/20' : w.status_huni === 'tidak huni' ? 'bg-blue-500/5 border-l-blue-500 hover:bg-blue-500/10' : 'hover:bg-gray-200 dark:bg-white/10 border-l-transparent' %>">
                                         <td
                                             class="px-2 py-1 whitespace-nowrap sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)] <%= w.status_huni === 'kosong' ? 'bg-gray-900' : w.status_huni === 'kontrak' ? 'bg-[#1a1500]' : w.status_huni === 'tidak huni' ? 'bg-[#000d1a]' : 'bg-[#0f1115]' %>">
                                             <div class="font-medium text-gray-200">
@@ -160,7 +160,7 @@
                                                 </div>
                                                 <% if(w.status_huni !=='tetap' ) { %>
                                                     <span
-                                                        class="text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold <%= w.status_huni === 'kosong' ? 'bg-gray-700 text-gray-300' : 'bg-amber-500/20 text-amber-500' %>">
+                                                        class="text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold <%= w.status_huni === 'kosong' ? 'bg-gray-700 text-gray-700 dark:text-gray-300' : 'bg-amber-500/20 text-amber-500' %>">
                                                         <%= w.status_huni %>
                                                     </span>
                                                     <% } %>
@@ -175,7 +175,7 @@
                                                     <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
                                     <%= status.kas_rt && status.kas_rt.status === 'lunas' ? 'bg-emerald-500' : 
                                         status.kas_rt && status.kas_rt.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
-                                        status.kas_rt ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                        status.kas_rt ? 'bg-red-500' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-300' %>
                                     <%= status.kas_rt ? 'cursor-pointer hover:opacity-80' : '' %>"
                                                         title="<%= status.kas_rt ? 'Kas RT: ' + status.kas_rt.status.replace('_', ' ') : 'Belum Ditagih' %>"
                                                         onclick="showDetail(this)"
@@ -187,7 +187,7 @@
                                                     <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
                                     <%= status.kas_gang && status.kas_gang.status === 'lunas' ? 'bg-emerald-500' : 
                                         status.kas_gang && status.kas_gang.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
-                                        status.kas_gang ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                        status.kas_gang ? 'bg-red-500' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-300' %>
                                     <%= status.kas_gang ? 'cursor-pointer hover:opacity-80' : '' %>"
                                                         title="<%= status.kas_gang ? 'Kas Gang: ' + status.kas_gang.status.replace('_', ' ') : 'Belum Ditagih' %>"
                                                         onclick="showDetail(this)"
@@ -199,7 +199,7 @@
                                                     <div class="inline-block px-1.5 py-1.5 rounded-full text-[7px] font-bold text-gray-900 min-w-[22px] text-center
                                     <%= status.sampah && status.sampah.status === 'lunas' ? 'bg-emerald-500' : 
                                         status.sampah && status.sampah.status === 'menunggu_konfirmasi' ? 'bg-amber-500' :
-                                        status.sampah ? 'bg-red-500' : 'bg-white/10 text-gray-500' %>
+                                        status.sampah ? 'bg-red-500' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-300' %>
                                     <%= status.sampah ? 'cursor-pointer hover:opacity-80' : '' %>"
                                                         title="<%= status.sampah ? 'Sampah: ' + status.sampah.status.replace('_', ' ') : 'Belum Ditagih' %>"
                                                         onclick="showDetail(this)"
@@ -215,8 +215,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-4 bg-white/5 border-t border-white/10">
-                        <div class="flex flex-wrap gap-4 text-xs text-gray-400">
+                    <div class="p-4 bg-gray-100 dark:bg-white/5 border-t border-white/10">
+                        <div class="flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-400">
                             <div class="flex items-center"><span
                                     class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>Lunas
                             </div>
@@ -226,7 +226,7 @@
                                     class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>Belum
                                 Lunas</div>
                             <div class="flex items-center"><span
-                                    class="w-3 h-3 bg-white/10 rounded-full mr-2"></span>Belum
+                                    class="w-3 h-3 bg-gray-200 dark:bg-white/10 rounded-full mr-2"></span>Belum
                                 Ditagih</div>
                         </div>
                     </div>
@@ -277,9 +277,9 @@
                                 const bayarStr = bayarObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace('.', ':');
 
                                 let html = `
-                                    <div class="flex items-center bg-white/10 border border-white/10 rounded-full px-1 py-1">
+                                    <div class="flex items-center bg-gray-200 dark:bg-white/10 border border-white/10 rounded-full px-1 py-1">
                                         <div class="flex items-center gap-2 px-3 py-1">
-                                            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
                                             <span class="text-xs text-gray-200">${bayarStr}</span>
                                         </div>
                                 `;
@@ -355,7 +355,7 @@
                                             const type = t.jenis === 'keamanan' ? 'Kas RT' : (t.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
 
                                             const div = document.createElement('div');
-                                            div.className = 'flex justify-between text-xs text-gray-300';
+                                            div.className = 'flex justify-between text-xs text-gray-700 dark:text-gray-300';
                                             div.innerHTML = `
                                             <span>${type} - ${date}</span>
                                             <span class="font-bold text-emerald-400">Rp ${amount.toLocaleString('id-ID')}</span>
@@ -390,7 +390,7 @@
                         const userRole = "<%= user ? user.role : '' %>";
 
                         let buttonsHtml = `
-                            <button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10" onclick="closePaymentModal()">Close</button>
+                            <button type="button" class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10" onclick="closePaymentModal()">Close</button>
                         `;
 
                         if (userRole === 'admin') {
@@ -402,7 +402,7 @@
                         if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
                             buttonsHtml = `
                                 <a href="/iuran/confirm/${data.id}" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/15 text-base font-medium text-gray-200 hover:bg-white/20 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/15">Approve</a>
-                                <a href="/iuran/reject/${data.id}" onclick="return confirm('Tolak pembayaran?')" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-white/10 text-base font-medium text-gray-300 hover:bg-white/15 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Reject</a>
+                                <a href="/iuran/reject/${data.id}" onclick="return confirm('Tolak pembayaran?')" class="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-gray-200 dark:bg-white/10 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-white/15 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-white/10">Reject</a>
                             ` + buttonsHtml;
                         }
 
@@ -420,10 +420,10 @@
                                     if (resp.success && resp.items.length > 1) {
                                         // Show batch selection
                                         const container = document.createElement('div');
-                                        container.className = "mt-4 p-3 bg-white/5 rounded-lg border border-white/10";
+                                        container.className = "mt-4 p-3 bg-gray-100 dark:bg-white/5 rounded-lg border border-white/10";
 
                                         let totalAmount = 0;
-                                        let html = `<p class="text-xs font-bold text-gray-300 mb-2">Pembayaran Menunggu Konfirmasi Lainnya:</p>
+                                        let html = `<p class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Pembayaran Menunggu Konfirmasi Lainnya:</p>
                                                     <div class="space-y-2 max-h-40 overflow-y-auto">`;
 
                                         resp.items.forEach(item => {
@@ -434,17 +434,17 @@
                                             totalAmount += amount;
 
                                             html += `
-                                                <label class="flex items-center space-x-2 cursor-pointer hover:bg-white/5 p-1 rounded">
+                                                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:bg-white/5 p-1 rounded">
                                                     <input type="checkbox" name="batch_ids" value="${item.id}" data-amount="${amount}" checked onchange="updateBatchTotal()" class="rounded border-gray-500 text-emerald-500 focus:ring-emerald-500 bg-gray-700">
-                                                    <span class="text-xs text-gray-300 flex-1">${j} - ${mY}</span>
-                                                    <span class="text-xs text-gray-400">Rp ${amount.toLocaleString('id-ID')}</span>
+                                                    <span class="text-xs text-gray-700 dark:text-gray-300 flex-1">${j} - ${mY}</span>
+                                                    <span class="text-xs text-gray-600 dark:text-gray-400">Rp ${amount.toLocaleString('id-ID')}</span>
                                                 </label>
                                             `;
                                         });
 
                                         html += `</div>
                                                  <div class="mt-3 pt-2 border-t border-white/10 flex justify-between items-center">
-                                                     <span class="text-xs font-bold text-gray-300">Grand Total:</span>
+                                                     <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Grand Total:</span>
                                                      <span id="batch-total" class="text-sm font-bold text-emerald-400">Rp ${totalAmount.toLocaleString('id-ID')}</span>
                                                  </div>`;
 
@@ -717,30 +717,30 @@
 
                     if (hideEmpty) {
                         // Hidden state (Switch ON - Green) -> Show "Huni"
-                        btn.classList.remove('bg-gray-700');
+                        btn.classList.remove('bg-gray-400');
                         btn.classList.add('bg-emerald-500');
                         span.classList.remove('translate-x-0');
                         span.classList.add('translate-x-4');
                         if (label) {
                             label.innerText = 'Huni';
                             label.classList.add('text-emerald-400');
-                            label.classList.remove('text-gray-400');
+                            label.classList.remove('text-gray-600', 'dark:text-gray-400');
                         }
 
-                        rows.forEach(r => r.classList.add('hidden'));
+                        rows.forEach(r => r.style.display = 'none');
                     } else {
                         // Visible state (Switch OFF - Gray) -> Show "Semua"
                         btn.classList.remove('bg-emerald-500');
-                        btn.classList.add('bg-gray-700');
+                        btn.classList.add('bg-gray-400');
                         span.classList.remove('translate-x-4');
                         span.classList.add('translate-x-0');
                         if (label) {
                             label.innerText = 'Semua';
                             label.classList.remove('text-emerald-400');
-                            label.classList.add('text-gray-400');
+                            label.classList.add('text-gray-600', 'dark:text-gray-400');
                         }
 
-                        rows.forEach(r => r.classList.remove('hidden'));
+                        rows.forEach(r => r.style.display = '');
                     }
                     localStorage.setItem('hideEmptyRows', hideEmpty);
                 }
@@ -764,23 +764,26 @@
                     <div
                         class="glass-card w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
                         <div class="p-6 overflow-y-auto">
-                            <h3 class="text-lg leading-6 font-medium text-gray-100 mb-4" id="modal-title">Detail
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4"
+                                id="modal-title">Detail
                                 Pembayaran</h3>
                             <div class="space-y-3">
-                                <p class="text-sm text-gray-300" id="modal-warga"></p>
-                                <p class="text-sm text-gray-300" id="modal-jenis"></p>
-                                <p class="text-sm text-gray-300" id="modal-nominal"></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-warga"></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-jenis"></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-nominal"></p>
                                 <div id="modal-timeline" class="hidden py-2 flex justify-center"></div>
                                 <div class="flex items-center gap-2 pt-1 justify-center">
-                                    <p class="text-sm text-gray-300">Status:</p>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">Status:</p>
                                     <span id="modal-status-badge"
                                         class="px-3 py-1 rounded-full text-xs font-semibold"></span>
                                 </div>
-                                <div id="modal-proof" class="hidden mt-4 border border-white/10 rounded p-2 bg-white/5">
-                                    <p class="text-xs font-bold mb-2 text-gray-300">Bukti Transfer:</p>
+                                <div id="modal-proof"
+                                    class="hidden mt-4 border border-white/10 rounded p-2 bg-gray-100 dark:bg-white/5">
+                                    <p class="text-xs font-bold mb-2 text-gray-700 dark:text-gray-300">Bukti Transfer:
+                                    </p>
                                     <img src="" class="w-full object-contain max-h-64 rounded">
                                     <a href="#" target="_blank"
-                                        class="block mt-2 text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
+                                        class="block mt-2 text-gray-600 dark:text-gray-400 text-xs hover:underline text-center hover:text-gray-200">Lihat
                                         Ukuran Penuh</a>
 
                                     <div id="modal-related-transactions"
@@ -792,10 +795,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
+                        <div class="bg-gray-100 dark:bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10"
                             id="modal-actions">
                             <button type="button"
-                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
+                                class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm border border-white/10"
                                 onclick="closePaymentModal()">Close</button>
 
                             <% if (user && user.role==='admin' ) { %>
@@ -821,8 +824,9 @@
                                     d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-100 mb-2">Pembayaran Berhasil Diinput</h3>
-                        <p class="text-sm text-gray-300 mb-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-2">Pembayaran
+                            Berhasil Diinput</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
                             Data pembayaran telah tersimpan. Apakah Anda ingin mengirim notifikasi ke Admin via WhatsApp
                             sekarang?
                         </p>
@@ -836,7 +840,7 @@
                                 Kirim Notifikasi (WA)
                             </a>
                             <button type="button" onclick="closeSuccessModal()"
-                                class="inline-flex justify-center px-4 py-2 text-sm font-medium rounded-xl text-gray-300 bg-white/10 hover:bg-white/20 border border-white/10 transition-all">
+                                class="inline-flex justify-center px-4 py-2 text-sm font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-white/10 hover:bg-white/20 border border-white/10 transition-all">
                                 Kembali ke Web
                             </button>
                         </div>

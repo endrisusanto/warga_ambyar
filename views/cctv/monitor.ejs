@@ -28,6 +28,7 @@
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+                background: #000;
             }
 
             .cctv-loading {
@@ -206,8 +207,9 @@
 
         <div class="glass-card">
             <div class="px-4 py-5 sm:px-6 border-b border-white/10">
-                <h3 class="text-lg leading-6 font-medium text-gray-100">Monitor CCTV Lalu Lintas</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-400">Live streaming dari 9 titik kamera CCTV di area
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Monitor CCTV Lalu Lintas</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400">Live streaming dari 9 titik kamera
+                    CCTV di area
                     perjalanan kerja</p>
             </div>
 
@@ -224,8 +226,12 @@
                 <div class="modal-video-container">
                     <video class="modal-video" id="modalVideo" autoplay muted controls></video>
                     <div class="modal-info">
-                        <div class="text-sm font-medium text-gray-200" id="modalCameraName"></div>
-                        <div class="text-xs text-gray-400 mt-1" id="modalCameraId"></div>
+                        <div class="text-sm font-bold text-white drop-shadow-md"
+                            style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);"
+                            id="modalCameraName"></div>
+                        <div class="text-xs text-white font-bold drop-shadow-md mt-1"
+                            style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);"
+                            id="modalCameraId"></div>
                     </div>
                 </div>
             </div>
@@ -273,13 +279,13 @@
                 <video class="cctv-video" autoplay muted playsinline></video>
                 <div class="cctv-loading">
                     <div class="loading-spinner"></div>
-                    <div class="text-xs text-gray-400 mt-2">Connecting...</div>
+                    <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
                 </div>
                 <div class="cctv-overlay">
                     <div class="live-badge">● LIVE</div>
                     <div class="cctv-info">
-                        <div class="text-xs text-gray-300 font-medium">${camera.id}</div>
-                        <div class="text-sm text-white font-semibold">${camera.name}</div>
+                        <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
+                        <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
                     </div>
                     <button class="expand-button" onclick="openModal('${camera.id}')">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

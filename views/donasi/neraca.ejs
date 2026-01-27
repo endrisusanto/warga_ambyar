@@ -4,11 +4,11 @@
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="mb-8 px-4 sm:px-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-100 flex items-center gap-3">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
                         <span class="text-4xl">💰</span>
                         Neraca Campaign
                     </h1>
-                    <p class="text-gray-400 mt-2">
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">
                         <%= campaign.judul %>
                     </p>
                 </div>
@@ -31,7 +31,7 @@
                         Input Pengeluaran
                     </a>
                     <a href="/donasi/campaign/<%= campaign.id %>"
-                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10 hover:border-white/20">
+                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10 hover:border-white/20">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -45,20 +45,20 @@
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500">
-                        <p class="text-sm text-gray-400 mb-2">Total Pemasukan (Donasi)</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Pemasukan (Donasi)</p>
                         <p class="text-3xl font-black text-green-400">
                             Rp <%= neraca.pemasukan.toLocaleString('id-ID') %>
                         </p>
                     </div>
                     <div class="glass-card p-6 rounded-2xl border-l-4 border-red-500">
-                        <p class="text-sm text-gray-400 mb-2">Total Pengeluaran</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Pengeluaran</p>
                         <p class="text-3xl font-black text-red-400">
                             Rp <%= neraca.pengeluaran.toLocaleString('id-ID') %>
                         </p>
                     </div>
                     <div
                         class="glass-card p-6 rounded-2xl border-l-4 <%= neraca.saldo >= 0 ? 'border-blue-500' : 'border-orange-500' %>">
-                        <p class="text-sm text-gray-400 mb-2">Saldo</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Saldo</p>
                         <p class="text-3xl font-black <%= neraca.saldo >= 0 ? 'text-blue-400' : 'text-orange-400' %>">
                             Rp <%= neraca.saldo.toLocaleString('id-ID') %>
                         </p>
@@ -68,7 +68,7 @@
                 <!-- Pengeluaran List -->
                 <div class="glass-card rounded-2xl overflow-hidden">
                     <div class="p-6 border-b border-white/10">
-                        <h2 class="text-xl font-bold text-gray-100">Rincian Pengeluaran</h2>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Rincian Pengeluaran</h2>
                     </div>
 
                     <% if(pengeluaran.length===0) { %>
@@ -79,36 +79,36 @@
                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                                 </path>
                             </svg>
-                            <p class="mt-2 text-sm text-gray-400">Belum ada pengeluaran tercatat</p>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Belum ada pengeluaran tercatat</p>
                         </div>
                         <% } else { %>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-white/10">
-                                    <thead class="bg-white/5">
+                                    <thead class="bg-gray-100 dark:bg-white/5">
                                         <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">
                                                 Tanggal</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">
                                                 Deskripsi</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase">
+                                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">
                                                 Kategori</th>
-                                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase">
+                                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">
                                                 Jumlah</th>
-                                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-400 uppercase">
+                                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">
                                                 Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-white/10">
                                         <% pengeluaran.forEach(p=> { %>
-                                            <tr class="hover:bg-white/5 transition-colors">
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                            <tr class="hover:bg-gray-100 dark:bg-white/5 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                                     <%= moment(p.tanggal).format('DD MMM YYYY') %>
                                                         <br>
                                                         <span class="text-xs text-gray-500">
                                                             <%= moment(p.tanggal).format('HH:mm') %>
                                                         </span>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm text-gray-300">
+                                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                                                     <%= p.deskripsi %>
                                                         <% if(p.bukti) { %>
                                                             <a href="/uploads/donasi/pengeluaran/<%= p.bukti %>"
@@ -121,7 +121,7 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                     <% if(p.kategori) { %>
                                                         <span
-                                                            class="bg-white/10 text-gray-300 text-xs font-bold px-3 py-1 rounded-full">
+                                                            class="bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 text-xs font-bold px-3 py-1 rounded-full">
                                                             <%= p.kategori %>
                                                         </span>
                                                         <% } else { %>
@@ -142,7 +142,7 @@
                                             </tr>
                                             <% }) %>
                                     </tbody>
-                                    <tfoot class="bg-white/10">
+                                    <tfoot class="bg-gray-200 dark:bg-white/10">
                                         <tr>
                                             <td colspan="3"
                                                 class="px-6 py-4 text-sm font-bold text-gray-200 text-right">TOTAL

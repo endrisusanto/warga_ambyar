@@ -2,47 +2,77 @@
     <%- include('../partials/navbar', { useWideContainer: true }) %>
         <script src="/js/html2canvas.min.js"></script>
 
-        <div class="glass-card mb-6">
-            <div class="px-6 py-6 flex flex-col sm:flex-row justify-between items-center flex-wrap gap-4">
-                <div>
-                    <h3 class="text-2xl leading-6 font-bold text-gray-100 drop-shadow-lg flex items-center gap-3">
+        <div id="filter-header-card" class="glass-card mb-6 transition-all duration-300">
+            <div class="px-6 py-6 flex flex-col xl:flex-row justify-between items-center gap-6">
+                <div class="w-full xl:w-auto text-center xl:text-left">
+                    <h3
+                        class="text-2xl leading-6 font-bold text-gray-900 dark:text-gray-100 drop-shadow-lg flex items-center justify-center xl:justify-start gap-3">
                         <svg class="h-7 w-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         Jadwal Ronda Malam Minggu
                     </h3>
-                    <p class="mt-2 text-sm text-gray-400 font-medium ml-10">Bulan <%= moment(year + '-' + month + '-01'
-                            ).format('MMMM YYYY') %>
-                    </p>
+                    <div
+                        class="mt-3 text-sm text-gray-600 dark:text-gray-400 font-medium flex items-center justify-center xl:justify-start gap-4">
+                        <% let prevM=parseInt(month) - 1; let prevY=parseInt(year); if(prevM===0) { prevM=12; prevY--; }
+                            let nextM=parseInt(month) + 1; let nextY=parseInt(year); if(nextM===13) { nextM=1; nextY++;
+                            } %>
+                            <a href="/ronda?month=<%= prevM %>&year=<%= prevY %>"
+                                class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full transition-all text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/10"
+                                title="Bulan Sebelumnya">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </a>
+                            <span
+                                class="text-base font-bold text-gray-800 dark:text-gray-100 uppercase tracking-widest min-w-[150px] text-center">
+                                <%= moment(year + '-' + month + '-01' ).format('MMMM YYYY') %>
+                            </span>
+                            <a href="/ronda?month=<%= nextM %>&year=<%= nextY %>"
+                                class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full transition-all text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/10"
+                                title="Bulan Selanjutnya">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                    </div>
                 </div>
-                <form action="/ronda" method="GET" class="flex flex-wrap items-center gap-3">
-                    <select name="month"
-                        class="glass-input rounded-xl text-sm text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors">
-                        <% moment.months().forEach(function(m, index) { %>
-                            <option value="<%= index + 1 %>" <%=(index + 1)==month ? 'selected' : '' %>><%= m %>
-                            </option>
-                            <% }) %>
-                    </select>
-                    <select name="year"
-                        class="glass-input rounded-xl text-sm text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors">
-                        <% for(let y=2024; y <=2030; y++) { %>
-                            <option value="<%= y %>" <%=y==year ? 'selected' : '' %>><%= y %>
-                            </option>
-                            <% } %>
-                    </select>
-                    <button type="submit"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        🔍 Lihat
-                    </button>
-                    <% if(user.role==='admin' || user.role==='bendahara' ) { %>
-                        <div class="h-8 w-px bg-white/20 mx-1 hidden sm:block"></div>
+                <form action="/ronda" method="GET" class="flex flex-wrap items-center justify-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <select name="month"
+                            class="bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors shadow-sm focus:ring-2 focus:ring-indigo-500/50">
+                            <% moment.months().forEach(function(m, index) { %>
+                                <option value="<%= index + 1 %>" <%=(index + 1)==month ? 'selected' : '' %>
+                                    class="bg-gray-100 dark:bg-gray-800"><%= m %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <select name="year"
+                            class="bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-gray-100 p-2.5 outline-none font-medium cursor-pointer transition-colors shadow-sm focus:ring-2 focus:ring-indigo-500/50">
+                            <% for(let y=2024; y <=2030; y++) { %>
+                                <option value="<%= y %>" <%=y==year ? 'selected' : '' %> class="bg-gray-100
+                                    dark:bg-gray-800"><%= y %>
+                                </option>
+                                <% } %>
+                        </select>
+                        <button type="submit"
+                            class="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span class="hidden sm:inline">Lihat</span>
+                        </button>
+                    </div>
+
+                    <div class="h-8 w-px bg-white/20 mx-1 hidden xl:block"></div>
+
+                    <div class="flex items-center gap-2">
                         <a href="/ronda/control?month=<%= month %>&year=<%= year %>"
-                            class="glass-button text-gray-300 hover:bg-white/10 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-white/10">
+                            class="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
@@ -50,22 +80,110 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            ⚙️ Control
+                            Control
                         </a>
-                        <a href="/ronda/teams"
-                            class="glass-button text-gray-300 hover:bg-white/10 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-white/10">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                </path>
-                            </svg>
-                            👥 Tim
-                        </a>
-                        <% } %>
+                        <% if(user.role==='admin' || user.role==='bendahara' ) { %>
+                            <a href="/ronda/teams"
+                                class="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                                Tim
+                            </a>
+                            <% } %>
+
+                                <!-- Filter Toggle Button -->
+                                <button type="button" id="togglePastSchedules" onclick="handleTogglePastSchedules()"
+                                    class="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                    <span id="filterButtonText">Sembunyikan Selesai</span>
+                                </button>
+                    </div>
                 </form>
             </div>
         </div>
 
+        <script>
+            // Filter past schedules functionality
+            const savedHide = localStorage.getItem('hidePastSchedules');
+            let hidePastSchedules = savedHide === null ? true : savedHide === 'true';
+
+            function handleTogglePastSchedules() {
+                hidePastSchedules = !hidePastSchedules;
+                localStorage.setItem('hidePastSchedules', hidePastSchedules);
+                applyPastSchedulesFilter();
+            }
+
+            function applyPastSchedulesFilter() {
+                const pastCards = document.querySelectorAll('.ronda-card-past');
+                const buttonText = document.getElementById('filterButtonText');
+                const button = document.getElementById('togglePastSchedules');
+                const container = document.getElementById('schedule-container');
+
+                // logic to count visible
+                const totalCards = document.querySelectorAll('[id^="card-"]').length;
+                const pastCount = pastCards.length;
+                // If hiding past, visible = total - past. If showing all, visible = total.
+                const visibleCount = hidePastSchedules ? (totalCards - pastCount) : totalCards;
+
+                if (hidePastSchedules) {
+                    pastCards.forEach(card => {
+                        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    });
+                    buttonText.textContent = 'Tampilkan Selesai';
+                    button.classList.add('!bg-indigo-500', '!text-white', '!border-indigo-400');
+                } else {
+                    pastCards.forEach(card => {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }, 10);
+                    });
+                    buttonText.textContent = 'Sembunyikan Selesai';
+                    button.classList.remove('!bg-indigo-500', '!text-white', '!border-indigo-400');
+                }
+
+                // Adjust Layout for Single Card
+                // Use timeout to match the visual transition if needed, or immediate reset
+                // Since this runs on click or load, we can set classes immediately
+                // However, display:none happens after 300ms in hide logic. 
+                // But for layout container, we want it to look right.
+
+                // Note: The count calculation above assumes past cards ARE hidden or shown based on the flag.
+                // In reality, animation takes time. But container class change can happen now.
+
+                if (visibleCount === 1) {
+                    // Center single card
+                    container.className = 'grid grid-cols-1 gap-6 max-w-4xl mx-auto transition-all duration-300';
+                    const headerCard = document.getElementById('filter-header-card');
+                    if (headerCard) headerCard.className = 'glass-card mb-6 transition-all duration-300 max-w-4xl mx-auto';
+                } else {
+                    // Default Grid
+                    container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 transition-all duration-300';
+                    const headerCard = document.getElementById('filter-header-card');
+                    if (headerCard) headerCard.className = 'glass-card mb-6 transition-all duration-300';
+                }
+            }
+
+            // Apply filter on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                applyPastSchedulesFilter();
+            });
+        </script>
 
         <style>
             @keyframes glow-pulse {
@@ -86,7 +204,8 @@
         </style>
 
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div id="schedule-container"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 transition-all duration-300">
             <% Object.keys(groupedSchedule).forEach(function(date) { const schedules=groupedSchedule[date]; const
                 teamCounts={}; schedules.forEach(function(s) { if(s.tim_ronda) {
                 teamCounts[s.tim_ronda]=(teamCounts[s.tim_ronda] || 0) + 1; } }); let teamName=null; let maxCount=0;
@@ -116,13 +235,13 @@
                     ); let isThisWeek; if (isSaturday && isSunday && currentHour < 6) { isThisWeek=true; } else {
                     isThisWeek=moment(date).isSame(moment(), 'week' ); } const isHighlighted=isThisWeek && !isPast; %>
                     <div id="card-<%= date %>"
-                        class="glass-card overflow-hidden divide-y <%= isHighlighted ? 'divide-gray-200' : 'divide-white/10' %> <%= isHighlighted ? 'bg-slate-50 border-2 border-white shadow-2xl scale-[1.02] z-10' : '' %> <%= isToday ? '!border-green-400 !bg-green-50 ring-4 ring-green-400/20' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2]' : '' %> transition-all duration-300 hover:scale-[1.03]">
+                        class="glass-card overflow-hidden divide-y <%= isHighlighted ? 'divide-gray-200' : 'divide-white/10' %> <%= isHighlighted ? 'bg-slate-50 border-2 border-white shadow-2xl scale-[1.02] z-10' : '' %> <%= isToday ? '!border-green-400 !bg-green-50 ring-4 ring-green-400/20 shadow-[0_0_25px_rgba(74,222,128,0.6)]' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2] ronda-card-past' : '' %> transition-all duration-300 hover:scale-[1.03]">
                         <div
-                            class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-white/5' : (isToday ? 'bg-green-100' : (isHighlighted ? 'bg-white border-b border-gray-200' : 'bg-white/5')) %> backdrop-blur-sm">
+                            class="px-4 py-5 sm:px-6 <%= isPast ? 'bg-gray-100 dark:bg-white/5' : (isToday ? 'bg-green-100' : (isHighlighted ? 'bg-white border-b border-gray-200' : 'bg-gray-100 dark:bg-white/5')) %> backdrop-blur-sm">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <h3
-                                        class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? 'text-gray-800' : 'text-indigo-300')) %> drop-shadow-lg">
+                                        class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? '!text-gray-900 !dark:text-gray-900' : 'text-indigo-300')) %> drop-shadow-lg">
                                         <%= moment(date).format('dddd, DD MMMM YYYY') %>
                                     </h3>
                                     <!-- Mobile Version (Text Buttons) -->
@@ -176,14 +295,14 @@
                                                 <% } %>
 
                                                     <button onclick="shareSchedule('<%= date %>', this)"
-                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
                                                         title="Share to WhatsApp">
                                                         🔗
                                                     </button>
 
                                                     <% if(user.role==='admin' || isToday || isThisWeek) { %>
                                                         <button onclick="openUploadConditionModal('<%= date %>')"
-                                                            class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
+                                                            class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= isHighlighted ? 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 border-gray-200' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-white/10 hover:text-white border-white/10' %> border transition-colors"
                                                             title="Upload Foto Ronda">
                                                             📷
                                                         </button>
@@ -191,7 +310,7 @@
 
                                                             <% if(isPast) { %>
                                                                 <span
-                                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                                                                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500/20 text-gray-600 dark:text-gray-400 border border-gray-500/30"
                                                                     title="Selesai">
                                                                     ✓
                                                                 </span>
@@ -200,7 +319,7 @@
                                 </div>
                                 <% if(teamName) { %>
                                     <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white' : 'bg-indigo-600 text-white' %> shadow-sm border <%= isPast ? 'border-gray-500' : 'border-indigo-400 glass-button' %>">
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold <%= isPast ? 'bg-gray-400 text-white border-gray-500' : 'bg-transparent text-indigo-600 border-indigo-600 dark:text-indigo-500 dark:border-indigo-500' %> shadow-sm border">
                                         Tim <%= teamName %>
                                     </span>
                                     <% } %>
@@ -216,7 +335,7 @@
                                         <div class="flex flex-wrap gap-1.5">
                                             <% teamMembers.forEach(function(member) { %>
                                                 <span
-                                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm <%= isPast ? 'bg-gray-500/20 text-gray-300 border border-gray-500/30' : (isToday ? 'bg-green-100 text-green-800 border border-green-200' : (isHighlighted ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/30')) %> shadow-sm">
+                                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm <%= isPast ? 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border border-gray-500/30' : (isToday ? 'bg-green-100 text-green-800 border border-green-200' : (isHighlighted ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/30')) %> shadow-sm">
                                                     <%= member.nama %>
                                                 </span>
                                                 <% }) %>
@@ -302,17 +421,17 @@
                                     });
                                     %>
                                     <li
-                                        class="flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-white/5 border-white/5 hover:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group">
+                                        class="flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-gray-100 dark:bg-white/5 border-white/5 hover:bg-gray-200 dark:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group">
                                         <div class="flex-grow min-w-0 mr-3">
                                             <div class="flex items-center gap-2">
                                                 <div
-                                                    class="text-sm font-bold <%= isHighlighted ? 'text-gray-800' : 'text-gray-100' %> truncate">
+                                                    class="text-sm font-bold <%= isHighlighted ? 'text-gray-800' : 'text-gray-900 dark:text-gray-100' %> truncate">
                                                     <%= s.nama %>
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2 mt-0.5">
                                                 <div
-                                                    class="text-xs <%= isHighlighted ? 'text-gray-500 bg-gray-100' : 'text-gray-400 bg-black/20' %> font-medium px-2 py-0.5 rounded-md inline-block">
+                                                    class="text-xs <%= isHighlighted ? 'text-gray-500 bg-gray-100' : 'text-gray-600 dark:text-gray-400 bg-black/20' %> font-medium px-2 py-0.5 rounded-md inline-block">
                                                     <%= s.blok %>-<%= s.nomor_rumah %>
                                                 </div>
                                                 <% if (isGuest) { %>
@@ -321,14 +440,13 @@
                                                         Ganti Hari
                                                     </div>
                                                     <% } %>
-                                                        <% if(s.status !=='scheduled' ) { let statusText=s.status; let
-                                                            statusClass='' ; if (s.status_bayar==='paid' ) {
-                                                            statusText='Pay Up' ;
+                                                        <% if(s.status !=='scheduled' && s.status !=='reschedule' ) {
+                                                            let statusText=s.status; let statusClass='' ; if
+                                                            (s.status_bayar==='paid' ) { statusText='Pay Up' ;
                                                             statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
                                                             ; } else if (s.status==='hadir' ) {
-                                                            statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                            ; } else if (s.status==='izin' || s.status==='reschedule' )
-                                                            {
+                                                            statusClass='bg-green-100 text-green-800 border border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-500/30'
+                                                            ; } else if (s.status==='izin' ) {
                                                             statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
                                                             ; } else {
                                                             statusClass='bg-red-500/20 text-red-300 border border-red-500/30'
@@ -463,7 +581,7 @@
         <div id="statusModal"
             class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
             <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
-                <h3 class="text-lg font-bold text-gray-100 mb-6 flex items-center gap-2">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -473,13 +591,16 @@
                 <form action="/ronda/update-status" method="POST">
                     <input type="hidden" id="scheduleId" name="id">
                     <div class="mb-5">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama
+                        <label
+                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nama
                             Warga</label>
                         <div id="wargaName"
-                            class="text-gray-100 font-bold bg-white/5 p-3 rounded-xl border border-white/10"></div>
+                            class="text-gray-900 dark:text-gray-100 font-bold bg-gray-100 dark:bg-white/5 p-3 rounded-xl border border-white/10">
+                        </div>
                     </div>
                     <div class="mb-5">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Status
+                        <label
+                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status
                             Kehadiran</label>
                         <select name="status"
                             class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
@@ -489,14 +610,15 @@
                         </select>
                     </div>
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Keterangan
+                        <label
+                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Keterangan
                             (Opsional)</label>
                         <textarea name="keterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..."
                             class="glass-input mt-1 block w-full rounded-xl p-3 outline-none resize-none"></textarea>
                     </div>
                     <div class="flex justify-end gap-3">
                         <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')"
-                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-gray-200 transition-colors">
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-200 transition-colors">
                             Batal
                         </button>
                         <button type="submit"
@@ -512,7 +634,7 @@
         <div id="uploadModal"
             class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
             <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
-                <h3 class="text-lg font-bold text-gray-100 mb-6 flex items-center gap-2">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
@@ -524,26 +646,29 @@
                 </h3>
                 <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
                     <div class="mb-5">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama
+                        <label
+                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nama
                             Warga /
                             Kegiatan</label>
                         <div id="uploadWargaName"
-                            class="text-gray-100 font-bold bg-white/5 p-3 rounded-xl border border-white/10"></div>
+                            class="text-gray-900 dark:text-gray-100 font-bold bg-gray-100 dark:bg-white/5 p-3 rounded-xl border border-white/10">
+                        </div>
                     </div>
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih
+                        <label
+                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Pilih
                             File
                             (Foto/Video)</label>
                         <div
-                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-white/10 border-dashed rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative">
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-white/10 border-dashed rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 transition-colors cursor-pointer relative">
                             <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
-                                    viewBox="0 0 48 48" aria-hidden="true">
+                                <svg class="mx-auto h-12 w-12 text-gray-600 dark:text-gray-400" stroke="currentColor"
+                                    fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                     <path
                                         d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
-                                <div class="flex text-sm text-gray-400">
+                                <div class="flex text-sm text-gray-600 dark:text-gray-400">
                                     <label for="file-upload"
                                         class="relative cursor-pointer rounded-md font-bold text-blue-400 hover:text-blue-300">
                                         <span>Upload files</span>
@@ -559,7 +684,7 @@
                     </div>
                     <div class="flex justify-end gap-3">
                         <button type="button" onclick="document.getElementById('uploadModal').classList.add('hidden')"
-                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-gray-200 transition-colors">
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-200 transition-colors">
                             Batal
                         </button>
                         <button type="submit"
@@ -575,21 +700,22 @@
         <div id="carouselModal"
             class="fixed inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center"
             onclick="if(event.target === this) closeCarousel()">
-            <button onclick="closeCarousel()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
+            <button onclick="closeCarousel()"
+                class="absolute top-4 right-4 text-white hover:text-gray-700 dark:text-gray-300 z-50">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
                 </svg>
             </button>
             <button onclick="prevSlide()"
-                class="absolute left-4 text-white hover:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full p-2">
+                class="absolute left-4 text-white hover:text-gray-700 dark:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
                     </path>
                 </svg>
             </button>
             <button onclick="nextSlide()"
-                class="absolute right-4 text-white hover:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full p-2">
+                class="absolute right-4 text-white hover:text-gray-700 dark:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -788,21 +914,24 @@
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Bayar Denda Ronda</h3>
                         <div class="mt-4 text-center">
-                            <p class="text-sm text-gray-300 mb-4">Scan QRIS di bawah ini untuk membayar denda sebesar
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Scan QRIS di bawah ini untuk
+                                membayar denda sebesar
                                 <span class="font-bold text-red-400" id="payFineAmount">Rp 50.000</span>
                             </p>
                             <div class="flex justify-center bg-white p-4 rounded-xl mx-auto w-fit">
                                 <canvas id="qrisCanvas"></canvas>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">NMID: ID1020020020020 (Warga Ambyar)</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">NMID: ID1020020020020 (Warga
+                                Ambyar)</p>
                         </div>
                         <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-4">
                             <input type="hidden" name="id" id="payFineId">
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-300 mb-1">Upload Bukti
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload
+                                    Bukti
                                     Transfer</label>
                                 <input type="file" name="foto_bukti" accept="image/*" required
-                                    class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                                    class="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
                             </div>
                             <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                 <button type="submit"
@@ -810,7 +939,7 @@
                                     Kirim Bukti
                                 </button>
                                 <button type="button" onclick="closePayFineModal()"
-                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
                                     Batal
                                 </button>
                             </div>
@@ -863,7 +992,7 @@
                         <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Verifikasi Pembayaran
                             Denda</h3>
                         <div class="mt-4 text-center">
-                            <p class="text-sm text-gray-300 mb-4">Bukti Pembayaran:</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Bukti Pembayaran:</p>
                             <div class="flex justify-center bg-black/50 p-2 rounded-xl mx-auto w-fit mb-4">
                                 <img id="verifyProofImage" src="" class="max-h-[60vh] object-contain rounded-lg">
                             </div>
@@ -882,7 +1011,7 @@
                             </div>
                             <div class="mt-3">
                                 <button type="button" onclick="closeVerifyFineModal()"
-                                    class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:text-sm">
+                                    class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:text-sm">
                                     Batal
                                 </button>
                             </div>

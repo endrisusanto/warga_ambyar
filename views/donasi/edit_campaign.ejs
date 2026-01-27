@@ -3,64 +3,64 @@
 
         <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="glass-card p-8 m-4">
-                <h2 class="text-3xl font-bold text-gray-100 mb-8 flex items-center gap-3">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8 flex items-center gap-3">
                     <span class="text-4xl">✏️</span>
                     Edit Campaign Donasi
                 </h2>
 
                 <form action="/donasi/campaign/<%= campaign.id %>/update" method="POST" enctype="multipart/form-data">
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Judul Campaign *</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Judul Campaign *</label>
                         <input type="text" name="judul" value="<%= campaign.judul %>" required
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Deskripsi</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Deskripsi</label>
                         <textarea name="deskripsi" rows="5"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"><%= campaign.deskripsi || '' %></textarea>
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"><%= campaign.deskripsi || '' %></textarea>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Target Dana (Rp)</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Target Dana (Rp)</label>
                         <input type="number" name="target_dana" value="<%= campaign.target_dana || '' %>" min="0"
                             step="1000"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Foto Campaign</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Foto Campaign</label>
                         <% if(campaign.foto) { %>
                             <div class="mb-3">
                                 <img src="/uploads/donasi/campaign/<%= campaign.foto %>"
                                     class="h-32 rounded-lg border border-white/10" alt="Current photo">
-                                <p class="text-xs text-gray-400 mt-1">Foto saat ini</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Foto saat ini</p>
                             </div>
                             <% } %>
                                 <input type="file" name="foto" accept="image/*"
-                                    class="glass-input w-full py-3 px-4 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                                    class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:bg-white/10 file:text-gray-900 dark:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                                 <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah foto</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label class="block text-gray-300 text-sm font-bold mb-2">Tanggal Mulai *</label>
+                            <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Tanggal Mulai *</label>
                             <input type="datetime-local" name="tanggal_mulai"
                                 value="<%= moment(campaign.tanggal_mulai).format('YYYY-MM-DDTHH:mm') %>" required
-                                class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                                class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-gray-300 text-sm font-bold mb-2">Tanggal Selesai (Opsional)</label>
+                            <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Tanggal Selesai (Opsional)</label>
                             <input type="datetime-local" name="tanggal_selesai"
                                 value="<%= campaign.tanggal_selesai ? moment(campaign.tanggal_selesai).format('YYYY-MM-DDTHH:mm') : '' %>"
-                                class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                                class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                         </div>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Status Campaign</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Status Campaign</label>
                         <select name="status" required
-                            class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                             <option value="aktif" <%=campaign.status==='aktif' ? 'selected' : '' %>>Aktif</option>
                             <option value="selesai" <%=campaign.status==='selesai' ? 'selected' : '' %>>Selesai</option>
                             <option value="ditutup" <%=campaign.status==='ditutup' ? 'selected' : '' %>>Ditutup</option>
@@ -69,7 +69,7 @@
 
                     <div class="flex items-center justify-end gap-4">
                         <a href="/donasi/campaign/<%= campaign.id %>"
-                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
+                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10">
                             Batal
                         </a>
                         <button type="submit"

@@ -127,7 +127,7 @@
                         <div class="p-4 sm:p-6">
                             <div class="mb-4 border-b border-white/10 pb-4">
                                 <div class="mb-2">
-                                    <h1 class="text-2xl sm:text-3xl font-black text-gray-100 mb-2 leading-tight">
+                                    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">
                                         <%= complaint.judul %>
                                     </h1>
                                     <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
@@ -144,7 +144,7 @@
                                             <%= complaint.status.toUpperCase() %>
                                         </span>
                                         <span
-                                            class="flex items-center text-gray-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
+                                            class="flex items-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
                                             <svg class="mr-1 h-3 w-3" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -164,7 +164,7 @@
                                                 <% } %>
                                         </span>
                                         <span
-                                            class="flex items-center text-gray-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
+                                            class="flex items-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
                                             <svg class="mr-1 h-3 w-3" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -177,7 +177,7 @@
 
                                 <div class="flex flex-wrap gap-2">
                                     <a href="/pengaduan"
-                                        class="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm glass-button text-gray-300 font-bold border border-white/10 hover:bg-white/10 transition-all">
+                                        class="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm glass-button text-gray-700 dark:text-gray-300 font-bold border border-white/10 hover:bg-gray-200 dark:bg-white/10 transition-all">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -216,7 +216,7 @@
 
                             <% if(complaint.foto) { %>
                                 <div class="mt-6 border-t border-white/10 pt-4">
-                                    <h3 class="text-lg font-bold text-gray-100 mb-3 flex items-center">
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
                                         <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -226,7 +226,7 @@
                                         Bukti Foto
                                     </h3>
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        <div class="relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/5 aspect-square flex items-center justify-center transition-all hover:border-indigo-500/50"
+                                        <div class="relative group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-gray-100 dark:bg-white/5 aspect-square flex items-center justify-center transition-all hover:border-indigo-500/50"
                                             onclick="openPreview('<%= complaint.foto %>')">
                                             <img src="<%= complaint.foto %>"
                                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
@@ -253,7 +253,7 @@
                     <!-- Diskusi & Aktivitas Card -->
                     <div class="glass-card p-4 sm:p-6 rounded-xl shadow-2xl sticky top-24">
                         <h3
-                            class="text-lg font-bold text-gray-100 mb-4 border-b border-white/10 pb-2 flex items-center gap-2">
+                            class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-white/10 pb-2 flex items-center gap-2">
                             <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
@@ -264,9 +264,9 @@
 
                         <!-- Status Update Form -->
                         <form action="/pengaduan/<%= complaint.id %>/update" method="POST"
-                            class="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+                            class="mb-6 p-4 bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10">
                             <div class="mb-3">
-                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Update
+                                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">Update
                                     Status</label>
                                 <div class="flex gap-2">
                                     <select name="status"
@@ -308,8 +308,8 @@
                                             <%= moment(complaint.created_at).fromNow() %>
                                         </span>
                                     </div>
-                                    <div class="text-xs text-gray-300">
-                                        Oleh <span class="font-bold text-gray-100">
+                                    <div class="text-xs text-gray-700 dark:text-gray-300">
+                                        Oleh <span class="font-bold text-gray-900 dark:text-gray-100">
                                             <% if (complaint.is_anonim && complaint.nama_warga) { const
                                                 words=complaint.nama_warga.split(' ');
                                                 const parts = words.map(w => {
@@ -343,8 +343,8 @@
                                                 </div>
                                                 <div class="text-xs text-gray-200"><%-
                                                         item.konten.trim().replace(/\n/g, '<br>' ) %></div>
-                                                <div class="text-[10px] text-gray-400 mt-1">
-                                                    Oleh <span class="font-bold text-gray-300">
+                                                <div class="text-[10px] text-gray-600 dark:text-gray-400 mt-1">
+                                                    Oleh <span class="font-bold text-gray-700 dark:text-gray-300">
                                                         <%= item.warga_nama || item.username %>
                                                     </span>
                                                 </div>
@@ -362,7 +362,7 @@
                                                     </div>
                                                     <div class="flex items-start gap-1 flex-1">
                                                         <div
-                                                            class="flex flex-col max-w-[90%] leading-tight bg-white/5 rounded-2xl border border-white/10 px-3 py-2">
+                                                            class="flex flex-col max-w-[90%] leading-tight bg-gray-100 dark:bg-white/5 rounded-2xl border border-white/10 px-3 py-2">
                                                             <div class="flex items-center gap-2 mb-1">
                                                                 <span class="text-xs font-semibold text-indigo-400">
                                                                     <%= item.warga_nama || item.username %>
@@ -373,20 +373,20 @@
                                                             </div>
                                                             <% if(item.parent_id) { %>
                                                                 <div
-                                                                    class="mb-2 p-2 bg-white/5 rounded-lg border-l-2 border-indigo-500/30">
+                                                                    class="mb-2 p-2 bg-gray-100 dark:bg-white/5 rounded-lg border-l-2 border-indigo-500/30">
                                                                     <div
                                                                         class="text-[10px] text-indigo-400 font-semibold mb-1">
                                                                         ↳ Membalas <%= item.parent_warga_nama ||
                                                                             item.parent_username %>
                                                                     </div>
                                                                     <div
-                                                                        class="text-[11px] text-gray-400 italic line-clamp-2 ql-editor prose prose-invert max-w-none !p-0 !m-0">
+                                                                        class="text-[11px] text-gray-600 dark:text-gray-400 italic line-clamp-2 ql-editor prose prose-invert max-w-none !p-0 !m-0">
                                                                         <%- item.parent_konten %>
                                                                     </div>
                                                                 </div>
                                                                 <% } %>
                                                                     <div
-                                                                        class="text-xs text-gray-300 ql-editor prose prose-invert max-w-none !p-0 !m-0">
+                                                                        class="text-xs text-gray-700 dark:text-gray-300 ql-editor prose prose-invert max-w-none !p-0 !m-0">
                                                                         <%- item.konten %>
                                                                     </div>
                                                                     <% if(item.lampiran) { %>
@@ -399,7 +399,7 @@
                                                                                 <% } else { %>
                                                                                     <a href="/uploads/pengaduan/<%= item.lampiran %>"
                                                                                         target="_blank"
-                                                                                        class="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors w-fit">
+                                                                                        class="flex items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 hover:bg-gray-200 dark:bg-white/10 transition-colors w-fit">
                                                                                         <svg class="w-4 h-4 text-indigo-400"
                                                                                             fill="none"
                                                                                             stroke="currentColor"
@@ -453,21 +453,21 @@
                                     <span class="text-xs text-indigo-400 font-semibold">Membalas: <span
                                             id="replyToName"></span></span>
                                     <button type="button" onclick="cancelReply()"
-                                        class="text-xs text-gray-400 hover:text-gray-200">✕</button>
+                                        class="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-200">✕</button>
                                 </div>
                                 <div id="replyPreview"
-                                    class="text-[11px] text-gray-400 italic line-clamp-2 pl-2 border-l-2 border-indigo-500/30">
+                                    class="text-[11px] text-gray-600 dark:text-gray-400 italic line-clamp-2 pl-2 border-l-2 border-indigo-500/30">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <div id="commentEditor" class="bg-white/5 rounded-xl border border-white/10"></div>
+                                <div id="commentEditor" class="bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10"></div>
                                 <input type="hidden" name="konten" id="commentKonten">
                             </div>
 
                             <div class="mb-3">
-                                <label class="block text-xs font-medium text-gray-400 mb-1">Lampiran (Opsional)</label>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Lampiran (Opsional)</label>
                                 <div id="dropzone"
-                                    class="relative border-2 border-dashed border-gray-600 hover:border-indigo-400 bg-white/5 rounded-xl p-4 transition-all group cursor-pointer text-center">
+                                    class="relative border-2 border-dashed border-gray-600 hover:border-indigo-400 bg-gray-100 dark:bg-white/5 rounded-xl p-4 transition-all group cursor-pointer text-center">
                                     <input type="file" name="lampiran" id="lampiranInput"
                                         accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" class="hidden">
 
@@ -475,15 +475,15 @@
                                     <div id="dropzone-content"
                                         class="flex flex-col items-center justify-center space-y-2">
                                         <div
-                                            class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-400" fill="none"
+                                            class="w-10 h-10 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
                                         </div>
-                                        <div class="text-xs text-gray-400 font-medium">Klik atau drop file di sini</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 font-medium">Klik atau drop file di sini</div>
                                     </div>
 
                                     <!-- Preview View -->
@@ -500,7 +500,7 @@
                                                 </path>
                                             </svg>
                                             <span id="preview-filename"
-                                                class="text-xs text-gray-300 font-medium truncate max-w-[200px]"></span>
+                                                class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]"></span>
                                         </div>
                                         <div
                                             class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/preview:opacity-100 transition-opacity rounded-lg">
@@ -573,11 +573,11 @@
         <div id="giphyModal"
             class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div class="glass-card w-full max-w-lg p-0 overflow-hidden flex flex-col max-h-[80vh]">
-                <div class="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
-                    <h3 class="text-lg font-bold text-gray-100 flex items-center gap-2">
+                <div class="p-4 border-b border-white/10 flex items-center justify-between bg-gray-100 dark:bg-white/5">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                         <span class="text-xl">👾</span> Cari GIF
                     </h3>
-                    <button onclick="closeGiphyModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <button onclick="closeGiphyModal()" class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -590,7 +590,7 @@
                         <input type="text" id="giphySearch" placeholder="Cari GIF lucu..."
                             class="w-full glass-input py-2 px-4 rounded-lg pl-10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500/50"
                             onkeyup="handleGiphySearch(event)">
-                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -604,7 +604,7 @@
                     <div class="col-span-3 text-center text-gray-500 py-10">Ketik sesuatu untuk mencari GIF...</div>
                 </div>
 
-                <div class="p-2 border-t border-white/10 bg-white/5 text-center">
+                <div class="p-2 border-t border-white/10 bg-gray-100 dark:bg-white/5 text-center">
                     <img src="https://developers.giphy.com/branch/master/static/header-logo-0fec0225d189bc0eae27dac3e3770582.gif"
                         alt="Powered by Giphy" class="h-6 mx-auto opacity-70">
                 </div>
@@ -857,13 +857,13 @@
             });
 
             function highlight(e) {
-                dropzone.classList.add('border-indigo-500', 'bg-white/10');
-                dropzone.classList.remove('border-gray-600', 'bg-white/5');
+                dropzone.classList.add('border-indigo-500', 'bg-gray-200 dark:bg-white/10');
+                dropzone.classList.remove('border-gray-600', 'bg-gray-100 dark:bg-white/5');
             }
 
             function unhighlight(e) {
-                dropzone.classList.remove('border-indigo-500', 'bg-white/10');
-                dropzone.classList.add('border-gray-600', 'bg-white/5');
+                dropzone.classList.remove('border-indigo-500', 'bg-gray-200 dark:bg-white/10');
+                dropzone.classList.add('border-gray-600', 'bg-gray-100 dark:bg-white/5');
             }
 
             // Handle Drop

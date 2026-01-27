@@ -3,11 +3,11 @@
 
         <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="glass-card p-8 m-4">
-                <h2 class="text-3xl font-bold text-gray-100 mb-2 flex items-center gap-3">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-3">
                     <span class="text-4xl">💝</span>
                     Donasi untuk Campaign
                 </h2>
-                <h3 class="text-xl text-gray-400 mb-8">
+                <h3 class="text-xl text-gray-600 dark:text-gray-400 mb-8">
                     <%= campaign.judul %>
                 </h3>
 
@@ -16,17 +16,17 @@
                     <input type="hidden" name="metode_bayar" value="transfer">
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Nama Donatur</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Nama Donatur</label>
                         <input type="text" name="nama_donatur" value="<%= user.username %>"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                         <p class="text-xs text-gray-500 mt-1">Nama yang akan ditampilkan (jika tidak anonim)</p>
                     </div>
 
                     <div class="mb-6">
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" name="is_anonim"
-                                class="w-5 h-5 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-2 focus:ring-indigo-500/50">
-                            <span class="ml-3 text-gray-300 font-medium">
+                                class="w-5 h-5 rounded border-white/20 bg-gray-100 dark:bg-white/5 text-indigo-600 focus:ring-2 focus:ring-indigo-500/50">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-medium">
                                 🕶️ Donasi sebagai Anonim (Hamba Allah)
                             </span>
                         </label>
@@ -37,43 +37,43 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
                         <input type="number" name="jumlah" id="jumlah" required min="1000" step="1000"
                             placeholder="Contoh: 50000"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-3">Transfer E-Wallet</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-3">Transfer E-Wallet</label>
                         <div
-                            class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-white/5">
+                            class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-gray-100 dark:bg-white/5">
                             <div class="flex items-center gap-4">
                                 <div
                                     class="w-12 h-12 rounded-xl bg-[#118EE9]/20 flex items-center justify-center border border-[#118EE9]/30 shadow-[0_0_15px_rgba(17,142,233,0.3)]">
                                     <span class="text-lg font-bold text-[#118EE9]">D</span>
                                 </div>
                                 <div>
-                                    <p class="text-base font-bold text-gray-100">DANA</p>
-                                    <p class="text-xs text-gray-400">a.n. Karsidi</p>
+                                    <p class="text-base font-bold text-gray-900 dark:text-gray-100">DANA</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">a.n. Karsidi</p>
                                 </div>
                             </div>
                             <button type="button" onclick="copyText('081222334261')"
-                                class="group flex items-center gap-3 bg-black/20 px-5 py-3 rounded-xl border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all active:scale-95 w-full sm:w-auto justify-between sm:justify-start">
+                                class="group flex items-center gap-3 bg-black/20 px-5 py-3 rounded-xl border border-white/5 hover:bg-gray-100 dark:bg-white/5 hover:border-white/20 transition-all active:scale-95 w-full sm:w-auto justify-between sm:justify-start">
                                 <span
                                     class="text-lg font-mono font-bold text-[#118EE9] tracking-wider group-hover:text-[#40a9ff] transition-colors">081222334261</span>
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" fill="none"
+                                    class="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-white transition-colors" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2">Transfer sesuai nominal donasi Anda</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">Transfer sesuai nominal donasi Anda</p>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-3">Atau Scan QRIS Sesuai Nominal</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-3">Atau Scan QRIS Sesuai Nominal</label>
                         <div id="qris-container" class="hidden">
                             <div
                                 class="flex flex-col items-center justify-center bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
@@ -87,7 +87,7 @@
                                 </div>
 
                                 <div class="mt-4 text-center">
-                                    <p class="text-xs text-gray-400 uppercase tracking-widest">Nominal</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest">Nominal</p>
                                     <p class="text-2xl font-black text-green-400 mt-1" id="qris-amount-display">Rp 0</p>
                                 </div>
 
@@ -101,28 +101,28 @@
                                 </button>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2">QRIS akan muncul setelah Anda memasukkan nominal donasi
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">QRIS akan muncul setelah Anda memasukkan nominal donasi
                         </p>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Bukti Transfer DANA / Bukti Pembayaran
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Bukti Transfer DANA / Bukti Pembayaran
                             QRIS
                             <span class="text-red-400 text-xs ml-1">(Wajib)</span></label>
                         <input type="file" name="bukti_bayar" required accept="image/*"
-                            class="glass-input w-full py-3 px-4 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:bg-white/10 file:text-gray-900 dark:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                         <p class="text-xs text-gray-500 mt-1">Upload screenshot/foto bukti transfer</p>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Pesan/Doa (Opsional)</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Pesan/Doa (Opsional)</label>
                         <textarea name="pesan" rows="3" placeholder="Tulis pesan atau doa untuk campaign ini..."
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"></textarea>
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"></textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-4">
                         <a href="/donasi/campaign/<%= campaign.id %>"
-                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
+                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10">
                             Batal
                         </a>
                         <button type="submit"

@@ -10,7 +10,7 @@
                     <ol class="flex items-center space-x-4">
                         <li>
                             <div>
-                                <a href="/keuangan" class="text-gray-400 hover:text-gray-200">
+                                <a href="/keuangan" class="text-gray-600 dark:text-gray-400 hover:text-gray-200">
                                     <svg class="flex-shrink-0 h-5 w-5" xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path
@@ -29,7 +29,7 @@
                                         clip-rule="evenodd" />
                                 </svg>
                                 <a href="/keuangan"
-                                    class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-200">Keuangan</a>
+                                    class="ml-4 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-200">Keuangan</a>
                             </div>
                         </li>
                         <li>
@@ -70,9 +70,9 @@
                     <% if (iuran && iuran.tanggal_bayar) { %>
                         <div class="mb-8 flex justify-center">
                             <div
-                                class="flex items-center bg-white/10 border border-white/10 rounded-full px-1 py-1 shadow-inner">
+                                class="flex items-center bg-gray-200 dark:bg-white/10 border border-white/10 rounded-full px-1 py-1 shadow-inner">
                                 <div class="flex items-center gap-2 px-3 py-1">
-                                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
+                                    <span class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
                                     <span class="text-xs text-gray-200">
                                         <%= moment(iuran.tanggal_bayar).format('DD MMM YYYY, HH:mm') %>
                                     </span>
@@ -104,10 +104,10 @@
                                 <!-- Left: Details -->
                                 <div class="lg:col-span-7 space-y-8">
                                     <% if(iuran) { %>
-                                        <div class="bg-white/5 rounded-xl p-5 border border-white/5 space-y-4">
+                                        <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-5 border border-white/5 space-y-4">
                                             <div>
                                                 <label
-                                                    class="block text-xs font-medium text-gray-400 uppercase tracking-wider">Warga</label>
+                                                    class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Warga</label>
                                                 <div class="mt-1 flex items-center">
                                                     <div
                                                         class="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mr-3 border border-emerald-500/20">
@@ -117,7 +117,7 @@
                                                         <div class="text-lg font-bold text-white">
                                                             <%= iuran.warga_nama %>
                                                         </div>
-                                                        <div class="text-sm text-gray-400">Blok <%= iuran.blok %>-<%=
+                                                        <div class="text-sm text-gray-600 dark:text-gray-400">Blok <%= iuran.blok %>-<%=
                                                                     iuran.nomor_rumah %>
                                                         </div>
                                                     </div>
@@ -127,7 +127,7 @@
                                             <% if (iuran.payer_nama) { %>
                                                 <div class="pt-3 border-t border-white/5">
                                                     <label
-                                                        class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Dibayarkan
+                                                        class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Dibayarkan
                                                         Oleh</label>
                                                     <div class="text-gray-200">
                                                         <%= iuran.payer_nama %>
@@ -138,14 +138,14 @@
                                                     <div class="grid grid-cols-2 gap-4 pt-3 border-t border-white/5">
                                                         <div>
                                                             <label
-                                                                class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Periode</label>
+                                                                class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Periode</label>
                                                             <div class="text-emerald-300 font-semibold">
                                                                 <%= moment(iuran.periode).format('MMMM YYYY') %>
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label
-                                                                class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Jenis</label>
+                                                                class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Jenis</label>
                                                             <div class="text-white font-medium capitalize">
                                                                 <%= iuran.jenis.replace('_', ' ' ) %>
                                                             </div>
@@ -153,8 +153,8 @@
                                                     </div>
                                         </div>
                                         <% } else { %>
-                                            <div class="bg-white/5 rounded-xl p-5 border border-white/5">
-                                                <p class="text-gray-400 italic">Informasi detail pembayar tidak tersedia
+                                            <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-5 border border-white/5">
+                                                <p class="text-gray-600 dark:text-gray-400 italic">Informasi detail pembayar tidak tersedia
                                                     (Transaksi Manual).</p>
                                             </div>
                                             <% } %>
@@ -172,7 +172,7 @@
                                                                 else total -= amount;
                                                                 %>
                                                                 <div
-                                                                    class="flex justify-between items-start text-sm group hover:bg-white/5 p-1 rounded transition-colors">
+                                                                    class="flex justify-between items-start text-sm group hover:bg-gray-100 dark:bg-white/5 p-1 rounded transition-colors">
                                                                     <div class="flex-1">
                                                                         <div class="text-gray-200 font-medium">
                                                                             <%= t.keterangan %>
@@ -222,7 +222,7 @@
                                                                             <div
                                                                                 class="border-t border-white/10 pt-3 flex justify-between items-center mt-2">
                                                                                 <span
-                                                                                    class="text-gray-400 font-bold">Total</span>
+                                                                                    class="text-gray-600 dark:text-gray-400 font-bold">Total</span>
                                                                                 <span
                                                                                     class="text-xl font-bold text-white">Rp
                                                                                     <%= total.toLocaleString('id-ID') %>
@@ -235,7 +235,7 @@
                                 <!-- Right: Proof Image -->
                                 <div class="lg:col-span-5 flex flex-col">
                                     <label
-                                        class="block text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Bukti
+                                        class="block text-sm font-bold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wider">Bukti
                                         Transfer</label>
                                     <div
                                         class="relative group rounded-3xl overflow-hidden border-8 border-white/5 bg-black/40 shadow-2xl transition-transform hover:scale-[1.01]">
@@ -276,7 +276,7 @@
                             <!-- Footer -->
                             <div class="border-t border-white/10 pt-6 pb-10 flex justify-center">
                                 <a href="/keuangan"
-                                    class="glass-button px-6 py-2 rounded-xl text-gray-300 hover:text-white border border-white/10 flex items-center transition-all bg-white/5 hover:bg-white/10">
+                                    class="glass-button px-6 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:text-white border border-white/10 flex items-center transition-all bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>

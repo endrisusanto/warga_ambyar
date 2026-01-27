@@ -4,16 +4,16 @@
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="mb-8 px-4 sm:px-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-100 flex items-center gap-3">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
                         <span class="text-4xl">📊</span>
                         Laporan Keuangan Donasi
                     </h1>
-                    <p class="text-gray-400 mt-2">Laporan terpisah dari kas utama</p>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Laporan terpisah dari kas utama</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <form method="GET" class="flex gap-2">
                         <select name="campaign" onchange="this.form.submit()"
-                            class="glass-input py-2 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input py-2 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                             <option value="">Semua Campaign</option>
                             <% campaigns.forEach(c=> { %>
                                 <option value="<%= c.id %>" <%=selectedCampaign==c.id ? 'selected' : '' %>>
@@ -32,7 +32,7 @@
                         Export Excel
                     </a>
                     <a href="/donasi"
-                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10 hover:border-white/20">
+                        class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10 hover:border-white/20">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -47,20 +47,20 @@
                 <!-- Summary Card -->
                 <div class="glass-card p-6 mb-6 rounded-2xl">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white/5 rounded-xl p-4">
-                            <p class="text-sm text-gray-400 mb-1">Total Donasi Terverifikasi</p>
+                        <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Donasi Terverifikasi</p>
                             <p class="text-3xl font-black text-green-400">
                                 Rp <%= total.toLocaleString('id-ID') %>
                             </p>
                         </div>
-                        <div class="bg-white/5 rounded-xl p-4">
-                            <p class="text-sm text-gray-400 mb-1">Jumlah Transaksi</p>
+                        <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Jumlah Transaksi</p>
                             <p class="text-3xl font-black text-blue-400">
                                 <%= transaksi.length %>
                             </p>
                         </div>
-                        <div class="bg-white/5 rounded-xl p-4">
-                            <p class="text-sm text-gray-400 mb-1">Campaign Aktif</p>
+                        <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Campaign Aktif</p>
                             <p class="text-3xl font-black text-purple-400">
                                 <%= campaigns.filter(c=> c.status === 'aktif').length %>
                             </p>
@@ -72,26 +72,26 @@
                 <div class="glass-card rounded-2xl overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-white/10">
-                            <thead class="bg-white/5">
+                            <thead class="bg-gray-100 dark:bg-white/5">
                                 <tr>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Tanggal
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Campaign
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Donatur
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Metode
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3 text-right text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Jumlah
                                     </th>
                                 </tr>
@@ -106,25 +106,25 @@
                                                     d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                                 </path>
                                             </svg>
-                                            <p class="mt-2 text-sm text-gray-400">Belum ada transaksi</p>
+                                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Belum ada transaksi</p>
                                         </td>
                                     </tr>
                                     <% } else { %>
                                         <% transaksi.forEach(t=> { %>
-                                            <tr class="hover:bg-white/5 transition-colors">
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                            <tr class="hover:bg-gray-100 dark:bg-white/5 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                                     <%= moment(t.verified_at).format('DD MMM YYYY') %>
                                                         <br>
                                                         <span class="text-xs text-gray-500">
                                                             <%= moment(t.verified_at).format('HH:mm') %>
                                                         </span>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm text-gray-300">
+                                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                                                     <%= t.campaign_judul %>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                     <div class="flex items-center gap-2">
-                                                        <span class="text-gray-300">
+                                                        <span class="text-gray-700 dark:text-gray-300">
                                                             <%= t.nama_donatur %>
                                                         </span>
                                                         <% if(t.is_anonim) { %>
@@ -135,7 +135,7 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                     <span
-                                                        class="bg-white/10 text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase">
+                                                        class="bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase">
                                                         <%= t.metode_bayar %>
                                                     </span>
                                                 </td>
@@ -148,7 +148,7 @@
                                                 <% } %>
                             </tbody>
                             <% if(transaksi.length> 0) { %>
-                                <tfoot class="bg-white/10">
+                                <tfoot class="bg-gray-200 dark:bg-white/10">
                                     <tr>
                                         <td colspan="4" class="px-6 py-4 text-sm font-bold text-gray-200 text-right">
                                             TOTAL

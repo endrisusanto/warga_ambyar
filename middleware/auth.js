@@ -1,6 +1,9 @@
 module.exports = {
     ensureAuthenticated: function (req, res, next) {
         if (req.session.user) {
+            // Set req.user for controllers to use
+            req.user = req.session.user;
+
             // Check approval status for Read-Only mode
             if (req.session.user.approval_status === 'pending') {
                 // Allow GET requests (Read-Only)

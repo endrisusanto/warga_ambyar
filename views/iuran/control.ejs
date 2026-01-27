@@ -58,7 +58,7 @@
                                                 <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
                                         <%= status.kas_rt === 'lunas' ? 'bg-green-500' : 
                                             status.kas_rt === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
-                                            status.kas_rt ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                            status.kas_rt ? 'bg-red-500' : 'bg-gray-200 text-gray-600 dark:text-gray-400' %>"
                                                     title="Kas RT: <%= status.kas_rt ? status.kas_rt.replace('_', ' ') : 'Belum Ditagih' %>">
                                                     RT
                                                 </div>
@@ -66,7 +66,7 @@
                                                 <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
                                         <%= status.kas_gang === 'lunas' ? 'bg-green-500' : 
                                             status.kas_gang === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
-                                            status.kas_gang ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                            status.kas_gang ? 'bg-red-500' : 'bg-gray-200 text-gray-600 dark:text-gray-400' %>"
                                                     title="Kas Gang: <%= status.kas_gang ? status.kas_gang.replace('_', ' ') : 'Belum Ditagih' %>">
                                                     GG
                                                 </div>
@@ -74,7 +74,7 @@
                                                 <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm
                                         <%= status.sampah === 'lunas' ? 'bg-green-500' : 
                                             status.sampah === 'menunggu_konfirmasi' ? 'bg-yellow-400' :
-                                            status.sampah ? 'bg-red-500' : 'bg-gray-200 text-gray-400' %>"
+                                            status.sampah ? 'bg-red-500' : 'bg-gray-200 text-gray-600 dark:text-gray-400' %>"
                                                     title="Sampah: <%= status.sampah ? status.sampah.replace('_', ' ') : 'Belum Ditagih' %>">
                                                     SP
                                                 </div>

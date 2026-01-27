@@ -2,11 +2,11 @@
     <%- include('../partials/navbar') %>
 
         <div class="max-w-2xl mx-auto glass-card p-6">
-            <h3 class="text-lg font-medium leading-6 text-gray-100 mb-4">Edit Data Warga</h3>
+            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 mb-4">Edit Data Warga</h3>
             <form action="/warga/update/<%= warga.id %>" method="POST">
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <div class="sm:col-span-6">
-                        <label for="nama" class="block text-sm font-medium text-gray-300">Nama Lengkap</label>
+                        <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap</label>
                         <div class="mt-1">
                             <input type="text" name="nama" id="nama" value="<%= warga.nama %>" required
                                 class="glass-input block w-full sm:text-sm rounded-md p-2">
@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="blok" class="block text-sm font-medium text-gray-300">Blok</label>
+                        <label for="blok" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Blok</label>
                         <div class="mt-1">
                             <select id="blok" name="blok" class="glass-input block w-full sm:text-sm rounded-md p-2">
                                 <option value="F7" <%=warga.blok==='F7' ? 'selected' : '' %>>F7</option>
@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="nomor_rumah" class="block text-sm font-medium text-gray-300">Nomor Rumah
+                        <label for="nomor_rumah" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Rumah
                             (1-50)</label>
                         <div class="mt-1">
                             <input type="number" name="nomor_rumah" id="nomor_rumah" value="<%= warga.nomor_rumah %>"
@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="status_keluarga" class="block text-sm font-medium text-gray-300">Status
+                        <label for="status_keluarga" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status
                             Keluarga</label>
                         <div class="mt-1">
                             <select id="status_keluarga" name="status_keluarga"
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="no_hp" class="block text-sm font-medium text-gray-300">No HP</label>
+                        <label for="no_hp" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No HP</label>
                         <div class="mt-1">
                             <input type="text" name="no_hp" id="no_hp" value="<%= warga.no_hp %>"
                                 class="glass-input block w-full sm:text-sm rounded-md p-2">
@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                         <div class="mt-1">
                             <input type="email" name="email" id="email" value="<%= warga.email %>"
                                 class="glass-input block w-full sm:text-sm rounded-md p-2">
@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <label for="status_huni" class="block text-sm font-medium text-gray-300">Status Huni</label>
+                        <label for="status_huni" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Huni</label>
                         <div class="mt-1">
                             <select id="status_huni" name="status_huni"
                                 class="glass-input block w-full sm:text-sm rounded-md p-2">
@@ -88,10 +88,10 @@
                             <div class="flex items-center h-5">
                                 <input id="is_ronda" name="is_ronda" type="checkbox" <%=warga.is_ronda ? 'checked' : ''
                                     %>
-                                class="focus:ring-white/30 h-4 w-4 text-gray-300 bg-white/10 border-white/20 rounded">
+                                class="focus:ring-white/30 h-4 w-4 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-white/10 border-white/20 rounded">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label for="is_ronda" class="font-medium text-gray-300">Wajib Ronda?</label>
+                                <label for="is_ronda" class="font-medium text-gray-700 dark:text-gray-300">Wajib Ronda?</label>
                             </div>
                         </div>
                     </div>
@@ -100,9 +100,9 @@
 
                 <div class="mt-6 flex justify-end gap-3">
                     <a href="/warga"
-                        class="glass-button py-2 px-4 rounded-lg text-sm font-medium text-gray-300 border border-white/10">Cancel</a>
+                        class="glass-button py-2 px-4 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-white/10">Cancel</a>
                     <button type="submit"
-                        class="glass-button inline-flex justify-center py-2 px-4 text-sm font-medium rounded-lg text-gray-200 bg-white/10 hover:bg-white/15 border border-white/15">Update</button>
+                        class="glass-button inline-flex justify-center py-2 px-4 text-sm font-medium rounded-lg text-gray-200 bg-gray-200 dark:bg-white/10 hover:bg-white/15 border border-white/15">Update</button>
                 </div>
             </form>
         </div>

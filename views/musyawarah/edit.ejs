@@ -102,38 +102,38 @@
 
         <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div class="glass-card p-6 sm:p-10 shadow-2xl">
-                <h2 class="text-3xl font-black text-gray-100 mb-8 flex items-center gap-4">
-                    <span class="bg-white/5 p-3 rounded-2xl border border-white/10 text-4xl">📝</span>
+                <h2 class="text-3xl font-black text-gray-900 dark:text-gray-100 mb-8 flex items-center gap-4">
+                    <span class="bg-gray-100 dark:bg-white/5 p-3 rounded-2xl border border-white/10 text-4xl">📝</span>
                     Edit Info Musyawarah
                 </h2>
 
                 <form action="/musyawarah/update/<%= item.id %>" method="POST" enctype="multipart/form-data">
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Judul /
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Judul /
                             Topik</label>
                         <input type="text" name="judul" value="<%= item.judul %>" required
-                            class="glass-input w-full py-3.5 px-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                            class="glass-input w-full py-3.5 px-5 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tanggal
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Tanggal
                             Meeting</label>
                         <input type="datetime-local" name="tanggal"
                             value="<%= moment(item.tanggal).format('YYYY-MM-DDTHH:mm') %>" required
-                            class="glass-input w-full py-3.5 px-5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                            class="glass-input w-full py-3.5 px-5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
                     </div>
 
 
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Konten /
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Konten /
                             Hasil Meeting</label>
                         <div id="editor" style="height: 400px;"
-                            class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10"></div>
+                            class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10"></div>
                         <input type="hidden" name="konten" id="konten">
                     </div>
 
                     <div class="mb-8">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Lampiran
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Lampiran
                             (Bukti/Foto/PDF)</label>
                         <% if(item.lampiran) { %>
                             <div
@@ -142,14 +142,14 @@
                             </div>
                             <% } %>
                                 <input type="file" name="lampiran"
-                                    class="glass-input w-full py-3.5 px-5 text-gray-100 file:mr-4 file:py-2 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
+                                    class="glass-input w-full py-3.5 px-5 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gray-200 dark:bg-white/10 file:text-gray-900 dark:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-2xl transition-all">
                                 <p class="mt-2 text-[10px] text-gray-500">Biarkan kosong jika tidak ingin mengganti
                                     lampiran.</p>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-end gap-4 border-t border-white/10 pt-8">
                         <a href="/musyawarah/view/<%= item.id %>"
-                            class="px-8 py-3.5 rounded-2xl text-sm font-bold text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-all border border-white/10">
+                            class="px-8 py-3.5 rounded-2xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10">
                             Batal
                         </a>
                         <button type="submit"

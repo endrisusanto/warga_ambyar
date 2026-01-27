@@ -11,20 +11,10 @@
         <% } %>
             </head>
 
-            <body class="bg-gray-900 min-h-screen text-gray-100 font-sans selection:bg-indigo-500 selection:text-white">
+            <body class="bg-white min-h-screen text-gray-900 font-sans selection:bg-indigo-500 selection:text-white">
 
                 <!-- Background Effects -->
-                <div class="fixed inset-0 z-0 pointer-events-none">
-                    <div
-                        class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-900/20 via-gray-900 to-black">
-                    </div>
-                    <div
-                        class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px]">
-                    </div>
-                    <div
-                        class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px]">
-                    </div>
-                </div>
+
 
                 <div
                     class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen">
@@ -43,12 +33,12 @@
                     </div>
 
                     <div
-                        class="glass-card w-full p-6 sm:p-8 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 backdrop-blur-md relative">
+                        class="w-full p-6 sm:p-8 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-white relative">
 
                         <!-- Anggota Bertugas -->
                         <div class="mb-8">
                             <h2
-                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -59,13 +49,13 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <% schedule.forEach(s=> { %>
                                     <div
-                                        class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                                        class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center space-x-3">
                                             <div
                                                 class="w-2.5 h-2.5 rounded-full shadow-lg shadow-current <%= s.status === 'hadir' ? 'bg-emerald-500 text-emerald-500' : (s.status === 'izin' ? 'bg-yellow-400 text-yellow-400' : (s.status === 'alpa' ? 'bg-red-500 text-red-500' : 'bg-gray-500 text-gray-500')) %>">
                                             </div>
                                             <div>
-                                                <div class="text-sm font-bold text-gray-200">
+                                                <div class="text-sm font-bold text-gray-900">
                                                     <%= s.nama %> (<%= s.blok %>-<%= s.nomor_rumah %>)
                                                                 <% if(s.is_ganti_hari || s.status==='reschedule' ) { %>
                                                                     <span class="text-red-400 font-bold ml-1">(Ganti
@@ -76,7 +66,7 @@
                                         </div>
                                         <% if(s.status && s.status !=='scheduled' ) { %>
                                             <span
-                                                class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider <%= s.status === 'hadir' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30' %>">
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider <%= s.status === 'hadir' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200' %>">
                                                 <%= s.status %>
                                             </span>
                                             <% } %>
@@ -88,7 +78,7 @@
                         <!-- Dokumentasi -->
                         <div>
                             <h2
-                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -119,15 +109,15 @@
                                         <% }) %>
                                             <% if(allPhotos.length> 12) { %>
                                                 <div
-                                                    class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 backdrop-blur-sm">
-                                                    <span class="text-gray-400 text-xs font-bold">+<%= allPhotos.length
-                                                            - 12 %></span>
+                                                    class="aspect-square bg-gray-100 dark:bg-white/5 rounded-xl flex items-center justify-center border border-white/10 backdrop-blur-sm">
+                                                    <span class="text-gray-600 dark:text-gray-400 text-xs font-bold">+
+                                                        <%= allPhotos.length - 12 %></span>
                                                 </div>
                                                 <% } %>
                                 </div>
                                 <% } else { %>
                                     <div
-                                        class="text-center py-8 bg-white/5 rounded-xl border border-white/10 border-dashed">
+                                        class="text-center py-8 bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10 border-dashed">
                                         <p class="text-gray-500 text-sm italic">Belum ada dokumentasi.</p>
                                     </div>
                                     <% } %>
@@ -136,7 +126,7 @@
                         <!-- Action Buttons -->
                         <div class="mt-8 pt-6 border-t border-white/10 flex gap-3">
                             <button onclick="copyLink()"
-                                class="flex-1 flex justify-center items-center px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-gray-300 hover:text-white transition-all backdrop-blur-sm">
+                                class="flex-1 flex justify-center items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:text-gray-900 transition-all">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
@@ -159,7 +149,7 @@
                     <!-- Home Button & Footer -->
                     <div class="mt-8 flex flex-col items-center gap-4">
                         <a href="/"
-                            class="flex items-center px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-bold text-gray-300 hover:text-white transition-all backdrop-blur-sm shadow-lg">
+                            class="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:text-gray-900 transition-all shadow-lg">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">

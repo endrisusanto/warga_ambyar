@@ -63,6 +63,7 @@ app.use('/donasi', require('./routes/donasi'));
 app.use('/share', require('./routes/share'));
 app.use('/cctv', require('./routes/cctv'));
 app.use('/pengaduan', require('./routes/pengaduan'));
+app.use('/banjir', require('./routes/banjir'));
 
 
 // Run Migrations

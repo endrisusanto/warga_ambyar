@@ -3,11 +3,11 @@
 
         <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="glass-card p-8 m-4">
-                <h2 class="text-3xl font-bold text-gray-100 mb-2 flex items-center gap-3">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-3">
                     <span class="text-4xl">💸</span>
                     Input Pengeluaran
                 </h2>
-                <h3 class="text-xl text-gray-400 mb-8">
+                <h3 class="text-xl text-gray-600 dark:text-gray-400 mb-8">
                     <%= campaign.judul %>
                 </h3>
 
@@ -15,22 +15,22 @@
                     <input type="hidden" name="campaign_id" value="<%= campaign.id %>">
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Tanggal Pengeluaran *</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Tanggal Pengeluaran *</label>
                         <input type="datetime-local" name="tanggal" required
-                            class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Deskripsi Pengeluaran *</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Deskripsi Pengeluaran *</label>
                         <textarea name="deskripsi" required rows="3"
                             placeholder="Contoh: Pembelian bahan bangunan untuk renovasi masjid"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"></textarea>
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"></textarea>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Kategori (Opsional)</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Kategori (Opsional)</label>
                         <select name="kategori"
-                            class="glass-input w-full py-3 px-4 text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                             <option value="">Pilih Kategori</option>
                             <option value="Material">Material</option>
                             <option value="Tenaga Kerja">Tenaga Kerja</option>
@@ -42,22 +42,22 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Jumlah Pengeluaran (Rp) *</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Jumlah Pengeluaran (Rp) *</label>
                         <input type="number" name="jumlah" required min="1" step="1" placeholder="Contoh: 500000"
-                            class="glass-input w-full py-3 px-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-300 text-sm font-bold mb-2">Bukti Pengeluaran
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Bukti Pengeluaran
                             (Nota/Kwitansi)</label>
                         <input type="file" name="bukti" accept="image/*"
-                            class="glass-input w-full py-3 px-4 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:bg-white/10 file:text-gray-900 dark:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                         <p class="text-xs text-gray-500 mt-1">Upload foto nota/kwitansi (opsional)</p>
                     </div>
 
                     <div class="flex items-center justify-end gap-4">
                         <a href="/donasi/campaign/<%= campaign.id %>/neraca"
-                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/5 transition-all border border-white/10">
+                            class="px-6 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 transition-all border border-white/10">
                             Batal
                         </a>
                         <button type="submit"
