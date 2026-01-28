@@ -2,13 +2,44 @@
     <%- include('partials/navbar') %>
 
         <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 flex-grow">
-            <div class="max-w-md w-full space-y-8 glass-card p-10 m-4">
+            <div
+                class="max-w-md w-full space-y-8 glass-card p-10 m-4 shadow-[0_0_40px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_0_40px_-5px_rgba(79,70,229,0.2)] border border-white/40 ring-1 ring-black/5 transition-all duration-300">
                 <div>
-                    <div
-                        class="mx-auto h-20 w-20 bg-white/30 rounded-full flex items-center justify-center text-4xl shadow-sm backdrop-blur-sm animate-pulse">
-                        ⚡
+                    <div class="mx-auto h-24 w-24 relative flex items-center justify-center mb-2">
+                        <!-- Peeking Mascot SVG -->
+                        <svg id="mascot" viewBox="0 0 120 120" class="w-full h-full drop-shadow-xl overflow-visible">
+                            <!-- Body/Head -->
+                            <circle cx="60" cy="60" r="50"
+                                class="fill-indigo-100 dark:fill-indigo-900 stroke-indigo-500 stroke-2" />
+                            <path d="M30,30 L40,15 L50,30 Z" class="fill-indigo-500" /> <!-- Left Ear -->
+                            <path d="M70,30 L80,15 L90,30 Z" class="fill-indigo-500" /> <!-- Right Ear -->
+
+                            <!-- Face Group -->
+                            <g id="face">
+                                <!-- Eyes -->
+                                <circle id="eye-l" cx="45" cy="55" r="5"
+                                    class="fill-gray-900 dark:fill-white transition-all duration-200" />
+                                <circle id="eye-r" cx="75" cy="55" r="5"
+                                    class="fill-gray-900 dark:fill-white transition-all duration-200" />
+                                <!-- Snouth/Mouth -->
+                                <ellipse cx="60" cy="70" rx="10" ry="7" class="fill-white/50" />
+                                <path d="M56,68 Q60,75 64,68"
+                                    class="fill-none stroke-gray-900 dark:stroke-white stroke-2"
+                                    stroke-linecap="round" />
+                            </g>
+
+                            <!-- Hands Group (Initially hidden/low) -->
+                            <g id="hands" class="transition-all duration-300 transform translate-y-20 opacity-0">
+                                <ellipse cx="40" cy="55" rx="12" ry="16"
+                                    class="fill-indigo-300 dark:fill-indigo-700 stroke-indigo-500 stroke-2 transform -rotate-15" />
+                                <ellipse cx="80" cy="55" rx="12" ry="16"
+                                    class="fill-indigo-300 dark:fill-indigo-700 stroke-indigo-500 stroke-2 transform rotate-15" />
+                            </g>
+                        </svg>
                     </div>
-                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100 drop-shadow-lg">Selamat Datang
+                    <h2
+                        class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100 drop-shadow-lg">
+                        Selamat Datang
                     </h2>
                     <p class="mt-2 text-center text-sm text-gray-700 dark:text-gray-300">
                         Sign in ke akun Warga Ambyar
@@ -25,9 +56,26 @@
                         </div>
                         <div>
                             <label for="password" class="sr-only">Password</label>
-                            <input id="password" name="password" type="password" required
-                                class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 focus:z-10 sm:text-sm text-center"
-                                placeholder="Password">
+                            <div class="relative">
+                                <input id="password" name="password" type="password" required
+                                    class="glass-input appearance-none rounded-xl relative block w-full px-4 py-3 placeholder-gray-500 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 focus:z-10 sm:text-sm text-center pr-10"
+                                    placeholder="Password">
+                                <button type="button" id="togglePassword"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center z-20 text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg id="icon-eye" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg id="icon-eye-off" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -43,9 +91,9 @@
 
                     <div>
                         <button type="submit"
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg transform transition hover:-translate-y-0.5">
+                            class="group relative w-full flex justify-center py-3 px-4 border border-white/20 backdrop-blur-md bg-white/20 hover:bg-white/30 text-sm font-bold rounded-xl text-gray-900 dark:text-gray-100 shadow-lg transform transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50">
                             <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                <svg class="h-5 w-5 text-indigo-300 group-hover:text-indigo-200"
+                                <svg class="h-5 w-5 text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white"
                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                     aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -91,3 +139,91 @@
         </div>
 
         <%- include('partials/footer') %>
+
+            <script>
+                const passwordInput = document.getElementById('password');
+                const toggleButton = document.getElementById('togglePassword');
+                const iconEye = document.getElementById('icon-eye');
+                const iconEyeOff = document.getElementById('icon-eye-off');
+                const hands = document.getElementById('hands');
+                const face = document.getElementById('face');
+                const usernameInput = document.getElementById('username');
+                const mascot = document.getElementById('mascot');
+                const eyeL = document.getElementById('eye-l');
+                const eyeR = document.getElementById('eye-r');
+
+                // Helper to set hands state
+                function setHandsState(state) {
+                    // Clear inline transforms first
+                    hands.style.transform = '';
+
+                    // Reset classes
+                    hands.classList.remove('translate-y-20', 'opacity-0', 'translate-y-4');
+
+                    if (state === 'hidden') {
+                        // Way down and invisible
+                        hands.classList.add('translate-y-20', 'opacity-0');
+                    } else if (state === 'peek') {
+                        // Slightly down (peeking)
+                        hands.classList.add('translate-y-4');
+                    } else if (state === 'cover') {
+                        // Default position (0,0) - fully covering eyes
+                        // No extra classes needed as default is 0
+                    }
+                }
+
+                // Mascot Logic - Focus/Blur
+                passwordInput.addEventListener('focus', () => {
+                    const type = passwordInput.getAttribute('type');
+                    if (type === 'password') {
+                        setHandsState('cover');
+                        eyeL.setAttribute('cx', '45');
+                        eyeR.setAttribute('cx', '75');
+                    } else {
+                        setHandsState('peek');
+                    }
+                });
+
+                passwordInput.addEventListener('blur', () => {
+                    setHandsState('hidden');
+                });
+
+                // Toggle Password
+                toggleButton.addEventListener('click', () => {
+                    const currentType = passwordInput.getAttribute('type');
+                    const newType = currentType === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', newType);
+
+                    // Toggle Icons
+                    if (newType === 'text') {
+                        iconEye.classList.add('hidden');
+                        iconEyeOff.classList.remove('hidden');
+                        setHandsState('peek');
+                    } else {
+                        iconEye.classList.remove('hidden');
+                        iconEyeOff.classList.add('hidden');
+                        // When hiding password, standard behavior is to cover eyes again
+                        setHandsState('cover');
+                    }
+
+                    // Keep focus on input after click so interactions continue
+                    passwordInput.focus();
+                });
+
+                // Username tracking
+                usernameInput.addEventListener('input', (e) => {
+                    const val = e.target.value.length;
+                    const limit = 30;
+                    const percentage = Math.min(val / limit, 1);
+                    const range = 10;
+                    const offset = (percentage * range) - (range / 2);
+
+                    eyeL.setAttribute('cx', 45 + offset);
+                    eyeR.setAttribute('cx', 75 + offset);
+                });
+
+                usernameInput.addEventListener('blur', () => {
+                    eyeL.setAttribute('cx', 45);
+                    eyeR.setAttribute('cx', 75);
+                });
+            </script>

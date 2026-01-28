@@ -66,8 +66,9 @@
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <div
                                         class="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors">
-                                        <div class="text-xs text-emerald-400 font-medium mb-1">Pemasukan Bulan Ini</div>
-                                        <div class="text-lg font-bold text-emerald-100">
+                                        <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-1">
+                                            Pemasukan Bulan Ini</div>
+                                        <div class="text-lg font-bold text-emerald-700 dark:text-emerald-100">
                                             Rp <%= summary.pemasukan ? new Intl.NumberFormat('id-ID', {
                                                 minimumFractionDigits: 0, maximumFractionDigits: 0
                                                 }).format(summary.pemasukan) : 0 %>
@@ -75,8 +76,9 @@
                                     </div>
                                     <div
                                         class="bg-red-500/10 p-4 rounded-lg border border-red-500/30 hover:bg-red-500/20 transition-colors">
-                                        <div class="text-xs text-red-400 font-medium mb-1">Pengeluaran Bulan Ini</div>
-                                        <div class="text-lg font-bold text-red-100">
+                                        <div class="text-xs text-red-600 dark:text-red-400 font-bold mb-1">Pengeluaran
+                                            Bulan Ini</div>
+                                        <div class="text-lg font-bold text-red-700 dark:text-red-100">
                                             Rp <%= summary.pengeluaran ? new Intl.NumberFormat('id-ID', {
                                                 minimumFractionDigits: 0, maximumFractionDigits: 0
                                                 }).format(summary.pengeluaran) : 0 %>
