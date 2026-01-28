@@ -117,6 +117,42 @@
                 background: #10b981;
                 box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
             }
+
+            /* Light Mode Override for Quill Editor */
+            html:not(.dark) .ql-toolbar.ql-snow {
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+            }
+
+            html:not(.dark) .ql-container.ql-snow {
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-stroke {
+                stroke: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-fill {
+                fill: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-picker {
+                color: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-editor {
+                color: #1f2937;
+            }
+
+            html:not(.dark) .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.1);
+            }
         </style>
 
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
@@ -127,15 +163,16 @@
                         <div class="p-4 sm:p-6">
                             <div class="mb-4 border-b border-white/10 pb-4">
                                 <div class="mb-2">
-                                    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">
+                                    <h1
+                                        class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">
                                         <%= complaint.judul %>
                                     </h1>
                                     <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
                                         <span
-                                            class="flex items-center px-2 py-0.5 rounded-full border
-                                            <%= complaint.status === 'pending' ? 'text-yellow-300 bg-yellow-500/10 border-yellow-500/20' : 
-                                                complaint.status === 'proses' ? 'text-blue-300 bg-blue-500/10 border-blue-500/20' : 
-                                                complaint.status === 'selesai' ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20' : 'text-red-300 bg-red-500/10 border-red-500/20' %>">
+                                            class="flex items-center px-2 py-0.5 rounded-full border border-white/10 shadow-sm font-bold
+                                            <%= complaint.status === 'pending' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20' : 
+                                                complaint.status === 'proses' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' : 
+                                                complaint.status === 'selesai' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' %>">
                                             <svg class="mr-1 h-3 w-3" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -151,17 +188,15 @@
                                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                                 </path>
                                             </svg>
-                                            <% if (complaint.is_anonim && complaint.nama_warga) { const
-                                                words=complaint.nama_warga.split(' ');
-                                                const parts = words.map(w => {
-                                                    if (w.length <= 1) return { first: w, blur: '' };
-                                                    return { first: w[0], blur: w.substring(1) };
-                                                });
-                                            %>
-                                                <% parts.forEach((part, idx) => { %><%= part.first %><% if (part.blur) { %><span class="blur-sm select-none" style="filter: blur(4px)"><%= part.blur %></span><% } %><% if (idx < parts.length - 1) { %> <% } %><% }); %>
-                                            <% } else { %>
-                                                <%= complaint.nama_warga || ' User' %>
-                                                <% } %>
+                                            <% if (complaint.is_anonim && complaint.nama_warga) { %>
+                                                <span class="blur-sm select-none cursor-default"
+                                                    style="filter: blur(6px); user-select: none;"
+                                                    title="Nama disamarkan (Anonim)">
+                                                    <%= complaint.nama_warga %>
+                                                </span>
+                                                <% } else { %>
+                                                    <%= complaint.nama_warga || ' User' %>
+                                                        <% } %>
                                         </span>
                                         <span
                                             class="flex items-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
@@ -193,20 +228,34 @@
                                         Share WA
                                     </button>
 
-                                    <% if (['admin', 'ketua' , 'bendahara' ].includes(user.role) ||
-                                        (user.warga_id==complaint.warga_id)) { %>
-                                        <a href="/pengaduan/delete/<%= complaint.id %>"
-                                            onclick="return confirm('Apakah anda yakin ingin menghapus pengaduan ini? Data yang dihapus tidak dapat dikembalikan.')"
-                                            class="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-all">
+                                    <% if (['admin'].includes(user.role) || (user.warga_id==complaint.warga_id)) { %>
+                                        <a href="/pengaduan/edit/<%= complaint.id %>"
+                                            class="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                                 </path>
                                             </svg>
-                                            Hapus
+                                            Edit
                                         </a>
                                         <% } %>
+
+                                            <% if (['admin', 'ketua' , 'bendahara' ].includes(user.role) ||
+                                                (user.warga_id==complaint.warga_id)) { %>
+                                                <a href="/pengaduan/delete/<%= complaint.id %>"
+                                                    onclick="return confirm('Apakah anda yakin ingin menghapus pengaduan ini? Data yang dihapus tidak dapat dikembalikan.')"
+                                                    class="flex items-center justify-center px-3 py-1.5 rounded-lg text-sm bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-all">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                    Hapus
+                                                </a>
+                                                <% } %>
                                 </div>
                             </div>
 
@@ -216,7 +265,8 @@
 
                             <% if(complaint.foto) { %>
                                 <div class="mt-6 border-t border-white/10 pt-4">
-                                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                    <h3
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
                                         <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -266,7 +316,8 @@
                         <form action="/pengaduan/<%= complaint.id %>/update" method="POST"
                             class="mb-6 p-4 bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10">
                             <div class="mb-3">
-                                <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">Update
+                                <label
+                                    class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">Update
                                     Status</label>
                                 <div class="flex gap-2">
                                     <select name="status"
@@ -310,17 +361,15 @@
                                     </div>
                                     <div class="text-xs text-gray-700 dark:text-gray-300">
                                         Oleh <span class="font-bold text-gray-900 dark:text-gray-100">
-                                            <% if (complaint.is_anonim && complaint.nama_warga) { const
-                                                words=complaint.nama_warga.split(' ');
-                                                const parts = words.map(w => {
-                                                    if (w.length <= 1) return { first: w, blur: '' };
-                                                    return { first: w[0], blur: w.substring(1) };
-                                                });
-                                            %>
-                                                <% parts.forEach((part, idx) => { %><%= part.first %><% if (part.blur) { %><span class="blur-sm select-none" style="filter: blur(4px)"><%= part.blur %></span><% } %><% if (idx < parts.length - 1) { %> <% } %><% }); %>
-                                            <% } else { %>
-                                                <%= complaint.nama_warga || ' User' %>
-                                                <% } %>
+                                            <% if (complaint.is_anonim && complaint.nama_warga) { %>
+                                                <span class="blur-sm select-none cursor-default"
+                                                    style="filter: blur(6px); user-select: none;"
+                                                    title="Nama disamarkan (Anonim)">
+                                                    <%= complaint.nama_warga %>
+                                                </span>
+                                                <% } else { %>
+                                                    <%= complaint.nama_warga || ' User' %>
+                                                        <% } %>
                                         </span>
                                     </div>
                                 </div>
@@ -460,12 +509,14 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <div id="commentEditor" class="bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10"></div>
+                                <div id="commentEditor"
+                                    class="bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10"></div>
                                 <input type="hidden" name="konten" id="commentKonten">
                             </div>
 
                             <div class="mb-3">
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Lampiran (Opsional)</label>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Lampiran
+                                    (Opsional)</label>
                                 <div id="dropzone"
                                     class="relative border-2 border-dashed border-gray-600 hover:border-indigo-400 bg-gray-100 dark:bg-white/5 rounded-xl p-4 transition-all group cursor-pointer text-center">
                                     <input type="file" name="lampiran" id="lampiranInput"
@@ -476,14 +527,15 @@
                                         class="flex flex-col items-center justify-center space-y-2">
                                         <div
                                             class="w-10 h-10 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
                                         </div>
-                                        <div class="text-xs text-gray-600 dark:text-gray-400 font-medium">Klik atau drop file di sini</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 font-medium">Klik atau drop
+                                            file di sini</div>
                                     </div>
 
                                     <!-- Preview View -->
@@ -577,7 +629,8 @@
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                         <span class="text-xl">👾</span> Cari GIF
                     </h3>
-                    <button onclick="closeGiphyModal()" class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors">
+                    <button onclick="closeGiphyModal()"
+                        class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -590,8 +643,8 @@
                         <input type="text" id="giphySearch" placeholder="Cari GIF lucu..."
                             class="w-full glass-input py-2 px-4 rounded-lg pl-10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500/50"
                             onkeyup="handleGiphySearch(event)">
-                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 absolute left-3 top-2.5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>

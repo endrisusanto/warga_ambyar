@@ -24,4 +24,7 @@ router.get('/:id', ensureAuthenticated, pengaduanController.detail);
 router.post('/:id/update', ensureAuthenticated, pengaduanController.updateStatus);
 router.post('/comment', ensureAuthenticated, upload.single('lampiran'), pengaduanController.postComment);
 
+router.get('/edit/:id', ensureAuthenticated, pengaduanController.edit);
+router.post('/edit/:id', ensureAuthenticated, upload.single('foto'), pengaduanController.update);
+
 module.exports = router;

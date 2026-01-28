@@ -1,25 +1,48 @@
+const User = require('../models/User');
+
 module.exports = {
-    ensureAuthenticated: function (req, res, next) {
+    ensureAuthenticated: async function (req, res, next) {
         if (req.session.user) {
+
+            // SECURITY PATCH: Always refresh critical user data from DB
+            // This ensures approval status and role are up-to-date
+            try {
+                const refreshedUser = await User.findByUsername(req.session.user.username);
+                if (refreshedUser) {
+                    // Update session data responsibly (keep non-db session flags if any, but overwrite db fields)
+                    req.session.user = { ...req.session.user, ...refreshedUser };
+                    req.session.save(); // Save background
+                } else {
+                    // User was deleted from DB but session exists?
+                    // req.session.destroy();
+                    // return res.redirect('/auth/login');
+                    // For now just keep going, assume db issue or edge case
+                }
+            } catch (err) {
+                console.error("Auth Middleware Refresh Error:", err);
+            }
+
             // Set req.user for controllers to use
             req.user = req.session.user;
 
-            // Check approval status for Read-Only mode
-            if (req.session.user.approval_status === 'pending') {
-                // Allow GET requests (Read-Only)
-                if (req.method === 'GET') {
+            // AUTH CHECK RIGOROUS
+            const status = req.session.user.approval_status;
+            const role = req.session.user.role;
+
+            // LOCK LOGIC: If NOT Admin AND NOT Approved -> LOCK DOWN
+            // This catches 'pending', null, undefined, 'rejected', etc.
+            if (role !== 'admin' && status !== 'approved') {
+
+                // Whitelist URLs (Pending Page & Logout)
+                if (req.originalUrl.startsWith('/auth/pending') || req.originalUrl === '/auth/logout') {
                     return next();
                 }
 
-                // Allow Logout (POST)
-                if (req.originalUrl === '/auth/logout') {
-                    return next();
-                }
-
-                // Block other state-changing requests
-                req.flash('error_msg', 'Akun Anda masih dalam proses verifikasi (Read-Only). Anda tidak dapat melakukan perubahan data.');
-                return res.redirect('back');
+                // Redirect unauthorized users to pending page
+                req.flash('error_msg', 'Akun Anda belum disetujui admin.'); // Optional feedback
+                return res.redirect('/auth/pending');
             }
+
             return next();
         }
         req.flash('error_msg', 'Please log in to view that resource');

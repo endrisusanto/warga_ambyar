@@ -131,6 +131,41 @@ const Pengaduan = {
         } finally {
             connection.release();
         }
+    },
+
+    update: async (id, data, userId, logMessage) => {
+        const { judul, deskripsi, foto, is_anonim } = data;
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            let query = 'UPDATE pengaduan SET judul = ?, deskripsi = ?, is_anonim = ?';
+            let params = [judul, deskripsi, is_anonim ? 1 : 0];
+
+            if (foto) {
+                query += ', foto = ?';
+                params.push(foto);
+            }
+
+            query += ' WHERE id = ?';
+            params.push(id);
+
+            await connection.query(query, params);
+
+            if (logMessage && userId) {
+                await connection.query(
+                    'INSERT INTO pengaduan_comments (pengaduan_id, user_id, konten, type) VALUES (?, ?, ?, ?)',
+                    [id, userId, logMessage, 'log']
+                );
+            }
+
+            await connection.commit();
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 };
 

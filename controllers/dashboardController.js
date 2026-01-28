@@ -15,8 +15,44 @@ exports.index = async (req, res) => {
         events: [],
         complaints: [],
         chartData: { labels: [], pemasukan: [], pengeluaran: [] },
-        user: req.session.user
+        user: req.session.user,
+        pendingCount: 0,
+        dashboardAlerts: [] // Array untuk carousel alert
     };
+
+    // Logic Alerts Pengurus (Admin, Ketua, Bendahara)
+    const userRole = req.session.user ? req.session.user.role.toString().toLowerCase() : '';
+    const isPengurus = ['admin', 'ketua', 'bendahara'].includes(userRole);
+
+    if (isPengurus) {
+        try {
+            // 1. Pending Approval Alert
+            const pendingUsers = await Warga.getPending();
+            const pCount = pendingUsers.length;
+
+            console.log(`[DEBUG] Dashboard Alert Check - Role: ${userRole}, PendingCount: ${pCount}`);
+            data.pendingCount = pCount;
+
+            if (pCount > 0) {
+                data.dashboardAlerts.push({
+                    type: 'approval',
+                    icon: '🔔',
+                    color: 'orange',
+                    title: 'Verifikasi Diperlukan',
+                    // Use simple description as fallback, View will use pendingUsers if available
+                    desc: `Terdapat <strong class="text-orange-400">${pCount}</strong> warga baru menunggu persetujuan akun.`,
+                    btnText: 'Lihat Data',
+                    link: '/warga',
+                    pendingUsers: pendingUsers.slice(0, 3), // Pass top 3 users
+                    totalPending: pCount
+                });
+            }
+
+            // 2. Complaint Alerts logic will follow below...
+        } catch (e) {
+            console.error('Error alerts logic:', e);
+        }
+    }
 
     try {
         // 1. Kas Data
@@ -160,10 +196,29 @@ exports.index = async (req, res) => {
             require('fs').appendFileSync('debug.log', `ERROR Events: ${e.message}\n`);
         }
 
-        // 5. Complaints for Modal
+        // 5. Complaints for Modal & Alerts
         try {
             const allComplaints = await Pengaduan.getAll();
-            data.complaints = allComplaints.filter(c => ['pending', 'proses'].includes(c.status));
+            // Filter pending/proses only
+            const activeComplaints = allComplaints.filter(c => ['pending', 'proses'].includes(c.status));
+            data.complaints = activeComplaints; // Keep original for compatibility if needed elsewhere
+
+            if (isPengurus) {
+                activeComplaints.slice(0, 5).forEach(c => {
+                    data.dashboardAlerts.push({
+                        type: 'complaint',
+                        raw: c, // Include raw data for rich display in modal
+                        id: 'complaint-' + c.id,
+                        icon: '⚠️',
+                        color: c.status === 'pending' ? 'red' : 'yellow',
+                        title: c.status === 'pending' ? 'Aduan Baru' : 'Aduan Diproses',
+                        // ... desc etc still there but maybe unused if specific layout used
+                        desc: `<span class="font-bold block mb-1 text-base text-gray-200">${c.judul}</span><span class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-md border border-white/5">${c.kategori}</span> <span class="text-xs text-gray-400 ml-1">📍 ${c.lokasi || 'Lingkungan'}</span>`,
+                        btnText: 'Tindak Lanjuti',
+                        link: '/pengaduan'
+                    });
+                });
+            }
         } catch (e) {
             console.error('Error fetching Complaints:', e.message);
         }

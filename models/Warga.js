@@ -6,7 +6,7 @@ const Warga = {
             SELECT w.*, u.role, u.username 
             FROM warga w 
             LEFT JOIN users u ON u.warga_id = w.id 
-            ORDER BY w.blok, w.nomor_rumah, w.status_keluarga
+            ORDER BY CASE WHEN w.approval_status = 'pending' THEN 0 ELSE 1 END, w.blok, w.nomor_rumah, w.status_keluarga
         `);
         return rows;
     },
@@ -89,6 +89,14 @@ const Warga = {
     },
     toggleRonda: async (id) => {
         await db.query('UPDATE warga SET is_ronda = NOT is_ronda WHERE id = ?', [id]);
+    },
+    countPending: async () => {
+        const [rows] = await db.query("SELECT COUNT(*) as count FROM warga WHERE approval_status = 'pending'");
+        return Number(rows[0].count);
+    },
+    getPending: async () => {
+        const [rows] = await db.query("SELECT * FROM warga WHERE approval_status = 'pending' ORDER BY created_at DESC");
+        return rows;
     }
 };
 

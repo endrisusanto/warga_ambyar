@@ -39,6 +39,9 @@ router.post('/complete-profile', (req, res, next) => {
     next();
 }, authController.postCompleteProfile);
 
-router.get('/pending', authController.getPending);
+router.get('/pending', (req, res, next) => {
+    if (!req.session.user) return res.redirect('/auth/login');
+    next();
+}, authController.getPending);
 
 module.exports = router;

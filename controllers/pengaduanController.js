@@ -149,3 +149,85 @@ exports.delete = async (req, res) => {
         res.redirect('/pengaduan');
     }
 };
+
+exports.edit = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const complaint = await Pengaduan.findById(id);
+
+        if (!complaint) {
+            req.flash('error_msg', 'Pengaduan tidak ditemukan');
+            return res.redirect('/pengaduan');
+        }
+
+        // Auth check: Admin or Creator
+        const isAuthorized = ['admin'].includes(req.session.user.role) || (complaint.warga_id === req.session.user.warga_id);
+
+        if (!isAuthorized) {
+            req.flash('error_msg', 'Anda tidak memiliki izin untuk mengedit pengaduan ini');
+            return res.redirect('/pengaduan/' + id);
+        }
+
+        res.render('pengaduan/edit', {
+            title: 'Edit Pengaduan',
+            user: req.session.user,
+            complaint,
+            path: '/pengaduan'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.update = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const complaint = await Pengaduan.findById(id);
+
+        if (!complaint) {
+            req.flash('error_msg', 'Pengaduan tidak ditemukan');
+            return res.redirect('/pengaduan');
+        }
+
+        // Auth check
+        const isAuthorized = ['admin'].includes(req.session.user.role) || (complaint.warga_id === req.session.user.warga_id);
+
+        if (!isAuthorized) {
+            req.flash('error_msg', 'Anda tidak memiliki izin untuk mengedit pengaduan ini');
+            return res.redirect('/pengaduan/' + id);
+        }
+
+        const { judul, deskripsi, is_anonim } = req.body;
+        const foto = req.file ? '/uploads/pengaduan/' + req.file.filename : null;
+
+        // Change Detection for Logging
+        const changes = [];
+        if (complaint.judul !== judul) changes.push('Judul');
+        if (complaint.deskripsi !== deskripsi) changes.push('Deskripsi');
+        if (foto) changes.push('Foto');
+        const anonimBool = is_anonim === 'on';
+        // Note: DB usually returns 1/0 for boolean. Compare using loose equality or !!
+        if ((!!complaint.is_anonim) !== anonimBool) changes.push('Status Anonim');
+
+        let logMessage = null;
+        if (changes.length > 0) {
+            logMessage = `Update konten: ${changes.join(', ')}`;
+        }
+
+        await Pengaduan.update(id, {
+            judul,
+            deskripsi,
+            foto,
+            is_anonim: anonimBool
+        }, req.session.user.id, logMessage);
+
+        req.flash('success_msg', 'Pengaduan berhasil diperbarui');
+        res.redirect('/pengaduan/' + id);
+
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Gagal memperbarui pengaduan');
+        res.redirect('/pengaduan/edit/' + req.params.id);
+    }
+};

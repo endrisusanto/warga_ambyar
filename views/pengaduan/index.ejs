@@ -118,17 +118,15 @@
                                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                                             </path>
                                                         </svg>
-                                                        <% if (c.is_anonim && c.nama_warga) { const
-                                                            words=c.nama_warga.split(' ');
-                                                            const parts = words.map(w => {
-                                                                if (w.length <= 1) return { first: w, blur: '' };
-                                                                return { first: w[0], blur: w.substring(1) };
-                                                            });
-                                                        %>
-                                                            <% parts.forEach((part, idx) => { %><%= part.first %><% if (part.blur) { %><span class="blur-sm select-none" style="filter: blur(4px)"><%= part.blur %></span><% } %><% if (idx < parts.length - 1) { %> <% } %><% }); %>
-                                                        <% } else { %>
-                                                            <%= c.nama_warga || ' User' %>
-                                                            <% } %>
+                                                        <% if (c.is_anonim && c.nama_warga) { %>
+                                                            <span class="blur-sm select-none cursor-default"
+                                                                style="filter: blur(6px); user-select: none;"
+                                                                title="Nama disamarkan (Anonim)">
+                                                                <%= c.nama_warga %>
+                                                            </span>
+                                                            <% } else { %>
+                                                                <%= c.nama_warga || ' User' %>
+                                                                    <% } %>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor"

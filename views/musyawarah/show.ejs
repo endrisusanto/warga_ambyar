@@ -141,6 +141,42 @@
                 background: #10b981;
                 box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
             }
+
+            /* Light Mode Override for Quill Editor */
+            html:not(.dark) .ql-toolbar.ql-snow {
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+            }
+
+            html:not(.dark) .ql-container.ql-snow {
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-stroke {
+                stroke: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-fill {
+                fill: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-picker {
+                color: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-editor {
+                color: #1f2937;
+            }
+
+            html:not(.dark) .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.1);
+            }
         </style>
 
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
@@ -151,14 +187,15 @@
                         <div class="p-4 sm:p-6">
                             <div class="mb-4 border-b border-white/10 pb-4">
                                 <div class="mb-2">
-                                    <h1 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">
+                                    <h1
+                                        class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">
                                         <%= item.judul %>
                                     </h1>
                                     <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
                                         <span
-                                            class="flex items-center text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            class="flex items-center text-indigo-600 dark:text-indigo-400 bg-transparent px-2.5 py-1 rounded-full text-xs font-bold border border-indigo-500 dark:border-indigo-400 shadow-sm">
+                                            <svg class="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
@@ -166,9 +203,9 @@
                                             Meeting: <%= moment(item.tanggal).format('DD MMM YYYY, HH:mm') %>
                                         </span>
                                         <span
-                                            class="flex items-center text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
-                                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            class="flex items-center text-gray-700 dark:text-gray-300 bg-transparent px-2.5 py-1 rounded-full text-xs font-medium border border-gray-400 dark:border-gray-500 shadow-sm">
+                                            <svg class="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
@@ -220,7 +257,8 @@
 
                             <% if(item.lampiran) { %>
                                 <div class="mt-6 border-t border-white/10 pt-4">
-                                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                    <h3
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
                                         <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -257,7 +295,7 @@
                                                             </path>
                                                         </svg>
                                                         <span
-                                                            class="text-[10px] text-gray-600 dark:text-gray-400 font-medium truncate w-full px-2">
+                                                            class="text-[10px] text-gray-900 dark:text-gray-100 font-bold truncate w-full px-2">
                                                             <%= item.lampiran %>
                                                         </span>
                                                     </div>
@@ -377,8 +415,8 @@
                                                                             <% } else { %>
                                                                                 <a href="/uploads/musyawarah/<%= timelineItem.lampiran %>"
                                                                                     target="_blank"
-                                                                                    class="flex items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 hover:bg-gray-200 dark:bg-white/10 transition-colors w-fit">
-                                                                                    <svg class="w-4 h-4 text-indigo-400"
+                                                                                    class="flex items-center gap-2 p-2 rounded-lg bg-transparent border border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors w-fit shadow-sm">
+                                                                                    <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400"
                                                                                         fill="none"
                                                                                         stroke="currentColor"
                                                                                         viewBox="0 0 24 24">
@@ -389,7 +427,7 @@
                                                                                         </path>
                                                                                     </svg>
                                                                                     <span
-                                                                                        class="text-xs text-indigo-300 truncate max-w-[150px]">
+                                                                                        class="text-xs font-bold truncate max-w-[150px]">
                                                                                         <%= timelineItem.lampiran %>
                                                                                     </span>
                                                                                 </a>
@@ -433,7 +471,8 @@
                                                         </span>
                                                     </div>
                                                     <div class="text-xs text-gray-700 dark:text-gray-300">
-                                                        Diedit oleh <span class="font-bold text-gray-900 dark:text-gray-100">
+                                                        Diedit oleh <span
+                                                            class="font-bold text-gray-900 dark:text-gray-100">
                                                             <%= timelineItem.warga_nama || timelineItem.username %>
                                                         </span>
                                                     </div>
@@ -466,11 +505,13 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <div id="commentEditor" class="bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10"></div>
+                                <div id="commentEditor"
+                                    class="bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10"></div>
                                 <input type="hidden" name="konten" id="commentKonten">
                             </div>
                             <div class="mb-3">
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Lampiran (Opsional)</label>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Lampiran
+                                    (Opsional)</label>
                                 <div id="dropzone"
                                     class="relative border-2 border-dashed border-gray-600 hover:border-indigo-400 bg-gray-100 dark:bg-white/5 rounded-xl p-4 transition-all group cursor-pointer text-center">
                                     <input type="file" name="lampiran" id="lampiranInput"
@@ -481,14 +522,15 @@
                                         class="flex flex-col items-center justify-center space-y-2">
                                         <div
                                             class="w-10 h-10 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
                                         </div>
-                                        <div class="text-xs text-gray-600 dark:text-gray-400 font-medium">Klik atau drop file di sini</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 font-medium">Klik atau drop
+                                            file di sini</div>
                                     </div>
 
                                     <!-- Preview View -->
@@ -522,7 +564,7 @@
                                 </div>
                             </div>
                             <button type="submit"
-                                class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
+                                class="w-full py-2.5 rounded-xl bg-transparent border border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:!text-white dark:hover:!text-white text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 group">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
@@ -557,7 +599,8 @@
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                         <span class="text-xl">👾</span> Cari GIF
                     </h3>
-                    <button onclick="closeGiphyModal()" class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors">
+                    <button onclick="closeGiphyModal()"
+                        class="text-gray-600 dark:text-gray-400 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -570,8 +613,8 @@
                         <input type="text" id="giphySearch" placeholder="Cari GIF lucu..."
                             class="w-full glass-input py-2 px-4 rounded-lg pl-10 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500/50"
                             onkeyup="handleGiphySearch(event)">
-                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 absolute left-3 top-2.5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>

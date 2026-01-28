@@ -165,7 +165,7 @@
                             </div>
 
                             <!-- Chart Container -->
-                            <div class="border-t border-white/5 bg-black/20 p-4">
+                            <div class="border-t border-white dark:border-white/5 bg-gray-50 dark:bg-black/20 p-4">
                                 <div id="chart-tanjungpura" class="w-full h-[250px]"></div>
                                 <div id="chart-tanjungpura-brush" class="w-full h-[100px] -mt-2"></div>
                             </div>
@@ -277,7 +277,7 @@
                             </div>
 
                             <!-- Chart Container -->
-                            <div class="border-t border-white/5 bg-black/20 p-4">
+                            <div class="border-t border-white dark:border-white/5 bg-gray-50 dark:bg-black/20 p-4">
                                 <div id="chart-cibeet" class="w-full h-[250px]"></div>
                                 <div id="chart-cibeet-brush" class="w-full h-[100px] -mt-2"></div>
                             </div>
@@ -323,6 +323,7 @@
             const createChartOptions = (id, data, thresholds, minY, maxY) => {
                 const uniqueId = `main-${id}`;
                 const brushId = `brush-${id}`;
+                const isDark = document.documentElement.classList.contains('dark');
 
                 const seriesTMA = data.map(d => ({
                     x: new Date(d.date).getTime(),
@@ -377,7 +378,7 @@
                         axisTicks: { show: false },
                         labels: {
                             datetimeUTC: false,
-                            style: { colors: '#9ca3af', fontFamily: 'Inter' },
+                            style: { colors: isDark ? '#9ca3af' : '#4b5563', fontFamily: 'Inter' },
                             datetimeFormatter: { hour: 'HH:mm' }
                         }
                     },
@@ -411,11 +412,11 @@
                         }
                     ],
                     grid: {
-                        borderColor: 'rgba(255,255,255,0.05)',
+                        borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                         strokeDashArray: 4,
                         xaxis: { lines: { show: true } }
                     },
-                    theme: { mode: 'dark' },
+                    theme: { mode: isDark ? 'dark' : 'light' },
                     annotations: {
                         yaxis: [
                             {
@@ -447,7 +448,7 @@
                         ]
                     },
                     tooltip: {
-                        theme: 'dark',
+                        theme: isDark ? 'dark' : 'light',
                         x: { format: 'dd MMM HH:mm' }
                     }
                 };
@@ -469,12 +470,21 @@
                         id: brushId,
                         height: 100,
                         type: 'area',
+                        background: 'transparent',
                         brush: {
                             target: uniqueId,
                             enabled: true
                         },
                         selection: {
-                            enabled: true
+                            enabled: true,
+                            fill: {
+                                color: isDark ? '#fff' : '#3b82f6',
+                                opacity: 0.1
+                            },
+                            stroke: {
+                                width: 1,
+                                color: isDark ? '#fff' : '#3b82f6',
+                            }
                         },
                         toolbar: { show: false }
                     },
@@ -494,14 +504,14 @@
                         tooltip: { enabled: false },
                         labels: {
                             datetimeUTC: false,
-                            style: { colors: '#9ca3af' }
+                            style: { colors: isDark ? '#9ca3af' : '#4b5563' }
                         }
                     },
                     yaxis: {
                         tickAmount: 2,
                         labels: { show: false }
                     },
-                    theme: { mode: 'dark' }
+                    theme: { mode: isDark ? 'dark' : 'light' }
                 };
 
                 return { main: mainOptions, brush: brushOptions };

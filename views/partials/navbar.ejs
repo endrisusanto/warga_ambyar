@@ -233,132 +233,117 @@
 
                     <!-- Grid Container -->
                     <div
-                        class="w-[95%] max-w-md bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl transform transition-all">
+                        class="w-[95%] max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-5 shadow-2xl transform transition-all">
                         <div class="grid grid-cols-2 gap-3 w-full">
                             <!-- Dashboard Button -->
                             <a href="/dashboard"
-                                class="<%= isDashboard ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isDashboard ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isDashboard ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                        </path>
-                                    </svg>
+                                    <div class="text-3xl drop-shadow-sm transition-transform group-hover:scale-110">🏠
+                                    </div>
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isDashboard ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Dashboard</span>
+                                    class="text-xs font-semibold <%= isDashboard ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Dashboard</span>
                             </a>
 
                             <!-- Jadwal Ronda Button -->
                             <a href="/ronda"
-                                class="<%= isRonda ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isRonda ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isRonda ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
+                                    <div class="text-3xl drop-shadow-sm transition-transform group-hover:scale-110">🛡️
+                                    </div>
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isRonda ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Ronda</span>
+                                    class="text-xs font-semibold <%= isRonda ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Ronda</span>
                             </a>
 
                             <!-- Iuran Button -->
                             <a href="/iuran"
-                                class="<%= isIuran ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isIuran ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isIuran ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
-                                        </path>
-                                    </svg>
+                                    <div class="text-3xl drop-shadow-sm transition-transform group-hover:scale-110">💸
+                                    </div>
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isIuran ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Iuran</span>
+                                    class="text-xs font-semibold <%= isIuran ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Iuran</span>
                             </a>
 
                             <!-- Keuangan Button -->
                             <a href="/keuangan"
-                                class="<%= isKeuangan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isKeuangan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isKeuangan ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
+                                    <div class="text-3xl drop-shadow-sm transition-transform group-hover:scale-110">📊
+                                    </div>
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isKeuangan ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Keuangan</span>
+                                    class="text-xs font-semibold <%= isKeuangan ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Keuangan</span>
                             </a>
 
                             <!-- Info Warga Button -->
                             <a href="/musyawarah"
-                                class="<%= isMusyawarah ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isMusyawarah ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isMusyawarah ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                        </path>
-                                    </svg>
+                                    <div class="text-3xl drop-shadow-sm transition-transform group-hover:scale-110">👥
+                                    </div>
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isMusyawarah ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Info
+                                    class="text-xs font-semibold <%= isMusyawarah ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Info
                                     Warga</span>
                             </a>
 
                             <!-- Donasi Button -->
                             <a href="/donasi"
-                                class="<%= isDonasi ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isDonasi ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isDonasi ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
                                     💝
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isDonasi ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Donasi</span>
+                                    class="text-xs font-semibold <%= isDonasi ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Donasi</span>
                             </a>
 
                             <!-- Pengaduan Button -->
                             <a href="/pengaduan"
-                                class="<%= isPengaduan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isPengaduan ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isPengaduan ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
                                     📢
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isPengaduan ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Aduan</span>
+                                    class="text-xs font-semibold <%= isPengaduan ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Aduan</span>
                             </a>
 
                             <!-- Banjir Button -->
                             <a href="/banjir"
-                                class="<%= isBanjir ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isBanjir ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isBanjir ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
                                     🌊
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isBanjir ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Banjir</span>
+                                    class="text-xs font-semibold <%= isBanjir ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Banjir</span>
                             </a>
 
                             <!-- CCTV Button -->
                             <a href="/cctv/monitor"
-                                class="<%= isCCTV ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
+                                class="<%= isCCTV ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-col items-center gap-2 group">
                                 <div
                                     class="<%= isCCTV ? 'text-indigo-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-400' %> transition-colors text-2xl">
                                     📹
 
                                 </div>
                                 <span
-                                    class="text-xs font-semibold <%= isCCTV ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">CCTV</span>
+                                    class="text-xs font-semibold <%= isCCTV ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">CCTV</span>
                             </a>
 
                             <!-- Profile Button -->
                             <a href="/profile"
-                                class="<%= isProfile ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-gray-100 dark:bg-white/5 border-white/10' %> p-5 rounded-2xl border hover:bg-gray-200 dark:bg-white/10 transition-all transform hover:scale-105 flex flex-row items-center justify-center gap-3 group">
+                                class="<%= isProfile ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' %> p-5 rounded-2xl border hover:bg-gray-50 dark:hover:bg-white/10 transition-all transform hover:scale-105 flex flex-row items-center justify-center gap-3 group">
                                 <% if (user.foto_profil) { %>
                                     <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
                                         class="w-6 h-6 rounded-full border border-white/20 object-cover group-hover:border-indigo-400 transition-colors">
@@ -372,7 +357,7 @@
                                             </div>
                                             <% } %>
                                                 <span
-                                                    class="text-xs font-semibold <%= isProfile ? 'text-indigo-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-white' %>">Profile</span>
+                                                    class="text-xs font-semibold <%= isProfile ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-white' %>">Profile</span>
                             </a>
                         </div>
                     </div>
@@ -515,7 +500,7 @@
                             <% } %>
 
                                 <% if(success_msg && success_msg.length> 0) { %>
-                                    <div class="bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                                    <div class="mx-4 sm:mx-6 lg:mx-8 bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
                                         role="alert">
                                         <strong class="font-bold">✨ Success!</strong>
                                         <span class="block sm:inline">
@@ -524,7 +509,7 @@
                                     </div>
                                     <% } %>
                                         <% if(error_msg && error_msg.length> 0) { %>
-                                            <div class="bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                                            <div class="mx-4 sm:mx-6 lg:mx-8 bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
                                                 role="alert">
                                                 <strong class="font-bold">⚠️ Error!</strong>
                                                 <span class="block sm:inline">
@@ -533,7 +518,7 @@
                                             </div>
                                             <% } %>
                                                 <% if(error && error.length> 0) { %>
-                                                    <div class="bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
+                                                    <div class="mx-4 sm:mx-6 lg:mx-8 bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 backdrop-blur-md shadow-lg"
                                                         role="alert">
                                                         <strong class="font-bold">⚠️ Error!</strong>
                                                         <span class="block sm:inline">

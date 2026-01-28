@@ -98,6 +98,81 @@
             .ql-snow .ql-tooltip a.ql-remove::before {
                 color: #60a5fa;
             }
+
+            /* Light Mode Override - Default styles for light mode */
+            html:not(.dark) .ql-toolbar.ql-snow {
+                background: rgba(255, 255, 255, 0.9);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+            }
+
+            html:not(.dark) .ql-container.ql-snow {
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(209, 213, 219, 0.5) !important;
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-stroke {
+                stroke: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-fill {
+                fill: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow .ql-picker-label {
+                color: #4b5563 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow button:hover,
+            html:not(.dark) .ql-toolbar.ql-snow button:focus,
+            html:not(.dark) .ql-toolbar.ql-snow button.ql-active {
+                background: rgba(99, 102, 241, 0.1);
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow button:hover .ql-stroke,
+            html:not(.dark) .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+                stroke: #4f46e5 !important;
+            }
+
+            html:not(.dark) .ql-toolbar.ql-snow button:hover .ql-fill,
+            html:not(.dark) .ql-toolbar.ql-snow button.ql-active .ql-fill {
+                fill: #4f46e5 !important;
+            }
+
+            html:not(.dark) .ql-snow .ql-picker-options {
+                background: rgba(255, 255, 255, 0.98);
+                border: 1px solid rgba(209, 213, 219, 0.5);
+            }
+
+            html:not(.dark) .ql-snow .ql-picker-item {
+                color: #374151;
+            }
+
+            html:not(.dark) .ql-snow .ql-picker-item:hover {
+                background: rgba(99, 102, 241, 0.1);
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-editor {
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-snow .ql-tooltip {
+                background: rgba(255, 255, 255, 0.98);
+                border: 1px solid rgba(209, 213, 219, 0.5);
+                color: #374151;
+            }
+
+            html:not(.dark) .ql-snow .ql-tooltip input[type=text] {
+                background: rgba(243, 244, 246, 0.8);
+                border: 1px solid rgba(209, 213, 219, 0.5);
+                color: #1f2937;
+            }
+
+            html:not(.dark) .ql-snow .ql-tooltip a.ql-action::after,
+            html:not(.dark) .ql-snow .ql-tooltip a.ql-remove::before {
+                color: #4f46e5;
+            }
         </style>
 
         <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -109,27 +184,32 @@
 
                 <form action="/musyawarah/store" method="POST" enctype="multipart/form-data">
                     <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Judul / Topik</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Judul /
+                            Topik</label>
                         <input type="text" name="judul" required
                             class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Tanggal Meeting</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Tanggal
+                            Meeting</label>
                         <input type="datetime-local" name="tanggal" required
                             class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
                     </div>
 
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Konten / Hasil Meeting</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Konten / Hasil
+                            Meeting</label>
                         <div id="editor" style="height: 400px;"
-                            class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-white/10"></div>
+                            class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-white/10">
+                        </div>
                         <input type="hidden" name="konten" id="konten">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Lampiran (Bukti/Foto/PDF) -
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Lampiran
+                            (Bukti/Foto/PDF) -
                             Optional</label>
                         <input type="file" name="lampiran"
                             class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-200 dark:bg-white/10 file:text-gray-900 dark:text-gray-100 hover:file:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
