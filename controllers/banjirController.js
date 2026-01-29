@@ -3,6 +3,7 @@ const path = require('path');
 const util = require('util');
 const multer = require('multer');
 const fs = require('fs');
+const Banjir = require('../models/Banjir'); // Import Model
 
 const execPromise = util.promisify(exec);
 
@@ -65,19 +66,38 @@ const shareStorage = multer.diskStorage({
 const uploadShare = multer({ storage: shareStorage }).single('image');
 
 exports.uploadShareImage = (req, res) => {
-    uploadShare(req, res, (err) => {
+    uploadShare(req, res, async (err) => {
         if (err) return res.json({ success: false, error: err.message });
         if (!req.file) return res.json({ success: false, error: 'No file uploaded' });
-        res.json({ success: true, filename: req.file.filename });
+
+        try {
+            await Banjir.initTable(); // Ensure table exists
+            const shareId = await Banjir.createShare(req.file.filename);
+            res.json({ success: true, filename: req.file.filename, shareId });
+        } catch (error) {
+            console.error('Share Error:', error);
+            res.json({ success: false, error: 'Database Error' });
+        }
     });
 };
 
 exports.viewShare = async (req, res) => {
-    const filename = req.params.filename;
-    res.render('banjir/index', {
-        title: 'Monitoring Risiko Banjir',
-        user: req.session ? req.session.user : null,
-        path: '/banjir',
-        ogImage: '/uploads/shares/' + filename
-    });
+    try {
+        const id = req.params.id;
+        const share = await Banjir.getShare(id);
+
+        if (!share) {
+            return res.redirect('/banjir');
+        }
+
+        res.render('banjir/index', {
+            title: 'Monitoring Risiko Banjir',
+            user: req.session ? req.session.user : null,
+            path: '/banjir',
+            ogImage: '/uploads/shares/' + share.image_filename
+        });
+    } catch (error) {
+        console.error(error);
+        res.redirect('/banjir');
+    }
 };

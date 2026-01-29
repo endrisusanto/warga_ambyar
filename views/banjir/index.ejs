@@ -1,7 +1,7 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
 
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-4">
             <% if (!user) { %>
                 <div
                     class="mb-6 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-xl flex items-center gap-3">
@@ -121,7 +121,7 @@
                                             Air</div>
                                         <div class="flex items-baseline">
                                             <span
-                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 font-mono tracking-tighter">--.--</span>
+                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-gray-800 to-gray-600 dark:from-white dark:to-gray-400 font-mono tracking-tighter">--.--</span>
                                             <span class="text-xl text-gray-500 font-bold ml-2">m</span>
                                             <div
                                                 class="trend-indicator ml-4 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 transform scale-90 origin-left">
@@ -131,13 +131,13 @@
                                     </div>
 
                                     <!-- Debit -->
-                                    <div class="sm:border-l sm:border-white/10 sm:pl-6">
+                                    <div class="sm:pl-6">
                                         <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
                                             Debit Air
                                         </div>
                                         <div class="flex items-baseline">
                                             <span
-                                                class="debit-value text-5xl font-black text-blue-600 dark:text-blue-400 font-mono tracking-tighter">--.--</span>
+                                                class="debit-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-700 to-blue-500 dark:from-blue-300 dark:to-blue-500 font-mono tracking-tighter">--.--</span>
                                             <span
                                                 class="text-lg text-blue-500 dark:text-blue-400/60 font-bold ml-2">m³/s</span>
                                         </div>
@@ -165,7 +165,7 @@
                             </div>
 
                             <!-- Chart Container -->
-                            <div class="border-t border-white dark:border-white/5 bg-gray-50 dark:bg-black/20 p-4">
+                            <div class="border-t border-white dark:border-white/5 bg-white dark:bg-black/20 p-4">
                                 <div id="chart-tanjungpura" class="w-full h-[250px]"></div>
                                 <div id="chart-tanjungpura-brush" class="w-full h-[100px] -mt-2"></div>
                             </div>
@@ -233,7 +233,7 @@
                                             Air</div>
                                         <div class="flex items-baseline">
                                             <span
-                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 font-mono tracking-tighter">--.--</span>
+                                                class="tma-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-gray-800 to-gray-600 dark:from-white dark:to-gray-400 font-mono tracking-tighter">--.--</span>
                                             <span class="text-xl text-gray-500 font-bold ml-2">m</span>
                                             <div
                                                 class="trend-indicator ml-4 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-white/5 border border-white/10 transform scale-90 origin-left">
@@ -243,13 +243,13 @@
                                     </div>
 
                                     <!-- Debit -->
-                                    <div class="sm:border-l sm:border-white/10 sm:pl-6">
+                                    <div class="sm:pl-6">
                                         <div class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">
                                             Debit Air
                                         </div>
                                         <div class="flex items-baseline">
                                             <span
-                                                class="debit-value text-5xl font-black text-teal-600 dark:text-teal-400 font-mono tracking-tighter">--.--</span>
+                                                class="debit-value text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-teal-700 to-teal-500 dark:from-teal-300 dark:to-teal-500 font-mono tracking-tighter">--.--</span>
                                             <span
                                                 class="text-lg text-teal-500 dark:text-teal-400/60 font-bold ml-2">m³/s</span>
                                         </div>
@@ -277,7 +277,7 @@
                             </div>
 
                             <!-- Chart Container -->
-                            <div class="border-t border-white dark:border-white/5 bg-gray-50 dark:bg-black/20 p-4">
+                            <div class="border-t border-white dark:border-white/5 bg-white dark:bg-black/20 p-4">
                                 <div id="chart-cibeet" class="w-full h-[250px]"></div>
                                 <div id="chart-cibeet-brush" class="w-full h-[100px] -mt-2"></div>
                             </div>
@@ -320,10 +320,11 @@
             };
 
             // Chart Configuration Factory
-            const createChartOptions = (id, data, thresholds, minY, maxY) => {
+            // Chart Configuration Factory
+            const createChartOptions = (id, data, thresholds, minY, maxY, isDarkMode = null) => {
                 const uniqueId = `main-${id}`;
                 const brushId = `brush-${id}`;
-                const isDark = document.documentElement.classList.contains('dark');
+                const isDark = isDarkMode !== null ? isDarkMode : document.documentElement.classList.contains('dark');
 
                 const seriesTMA = data.map(d => ({
                     x: new Date(d.date).getTime(),
@@ -355,7 +356,7 @@
                         },
                         animations: { enabled: true }
                     },
-                    colors: ['#3b82f6', '#10b981'],
+                    colors: [isDark ? '#60a5fa' : '#3b82f6', isDark ? '#34d399' : '#10b981'],
                     fill: {
                         type: ['gradient', 'solid'],
                         gradient: {
@@ -389,12 +390,12 @@
                             tickAmount: 5,
                             seriesName: 'TMA',
                             labels: {
-                                style: { colors: '#3b82f6', fontFamily: 'Inter' },
+                                style: { colors: isDark ? '#60a5fa' : '#3b82f6', fontFamily: 'Inter' },
                                 formatter: (val) => val.toFixed(2)
                             },
                             title: {
                                 text: 'TMA (m)',
-                                style: { color: '#3b82f6' }
+                                style: { color: isDark ? '#60a5fa' : '#3b82f6' }
                             }
                         },
                         {
@@ -402,12 +403,12 @@
                             show: hasFlow,
                             seriesName: 'Debit',
                             labels: {
-                                style: { colors: '#10b981', fontFamily: 'Inter' },
+                                style: { colors: isDark ? '#34d399' : '#10b981', fontFamily: 'Inter' },
                                 formatter: (val) => val.toFixed(0)
                             },
                             title: {
                                 text: 'Debit (m³/s)',
-                                style: { color: '#10b981' }
+                                style: { color: isDark ? '#34d399' : '#10b981' }
                             }
                         }
                     ],
@@ -425,6 +426,8 @@
                                 strokeDashArray: 4,
                                 label: {
                                     text: 'Siaga 3',
+                                    position: 'left',
+                                    textAnchor: 'start',
                                     style: { color: '#000', background: '#eab308' }
                                 }
                             },
@@ -434,6 +437,8 @@
                                 strokeDashArray: 4,
                                 label: {
                                     text: 'Siaga 2',
+                                    position: 'left',
+                                    textAnchor: 'start',
                                     style: { color: '#fff', background: '#f97316' }
                                 }
                             },
@@ -442,6 +447,8 @@
                                 borderColor: '#ef4444',
                                 label: {
                                     text: 'Siaga 1',
+                                    position: 'left',
+                                    textAnchor: 'start',
                                     style: { color: '#fff', background: '#ef4444' }
                                 }
                             }
@@ -488,7 +495,7 @@
                         },
                         toolbar: { show: false }
                     },
-                    colors: ['#3b82f6'],
+                    colors: [isDark ? '#60a5fa' : '#3b82f6'],
                     fill: {
                         type: 'gradient',
                         gradient: {
@@ -594,47 +601,118 @@
             setInterval(fetchData, 300000);
 
             // Share to WhatsApp
-            function shareToWA(id) {
-                const el = document.getElementById(`station-${id}`);
+            async function shareToWA(id) {
                 const data = globalData[id];
-                if (!el || !data) return;
+                if (!data) return;
 
-                const statusEl = el.querySelector('.station-status');
+                const originalEl = document.getElementById(`station-${id}`);
+                const statusEl = originalEl.querySelector('.station-status');
+                const originalText = statusEl.innerHTML;
                 statusEl.innerText = 'Capturing...';
 
-                html2canvas(el, {
-                    backgroundColor: null,
-                    scale: 2,
-                    useCORS: true,
-                    onclone: (clonedDoc) => {
-                        const clonedEl = clonedDoc.getElementById(`station-${id}`);
+                // Create Hidden Container for Desktop Capture
+                let hiddenContainer = document.getElementById('share-capture-container');
+                if (!hiddenContainer) {
+                    hiddenContainer = document.createElement('div');
+                    hiddenContainer.id = 'share-capture-container';
+                    hiddenContainer.style.position = 'fixed';
+                    hiddenContainer.style.left = '-9999px';
+                    hiddenContainer.style.top = '0';
+                    hiddenContainer.style.width = '1000px';
+                    hiddenContainer.style.zIndex = '99999';
+                    hiddenContainer.style.backgroundColor = 'white'; // Force white canvas
+                    document.body.appendChild(hiddenContainer);
+                }
+                hiddenContainer.innerHTML = ''; // Clear previous
 
-                        // Remove Under Glow (blur-3xl)
-                        const glows = clonedEl.querySelectorAll('.blur-3xl');
-                        glows.forEach(g => g.remove());
+                // Clone Content
+                const clone = originalEl.cloneNode(true);
+                clone.id = `station-share-${id}`;
+                clone.style.width = '1000px';
+                clone.style.maxWidth = 'none';
+                clone.style.margin = '0';
+                clone.style.padding = '32px';
+                clone.style.backgroundColor = '#ffffff';
+                clone.style.color = '#1f2937';
+                clone.style.border = '1px solid #e5e7eb';
+                clone.style.boxShadow = 'none';
+                clone.classList.remove('dark'); // Remove dark class if present
 
-                        // Remove Text Gradients (TMA Value)
-                        const gradients = clonedEl.querySelectorAll('.text-transparent');
-                        gradients.forEach(g => {
-                            g.classList.remove('text-transparent', 'bg-clip-text', 'bg-gradient-to-b', 'from-white', 'to-gray-400');
-                            g.style.backgroundImage = 'none'; // Ensure no bg image
+                // Clean up Clone Styles (Metrics, Header)
+                // Remove Gradients
+                const gradients = clone.querySelectorAll('.text-transparent');
+                gradients.forEach(g => {
+                    g.classList.remove('text-transparent', 'bg-clip-text', 'bg-gradient-to-b');
+                    Array.from(g.classList).forEach(cls => {
+                        if (cls.startsWith('from-') || cls.startsWith('to-')) g.classList.remove(cls);
+                    });
+                    g.style.backgroundImage = 'none';
+                    if (g.classList.contains('tma-value')) g.style.color = '#1f2937';
+                    if (g.classList.contains('debit-value')) g.style.color = (id === 'tanjungpura') ? '#2563eb' : (id === 'cibeet' ? '#0d9488' : '#1f2937');
+                });
 
-                            // Check for dark mode to set appropriate color if needed, 
-                            // or just default to the computed style text color if available.
-                            // But usually removing text-transparent reveals the 'color' property.
-                            // Given the design seems to be dark-ish or using specific colors:
-                            // The original was 'from-white'.
-                            // We'll set it to match the main text color or just white/black depending on context.
-                            // For safety let's try to detect or force a high contrast color?
-                            // Actually, simply removing the classes usually reverts to the parent's color or the element's base color.
-                            // But let's force a solid color that matches the intent (white-ish or gray-ish).
-                            // Let's assume white for now as it was 'from-white'.
-                            // However, if the user sees black text in light mode...
+                // Remove Glows
+                clone.querySelectorAll('.blur-3xl').forEach(e => e.remove());
 
-                            // Let's just remove the classes.
-                        });
-                    }
-                }).then(canvas => {
+                // Fix Layouts for Desktop Width
+                const metricsGrid = clone.querySelector('.grid');
+                if (metricsGrid) {
+                    metricsGrid.className = 'grid grid-cols-2 gap-8 mb-8'; // Force 2 cols
+                }
+
+                // Reset Status Badge Text
+                const cloneStatus = clone.querySelector('.station-status');
+                if (cloneStatus) {
+                    cloneStatus.innerHTML = `
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                        ${getStatusLabel(data.alert_status)}
+                    `;
+                }
+
+                // Prepare Chart Container
+                const chartContainer = clone.querySelector('.border-t');
+                let mainChartId = `share-chart-${id}`;
+                let brushChartId = `share-chart-${id}-brush`;
+
+                if (chartContainer) {
+                    chartContainer.className = 'mt-6 pt-6 border-t border-gray-200 bg-white';
+                    chartContainer.innerHTML = `
+                        <div id="${mainChartId}" style="width: 100%; height: 250px;"></div>
+                        <div id="${brushChartId}" style="width: 100%; height: 100px; margin-top: -8px;"></div>
+                    `;
+                }
+
+                hiddenContainer.appendChild(clone);
+
+                // Re-Render Charts in Hidden Container (Force Light Mode)
+                const minY = id === 'tanjungpura' ? 8 : 10;
+                const maxY = id === 'tanjungpura' ? 11 : 14;
+                const options = createChartOptions(id, data.data, data.thresholds, minY, maxY, false); // false = Force Light Mode
+
+                // Tweak options for static capture if needed (e.g. animation false)
+                options.main.chart.animations = { enabled: false };
+                options.brush.chart.animations = { enabled: false };
+                options.main.chart.width = '100%';
+                options.brush.chart.width = '100%';
+
+                const chartMain = new ApexCharts(document.getElementById(mainChartId), options.main);
+                const chartBrush = new ApexCharts(document.getElementById(brushChartId), options.brush);
+
+                await chartMain.render();
+                await chartBrush.render();
+
+                // Wait a bit for ApexCharts to fully draw (ticks, SVG, etc.)
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                try {
+                    const canvas = await html2canvas(clone, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+                        width: 1000,
+                        windowWidth: 1200 // Simulate desktop window
+                    });
+
                     canvas.toBlob(blob => {
                         const formData = new FormData();
                         formData.append('image', blob, `banjir-${id}.png`);
@@ -645,17 +723,20 @@
                         })
                             .then(r => r.json())
                             .then(res => {
+                                // Restore original UI
+                                statusEl.innerHTML = originalText;
                                 updateStationUI(id, data);
+
                                 if (res.success) {
-                                    const pageUrl = `${window.location.origin}/banjir/v/${res.filename}`;
+                                    const pageUrl = `${window.location.origin}/banjir/v/${res.shareId}`;
                                     const text = `*MONITORING BANJIR*\n\n` +
-                                        `📍 Station: ${data.station_name}\n` +
-                                        `⚠️ Status: ${getStatusLabel(data.alert_status)}\n` +
-                                        `🌊 TMA: ${data.current_level.toFixed(2)} m\n` +
-                                        `💧 Debit: ${(data.current_flow || 0).toFixed(2)} m³/s\n` +
-                                        `⏱ Waktu: ${formatTime(new Date())}\n\n` +
-                                        `🔗 kartu: ${pageUrl}`;
-                                    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                                        `\uD83D\uDCCD Station: ${data.station_name}\n` +
+                                        `\u26A0\uFE0F Status: ${getStatusLabel(data.alert_status)}\n` +
+                                        `\uD83C\uDF0A TMA: ${data.current_level.toFixed(2)} m\n` +
+                                        `\uD83D\uDCA7 Debit: ${(data.current_flow || 0).toFixed(2)} m³/s\n` +
+                                        `\u23F1\uFE0F Waktu: ${formatTime(new Date())}\n\n` +
+                                        `\uD83D\uDD17 kartu: ${pageUrl}`;
+                                    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                                     window.open(url, '_blank');
                                 } else {
                                     alert('Gagal share gambar.');
@@ -663,10 +744,19 @@
                             })
                             .catch(err => {
                                 console.error(err);
+                                statusEl.innerHTML = originalText;
                                 updateStationUI(id, data);
                             });
                     }, 'image/png');
-                });
+                } catch (error) {
+                    console.error('Capture failed:', error);
+                    statusEl.innerHTML = originalText;
+                } finally {
+                    // Cleanup hidden container components
+                    chartMain.destroy();
+                    chartBrush.destroy();
+                    // hiddenContainer.innerHTML = ''; // Keep for debug if needed, or clear
+                }
             }
             function shareAllToWA() {
                 if (!globalData.tanjungpura || !globalData.cibeet) return;
@@ -676,19 +766,19 @@
                 const now = formatTime(new Date());
                 const url = window.location.href;
 
-                const text = `*MONITORING RISIKO BANJIR* 🌊\n` +
-                    `🕒 Updated: ${now}\n\n` +
+                const text = `*MONITORING RISIKO BANJIR* \uD83C\uDF0A\n` +
+                    `\uD83D\uDD52 Updated: ${now}\n\n` +
                     `*1. Tanjungpura (Citarum)*\n` +
-                    `   🌊 TMA: ${tp.current_level.toFixed(2)} m\n` +
-                    `   ⚠️ Status: ${getStatusLabel(tp.alert_status)}\n` +
-                    `   💧 Debit: ${(tp.current_flow || 0).toFixed(2)} m³/s\n\n` +
+                    `   \uD83C\uDF0A TMA: ${tp.current_level.toFixed(2)} m\n` +
+                    `   \u26A0\uFE0F Status: ${getStatusLabel(tp.alert_status)}\n` +
+                    `   \uD83D\uDCA7 Debit: ${(tp.current_flow || 0).toFixed(2)} m³/s\n\n` +
                     `*2. Syphon Cibeet (Cibeet)*\n` +
-                    `   🌊 TMA: ${cb.current_level.toFixed(2)} m\n` +
-                    `   ⚠️ Status: ${getStatusLabel(cb.alert_status)}\n` +
-                    `   💧 Debit: ${(cb.current_flow || 0).toFixed(2)} m³/s\n\n` +
-                    `🔗 Pantau detail: ${url}`;
+                    `   \uD83C\uDF0A TMA: ${cb.current_level.toFixed(2)} m\n` +
+                    `   \u26A0\uFE0F Status: ${getStatusLabel(cb.alert_status)}\n` +
+                    `   \uD83D\uDCA7 Debit: ${(cb.current_flow || 0).toFixed(2)} m³/s\n\n` +
+                    `\uD83D\uDD17 Pantau detail: ${url}`;
 
-                const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
                 window.open(waUrl, '_blank');
             }
         </script>
