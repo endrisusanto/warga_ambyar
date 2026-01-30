@@ -541,11 +541,11 @@
 
                     // Update Tanjungpura
                     updateStationUI('tanjungpura', data.tanjungpura);
-                    renderChart('tanjungpura', data.tanjungpura, 8, 11); // Custom Y-axis range for visual clarity
+                    renderChart('tanjungpura', data.tanjungpura, 6, 13); // Custom Y-axis range (Widened)
 
                     // Update Cibeet
                     updateStationUI('cibeet', data.cibeet);
-                    renderChart('cibeet', data.cibeet, 10, 14);
+                    renderChart('cibeet', data.cibeet, 8, 16); // Custom Y-axis range (Widened)
 
                 } catch (error) {
                     console.error('Fetch error:', error);
@@ -685,8 +685,8 @@
                 hiddenContainer.appendChild(clone);
 
                 // Re-Render Charts in Hidden Container (Force Light Mode)
-                const minY = id === 'tanjungpura' ? 8 : 10;
-                const maxY = id === 'tanjungpura' ? 11 : 14;
+                const minY = id === 'tanjungpura' ? 6 : 8;
+                const maxY = id === 'tanjungpura' ? 13 : 16;
                 const options = createChartOptions(id, data.data, data.thresholds, minY, maxY, false); // false = Force Light Mode
 
                 // Tweak options for static capture if needed (e.g. animation false)

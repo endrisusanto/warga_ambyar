@@ -492,7 +492,7 @@
                                         </div>
 
                                         <div class="flex items-center gap-2 shrink-0">
-                                            <% if(user.role !=='warga' || user.warga_id==s.warga_id) { %>
+                                            <% if(true) { %>
                                                 <% if((s.status==='scheduled' || s.status==='reschedule' ||
                                                     s.status==='' ) && s.id) { %>
                                                     <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
@@ -604,9 +604,9 @@
                             Kehadiran</label>
                         <select name="status"
                             class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
-                            <option value="hadir">Hadir</option>
-                            <option value="reschedule">Reschedule (Ganti Minggu Depan)</option>
-                            <option value="alpa">Alpa (Denda 50rb)</option>
+                            <option value="hadir" class="text-gray-900">Hadir</option>
+                            <option value="reschedule" class="text-gray-900">Reschedule (Ganti Minggu Depan)</option>
+                            <option value="alpa" class="text-gray-900">Alpa (Denda 50rb)</option>
                         </select>
                     </div>
                     <div class="mb-6">

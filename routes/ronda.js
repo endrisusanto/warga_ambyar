@@ -15,7 +15,7 @@ router.post('/upload-photos/:id', ensureAuthenticated, rondaController.uploadPho
 router.post('/upload-condition/:date', ensureAuthenticated, rondaController.uploadCondition);
 router.post('/delete-photo', ensureAuthenticated, rondaController.deletePhoto);
 router.post('/share-image', ensureAuthenticated, rondaController.uploadShareImage);
-router.get('/control', ensureAuthenticated, isAdminOrBendahara, rondaController.control);
+router.get('/control', ensureAuthenticated, rondaController.control);
 router.get('/view', rondaController.viewPublic);
 router.get('/v/:id', rondaController.viewPublic);
 

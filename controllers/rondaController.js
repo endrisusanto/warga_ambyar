@@ -499,7 +499,7 @@ exports.control = async (req, res) => {
             }
         });
 
-        res.render('ronda/control', {
+        res.render('ronda/control_v2', {
             title: 'Control Ronda / Absensi',
             month,
             year,

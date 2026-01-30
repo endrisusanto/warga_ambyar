@@ -1,4 +1,5 @@
-<%- include('../partials/head') %>
+const fs = require('fs');
+const content = `<%- include('../partials/head') %>
     <%- include('../partials/navbar', { useWideContainer: true, user: user }) %>
 
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -20,7 +21,7 @@
                     <div class="glass-card p-3 flex items-center space-x-2">
                         <% let prevM=parseInt(month) - 1; let prevY=parseInt(year); if(prevM===0) { prevM=12; prevY--; }
                             let nextM=parseInt(month) + 1; let nextY=parseInt(year); if(nextM===13) { nextM=1; nextY++;
-                            } %>
+                        } %>
 
                             <a href="/ronda/control?month=<%= prevM %>&year=<%= prevY %>"
                                 class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
@@ -71,13 +72,13 @@
                                             class="px-6 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                             <%= moment(d).format('DD MMM') %>
                                         </th>
-                                        <% }) %>
+                                    <% }) %>
                                 </tr>
                             </thead>
                             <tbody class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl divide-y divide-white/10">
                                 <% Object.keys(matrix).forEach(wId=> {
                                     const row = matrix[wId];
-                                    %>
+                                %>
                                     <tr class="hover:bg-gray-200 dark:bg-white/10 transition-colors">
                                         <td
                                             class="px-6 py-4 whitespace-nowrap sticky left-0 bg-gray-200 dark:bg-white/10 backdrop-blur-xl z-10 border-r border-white/10">
@@ -96,66 +97,75 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <% let firstFineIndex=-1; for(let i=0; i < saturdays.length; i++) { const
-                                            d=saturdays[i]; const c=row.dates[d]; const late=c.status==='scheduled' &&
-                                            moment(d).add(3, 'weeks' ).isBefore(moment(), 'day' ); if (late || c.denda>
-                                            0) {
-                                            firstFineIndex = i;
-                                            break;
+                                        <% let firstFineIndex=-1; for(let i=0; i < saturdays.length; i++) {
+                                            const d=saturdays[i]; 
+                                            const c=row.dates[d]; 
+                                            const late=c.status==='scheduled' && moment(d).add(3, 'weeks' ).isBefore(moment(), 'day' ); 
+                                            if (late || c.denda> 0) {
+                                                firstFineIndex = i;
+                                                break;
                                             }
-                                            }
+                                        }
 
-                                            let highlightEndIndex = saturdays.length - 1;
+                                        let highlightEndIndex = saturdays.length - 1;
 
-                                            if (firstFineIndex !== -1) {
-                                            for(let i = firstFineIndex + 1; i < saturdays.length; i++) { const
-                                                d=saturdays[i]; const c=row.dates[d]; if (c.status==='scheduled' ) {
-                                                highlightEndIndex=i - 1; break; } } } const highlightStartIndex=0; const
-                                                hasDenda=firstFineIndex !==-1; saturdays.forEach((d, satIndex)=> {
-                                                const cell = row.dates[d];
-                                                let tdClasses = "px-6 py-4 whitespace-nowrap ";
-                                                tdClasses += "text-center text-sm relative ";
-                                                const isHighlight = hasDenda && satIndex >= highlightStartIndex &&
-                                                satIndex <= highlightEndIndex; if (isHighlight) { tdClasses
-                                                    +="bg-red-500/5 border-y border-red-500/10 " ; if
-                                                    (satIndex===highlightStartIndex) tdClasses
-                                                    +="rounded-l-3xl border-l " ; if (satIndex===highlightEndIndex)
-                                                    tdClasses +="rounded-r-3xl border-r " ; } %>
-                                                    <td class="<%= tdClasses %>">
-                                                        <div
-                                                            class="relative z-10 inline-flex flex-col items-center justify-center w-full h-full">
-                                                            <% if (cell.status) { %>
-                                                                <span
-                                                                    class="px-2 py-1 rounded text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-100 text-red-800' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>">
-                                                                    <%= cell.status %>
-                                                                </span>
-                                                                <% } %>
+                                        if (firstFineIndex !== -1) {
+                                            for(let i = firstFineIndex + 1; i < saturdays.length; i++) { 
+                                                const d=saturdays[i]; 
+                                                const c=row.dates[d]; 
+                                                if (c.status==='scheduled' ) {
+                                                    highlightEndIndex=i - 1; 
+                                                    break; 
+                                                } 
+                                            } 
+                                        } 
+                                        
+                                        const highlightStartIndex=0; 
+                                        const hasDenda = firstFineIndex !== -1;
+                                        
+                                        saturdays.forEach((d, satIndex) => {
+                                            const cell = row.dates[d];
+                                            let tdClasses = "px-6 py-4 whitespace-nowrap text-center text-sm relative ";
+                                            const isHighlight = hasDenda && satIndex >= highlightStartIndex && satIndex <= highlightEndIndex;
 
-                                                                    <% if (isHighlight && satIndex===highlightEndIndex)
-                                                                        { %>
-                                                                        <span
-                                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm mt-1 animate-pulse">
-                                                                            ⚠ DENDA
-                                                                        </span>
-                                                                        <% let totalDenda=0; for (let i=0; i <
-                                                                            saturdays.length; i++) { if
-                                                                            (row.dates[saturdays[i]].denda> 0) {
-                                                                            totalDenda += row.dates[saturdays[i]].denda;
-                                                                            }
-                                                                            }
-                                                                            if (totalDenda > 0) {
-                                                                            %>
-                                                                            <span
-                                                                                class="text-[10px] text-red-500 font-semibold mt-0.5">
-                                                                                Rp<%= totalDenda.toLocaleString() %>
-                                                                            </span>
-                                                                            <% } %>
-                                                                                <% } %>
-                                                        </div>
-                                                    </td>
-                                                    <% }) %>
+                                            if (isHighlight) {
+                                                tdClasses += "bg-red-500/5 border-y border-red-500/10 ";
+                                                    if (satIndex === highlightStartIndex) tdClasses += "rounded-l-3xl border-l ";
+                                                    if (satIndex === highlightEndIndex) tdClasses += "rounded-r-3xl border-r ";
+                                            } %>
+                                            <td class="<%= tdClasses %>">
+                                                <div class="relative z-10 inline-flex flex-col items-center justify-center w-full h-full">
+                                                    <% if (cell.status) { %>
+                                                        <span
+                                                            class="px-2 py-1 rounded text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-100 text-red-800' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>">
+                                                            <%= cell.status %>
+                                                        </span>
+                                                    <% } %>
+
+                                                    <% if (isHighlight && satIndex===highlightEndIndex) { %>
+                                                        <span
+                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm mt-1 animate-pulse">
+                                                            ⚠ DENDA
+                                                        </span>
+                                                        <% let totalDenda=0; 
+                                                            for (let i=0; i < saturdays.length; i++) { 
+                                                                if (row.dates[saturdays[i]].denda> 0) {
+                                                                    totalDenda += row.dates[saturdays[i]].denda;
+                                                                }
+                                                            }
+                                                            if (totalDenda > 0) {
+                                                            %>
+                                                            <span
+                                                                class="text-[10px] text-red-500 font-semibold mt-0.5">
+                                                                Rp<%= totalDenda.toLocaleString() %>
+                                                            </span>
+                                                            <% } %>
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                        <% }) %>
                                     </tr>
-                                    <% }) %>
+                                <% }) %>
                             </tbody>
                         </table>
                     </div>
@@ -170,4 +180,7 @@
             </div>
         </div>
 
-        <%- include('../partials/footer') %>
+        <%- include('../partials/footer') %>`;
+
+fs.writeFileSync('/home/endrisusanto/dev/warga_ambyar/views/ronda/control.ejs', content);
+console.log('File successfully updated!');
