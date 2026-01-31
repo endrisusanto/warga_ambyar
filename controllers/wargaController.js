@@ -51,36 +51,13 @@ exports.exportExcel = async (req, res) => {
 
 exports.index = async (req, res) => {
     try {
-        // Auto-reset names for unregistered warga (Temporary)
-        const db = require('../config/db');
+        // Auto-reset logic for unregistered users removed to allow manual names.
+        // const db = require('../config/db');
         // Drop unique constraint to allow multiple 'Blok - No' names per house
-        try { await db.query("ALTER TABLE warga DROP INDEX unique_rumah_person"); } catch (e) { }
+        // try { await db.query("ALTER TABLE warga DROP INDEX unique_rumah_person"); } catch (e) { }
 
-        // 1. Cleanup: Delete unregistered warga if there are duplicates in the same house
-        // Keep registered users, or the one with smallest ID if none are registered
-        await db.query(`
-            DELETE w1 FROM warga w1
-            LEFT JOIN users u1 ON w1.id = u1.warga_id
-            WHERE u1.id IS NULL
-            AND EXISTS (
-                SELECT 1 FROM (SELECT * FROM warga) w2
-                LEFT JOIN users u2 ON w2.id = u2.warga_id
-                WHERE w2.blok = w1.blok AND w2.nomor_rumah = w1.nomor_rumah
-                AND w2.id != w1.id
-                AND (
-                    u2.id IS NOT NULL
-                    OR w2.id < w1.id
-                )
-            )
-        `);
-
-        // 2. Reset Names: Update remaining unregistered warga to 'Blok - No'
-        await db.query(`
-            UPDATE warga w
-            LEFT JOIN users u ON w.id = u.warga_id
-            SET w.nama = CONCAT('Blok ', IFNULL(w.blok, '?'), ' - ', IFNULL(w.nomor_rumah, '?'))
-            WHERE u.id IS NULL
-        `);
+        // Cleanup duplicates logic remains optional or can be removed if specific cleanup needed.
+        // For now, removing the auto-reset block entirely is key.
 
         const warga = await Warga.getAll();
         res.render('warga/index', { title: 'Data Warga', warga, useWideContainer: true, noPadding: true });
