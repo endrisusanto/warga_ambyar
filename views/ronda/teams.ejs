@@ -121,12 +121,12 @@
                             <form action="/ronda/teams/update" method="POST">
                                 <input type="hidden" name="warga_id" value="<%= member.id %>">
                                 <select name="tim" onchange="this.form.submit()"
-                                    class="glass-input text-xs text-gray-900 dark:text-gray-100 px-2 py-1 rounded-lg">
-                                    <option value="">Pilih Tim</option>
-                                    <option value="A">Tim A</option>
-                                    <option value="B">Tim B</option>
-                                    <option value="C">Tim C</option>
-                                    <option value="D">Tim D</option>
+                                    class="glass-input text-xs text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-2 py-1 rounded-lg">
+                                    <option value="" class="text-black bg-white dark:text-white dark:bg-gray-800">Pilih Tim</option>
+                                    <option value="A" class="text-black bg-white dark:text-white dark:bg-gray-800">Tim A</option>
+                                    <option value="B" class="text-black bg-white dark:text-white dark:bg-gray-800">Tim B</option>
+                                    <option value="C" class="text-black bg-white dark:text-white dark:bg-gray-800">Tim C</option>
+                                    <option value="D" class="text-black bg-white dark:text-white dark:bg-gray-800">Tim D</option>
                                 </select>
                             </form>
                         </div>
