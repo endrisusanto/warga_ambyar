@@ -177,8 +177,8 @@ const importData = async () => {
             } else {
                 // Update existing record
                 await connection.query(
-                    "UPDATE warga SET status_huni = ?, is_ronda = ?, status_keluarga = ?, no_hp = COALESCE(?, no_hp) WHERE id = ?",
-                    [w.huni, w.ronda ? 1 : 0, w.status_keluarga, w.hp, rows[0].id]
+                    "UPDATE warga SET nama = ?, status_huni = ?, is_ronda = ?, status_keluarga = ?, no_hp = COALESCE(?, no_hp) WHERE id = ?",
+                    [w.nama, w.huni, w.ronda ? 1 : 0, w.status_keluarga, w.hp, rows[0].id]
                 );
                 console.log(`🔄 Updated: ${w.nama} (${w.blok}-${w.nomor})`);
             }
