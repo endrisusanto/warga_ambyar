@@ -175,7 +175,12 @@ const importData = async () => {
                 );
                 console.log(`✅ Inserted: ${w.nama} (${w.blok}-${w.nomor})`);
             } else {
-                console.log(`ℹ️ Skipped (Exists): ${w.nama} (${w.blok}-${w.nomor})`);
+                // Update existing record
+                await connection.query(
+                    "UPDATE warga SET status_huni = ?, is_ronda = ?, status_keluarga = ?, no_hp = COALESCE(?, no_hp) WHERE id = ?",
+                    [w.huni, w.ronda ? 1 : 0, w.status_keluarga, w.hp, rows[0].id]
+                );
+                console.log(`🔄 Updated: ${w.nama} (${w.blok}-${w.nomor})`);
             }
         }
 
