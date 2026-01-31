@@ -58,16 +58,33 @@
                                                 <div class="text-sm font-bold text-gray-900">
                                                     <%= s.nama %> (<%= s.blok %>-<%= s.nomor_rumah %>)
                                                                 <% if(s.is_ganti_hari || s.status==='reschedule' ) { %>
-                                                                    <span class="text-red-400 font-bold ml-1">(Ganti
-                                                                        Hari)</span>
+                                                                    
                                                                     <% } %>
                                                 </div>
                                             </div>
                                         </div>
-                                        <% if(s.status && s.status !=='scheduled' ) { %>
+                                        <% 
+                                        const isMalamMingguNow = (moment().day() === 6 && moment().hour() >= 18) || (moment().day() === 0);
+                                        if(s.status && s.status !=='scheduled' && (s.status !=='reschedule' || isMalamMingguNow)) { 
+                                            let statusText = s.status;
+                                            let statusClass = '';
+                                            if (s.status_bayar === 'paid') {
+                                                statusText = 'Pay Up';
+                                                statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                            } else if (s.status === 'hadir') {
+                                                statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                            } else if (s.status === 'izin') {
+                                                statusClass = 'bg-transparent border border-yellow-600 text-yellow-600';
+                                            } else if (s.status === 'reschedule') {
+                                                statusText = 'Ganti Hari';
+                                                statusClass = 'bg-transparent border border-purple-600 text-purple-600';
+                                            } else {
+                                                statusClass = 'bg-transparent border border-red-600 text-red-600';
+                                            }
+                                        %>
                                             <span
-                                                class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider <%= s.status === 'hadir' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200' %>">
-                                                <%= s.status %>
+                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
+                                                <%= statusText %>
                                             </span>
                                             <% } %>
                                     </div>
@@ -176,8 +193,22 @@
 
                             // Build members list from EJS data
                             let membersList = "Anggota Bertugas <%= teamName ? '(Tim ' + teamName + ')' : '' %>:\n";
-                        <% schedule.forEach((s, index) => { %>
-                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)<%= (s.is_ganti_hari || s.status === 'reschedule') ? ' *(Ganti Hari)*' : '' %>\n";
+                        <% schedule.forEach((s, index) => { 
+                            let statusStr = '';
+                            if (s.status && s.status !== 'scheduled') {
+                                if (s.status_bayar === 'paid') {
+                                    statusStr = ' 💸'; // Lunas
+                                } else if (s.status === 'hadir') {
+                                    statusStr = ' ✅'; // Hadir
+                                } else if (s.status === 'izin') {
+                                    statusStr = ' ⚠️'; // Izin
+                                } else if (s.status === 'alpa') {
+                                    statusStr = ' ❌'; // Alpa/Tanpa Keterangan
+                                }
+                            }
+                            let rescheduleStr = (s.is_ganti_hari || s.status === 'reschedule') ? ' 🔄' : '';
+                        %>
+                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)<%= rescheduleStr %>" + "<%= statusStr %>" + "\n";
                             <% }) %>
 
                                 const text = encodeURIComponent('Cek Jadwal Ronda: *' + document.title.replace('Jadwal Ronda ', '') + '*\n\n' + membersList);

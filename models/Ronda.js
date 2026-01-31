@@ -70,13 +70,21 @@ const Ronda = {
     },
 
     getTodaySchedule: async () => {
-        const today = moment().format('YYYY-MM-DD');
+        const now = moment();
+        let targetDate = now.format('YYYY-MM-DD');
+
+        // Jika hari ini Minggu, tampilkan jadwal hari Sabtu (kemarin)
+        // karena Ronda Malam Minggu relevan sampai Minggu pagi/siang
+        if (now.day() === 0) {
+            targetDate = now.clone().subtract(1, 'days').format('YYYY-MM-DD');
+        }
+
         const [rows] = await db.query(`
             SELECT r.*, w.nama, w.blok, w.nomor_rumah, w.tim_ronda, w.foto_profil
             FROM ronda_jadwal r
             JOIN warga w ON r.warga_id = w.id
             WHERE r.tanggal = ?
-        `, [today]);
+        `, [targetDate]);
         return rows;
     },
 
@@ -143,6 +151,14 @@ const Ronda = {
         } catch (e) {
             // Ignore
         }
+    },
+
+    markAsPaid: async (ids) => {
+        if (!Array.isArray(ids)) ids = [ids];
+        if (ids.length === 0) return;
+        // Mark as paid but DO NOT clear denda amount. This preserves history.
+        // Also do NOT change status to 'hadir', keep it as 'alpa' or whatever.
+        await db.query("UPDATE ronda_jadwal SET status_bayar = 'paid' WHERE id IN (?)", [ids]);
     },
 
     payFine: async (id) => {

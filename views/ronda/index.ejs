@@ -229,11 +229,32 @@
                 const isSunday = now.day() === 0;
                 const currentHour = now.hour();
 
+                
+                // Logic Fix:
+                // We want to highlight the Saturday card if:
+                // 1. It is currently Saturday (today == date)
+                // 2. It is currently Sunday (today is Sunday AND date came immediately before today)
+                
+                const isCurrentActiveWeekend = (now.day() === 6 && moment(date).isSame(now, 'day')) || 
+                                             (now.day() === 0 && moment(date).isSame(now.clone().subtract(1, 'days'), 'day'));
+
                 let isPast;
-                if (isSaturday && isSunday && currentHour < 6) { isPast=false; } else {
-                    isPast=moment(date).isBefore(moment(), 'day' ); } const isToday=moment(date).isSame(moment(), 'day'
-                    ); let isThisWeek; if (isSaturday && isSunday && currentHour < 6) { isThisWeek=true; } else {
-                    isThisWeek=moment(date).isSame(moment(), 'week' ); } const isHighlighted=isThisWeek && !isPast; %>
+                if (isCurrentActiveWeekend) { 
+                    isPast = false; 
+                } else {
+                    isPast = moment(date).isBefore(moment(), 'day'); 
+                } 
+                
+                const isToday = moment(date).isSame(moment(), 'day'); 
+                
+                let isThisWeek; 
+                if (isCurrentActiveWeekend) { 
+                    isThisWeek = true; 
+                } else {
+                    isThisWeek = moment(date).isSame(moment(), 'week'); 
+                } 
+                
+                const isHighlighted = isThisWeek && !isPast; %>
                     <div id="card-<%= date %>"
                         class="glass-card overflow-hidden divide-y <%= isHighlighted ? 'divide-gray-200' : 'divide-white/10' %> <%= isHighlighted ? 'bg-slate-50 border-2 border-white shadow-2xl scale-[1.02] z-10' : '' %> <%= isToday ? '!border-green-400 !bg-green-50 ring-4 ring-green-400/20 shadow-[0_0_25px_rgba(74,222,128,0.6)]' : '' %> <%= isPast ? 'opacity-60 grayscale-[0.2] ronda-card-past' : '' %> transition-all duration-300 hover:scale-[1.03]">
                         <div
@@ -241,7 +262,7 @@
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <h3
-                                        class="text-lg font-bold <%= isPast ? 'text-gray-500' : (isToday ? 'text-green-700' : (isHighlighted ? '!text-gray-900 !dark:text-gray-900' : 'text-indigo-300')) %> drop-shadow-lg">
+                                        class="text-lg font-bold <%= isPast ? 'text-gray-500' : ((isToday || isHighlighted) ? '!text-black' : 'text-indigo-300') %> drop-shadow-lg">
                                         <%= moment(date).format('dddd, DD MMMM YYYY') %>
                                     </h3>
                                     <!-- Mobile Version (Text Buttons) -->
@@ -434,23 +455,24 @@
                                                     class="text-xs <%= isHighlighted ? 'text-gray-500 bg-gray-100' : 'text-gray-600 dark:text-gray-400 bg-black/20' %> font-medium px-2 py-0.5 rounded-md inline-block">
                                                     <%= s.blok %>-<%= s.nomor_rumah %>
                                                 </div>
-                                                <% if (isGuest) { %>
-                                                    <div
-                                                        class="text-[10px] text-red-400 font-bold bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
-                                                        Ganti Hari
-                                                    </div>
-                                                    <% } %>
-                                                        <% if(s.status !=='scheduled' && s.status !=='reschedule' ) {
-                                                            let statusText=s.status; let statusClass='' ; if
-                                                            (s.status_bayar==='paid' ) { statusText='Pay Up' ;
-                                                            statusClass='bg-green-500/20 text-green-300 border border-green-500/30'
-                                                            ; } else if (s.status==='hadir' ) {
-                                                            statusClass='bg-green-100 text-green-800 border border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-500/30'
-                                                            ; } else if (s.status==='izin' ) {
-                                                            statusClass='bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                                            ; } else {
-                                                            statusClass='bg-red-500/20 text-red-300 border border-red-500/30'
-                                                            ; } %>
+                                                
+                                                        <% 
+                                                            const isMalamMingguNow = (moment().day() === 6 && moment().hour() >= 18) || (moment().day() === 0);
+                                                            if(s.status !=='scheduled' && (s.status !=='reschedule' || isMalamMingguNow)) {
+                                                            let statusText=s.status; let statusClass='' ; 
+                                                            if (s.status_bayar==='paid' ) { 
+                                                                statusText='Pay Up' ;
+                                                                statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                            } else if (s.status==='hadir' ) {
+                                                                statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                            } else if (s.status==='izin' ) {
+                                                                statusClass='bg-transparent border border-yellow-600 text-yellow-600'; 
+                                                            } else if (s.status === 'reschedule') {
+                                                                statusText = 'Ganti Hari';
+                                                                statusClass = 'bg-transparent border border-purple-600 text-purple-600';
+                                                            } else {
+                                                                statusClass='bg-transparent border border-red-600 text-red-600'; 
+                                                            } %>
                                                             <span
                                                                 class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
                                                                 <%= statusText %>

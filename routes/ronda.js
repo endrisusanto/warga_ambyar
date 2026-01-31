@@ -16,6 +16,7 @@ router.post('/upload-condition/:date', ensureAuthenticated, rondaController.uplo
 router.post('/delete-photo', ensureAuthenticated, rondaController.deletePhoto);
 router.post('/share-image', ensureAuthenticated, rondaController.uploadShareImage);
 router.get('/control', ensureAuthenticated, rondaController.control);
+router.post('/update-fine-status', ensureAuthenticated, rondaController.updateFineStatus);
 router.get('/view', rondaController.viewPublic);
 router.get('/v/:id', rondaController.viewPublic);
 

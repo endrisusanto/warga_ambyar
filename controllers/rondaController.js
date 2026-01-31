@@ -36,8 +36,24 @@ function checkFileType(file, cb) {
 
 exports.index = async (req, res) => {
     try {
-        const month = req.query.month || moment().format('MM');
-        const year = req.query.year || moment().format('YYYY');
+        const now = moment();
+        let queryMonth = req.query.month;
+        let queryYear = req.query.year;
+
+        // Special check: If today is 1st of month AND before 6 AM, show previous month by default
+        if (!queryMonth && !queryYear) {
+            if (now.date() === 1 && now.hour() < 6) {
+                const prevMonth = now.clone().subtract(1, 'month');
+                queryMonth = prevMonth.format('MM');
+                queryYear = prevMonth.format('YYYY');
+            } else {
+                queryMonth = now.format('MM');
+                queryYear = now.format('YYYY');
+            }
+        }
+
+        const month = queryMonth || now.format('MM');
+        const year = queryYear || now.format('YYYY');
 
         await Ronda.generateSchedule(month, year);
 
@@ -240,6 +256,34 @@ exports.verifyFine = async (req, res) => {
         console.error(err);
         req.flash('error_msg', 'Gagal verifikasi pembayaran');
         res.redirect('/ronda');
+    }
+};
+
+exports.updateFineStatus = async (req, res) => {
+    try {
+        let { ids } = req.body;
+        if (typeof ids === 'string') ids = ids.split(',');
+        
+        await Ronda.markAsPaid(ids);
+        
+        // Add to Kas (Optional, calculate total first)
+        // For simplicity, we just mark as paid for now.
+        // If we want to add to Kas, we need to fetch amounts.
+        try {
+            const [rows] = await db.query("SELECT denda, nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id IN (?)", [ids]);
+            let total = 0;
+            rows.forEach(r => total += (r.denda || 0));
+            if (total > 0) {
+                 await Kas.add('masuk', total, `Bayar Denda Ronda (Admin) - ${rows.length} item`, new Date());
+            }
+        } catch(e) { console.error('Error adding to kas', e); }
+
+        req.flash('success_msg', 'Status denda berhasil diupdate menjadi LUNAS');
+        res.redirect('/ronda/control');
+    } catch (err) {
+        console.error(err);
+        req.flash('error_msg', 'Gagal update status denda');
+        res.redirect('/ronda/control');
     }
 };
 
