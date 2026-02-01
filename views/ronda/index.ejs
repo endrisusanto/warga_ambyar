@@ -515,11 +515,11 @@
 
                                         <div class="flex items-center gap-2 shrink-0">
                                             <% if(true) { %>
-                                                <% if((s.status==='scheduled' || s.status==='reschedule' ||
+                                                <% if((user.role === 'admin' || s.status==='scheduled' || s.status==='reschedule' ||
                                                     s.status==='' ) && s.id) { %>
-                                                    <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>')"
+                                                    <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status || `scheduled` %>', '<%= (s.keterangan || ``).replace(/'/g, "\\'") %>')"
                                                         class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
-                                                        title="Absensi">
+                                                        title="Ubah Status">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -624,19 +624,20 @@
                         <label
                             class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status
                             Kehadiran</label>
-                        <select name="status"
-                            class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
-                            <option value="hadir" class="text-gray-900">Hadir</option>
-                            <option value="reschedule" class="text-gray-900">Reschedule (Ganti Minggu Depan)</option>
-                            <option value="alpa" class="text-gray-900">Alpa (Denda 50rb)</option>
-                        </select>
+                        <select name="status" id="statusSelect"
+    class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
+    <option value="scheduled" class="text-gray-900">Reset (Scheduled)</option>
+    <option value="hadir" class="text-gray-900">Hadir</option>
+    <option value="reschedule" class="text-gray-900">Reschedule (Ganti Minggu Depan)</option>
+    <option value="alpa" class="text-gray-900">Alpa (Denda 50rb)</option>
+</select>
                     </div>
                     <div class="mb-6">
                         <label
                             class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Keterangan
                             (Opsional)</label>
-                        <textarea name="keterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..."
-                            class="glass-input mt-1 block w-full rounded-xl p-3 outline-none resize-none"></textarea>
+                        <textarea name="keterangan" id="statusKeterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..."
+    class="glass-input mt-1 block w-full rounded-xl p-3 outline-none resize-none"></textarea>
                     </div>
                     <div class="flex justify-end gap-3">
                         <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')"
@@ -844,9 +845,21 @@
                 if (e.key === 'Escape') closeCarousel();
             });
 
-            function openStatusModal(id, name) {
+            function openStatusModal(id, name, status, keterangan) {
                 document.getElementById('scheduleId').value = id;
                 document.getElementById('wargaName').innerText = name;
+                
+                // Set status if provided
+                if (status) {
+                    const statusSelect = document.getElementById('statusSelect');
+                    if (statusSelect) statusSelect.value = status;
+                }
+
+                if (keterangan) {
+                    const ket = document.getElementById('statusKeterangan');
+                    if (ket) ket.value = keterangan;
+                }
+
                 document.getElementById('statusModal').classList.remove('hidden');
             }
 

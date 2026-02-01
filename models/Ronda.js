@@ -257,6 +257,40 @@ const Ronda = {
                 }
             } catch (e) { }
         }
+    },
+    
+    autoProcessLateSchedules: async () => {
+        const today = moment().format('YYYY-MM-DD');
+        
+        // Find past scheduled items
+        const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE status = 'scheduled' AND tanggal < ?", [today]);
+        
+        for (const r of rows) {
+            // Check move count from keterangan
+            let moveCount = 0;
+            const match = (r.keterangan || '').match(/Auto Move \((\d+)\)/);
+            if (match) {
+                moveCount = parseInt(match[1]);
+            }
+
+            if (moveCount >= 3) {
+                // Already moved 3 times, this is the 4th miss -> Denda
+                await db.query("UPDATE ronda_jadwal SET status = 'alpa', denda = 50000, keterangan = CONCAT(IFNULL(keterangan, ''), ' [Otomatis Denda - 4 Minggu]') WHERE id = ?", [r.id]);
+            } else {
+                // Move to next week
+                const nextDate = moment(r.tanggal).add(7, 'days').format('YYYY-MM-DD');
+                
+                // 1. Mark current as reschedule
+                await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [`Auto Reschedule (${moveCount + 1})`, r.id]);
+                
+                // 2. Insert new schedule (check duplicate first)
+                const [exists] = await db.query("SELECT id FROM ronda_jadwal WHERE warga_id = ? AND tanggal = ?", [r.warga_id, nextDate]);
+                if (exists.length === 0) {
+                     await db.query("INSERT INTO ronda_jadwal (tanggal, warga_id, status, keterangan) VALUES (?, ?, 'scheduled', ?)", 
+                        [nextDate, r.warga_id, `Auto Move (${moveCount + 1})`]);
+                }
+            }
+        }
     }
 };
 

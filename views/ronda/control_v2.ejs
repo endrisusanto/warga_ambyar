@@ -16,44 +16,59 @@
                             Control Absensi Ronda
                         </h1>
                     </div>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
-                    <div class="glass-card p-3 flex items-center space-x-2">
-                        <% let prevM=parseInt(month) - 1; let prevY=parseInt(year); if(prevM===0) { prevM=12; prevY--; }
-                            let nextM=parseInt(month) + 1; let nextY=parseInt(year); if(nextM===13) { nextM=1; nextY++;
-                            } %>
-
-                            <a href="/ronda/control?month=<%= prevM %>&year=<%= prevY %>"
-                                class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
+                    <div class="flex flex-wrap justify-end gap-3">
+                        <!-- Export Button Wrapper -->
+                        <div class="glass-card p-3 flex items-center">
+                            <a href="/ronda/export-control?year=<%= year %>"
+                                class="flex items-center gap-2 px-3 py-2 text-sm font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 19l-7-7 7-7"></path>
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
+                                Export Excel
                             </a>
+                        </div>
 
-                            <form method="GET" class="flex space-x-2">
-                                <select name="month" onchange="this.form.submit()"
-                                    class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
-                                    <% moment.months().forEach((m, i)=> { %>
-                                        <option value="<%= String(i + 1).padStart(2, '0') %>" <%=parseInt(month)===i + 1
-                                            ? 'selected' : '' %>><%= m %>
-                                        </option>
-                                        <% }) %>
-                                </select>
-                                <select name="year" onchange="this.form.submit()"
-                                    class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
-                                    <% for(let y=2024; y <=2030; y++) { %>
-                                        <option value="<%= y %>" <%=parseInt(year)===y ? 'selected' : '' %>><%= y %>
-                                        </option>
-                                        <% } %>
-                                </select>
-                            </form>
-                            <a href="/ronda/control?month=<%= nextM %>&year=<%= nextY %>"
-                                class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </a>
+                        <div class="glass-card p-3 flex items-center space-x-2">
+                            <% let prevM=parseInt(month) - 1; let prevY=parseInt(year); if(prevM===0) { prevM=12; prevY--; }
+                                let nextM=parseInt(month) + 1; let nextY=parseInt(year); if(nextM===13) { nextM=1; nextY++;
+                                } %>
+    
+                                <a href="/ronda/control?month=<%= prevM %>&year=<%= prevY %>"
+                                    class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </a>
+    
+                                <form method="GET" class="flex space-x-2">
+                                    <select name="month" onchange="this.form.submit()"
+                                        class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
+                                        <% moment.months().forEach((m, i)=> { %>
+                                            <option value="<%= String(i + 1).padStart(2, '0') %>" <%=parseInt(month)===i + 1
+                                                ? 'selected' : '' %>><%= m %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                    <select name="year" onchange="this.form.submit()"
+                                        class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
+                                        <% for(let y=2024; y <=2030; y++) { %>
+                                            <option value="<%= y %>" <%=parseInt(year)===y ? 'selected' : '' %>><%= y %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </form>
+                                <a href="/ronda/control?month=<%= nextM %>&year=<%= nextY %>"
+                                    class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                        </div>
                     </div>
                 </div>
 
@@ -117,83 +132,57 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <% let firstFineIndex=-1; for(let i=0; i < saturdays.length; i++) { const
-                                            d=saturdays[i]; const c=row.dates[d]; const late=c.status==='scheduled' &&
-                                            moment(d).year() >= 2026 &&
-                                            moment(d).add(4, 'weeks' ).isBefore(moment(), 'day' ); if (late || c.denda>
-                                            0) {
-                                            firstFineIndex = i;
-                                            break;
+                                        <% 
+                                            saturdays.forEach((d, satIndex)=> {
+                                            const cell = row.dates[d];
+                                            const isActiveColumn = d === activeSaturday;
+                                            
+                                            let tdClasses = "px-6 py-4 whitespace-nowrap text-center text-sm relative ";
+                                            
+                                            // Active column highlighting
+                                            if (isActiveColumn) {
+                                                tdClasses += "bg-indigo-50 dark:bg-indigo-900/20 border-x-2 border-indigo-400 ";
                                             }
-                                            }
-
-                                            let highlightEndIndex = saturdays.length - 1;
-
-                                            if (firstFineIndex !== -1) {
-                                            for(let i = firstFineIndex + 1; i < saturdays.length; i++) { const
-                                                d=saturdays[i]; const c=row.dates[d]; if (c.status==='scheduled' ) {
-                                                highlightEndIndex=i - 1; break; } } } const highlightStartIndex=0; const
-                                                hasDenda=firstFineIndex !==-1; saturdays.forEach((d, satIndex)=> {
-                                                const cell = row.dates[d];
-                                                const isActiveColumn = d === activeSaturday;
-                                                let tdClasses = "px-6 py-4 whitespace-nowrap ";
-                                                tdClasses += "text-center text-sm relative ";
-                                                
-                                                // Active column highlighting
-                                                if (isActiveColumn) {
-                                                    tdClasses += "bg-indigo-50 dark:bg-indigo-900/20 border-x-2 border-indigo-400 ";
-                                                }
-                                                
-                                                const isHighlight = hasDenda && satIndex >= highlightStartIndex &&
-                                                satIndex <= highlightEndIndex; if (isHighlight) { tdClasses
-                                                    +="bg-red-500/5 border-y border-red-500/10 " ; if
-                                                    (satIndex===highlightStartIndex) tdClasses
-                                                    +="rounded-l-3xl border-l " ; if (satIndex===highlightEndIndex)
-                                                    tdClasses +="rounded-r-3xl border-r " ; } %>
+                                        %>
                                                     <td class="<%= tdClasses %>">
                                                         <div
                                                             class="relative z-10 inline-flex flex-col items-center justify-center w-full h-full">
                                                             <% if (cell.status) { %>
-                                                                <span
-                                                                    class="px-2 py-1 rounded text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-100 text-red-800' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>">
-                                                                    <%= cell.status %>
-                                                                </span>
-                                                                <% } %>
-
-                                                                    <% if (isHighlight && satIndex===highlightEndIndex) { 
-                                                                        let totalUnpaid = 0;
-                                                                        let totalPaid = 0;
-                                                                        let unpaidIds = [];
-                                                                        
-                                                                        for (let i=0; i < saturdays.length; i++) {
-                                                                            const d_check = saturdays[i];
-                                                                            const c_check = row.dates[d_check];
-                                                                            if (c_check && c_check.denda > 0) {
-                                                                                if (c_check.status_bayar === 'paid') {
-                                                                                    totalPaid += c_check.denda;
-                                                                                } else {
-                                                                                    totalUnpaid += c_check.denda;
-                                                                                    unpaidIds.push(c_check.id);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    %>
-
-                                                                    <% if (totalUnpaid > 0) { %>
-                                                                        <span onclick="openPayFineModal('<%= unpaidIds.join(',') %>', '<%= totalUnpaid %>', '<%= row.info.nama %>')"
-                                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm mt-1 animate-pulse cursor-pointer hover:bg-red-200 transition-colors" title="Klik untuk bayar">
-                                                                            ⚠ DENDA
-                                                                        </span>
-                                                                        <span class="text-[10px] text-red-500 font-semibold mt-0.5">
-                                                                            Rp<%= totalUnpaid.toLocaleString() %>
-                                                                        </span>
-                                                                    <% } else if (totalPaid > 0) { %>
-                                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200 shadow-sm mt-1">
-                                                                            ✓ LUNAS
-                                                                        </span>
-                                                                    <% } %>
-
-                                                                    <% } %>
+    <span 
+        data-schedule-id="<%= cell.id %>"
+        data-status="<%= cell.status %>"
+        data-nama="<%= row.info.nama %>"
+        data-date="<%= moment(d).format('DD MMM YYYY') %>"
+        data-keterangan="<%= cell.keterangan || '' %>"
+        onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
+        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>"
+        title="Klik untuk ubah status">
+        <%= cell.status %>
+    </span>
+<% } else if (cell.id) { %>
+     <span 
+        data-schedule-id="<%= cell.id %>"
+        data-status="scheduled"
+        data-nama="<%= row.info.nama %>"
+        data-date="<%= moment(d).format('DD MMM YYYY') %>"
+        data-keterangan=""
+        onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
+        class="cursor-pointer hover:bg-gray-200 transition-colors px-2 py-1 rounded text-xs font-bold text-gray-400 uppercase mb-1">
+        -
+    </span>
+<% } %>
+<% if (cell.denda > 0) { %>
+    <% if (cell.status_bayar === 'paid') { %>
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 mt-1 cursor-default">
+            ✓ Lunas
+        </span>
+    <% } else { %>
+        <span onclick="event.stopPropagation(); openQrisPayModal('<%= cell.id %>', '<%= cell.denda %>', '<%= row.info.nama %>')" 
+              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 mt-1 cursor-pointer hover:bg-red-200 hover:scale-105 transition-all shadow-sm">
+            💸 Bayar
+        </span>
+    <% } %>
+<% } %>
                                                         </div>
                                                     </td>
                                                     <% }) %>
@@ -251,13 +240,117 @@
             </div>
         </div>
 
+        <!-- Status Modal -->
+        <div id="statusModal" class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+            <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    Ubah Status Absensi
+                </h3>
+                <form action="/ronda/update-status" method="POST">
+                    <input type="hidden" id="statusScheduleId" name="id">
+                    <input type="hidden" name="redirectUrl" value="/ronda/control?month=<%= month %>&year=<%= year %>">
+                    
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nama Warga</label>
+                        <div id="statusWargaName" class="text-base font-bold text-gray-900 dark:text-gray-100"></div>
+                        <div id="statusDateLabel" class="text-xs text-indigo-500 font-medium"></div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status Kehadiran</label>
+                        <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500">
+                            <option value="scheduled" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Scheduled (Reset)</option>
+                            <option value="hadir" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Hadir</option>
+                            <option value="alpa" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Alpa (Denda)</option>
+                            <option value="reschedule" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Reschedule</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Keterangan</label>
+                        <textarea name="keterangan" id="statusKeterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..." class="glass-input block w-full rounded-xl p-3 outline-none resize-none text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-white/10">
+                        <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">Batal</button>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02]">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <script>
+            function openStatusModal(id, currentStatus, name, date, keterangan) {
+                document.getElementById('statusScheduleId').value = id;
+                document.getElementById('statusWargaName').textContent = name;
+                document.getElementById('statusDateLabel').textContent = date;
+                document.getElementById('statusSelect').value = currentStatus && currentStatus !== '' ? currentStatus : 'scheduled';
+                document.getElementById('statusKeterangan').value = keterangan || '';
+                document.getElementById('statusModal').classList.remove('hidden');
+            }
+
             function openPayFineModal(ids, amount, name) {
                 document.getElementById('fineIds').value = ids;
                 document.getElementById('fineAmountDisplay').textContent = 'Rp ' + parseInt(amount).toLocaleString('id-ID');
                 document.getElementById('fineWargaName').textContent = name;
                 document.getElementById('payFineModal').classList.remove('hidden');
             }
+            
+            function openQrisPayModal(id, denda, name) {
+                document.getElementById('qrisFineId').value = id;
+                document.getElementById('qrisAmountDisplay').innerText = 'Rp ' + parseInt(denda).toLocaleString('id-ID');
+                document.getElementById('qrisModal').classList.remove('hidden');
+
+                // Generate QRIS
+                const qrisData = "<%= typeof staticQris !== 'undefined' ? staticQris : '' %>" + id;
+                const canvas = document.getElementById('qrisCanvas');
+                
+                // Clear previous
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                QRCode.toCanvas(canvas, qrisData, { width: 200, margin: 2 }, function (error) {
+                    if (error) console.error(error);
+                });
+            }
         </script>
+
+        <!-- QRIS Pay Modal -->
+        <div id="qrisModal" class="fixed inset-0 z-[10000] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="document.getElementById('qrisModal').classList.add('hidden')"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-200 dark:border-gray-700">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100" id="modal-title">Bayar Denda Ronda</h3>
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Scan QRIS di bawah ini untuk membayar denda sebesar <span class="font-bold text-red-500" id="qrisAmountDisplay"></span></p>
+                            <div class="flex justify-center bg-white p-4 rounded-xl mx-auto w-fit border border-gray-200">
+                                <canvas id="qrisCanvas"></canvas>
+                            </div>
+                        </div>
+                        <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-4">
+                            <input type="hidden" name="id" id="qrisFineId">
+                            <input type="hidden" name="redirectUrl" value="/ronda/control?month=<%= month %>&year=<%= year %>">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Bukti Transfer</label>
+                                <input type="file" name="foto_bukti" accept="image/*" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            </div>
+                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:col-start-2 sm:text-sm">
+                                    Kirim Bukti
+                                </button>
+                                <button type="button" onclick="document.getElementById('qrisModal').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <%- include('../partials/footer') %>

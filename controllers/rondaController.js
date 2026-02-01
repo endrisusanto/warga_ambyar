@@ -5,6 +5,7 @@ const moment = require('moment');
 const multer = require('multer');
 const path = require('path');
 const Kas = require('../models/Kas');
+const ExcelJS = require('exceljs');
 
 // Multer Config for Ronda
 const storage = multer.diskStorage({
@@ -163,7 +164,7 @@ exports.updateTeam = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
     try {
-        const { id, status, keterangan } = req.body;
+        const { id, status, keterangan, redirectUrl } = req.body;
 
         if (status === 'reschedule') {
             await Ronda.reschedule(id, keterangan);
@@ -173,11 +174,14 @@ exports.updateStatus = async (req, res) => {
             req.flash('success_msg', 'Status ronda diperbarui');
         }
 
-        res.redirect('/ronda');
+        if (redirectUrl) {
+            return res.redirect(redirectUrl);
+        }
+        res.redirect(req.get('Referer') || '/ronda');
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal update status');
-        res.redirect('/ronda');
+        res.redirect(req.get('Referer') || '/ronda');
     }
 };
 
@@ -217,11 +221,15 @@ exports.submitFine = (req, res) => {
 
             await Ronda.submitFinePayment(id, filename);
             req.flash('success_msg', 'Bukti pembayaran dikirim, menunggu verifikasi admin.');
-            res.redirect('/ronda');
+            
+            if (req.body.redirectUrl) {
+                return res.redirect(req.body.redirectUrl);
+            }
+            res.redirect(req.get('Referer') || '/ronda');
         } catch (error) {
             console.error('DEBUG submitFine ERROR:', error);
             req.flash('error_msg', 'Gagal mengirim bukti pembayaran: ' + error.message);
-            res.redirect('/ronda');
+            res.redirect(req.get('Referer') || '/ronda');
         }
     });
 };
@@ -502,6 +510,8 @@ exports.viewPublic = async (req, res) => {
 
 exports.control = async (req, res) => {
     try {
+        await Ronda.autoProcessLateSchedules();
+
         const month = req.query.month || moment().format('MM');
         const year = req.query.year || moment().format('YYYY');
 
@@ -551,7 +561,8 @@ exports.control = async (req, res) => {
             matrix,
             moment,
             user: req.user,
-            useWideContainer: true
+            useWideContainer: true,
+            staticQris: process.env.QRIS_RONDA
         });
 
     } catch (e) {
@@ -579,5 +590,204 @@ exports.addManualParticipant = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send("Error adding participant");
+    }
+};
+
+exports.exportControl = async (req, res) => {
+    try {
+        const year = req.query.year || moment().format('YYYY');
+        
+        // Range: Full Year
+        const startDate = moment(`${year}-01-01`, 'YYYY-MM-DD');
+        const endDate = moment(`${year}-12-31`, 'YYYY-MM-DD');
+
+        const saturdays = [];
+        let day = startDate.clone();
+        
+        // Find first Saturday of the year
+        while(day.day() !== 6) {
+            day.add(1, 'days');
+        }
+        
+        while (day <= endDate) {
+            saturdays.push(day.format('YYYY-MM-DD'));
+            day.add(7, 'days'); // Optimization: add 7 days instead of 1
+        }
+
+        // Get All Warga Wajib Ronda
+        const [warga] = await db.query("SELECT id, nama, blok, nomor_rumah, tim_ronda FROM warga WHERE is_ronda = 1 AND status_keluarga = 'Kepala Keluarga' ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC");
+
+        // Get Schedules for this wide range
+        const [schedules] = await db.query(`
+            SELECT * FROM ronda_jadwal 
+            WHERE tanggal BETWEEN ? AND ?
+        `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
+
+        // Build Matrix
+        const matrix = {};
+        warga.forEach(w => {
+            matrix[w.id] = {
+                info: w,
+                dates: {}
+            };
+            saturdays.forEach(d => {
+                matrix[w.id].dates[d] = { status: null, denda: 0 };
+            });
+        });
+
+        schedules.forEach(s => {
+            const d = moment(s.tanggal).format('YYYY-MM-DD');
+            if (matrix[s.warga_id] && matrix[s.warga_id].dates[d]) {
+                matrix[s.warga_id].dates[d] = s;
+            }
+        });
+
+        // Create Excel
+        // Create Excel
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Control Ronda');
+
+        // Define Columns
+        const columns = [
+            { header: 'No', key: 'no', width: 5 },
+            { header: 'Nama', key: 'nama', width: 30 },
+            { header: 'Blok/Rumah', key: 'blok', width: 15 },
+            { header: 'Tim', key: 'tim', width: 10 },
+            { header: 'Total Denda', key: 'total', width: 15 },
+            { header: 'Sudah Bayar', key: 'paid', width: 15 },
+            { header: 'Terhutang', key: 'unpaid', width: 15 }
+        ];
+
+        saturdays.forEach(s => {
+            columns.push({ header: moment(s).format('DD MMM'), key: s, width: 12 });
+        });
+        
+        worksheet.columns = columns;
+
+        // Freeze Panes (First 7 columns + Header Row)
+        worksheet.views = [
+            { state: 'frozen', xSplit: 7, ySplit: 1 }
+        ];
+
+        // Style Header Row
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true };
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFEFEFEF' }
+            };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Rows
+        let rowNum = 1;
+        Object.values(matrix).forEach(row => {
+            // First calculate totals so we can put them in the left columns
+            let totalDenda = 0;
+            let totalPaid = 0;
+            let totalUnpaid = 0;
+            const dateStatuses = {};
+
+            saturdays.forEach(d => {
+                const cell = row.dates[d];
+                let statusText = '-';
+                if (cell.status) {
+                    statusText = cell.status.toUpperCase();
+                    if (cell.status === 'alpa' && cell.denda > 0) statusText = 'DENDA';
+                }
+                
+                if (cell.denda > 0) {
+                    totalDenda += cell.denda;
+                    if (cell.status_bayar === 'paid') {
+                        totalPaid += cell.denda;
+                    } else {
+                        totalUnpaid += cell.denda;
+                    }
+                }
+                dateStatuses[d] = statusText;
+            });
+
+            const rowData = [
+                rowNum++,
+                row.info.nama,
+                `${row.info.blok}-${row.info.nomor_rumah}`,
+                row.info.tim_ronda || '-',
+                totalDenda > 0 ? `Rp ${totalDenda.toLocaleString('id-ID')}` : '-',
+                totalPaid > 0 ? `Rp ${totalPaid.toLocaleString('id-ID')}` : '-',
+                totalUnpaid > 0 ? `Rp ${totalUnpaid.toLocaleString('id-ID')}` : '-'
+            ];
+
+            // Add date columns
+            saturdays.forEach(d => {
+                rowData.push(dateStatuses[d]);
+            });
+
+            const r = worksheet.addRow(rowData);
+            
+            // Styling
+            r.eachCell((cell, colNumber) => {
+                // Borders
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+
+                // Conditional Coloring based on Value/Column
+                
+                // Summary Columns (Indices 5, 6, 7 -> colNumber 5, 6, 7)
+                if (colNumber === 5) { // Total Denda
+                   // Optional: color if you want
+                }
+                if (colNumber === 6) { // Sudah Bayar
+                    if (totalPaid > 0) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+                        cell.font = { color: { argb: 'FF166534' }, bold: true };
+                    }
+                }
+                if (colNumber === 7) { // Terhutang
+                    if (totalUnpaid > 0) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                        cell.font = { color: { argb: 'FF991B1B' }, bold: true };
+                    }
+                }
+
+                // Status Columns (Indices > 7)
+                if (colNumber > 7) {
+                    const val = cell.value;
+                    if (val === 'HADIR') {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }; 
+                        cell.font = { color: { argb: 'FF166534' } }; 
+                    } else if (val === 'IZIN') {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF9C3' } }; 
+                        cell.font = { color: { argb: 'FF854D0E' } }; 
+                    } else if (val === 'DENDA' || val === 'ALPA') {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } }; 
+                        cell.font = { color: { argb: 'FF991B1B' } }; 
+                    } else if (val === 'RESCHEDULE') {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } }; 
+                        cell.font = { color: { argb: 'FF1E40AF' } }; 
+                    }
+                }
+            });
+        });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=Control_Ronda_${year}.xlsx`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error exporting excel');
     }
 };
