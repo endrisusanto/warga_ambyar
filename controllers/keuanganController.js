@@ -5,6 +5,7 @@ const moment = require('moment');
 const multer = require('multer');
 const path = require('path');
 const ExcelJS = require('exceljs');
+const db = require('../config/db');
 
 
 
@@ -28,46 +29,72 @@ const upload = multer({
 }).single('bukti_foto');
 
 exports.index = async (req, res) => {
+    // Initialize with defaults
+    let saldo = 0;
+    let transactions = [];
+    let trend = [];
+    let pemasukanBulanIni = 0;
+    let pengeluaranBulanIni = 0;
+    let totalPiutang = 0;
+    let chartData = { labels: [], income: [], expense: [] };
+
     try {
-        const saldo = await Kas.getBalance();
-        const transactions = await Kas.getAll(); // All transactions
-        const trend = await Kas.getMonthlyTrend();
+        saldo = await Kas.getBalance();
+        transactions = await Kas.getAll(); // All transactions
+        trend = await Kas.getMonthlyTrend();
 
         // Calculate this month summary
         const currentMonth = moment().format('YYYY-MM');
         const thisMonthTrans = transactions.filter(t => moment(t.tanggal).format('YYYY-MM') === currentMonth);
 
-        const pemasukanBulanIni = thisMonthTrans
+        pemasukanBulanIni = thisMonthTrans
             .filter(t => t.tipe === 'masuk')
             .reduce((acc, curr) => acc + Number(curr.jumlah), 0);
 
-        const pengeluaranBulanIni = thisMonthTrans
+        pengeluaranBulanIni = thisMonthTrans
             .filter(t => t.tipe === 'keluar')
             .reduce((acc, curr) => acc + Number(curr.jumlah), 0);
 
+        // Calculate Piutang (Unpaid Bills)
+        try {
+            const [piutangRows] = await db.query(`
+                SELECT SUM(i.jumlah) as total_piutang
+                FROM iuran i
+                JOIN warga w ON i.warga_id = w.id
+                WHERE i.status != 'lunas'
+            `);
+            totalPiutang = piutangRows[0]?.total_piutang || 0;
+        } catch (piutangErr) {
+            console.error('Error fetching piutang:', piutangErr);
+            // Fallback to 0 if query fails
+            totalPiutang = 0;
+        }
+
         // Chart Data
-        const chartData = {
+        chartData = {
             labels: trend.map(t => moment(t.bulan).format('MMM YYYY')).reverse(),
             income: trend.map(t => Number(t.pemasukan || 0)).reverse(),
             expense: trend.map(t => Number(t.pengeluaran || 0)).reverse()
         };
 
-        res.render('keuangan/index', {
-            title: 'Laporan Keuangan',
-            saldo,
-            pemasukanBulanIni,
-            pengeluaranBulanIni,
-            transactions: transactions.slice(0, 100), // Limit 100 newest
-            chartData: JSON.stringify(chartData),
-            moment,
-            user: req.session.user,
-            useWideContainer: true
-        });
     } catch (err) {
-        console.error(err);
-        req.flash('error_msg', 'Terjadi kesalahan server');
-        res.redirect('/dashboard');
+        console.error('Error in keuangan index:', err);
+        // Don't redirect, just render with default values
     }
+
+    // Always render, even if there were errors
+    res.render('keuangan/index', {
+        title: 'Laporan Keuangan',
+        saldo,
+        pemasukanBulanIni,
+        pengeluaranBulanIni,
+        totalPiutang,
+        transactions: transactions.slice(0, 100), // Limit 100 newest
+        chartData: JSON.stringify(chartData),
+        moment,
+        user: req.session.user,
+        useWideContainer: true
+    });
 };
 
 exports.add = (req, res) => {

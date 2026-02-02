@@ -16,7 +16,7 @@
                 </div>
                 <% if(user) { %>
                     <div
-                        class="hidden min-[950px]:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center space-x-1">
+                        class="hidden min-[1480px]:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center space-x-1">
                         <a href="/dashboard"
                             class="<%= isDashboard ? 'bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200' %> px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center border border-transparent <%= isDashboard ? 'border-white/10' : 'hover:border-white/5' %>">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,14 +121,14 @@
                             <% if(user) { %>
                                 <!-- Mobile Menu Button - Right Side -->
                                 <button id="mobileMenuBtn"
-                                    class="min-[950px]:hidden mr-2 p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none transition-colors">
+                                    class="min-[1480px]:hidden mr-2 p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none transition-colors">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M4 6h16M4 12h16M4 18h16"></path>
                                     </svg>
                                 </button>
                                 <a href="/profile"
-                                    class="text-sm font-medium <%= isProfile ? 'bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-gray-100 border-white/10' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 border-transparent' %> hidden min-[950px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border hover:border-white/10">
+                                    class="text-sm font-medium <%= isProfile ? 'bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-gray-100 border-white/10' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-white/5 border-transparent' %> hidden min-[1480px]:inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border hover:border-white/10">
                                     <% if (user.foto_profil) { %>
                                         <img src="/uploads/profiles/<%= user.foto_profil %>" alt="Profile"
                                             class="w-6 h-6 rounded-full border border-white/20 object-cover">

@@ -10,6 +10,8 @@ exports.index = async (req, res) => {
         title: 'Dashboard',
         saldo: 0,
         summary: { pemasukan: 0, pengeluaran: 0 },
+        totalPiutang: 0,
+        piutangChartData: { jenisLabel: [], jenisData: [], blokLabel: [], blokData: [] },
         mapData: [],
         jadwalRonda: [],
         events: [],
@@ -63,6 +65,47 @@ exports.index = async (req, res) => {
             data.chartData.labels = trend.map(t => t.bulan).reverse();
             data.chartData.pemasukan = trend.map(t => t.pemasukan).reverse();
             data.chartData.pengeluaran = trend.map(t => t.pengeluaran).reverse();
+            
+            // Calculate Piutang
+            try {
+                const db = require('../config/db');
+                const [piutangRows] = await db.query(`
+                    SELECT SUM(i.jumlah) as total_piutang
+                    FROM iuran i
+                    JOIN warga w ON i.warga_id = w.id
+                    WHERE i.status != 'lunas'
+                `);
+                data.totalPiutang = piutangRows[0]?.total_piutang || 0;
+                // Calculate Piutang Breakdown (By Jenis)
+                const [piutangByJenis] = await db.query(`
+                    SELECT jenis, SUM(i.jumlah) as total
+                    FROM iuran i
+                    JOIN warga w ON i.warga_id = w.id
+                    WHERE i.status != 'lunas'
+                    GROUP BY jenis
+                `);
+                data.piutangChartData = {
+                    jenisLabel: piutangByJenis.map(r => r.jenis.charAt(0).toUpperCase() + r.jenis.slice(1).replace('_', ' ')),
+                    jenisData: piutangByJenis.map(r => r.total)
+                };
+
+                // Calculate Piutang Breakdown (By Blok)
+                const [piutangByBlok] = await db.query(`
+                    SELECT w.blok, SUM(i.jumlah) as total
+                    FROM iuran i
+                    JOIN warga w ON i.warga_id = w.id
+                    WHERE i.status != 'lunas'
+                    GROUP BY w.blok
+                    ORDER BY w.blok ASC
+                `);
+                data.piutangChartData.blokLabel = piutangByBlok.map(r => 'Blok ' + r.blok);
+                data.piutangChartData.blokData = piutangByBlok.map(r => r.total);
+
+            } catch (piutangErr) {
+                console.error('Error fetching piutang:', piutangErr);
+                data.totalPiutang = 0;
+                data.piutangChartData = { jenisLabel: [], jenisData: [], blokLabel: [], blokData: [] };
+            }
         } catch (e) {
             console.error('Error fetching Kas data:', e.message);
             require('fs').appendFileSync('debug.log', `ERROR Kas: ${e.message}\n`);

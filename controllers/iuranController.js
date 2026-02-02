@@ -145,13 +145,19 @@ function renderIndex(req, res, { rows, warga, year }) {
 
 exports.generate = async (req, res) => {
     try {
-        const currentMonth = moment().startOf('month').format('YYYY-MM-DD');
-        const count = await Iuran.generateBillsForMonth(currentMonth);
-        req.flash('success_msg', `Berhasil generate ${count} tagihan untuk bulan ini.`);
+        // Accept custom month from request body (format: YYYY-MM)
+        // If not provided, use current month
+        const targetMonth = req.body.month || moment().format('YYYY-MM');
+        const periode = moment(targetMonth, 'YYYY-MM').startOf('month').format('YYYY-MM-DD');
+        
+        const count = await Iuran.generateBillsForMonth(periode);
+        
+        const monthName = moment(periode).format('MMMM YYYY');
+        req.flash('success_msg', `Berhasil generate ${count} tagihan untuk ${monthName}.`);
         res.redirect('/iuran');
     } catch (err) {
         console.error(err);
-        req.flash('error_msg', 'Gagal generate tagihan');
+        req.flash('error_msg', 'Gagal generate tagihan: ' + err.message);
         res.redirect('/iuran');
     }
 };

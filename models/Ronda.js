@@ -26,7 +26,7 @@ const Ronda = {
         for (const dateStr of saturdays) {
             const dateObj = moment(dateStr);
             const diffDays = dateObj.diff(epochDate, 'days');
-            const diffWeeks = Math.round(diffDays / 7);
+            const diffWeeks = Math.floor(diffDays / 7);
 
             let teamIndex = (epochIndex + diffWeeks) % 4;
             if (teamIndex < 0) teamIndex += 4;
@@ -131,6 +131,23 @@ const Ronda = {
         params.push(id);
 
         await db.query(query, params);
+
+        // Jika status berubah menjadi 'hadir', batalkan semua jadwal 'scheduled' 
+        // untuk warga yang sama dalam range 4 minggu ke depan dari tanggal jadwal ini
+        if (status === 'hadir') {
+            const [currentSchedule] = await db.query("SELECT tanggal, warga_id FROM ronda_jadwal WHERE id = ?", [id]);
+            if (currentSchedule.length > 0) {
+                const currentDate = currentSchedule[0].tanggal;
+                const wargaId = currentSchedule[0].warga_id;
+                const fourWeeksLater = moment(currentDate).add(4, 'weeks').format('YYYY-MM-DD');
+                
+                // Batalkan jadwal scheduled dalam range 4 minggu
+                await db.query(
+                    "DELETE FROM ronda_jadwal WHERE warga_id = ? AND status = 'scheduled' AND tanggal > ? AND tanggal <= ?",
+                    [wargaId, currentDate, fourWeeksLater]
+                );
+            }
+        }
     },
 
     reschedule: async (id, keterangan) => {
@@ -266,6 +283,19 @@ const Ronda = {
         const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE status = 'scheduled' AND tanggal < ?", [today]);
         
         for (const r of rows) {
+            // Cek apakah warga sudah hadir dalam 4 minggu sebelum tanggal jadwal ini
+            const fourWeeksBefore = moment(r.tanggal).subtract(4, 'weeks').format('YYYY-MM-DD');
+            const [hadirRecords] = await db.query(
+                "SELECT id FROM ronda_jadwal WHERE warga_id = ? AND status = 'hadir' AND tanggal >= ? AND tanggal < ?",
+                [r.warga_id, fourWeeksBefore, r.tanggal]
+            );
+
+            // Jika sudah hadir dalam 4 minggu terakhir, hapus jadwal ini (rantai sudah selesai)
+            if (hadirRecords.length > 0) {
+                await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [r.id]);
+                continue;
+            }
+
             // Check move count from keterangan
             let moveCount = 0;
             const match = (r.keterangan || '').match(/Auto Move \((\d+)\)/);

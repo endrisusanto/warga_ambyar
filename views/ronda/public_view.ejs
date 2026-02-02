@@ -57,15 +57,31 @@
                                             <div>
                                                 <div class="text-sm font-bold text-gray-900">
                                                     <%= s.nama %> (<%= s.blok %>-<%= s.nomor_rumah %>)
-                                                                <% if(s.is_ganti_hari || s.status==='reschedule' ) { %>
-                                                                    
-                                                                    <% } %>
                                                 </div>
                                             </div>
                                         </div>
                                         <% 
-                                        const isMalamMingguNow = (moment().day() === 6 && moment().hour() >= 18) || (moment().day() === 0);
-                                        if(s.status && s.status !=='scheduled' && (s.status !=='reschedule' || isMalamMingguNow)) { 
+                                        // Prioritas badge: Ganti Hari Hadir > Ganti Hari > Status lainnya
+                                        const isGuest = s.is_ganti_hari;
+                                        
+                                        if(isGuest && s.status === 'hadir') {
+                                            // Badge Ganti Hari yang sudah Hadir (biru)
+                                        %>
+                                            <span
+                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-blue-600 text-blue-600">
+                                                🔄 Hadir
+                                            </span>
+                                        <%
+                                        } else if(isGuest || s.status === 'reschedule') {
+                                            // Badge Ganti Hari (untuk isGuest atau reschedule yang belum hadir)
+                                        %>
+                                            <span
+                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-orange-600 text-orange-600">
+                                                🔄 Ganti Hari
+                                            </span>
+                                        <%
+                                        } else if(s.status && s.status !=='scheduled') { 
+                                            // Badge status lainnya
                                             let statusText = s.status;
                                             let statusClass = '';
                                             if (s.status_bayar === 'paid') {
@@ -75,9 +91,6 @@
                                                 statusClass = 'bg-transparent border border-green-600 text-green-600';
                                             } else if (s.status === 'izin') {
                                                 statusClass = 'bg-transparent border border-yellow-600 text-yellow-600';
-                                            } else if (s.status === 'reschedule') {
-                                                statusText = 'Ganti Hari';
-                                                statusClass = 'bg-transparent border border-purple-600 text-purple-600';
                                             } else {
                                                 statusClass = 'bg-transparent border border-red-600 text-red-600';
                                             }
@@ -86,7 +99,7 @@
                                                 class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
                                                 <%= statusText %>
                                             </span>
-                                            <% } %>
+                                        <% } %>
                                     </div>
                                     <% }) %>
                             </div>

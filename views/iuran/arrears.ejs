@@ -339,29 +339,16 @@
                                                             <div class="flex flex-col gap-2 items-end">
                                                                 <% Object.values(house.residents).forEach(resident=> {
                                                                     %>
-                                                                    <% if (resident.no_hp) { const
-                                                                        phone=resident.no_hp.replace(/^0/, '62'
-                                                                        ).replace(/\D/g, '' ); let msg=`Halo
-                                                                        ${resident.nama}, berikut rekap tunggakan iuran
-                                                                        untuk rumah
-                                                                        ${house.blok}/${house.nomor_rumah}:\n\n`;
-                                                                        house.items.forEach(item=> {
-                                                                        const j = item.jenis === 'kas_rt' ? 'Kas RT' :
-                                                                        item.jenis === 'kas_gang' ? 'Kas Gang' :
-                                                                        item.jenis
-                                                                        === 'sampah' ? 'Sampah' : item.jenis;
-                                                                        msg += `- ${moment(item.periode).format('MMM
-                                                                        YYYY')}
-                                                                        (${j}): Rp
-                                                                        ${parseInt(item.jumlah).toLocaleString('id-ID')}\n`;
+                                                                    <% if (resident.no_hp) { 
+                                                                        const phone = resident.no_hp.replace(/^0/, '62').replace(/\D/g, '');
+                                                                        let msg = `Halo ${resident.nama}, berikut rekap tunggakan iuran untuk rumah ${house.blok}/${house.nomor_rumah}:\n\n`;
+                                                                        house.items.forEach(item => {
+                                                                            const j = item.jenis === 'kas_rt' ? 'Kas RT' : item.jenis === 'kas_gang' ? 'Kas Gang' : item.jenis === 'sampah' ? 'Sampah' : item.jenis;
+                                                                            msg += `- ${moment(item.periode).format('MMM YYYY')} (${j}): Rp ${parseInt(item.jumlah).toLocaleString('id-ID')}\n`;
                                                                         });
-                                                                        msg += `\n*Total: Rp
-                                                                        ${house.total.toLocaleString('id-ID')}*\n\nMohon
-                                                                        segera dilunasi. Terima kasih.`;
-
-                                                                        const waUrl =
-                                                                        `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-                                                                        %>
+                                                                        msg += `\n*Total: Rp ${house.total.toLocaleString('id-ID')}*\n\nMohon segera dilunasi. Terima kasih.`;
+                                                                        const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+                                                                    %>
                                                                         <a href="<%= waUrl %>" target="_blank"
                                                                             class="inline-flex items-center px-3 py-1.5 border border-emerald-500/30 rounded-lg text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all shadow-lg shadow-emerald-500/10"
                                                                             title="Hubungi <%= resident.nama %>">
@@ -385,7 +372,7 @@
                                         <td colspan="2" class="px-6 py-4 text-right font-bold text-gray-700 dark:text-gray-300">Grand Total
                                             Tunggakan:</td>
                                         <td colspan="3" class="px-6 py-4 text-left font-bold text-red-400 text-lg">
-                                            Rp <%= grandTotal.toLocaleString(' id-ID') %>
+                                            Rp <%= grandTotal.toLocaleString('id-ID') %>
                                                         </td>
                                                     </tr>
                                                     </tfoot>

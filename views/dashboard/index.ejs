@@ -44,46 +44,64 @@
 
                             <!-- 1. Finance Summary -->
                             <div
-                                class="md:col-span-2 lg:col-span-2 glass-card p-6 flex flex-col justify-between h-full group">
+                                class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col justify-between h-full group">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3
                                             class="text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                                             Saldo
-                                            Kas RT
+                                            Kas
                                         </h3>
-                                        <div class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                                        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">
                                             Rp <%= new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0,
                                                 maximumFractionDigits: 0 }).format(saldo) %>
                                         </div>
                                     </div>
                                     <div
-                                        class="bg-gray-100 dark:bg-white/5 w-12 h-12 flex items-center justify-center rounded-lg backdrop-blur-sm border border-white/10 group-hover:bg-gray-200 dark:bg-white/10 transition-all">
+                                        class="bg-gray-100 dark:bg-white/5 w-10 h-10 flex items-center justify-center rounded-lg backdrop-blur-sm border border-white/10 group-hover:bg-gray-200 dark:bg-white/10 transition-all">
                                         <span
-                                            class="text-lg font-bold text-gray-700 dark:text-gray-300 dark:group-hover:text-gray-700 transition-colors">Rp</span>
+                                            class="text-base font-bold text-gray-700 dark:text-gray-300 dark:group-hover:text-gray-700 transition-colors">Rp</span>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div class="space-y-3 mt-2">
                                     <div
-                                        class="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors">
-                                        <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-1">
-                                            Pemasukan Bulan Ini</div>
-                                        <div class="text-lg font-bold text-emerald-700 dark:text-emerald-100">
-                                            Rp <%= summary.pemasukan ? new Intl.NumberFormat('id-ID', {
-                                                minimumFractionDigits: 0, maximumFractionDigits: 0
-                                                }).format(summary.pemasukan) : 0 %>
+                                        class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors">
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Pemasukan</div>
+                                            <div class="text-sm font-bold text-emerald-700 dark:text-emerald-100">
+                                                Rp <%= summary.pemasukan ? new Intl.NumberFormat('id-ID', {
+                                                    minimumFractionDigits: 0, maximumFractionDigits: 0
+                                                    }).format(summary.pemasukan) : 0 %>
+                                            </div>
                                         </div>
                                     </div>
                                     <div
-                                        class="bg-red-500/10 p-4 rounded-lg border border-red-500/30 hover:bg-red-500/20 transition-colors">
-                                        <div class="text-xs text-red-600 dark:text-red-400 font-bold mb-1">Pengeluaran
-                                            Bulan Ini</div>
-                                        <div class="text-lg font-bold text-red-700 dark:text-red-100">
-                                            Rp <%= summary.pengeluaran ? new Intl.NumberFormat('id-ID', {
-                                                minimumFractionDigits: 0, maximumFractionDigits: 0
-                                                }).format(summary.pengeluaran) : 0 %>
+                                        class="bg-red-500/10 p-2.5 rounded-lg border border-red-500/30 hover:bg-red-500/20 transition-colors">
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-xs text-red-600 dark:text-red-400 font-bold">Pengeluaran</div>
+                                            <div class="text-sm font-bold text-red-700 dark:text-red-100">
+                                                Rp <%= summary.pengeluaran ? new Intl.NumberFormat('id-ID', {
+                                                    minimumFractionDigits: 0, maximumFractionDigits: 0
+                                                    }).format(summary.pengeluaran) : 0 %>
+                                            </div>
                                         </div>
                                     </div>
+                                    <a href="/iuran/arrears"
+                                        class="bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/30 hover:bg-amber-500/20 transition-colors cursor-pointer group/piutang block">
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-xs text-amber-600 dark:text-amber-400 font-bold flex items-center">
+                                                Piutang
+                                                <svg class="w-3 h-3 ml-1 opacity-0 group-hover/piutang:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                            <div class="text-sm font-bold text-amber-700 dark:text-amber-100">
+                                                Rp <%= new Intl.NumberFormat('id-ID', {
+                                                    minimumFractionDigits: 0, maximumFractionDigits: 0
+                                                    }).format(typeof totalPiutang !== 'undefined' ? totalPiutang : 0) %>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
 
@@ -233,67 +251,36 @@
                                     </div>
                             </div>
 
-                            <!-- 3. Announcements -->
-                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
+                            <!-- 3. Charts Section (Expanded) -->
+                            <div class="md:col-span-2 lg:col-span-2 glass-card p-6 rounded-xl h-full flex flex-col">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg flex items-center">
-                                        <span
-                                            class="bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg mr-2 text-gray-600 dark:text-gray-400 border border-white/10">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
-                                                </path>
-                                            </svg>
-                                        </span>
-                                        Pengumuman
-                                    </h3>
-                                    <button onclick="openEventModal()"
-                                        class="glass-button bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 p-2 rounded-lg transition border border-white/10"
-                                        title="Tambah Pengumuman">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4"></path>
-                                        </svg>
-                                    </button>
+                                    <h3 class="font-bold text-gray-900 dark:text-gray-100" id="chartTitle">Statistik Keuangan & Piutang</h3>
                                 </div>
-                                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                    <% if (events && events.length> 0) { %>
-                                        <% events.forEach(event=> { %>
-                                            <div onclick="openEventDetail(<%= JSON.stringify(event) %>)"
-                                                class="glass-card bg-gray-100 dark:bg-white/5 p-4 hover:bg-gray-200 dark:bg-white/10 transition-all cursor-pointer group border border-white/10">
-                                                <div
-                                                    class="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1.5 uppercase tracking-wide group-hover:text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 inline-block px-2 py-0.5 rounded-md">
-                                                    <%= new Date(event.tanggal).toLocaleDateString('id-ID', {
-                                                        weekday: 'long' , day: 'numeric' , month: 'short' ,
-                                                        year: 'numeric' }) %>
-                                                </div>
-                                                <div
-                                                    class="text-sm font-semibold text-gray-200 group-hover:text-gray-900 dark:text-gray-100 mt-1 line-clamp-2">
-                                                    <%= event.judul %>
-                                                </div>
-                                                <% if(event.lokasi) { %>
-                                                    <div
-                                                        class="text-xs text-gray-600 dark:text-gray-400 mt-2 flex items-center">
-                                                        <svg class="w-3 h-3 mr-1 text-gray-500" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                                            </path>
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
-                                                            </path>
-                                                        </svg>
-                                                        <%= event.lokasi %>
-                                                    </div>
-                                                    <% } %>
-                                            </div>
-                                            <% }); %>
-                                                <% } else { %>
-                                                    <div
-                                                        class="text-center py-8 text-gray-500 bg-gray-100 dark:bg-white/5 rounded-xl border border-dashed border-white/10">
-                                                        Belum ada pengumuman</div>
-                                                    <% } %>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                                    <!-- 1. Arus Kas (Line) -->
+                                    <div class="col-span-1 h-[200px] md:h-auto flex flex-col">
+                                        <p class="text-xs text-center text-gray-500 mb-2 font-medium">Arus Kas (Line)</p>
+                                        <div class="flex-grow w-full relative">
+                                            <canvas id="kasChart"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 2. Komposisi Piutang (Doughnut) -->
+                                    <div class="col-span-1 h-[200px] md:h-auto flex flex-col border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-4">
+                                        <p class="text-xs text-center text-gray-500 mb-2 font-medium">Komposisi Piutang</p>
+                                        <div class="flex-grow w-full relative">
+                                            <canvas id="piutangJenisChart"></canvas>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Sebaran Blok (Bar) -->
+                                    <div class="col-span-1 h-[200px] md:h-auto flex flex-col border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-4">
+                                        <p class="text-xs text-center text-gray-500 mb-2 font-medium">Sebaran Blok</p>
+                                        <div class="flex-grow w-full relative">
+                                            <canvas id="piutangBlokChart"></canvas>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -446,10 +433,69 @@
                                 </div>
                             </div>
 
-                            <!-- 5. Chart -->
-                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 rounded-xl h-full">
-                                <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-4">Grafik Keuangan</h3>
-                                <div class="h-40"><canvas id="kasChart"></canvas></div>
+                            <!-- 5. Charts Section -->
+                            <!-- 3. Announcements (Moved Here) -->
+                            <div class="md:col-span-1 lg:col-span-1 glass-card p-6 flex flex-col h-full">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg flex items-center">
+                                        <span
+                                            class="bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg mr-2 text-gray-600 dark:text-gray-400 border border-white/10">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
+                                                </path>
+                                            </svg>
+                                        </span>
+                                        Pengumuman
+                                    </h3>
+                                    <button onclick="openEventModal()"
+                                        class="glass-button bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 p-2 rounded-lg transition border border-white/10"
+                                        title="Tambah Pengumuman">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <% if (events && events.length> 0) { %>
+                                        <% events.forEach(event=> { %>
+                                            <div onclick="openEventDetail(<%= JSON.stringify(event) %>)"
+                                                class="glass-card bg-gray-100 dark:bg-white/5 p-4 hover:bg-gray-200 dark:bg-white/10 transition-all cursor-pointer group border border-white/10">
+                                                <div
+                                                    class="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1.5 uppercase tracking-wide group-hover:text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 inline-block px-2 py-0.5 rounded-md">
+                                                    <%= new Date(event.tanggal).toLocaleDateString('id-ID', {
+                                                        weekday: 'long' , day: 'numeric' , month: 'short' ,
+                                                        year: 'numeric' }) %>
+                                                </div>
+                                                <div
+                                                    class="text-sm font-semibold text-gray-200 group-hover:text-gray-900 dark:text-gray-100 mt-1 line-clamp-2">
+                                                    <%= event.judul %>
+                                                </div>
+                                                <% if(event.lokasi) { %>
+                                                    <div
+                                                        class="text-xs text-gray-600 dark:text-gray-400 mt-2 flex items-center">
+                                                        <svg class="w-3 h-3 mr-1 text-gray-500" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                            </path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+                                                            </path>
+                                                        </svg>
+                                                        <%= event.lokasi %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <div
+                                                        class="text-center py-8 text-gray-500 bg-gray-100 dark:bg-white/5 rounded-xl border border-dashed border-white/10">
+                                                        Belum ada pengumuman</div>
+                                                    <% } %>
+                                </div>
                             </div>
                         </div>
 
@@ -687,7 +733,13 @@
 
                         <script src="/js/html2canvas.min.js"></script>
                         <script>
-                            function openEventModal() { document.getElementById('eventModal').classList.remove('hidden'); }
+                            function openEventModal() { 
+                                document.getElementById('eventModal').classList.remove('hidden');
+                                // Set default datetime to now (local time)
+                                const now = new Date();
+                                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                                document.getElementById('date').value = now.toISOString().slice(0, 16);
+                            }
                             function closeEventModal() { document.getElementById('eventModal').classList.add('hidden'); }
 
                             let currentEvent = null;
@@ -904,45 +956,174 @@
                                 }
                             };
 
-                            // Chart Logic - Monochrome
-                            try {
-                                const chartDataElement = document.getElementById('debugData');
-                                const chartDataRaw = chartDataElement ? chartDataElement.getAttribute('data-chartdata') : null;
-                                const chartData = chartDataRaw ? JSON.parse(atob(chartDataRaw)) : {};
-                                if (chartData && chartData.pemasukan && chartData.pengeluaran) {
-                                    const ctx = document.getElementById('kasChart').getContext('2d');
-                                    new Chart(ctx, {
-                                        type: 'doughnut',
+                            // Chart Logic - Grid Layout
+                            // Parse Data from Controller
+                            const rawKasData = <%- JSON.stringify(chartData) %>;
+                            const rawPiutangData = <%- JSON.stringify(typeof piutangChartData !== 'undefined' ? piutangChartData : { jenisLabel:[], jenisData:[], blokLabel:[], blokData:[] }) %>;
+
+                            function initCharts() {
+                                const chartCommonOptions = {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            mode: 'index',
+                                            intersect: false,
+                                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                            titleColor: '#fff',
+                                            bodyColor: '#fff',
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            borderWidth: 1
+                                        }
+                                    }
+                                };
+
+                                // 1. Render Kas Chart (Line)
+                                const ctxKas = document.getElementById('kasChart');
+                                if (ctxKas) {
+                                    new Chart(ctxKas.getContext('2d'), {
+                                        type: 'line',
                                         data: {
-                                            labels: ['Masuk', 'Keluar'],
-                                            datasets: [{
-                                                data: [
-                                                    chartData.pemasukan.reduce((a, b) => a + b, 0),
-                                                    chartData.pengeluaran.reduce((a, b) => a + b, 0)
-                                                ],
-                                                backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(248, 113, 113, 0.8)'],
-                                                borderColor: ['rgba(52, 211, 153, 1)', 'rgba(248, 113, 113, 1)'],
-                                                borderWidth: 1
-                                            }]
+                                            labels: rawKasData.labels,
+                                            datasets: [
+                                                {
+                                                    label: 'Pemasukan',
+                                                    data: rawKasData.pemasukan,
+                                                    borderColor: '#10b981', // emerald-500
+                                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                                    borderWidth: 2,
+                                                    fill: true,
+                                                    tension: 0.4,
+                                                    pointRadius: 0,
+                                                    pointHoverRadius: 4
+                                                },
+                                                {
+                                                    label: 'Pengeluaran',
+                                                    data: rawKasData.pengeluaran,
+                                                    borderColor: '#ef4444', // red-500
+                                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                                    borderWidth: 2,
+                                                    fill: true,
+                                                    tension: 0.4,
+                                                    pointRadius: 0,
+                                                    pointHoverRadius: 4
+                                                }
+                                            ]
                                         },
                                         options: {
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'bottom',
-                                                    labels: {
-                                                        boxWidth: 12,
-                                                        font: { size: 10 },
-                                                        color: '#d1d5db'
+                                            ...chartCommonOptions,
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    grid: { color: 'rgba(156, 163, 175, 0.1)', borderDash: [5, 5] },
+                                                    ticks: {
+                                                        callback: function(value) { return (value/1000) + 'k'; },
+                                                        color: '#9ca3af',
+                                                        font: { size: 9 },
+                                                        maxTicksLimit: 5
                                                     }
+                                                },
+                                                x: {
+                                                    display: false // Hide X axis labels for cleaner look in small space
                                                 }
                                             },
-                                            cutout: '70%'
+                                            interaction: {
+                                                mode: 'nearest',
+                                                axis: 'x',
+                                                intersect: false
+                                            }
                                         }
                                     });
                                 }
-                            } catch (e) { console.error("Chart error:", e); }
+
+                                // 2. Render Piutang Jenis (Doughnut)
+                                const ctxPiutangJenis = document.getElementById('piutangJenisChart');
+                                if (ctxPiutangJenis) {
+                                    const chartColors = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
+                                    new Chart(ctxPiutangJenis.getContext('2d'), {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels: rawPiutangData.jenisLabel,
+                                            datasets: [{
+                                                data: rawPiutangData.jenisData,
+                                                backgroundColor: chartColors,
+                                                borderWidth: 0
+                                            }]
+                                        },
+                                        options: {
+                                            ...chartCommonOptions,
+                                            plugins: {
+                                                legend: { 
+                                                    display: true, 
+                                                    position: 'right', 
+                                                    labels: { boxWidth: 8, font: { size: 9 }, color: '#9ca3af' } 
+                                                },
+                                                tooltip: {
+                                                    callbacks: {
+                                                        label: function(context) {
+                                                            let label = context.label || '';
+                                                            if (label) label += ': ';
+                                                            if (context.parsed !== null) label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed);
+                                                            return label;
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            cutout: '65%'
+                                        }
+                                    });
+                                }
+
+                                // 3. Render Piutang Blok (Bar)
+                                const ctxPiutangBlok = document.getElementById('piutangBlokChart');
+                                if (ctxPiutangBlok) {
+                                    new Chart(ctxPiutangBlok.getContext('2d'), {
+                                        type: 'bar',
+                                        data: {
+                                            labels: rawPiutangData.blokLabel,
+                                            datasets: [{
+                                                label: 'Total Tunggakan',
+                                                data: rawPiutangData.blokData,
+                                                backgroundColor: '#f59e0b', // amber-500
+                                                borderRadius: 2
+                                            }]
+                                        },
+                                        options: {
+                                            ...chartCommonOptions,
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: {
+                                                    callbacks: {
+                                                        label: function(context) {
+                                                            let label = context.dataset.label || '';
+                                                            if (label) label += ': ';
+                                                            if (context.parsed.y !== null) label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                                            return label;
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            scales: {
+                                                y: {
+                                                    display: false // Clean look
+                                                },
+                                                x: {
+                                                    grid: { display: false },
+                                                    ticks: { color: '#9ca3af', font: { size: 9 } }
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
+                            // Initialize charts when DOM is ready
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', initCharts);
+                            } else {
+                                initCharts();
+                            }
 
                             const closeModal = () => document.getElementById('houseModal').classList.add('hidden');
                             document.getElementById('okBtn').addEventListener('click', closeModal);

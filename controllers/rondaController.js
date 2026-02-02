@@ -80,6 +80,59 @@ exports.index = async (req, res) => {
                 console.log('DEBUG SCHED ' + s.id, 'PARSED:', s.parsedPhotos);
             }
         });
+        
+        // Check for recent reschedules - only for current/past months
+        const db = require('../config/db');
+        const viewingMonth = moment(`${year}-${month}-01`);
+        
+        // Only check reschedules if viewing current month or past months
+        if (viewingMonth.isSameOrBefore(now, 'month')) {
+            const [recentReschedules] = await db.query(
+                `SELECT DISTINCT warga_id 
+                 FROM ronda_jadwal 
+                 WHERE status = 'reschedule' 
+                 AND tanggal >= ? 
+                 AND tanggal < ?`,
+                [
+                    moment().subtract(4, 'weeks').format('YYYY-MM-DD'),
+                    moment().format('YYYY-MM-DD')
+                ]
+            );
+            
+            const wargaWithReschedule = new Set(recentReschedules.map(r => r.warga_id));
+            
+            // Determine the upcoming Saturday (active ronda)
+            const currentDay = now.day();
+            const currentHour = now.hour();
+            let upcomingSaturday = null;
+            
+            // If it's Sunday before 6 AM, the upcoming Saturday is next week
+            if (currentDay === 0 && currentHour < 6) {
+                upcomingSaturday = now.clone().add(6, 'days').format('YYYY-MM-DD');
+            } else {
+                // Find the Saturday of the current week
+                const startOfWeek = now.clone().startOf('week');
+                const thisSaturday = startOfWeek.clone().add(6, 'days');
+                
+                // If today is Saturday after 6 PM or Sunday after 6 AM, next Saturday is upcoming
+                if ((currentDay === 6 && currentHour >= 18) || (currentDay === 0 && currentHour >= 6)) {
+                    upcomingSaturday = thisSaturday.clone().add(7, 'days').format('YYYY-MM-DD');
+                } else {
+                    upcomingSaturday = thisSaturday.format('YYYY-MM-DD');
+                }
+            }
+            
+            // Mark scheduled entries ONLY for upcoming Saturday
+            schedule.forEach(s => {
+                const scheduleDate = moment(s.tanggal).format('YYYY-MM-DD');
+                if (s.status === 'scheduled' && 
+                    wargaWithReschedule.has(s.warga_id) &&
+                    scheduleDate === upcomingSaturday) {
+                    s.hasRecentReschedule = true;
+                }
+            });
+        }
+        
         const teams = await Ronda.getTeams();
 
         const groupedSchedule = {};
@@ -512,12 +565,17 @@ exports.control = async (req, res) => {
     try {
         await Ronda.autoProcessLateSchedules();
 
-        const month = req.query.month || moment().format('MM');
         const year = req.query.year || moment().format('YYYY');
 
-        // Determine Saturdays
-        const startDate = moment(`${year}-${month}-01`, 'YYYY-MM-DD');
-        const endDate = startDate.clone().endOf('month');
+        // Generate schedule for all months in the year
+        for (let month = 1; month <= 12; month++) {
+            const monthStr = String(month).padStart(2, '0');
+            await Ronda.generateSchedule(monthStr, year);
+        }
+
+        // Determine ALL Saturdays in the year
+        const startDate = moment(`${year}-01-01`, 'YYYY-MM-DD');
+        const endDate = moment(`${year}-12-31`, 'YYYY-MM-DD');
         const saturdays = [];
         let day = startDate.clone();
         while (day <= endDate) {
@@ -525,10 +583,31 @@ exports.control = async (req, res) => {
             day.add(1, 'days');
         }
 
-        // Get All Warga Wajib Ronda (Only Heads of Family) - Sorted by Block and House Number
-        const [warga] = await db.query("SELECT id, nama, blok, nomor_rumah, tim_ronda FROM warga WHERE is_ronda = 1 AND status_keluarga = 'Kepala Keluarga' ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC");
+        // Get All Warga Wajib Ronda (Only Heads of Family) - Exclude Tim '-'
+        const [warga] = await db.query(`
+            SELECT id, nama, blok, nomor_rumah, tim_ronda 
+            FROM warga 
+            WHERE is_ronda = 1 
+            AND status_keluarga = 'Kepala Keluarga'
+            AND tim_ronda IS NOT NULL 
+            AND tim_ronda != '-' 
+            AND tim_ronda != ''
+        `);
 
-        // Get Schedules for this month
+        // Sort by Tim Ronda (ASC) then House Number (ASC)
+        warga.sort((a, b) => {
+            // Sort by Tim Ronda
+            const timA = a.tim_ronda || 'Z';
+            const timB = b.tim_ronda || 'Z';
+            if (timA !== timB) return timA.localeCompare(timB);
+            
+            // Then by house number
+            const aRumah = parseInt(a.nomor_rumah);
+            const bRumah = parseInt(b.nomor_rumah);
+            return aRumah - bRumah;
+        });
+
+        // Get Schedules for this year
         const [schedules] = await db.query(`
             SELECT * FROM ronda_jadwal 
             WHERE tanggal BETWEEN ? AND ?
@@ -555,7 +634,6 @@ exports.control = async (req, res) => {
 
         res.render('ronda/control_v2', {
             title: 'Control Ronda / Absensi',
-            month,
             year,
             saturdays,
             matrix,
@@ -614,8 +692,27 @@ exports.exportControl = async (req, res) => {
             day.add(7, 'days'); // Optimization: add 7 days instead of 1
         }
 
-        // Get All Warga Wajib Ronda
-        const [warga] = await db.query("SELECT id, nama, blok, nomor_rumah, tim_ronda FROM warga WHERE is_ronda = 1 AND status_keluarga = 'Kepala Keluarga' ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC");
+        // Get All Warga Wajib Ronda - Exclude Tim '-'
+        const [warga] = await db.query(`
+            SELECT id, nama, blok, nomor_rumah, tim_ronda 
+            FROM warga 
+            WHERE is_ronda = 1 
+            AND status_keluarga = 'Kepala Keluarga'
+            AND tim_ronda IS NOT NULL 
+            AND tim_ronda != '-' 
+            AND tim_ronda != ''
+        `);
+
+        // Sort by Tim Ronda (ASC) then House Number (ASC)
+        warga.sort((a, b) => {
+            const timA = a.tim_ronda || 'Z';
+            const timB = b.tim_ronda || 'Z';
+            if (timA !== timB) return timA.localeCompare(timB);
+            
+            const aRumah = parseInt(a.nomor_rumah);
+            const bRumah = parseInt(b.nomor_rumah);
+            return aRumah - bRumah;
+        });
 
         // Get Schedules for this wide range
         const [schedules] = await db.query(`
@@ -655,7 +752,8 @@ exports.exportControl = async (req, res) => {
             { header: 'Tim', key: 'tim', width: 10 },
             { header: 'Total Denda', key: 'total', width: 15 },
             { header: 'Sudah Bayar', key: 'paid', width: 15 },
-            { header: 'Terhutang', key: 'unpaid', width: 15 }
+            { header: 'Terhutang', key: 'unpaid', width: 15 },
+            { header: 'Tidak Hadir', key: 'absent', width: 15 }
         ];
 
         saturdays.forEach(s => {
@@ -664,9 +762,9 @@ exports.exportControl = async (req, res) => {
         
         worksheet.columns = columns;
 
-        // Freeze Panes (First 7 columns + Header Row)
+        // Freeze Panes (First 8 columns + Header Row)
         worksheet.views = [
-            { state: 'frozen', xSplit: 7, ySplit: 1 }
+            { state: 'frozen', xSplit: 8, ySplit: 1 }
         ];
 
         // Style Header Row
@@ -693,6 +791,7 @@ exports.exportControl = async (req, res) => {
             let totalDenda = 0;
             let totalPaid = 0;
             let totalUnpaid = 0;
+            let totalAbsent = 0;
             const dateStatuses = {};
 
             saturdays.forEach(d => {
@@ -701,6 +800,7 @@ exports.exportControl = async (req, res) => {
                 if (cell.status) {
                     statusText = cell.status.toUpperCase();
                     if (cell.status === 'alpa' && cell.denda > 0) statusText = 'DENDA';
+                    if (cell.status === 'alpa') totalAbsent++;
                 }
                 
                 if (cell.denda > 0) {
@@ -721,7 +821,8 @@ exports.exportControl = async (req, res) => {
                 row.info.tim_ronda || '-',
                 totalDenda > 0 ? `Rp ${totalDenda.toLocaleString('id-ID')}` : '-',
                 totalPaid > 0 ? `Rp ${totalPaid.toLocaleString('id-ID')}` : '-',
-                totalUnpaid > 0 ? `Rp ${totalUnpaid.toLocaleString('id-ID')}` : '-'
+                totalUnpaid > 0 ? `Rp ${totalUnpaid.toLocaleString('id-ID')}` : '-',
+                totalAbsent > 0 ? `${totalAbsent}x` : '-'
             ];
 
             // Add date columns

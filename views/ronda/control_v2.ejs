@@ -1,8 +1,29 @@
 <%- include('../partials/head') %>
+    <style>
+        /* Custom soft colors for dark mode sticky columns */
+        .dark .bg-gray-soft { background-color: rgb(75 75 75); }
+        .dark .bg-gray-medium { background-color: rgb(60 60 60); }
+        
+        .dark .bg-green-soft { background-color: rgb(67 94 77); }
+        .dark .bg-blue-soft { background-color: rgb(67 84 94); }
+        .dark .bg-red-soft { background-color: rgb(94 67 67); }
+        .dark .bg-orange-soft { background-color: rgb(94 80 67); }
+        
+        .dark .bg-green-medium { background-color: rgb(45 75 55); }
+        .dark .bg-blue-medium { background-color: rgb(45 65 75); }
+        .dark .bg-red-medium { background-color: rgb(75 45 45); }
+        .dark .bg-orange-medium { background-color: rgb(75 60 45); }
+        
+        /* Dropdown Contrast Fix for Dark Mode */
+        .dark select option {
+            background-color: #1f2937;
+            color: #f3f4f6;
+        }
+    </style>
     <%- include('../partials/navbar', { useWideContainer: true, user: user }) %>
 
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div class="px-4 py-6 sm:px-0">
+        <div class="mx-auto py-6 px-2 sm:px-4 lg:px-6">
+            <div class="py-6">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <div class="flex items-center space-x-4">
                         <a href="/ronda" class="text-gray-600 dark:text-gray-400 hover:text-gray-200 transition-colors">
@@ -31,12 +52,11 @@
                             </a>
                         </div>
 
-                        <div class="glass-card p-3 flex items-center space-x-2">
-                            <% let prevM=parseInt(month) - 1; let prevY=parseInt(year); if(prevM===0) { prevM=12; prevY--; }
-                                let nextM=parseInt(month) + 1; let nextY=parseInt(year); if(nextM===13) { nextM=1; nextY++;
-                                } %>
+                        <div class="glass-card p-4 flex items-center justify-between">
+                            <% let prevY=parseInt(year) - 1;
+                                let nextY=parseInt(year) + 1; %>
     
-                                <a href="/ronda/control?month=<%= prevM %>&year=<%= prevY %>"
+                                <a href="/ronda/control?year=<%= prevY %>"
                                     class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,24 +64,11 @@
                                     </svg>
                                 </a>
     
-                                <form method="GET" class="flex space-x-2">
-                                    <select name="month" onchange="this.form.submit()"
-                                        class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
-                                        <% moment.months().forEach((m, i)=> { %>
-                                            <option value="<%= String(i + 1).padStart(2, '0') %>" <%=parseInt(month)===i + 1
-                                                ? 'selected' : '' %>><%= m %>
-                                            </option>
-                                            <% }) %>
-                                    </select>
-                                    <select name="year" onchange="this.form.submit()"
-                                        class="glass-input block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 rounded-xl cursor-pointer">
-                                        <% for(let y=2024; y <=2030; y++) { %>
-                                            <option value="<%= y %>" <%=parseInt(year)===y ? 'selected' : '' %>><%= y %>
-                                            </option>
-                                            <% } %>
-                                    </select>
-                                </form>
-                                <a href="/ronda/control?month=<%= nextM %>&year=<%= nextY %>"
+                                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                    Tahun <%= year %>
+                                </h2>
+                                
+                                <a href="/ronda/control?year=<%= nextY %>"
                                     class="p-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg text-gray-600 dark:text-gray-300 transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -72,14 +79,17 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-0 overflow-hidden m-4">
+                <div class="glass-card p-0 overflow-hidden mx-2 sm:mx-4 lg:mx-6">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-white/10">
                             <thead class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl">
                                 <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider sticky left-0 bg-gray-200 dark:bg-white/10 backdrop-blur-xl z-10 border-r border-white/10">
-                                        Warga
+                                    <th scope="col" onclick="sortTable(0, 'string')"
+                                        class="px-2 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider sticky left-0 bg-gray-100 bg-gray-soft z-20 border-r border-gray-300 dark:border-gray-700 cursor-pointer group hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="flex items-center justify-between">
+                                            Warga
+                                            <span class="sort-icon ml-1 text-gray-900 dark:text-white">↑</span>
+                                        </div>
                                     </th>
                                     <% 
                                     // Determine active Saturday (current week's Saturday)
@@ -97,32 +107,103 @@
                                         activeSaturday = startOfWeek.clone().add(6, 'days').format('YYYY-MM-DD');
                                     }
                                     
+                                    %>
+                                    <th scope="col" onclick="sortTable(1, 'number')"
+                                        class="table-cell sm:hidden px-1 py-3 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-green-100 bg-green-soft w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Total</span>
+                                            <span>Denda</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(2, 'number')"
+                                        class="table-cell sm:hidden px-1 py-3 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-blue-100 bg-blue-soft w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Sudah</span>
+                                            <span>Bayar</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(3, 'number')"
+                                        class="table-cell sm:hidden px-1 py-3 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-red-100 bg-red-soft w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Ter-</span>
+                                            <span>hutang</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(4, 'number')"
+                                        class="table-cell sm:hidden px-1 py-3 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-orange-100 bg-orange-soft w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Tidak</span>
+                                            <span>Hadir</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <% 
                                     saturdays.forEach(d=> { 
                                         const isActive = d === activeSaturday;
                                     %>
                                         <th scope="col"
-                                            class="px-6 py-3 text-center text-xs font-medium <%= isActive ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200 border-x-2 border-indigo-400' : 'text-gray-700 dark:text-gray-300' %> uppercase tracking-wider">
-                                            <%= moment(d).format('DD MMM') %>
+                                        class="px-2 py-2 sm:px-6 sm:py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider min-w-[120px] <%= isActive ? 'bg-indigo-50 dark:bg-indigo-900/40 border-b-2 border-indigo-500' : '' %>">
+                                        <div class="mb-1">Tgl <%= moment(d).format('DD') %></div>
+                                        <div class="text-[10px] text-gray-500 dark:text-gray-400">
+                                            <%= moment(d).format('MMM') %>
+                                        </div>
                                             <% if (isActive) { %>
-                                                <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">● AKTIF</div>
+                                                <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">● Upcoming</div>
                                             <% } %>
                                         </th>
                                         <% }) %>
+                                        
+                                    <!-- Desktop Sticky Columns -->
+                                    <th scope="col" onclick="sortTable(-4, 'number')"
+                                        class="hidden sm:table-cell px-1 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-green-100 bg-green-soft border-l-2 border-green-400 sm:sticky sm:right-[270px] z-10 w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Total</span>
+                                            <span>Denda</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(-3, 'number')"
+                                        class="hidden sm:table-cell px-1 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-blue-100 bg-blue-soft sm:sticky sm:right-[180px] z-10 w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Sudah</span>
+                                            <span>Bayar</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(-2, 'number')"
+                                        class="hidden sm:table-cell px-1 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-red-100 bg-red-soft sm:sticky sm:right-[90px] z-10 w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Ter-</span>
+                                            <span>hutang</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" onclick="sortTable(-1, 'number')"
+                                        class="hidden sm:table-cell px-1 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-orange-100 bg-orange-soft sm:sticky sm:right-0 z-10 w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
+                                        <div class="flex flex-col items-center justify-center leading-tight">
+                                            <span>Tidak</span>
+                                            <span>Hadir</span>
+                                            <span class="sort-icon text-gray-400/70 group-hover:text-gray-600 mt-0.5">⇵</span>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-gray-100 dark:bg-white/5 backdrop-blur-xl divide-y divide-white/10">
+                            <tbody class="bg-gray-100 dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                 <% Object.keys(matrix).forEach(wId=> {
                                     const row = matrix[wId];
                                     %>
-                                    <tr class="hover:bg-gray-200 dark:bg-white/10 transition-colors">
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap sticky left-0 bg-gray-200 dark:bg-white/10 backdrop-blur-xl z-10 border-r border-white/10">
+                                    <tr class="hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                                        <td data-tim="<%= row.info.tim_ronda %>"
+                                            class="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap sticky left-0 bg-gray-100 bg-gray-soft z-20 border-r border-gray-300 dark:border-gray-700">
                                             <div class="flex items-center">
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    <div class="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">
                                                         <%= row.info.nama %>
                                                     </div>
-                                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                                    <div class="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
                                                         Blok <%= row.info.blok %>-<%= row.info.nomor_rumah %>
                                                                 <span
                                                                     class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
@@ -133,11 +214,55 @@
                                             </div>
                                         </td>
                                         <% 
+                                            // Calculate totals for this warga
+                                            let totalDenda = 0;
+                                            let sudahBayar = 0;
+                                            let terhutang = 0;
+                                            let tidakHadir = 0;
+                                            
+                                            saturdays.forEach(d => {
+                                                const cell = row.dates[d];
+                                                if (cell.status === 'alpa') {
+                                                    tidakHadir++;
+                                                }
+                                                if (cell.denda > 0) {
+                                                    totalDenda += cell.denda;
+                                                    if (cell.status_bayar === 'paid') {
+                                                        sudahBayar += cell.denda;
+                                                    } else {
+                                                        terhutang += cell.denda;
+                                                    }
+                                                }
+                                            });
+                                        %>
+                                        
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-green-50 bg-green-soft w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-gray-900 dark:text-gray-100 text-[10px] sm:text-xs">
+                                                <%= totalDenda > 0 ? 'Rp ' + totalDenda.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-blue-50 bg-blue-soft w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= sudahBayar > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= sudahBayar > 0 ? 'Rp ' + sudahBayar.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-red-50 bg-red-soft w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= terhutang > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= terhutang > 0 ? 'Rp ' + terhutang.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-orange-50 bg-orange-soft w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= tidakHadir > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= tidakHadir > 0 ? tidakHadir + 'x' : '-' %>
+                                            </span>
+                                        </td>
+
+                                        <% 
                                             saturdays.forEach((d, satIndex)=> {
                                             const cell = row.dates[d];
                                             const isActiveColumn = d === activeSaturday;
                                             
-                                            let tdClasses = "px-6 py-4 whitespace-nowrap text-center text-sm relative ";
+                                            let tdClasses = "px-1 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-center text-sm relative ";
                                             
                                             // Active column highlighting
                                             if (isActiveColumn) {
@@ -155,7 +280,7 @@
         data-date="<%= moment(d).format('DD MMM YYYY') %>"
         data-keterangan="<%= cell.keterangan || '' %>"
         onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
-        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>"
+        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>"
         title="Klik untuk ubah status">
         <%= cell.status %>
     </span>
@@ -186,8 +311,112 @@
                                                         </div>
                                                     </td>
                                                     <% }) %>
+                                                    
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-green-50 bg-green-soft border-l-2 border-green-400 sm:sticky sm:right-[270px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-gray-900 dark:text-gray-100 text-[10px] sm:text-xs">
+                                                <%= totalDenda > 0 ? 'Rp ' + totalDenda.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-blue-50 bg-blue-soft sm:sticky sm:right-[180px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= sudahBayar > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= sudahBayar > 0 ? 'Rp ' + sudahBayar.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-red-50 bg-red-soft sm:sticky sm:right-[90px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= terhutang > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= terhutang > 0 ? 'Rp ' + terhutang.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-orange-50 bg-orange-soft sm:sticky sm:right-0 z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold <%= tidakHadir > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400' %> text-[10px] sm:text-xs">
+                                                <%= tidakHadir > 0 ? tidakHadir + 'x' : '-' %>
+                                            </span>
+                                        </td>                 
                                     </tr>
                                     <% }) %>
+                                    
+                                    <!-- Grand Total Row -->
+                                    <tr class="bg-gray-200 dark:bg-white/20 font-bold border-t-2 border-gray-400">
+                                        <td class="px-2 py-2 sm:px-6 sm:py-4 whitespace-nowrap sticky left-0 bg-gray-200 bg-gray-medium z-20 border-r border-gray-300 dark:border-gray-600">
+                                            <div class="text-[10px] sm:text-sm font-bold text-gray-900 dark:text-gray-100 uppercase">
+                                                GRAND TOTAL
+                                            </div>
+                                        </td>
+                                        <% 
+                                            // Calculate grand totals
+                                            let grandTotalDenda = 0;
+                                            let grandSudahBayar = 0;
+                                            let grandTerhutang = 0;
+                                            let grandTidakHadir = 0;
+                                            
+                                            Object.keys(matrix).forEach(wId => {
+                                                const row = matrix[wId];
+                                                saturdays.forEach(d => {
+                                                    const cell = row.dates[d];
+                                                    if (cell.status === 'alpa') {
+                                                        grandTidakHadir++;
+                                                    }
+                                                    if (cell.denda > 0) {
+                                                        grandTotalDenda += cell.denda;
+                                                        if (cell.status_bayar === 'paid') {
+                                                            grandSudahBayar += cell.denda;
+                                                        } else {
+                                                            grandTerhutang += cell.denda;
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                        %>
+                                        
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-green-100 bg-green-medium border-l-2 border-green-400 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-gray-900 dark:text-gray-100">
+                                                <%= grandTotalDenda > 0 ? 'Rp ' + grandTotalDenda.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-blue-100 bg-blue-medium w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-blue-600 dark:text-blue-400">
+                                                <%= grandSudahBayar > 0 ? 'Rp ' + grandSudahBayar.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-red-100 bg-red-medium w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-red-600 dark:text-red-400">
+                                                <%= grandTerhutang > 0 ? 'Rp ' + grandTerhutang.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="table-cell sm:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-orange-100 bg-orange-medium w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-orange-600 dark:text-orange-400">
+                                                <%= grandTidakHadir > 0 ? grandTidakHadir + 'x' : '-' %>
+                                            </span>
+                                        </td>
+
+                                        <% 
+                                            // Empty cells for Saturday columns
+                                            saturdays.forEach(d => {
+                                        %>
+                                            <td class="px-6 py-4"></td>
+                                        <% }) %>
+                                        
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-green-100 bg-green-medium border-l-2 border-green-400 sm:sticky sm:right-[270px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-gray-900 dark:text-gray-100">
+                                                <%= grandTotalDenda > 0 ? 'Rp ' + grandTotalDenda.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-blue-100 bg-blue-medium sm:sticky sm:right-[180px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-blue-600 dark:text-blue-400">
+                                                <%= grandSudahBayar > 0 ? 'Rp ' + grandSudahBayar.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-red-100 bg-red-medium sm:sticky sm:right-[90px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-red-600 dark:text-red-400">
+                                                <%= grandTerhutang > 0 ? 'Rp ' + grandTerhutang.toLocaleString('id-ID') : '-' %>
+                                            </span>
+                                        </td>
+                                        <td class="hidden sm:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-orange-100 bg-orange-medium sm:sticky sm:right-0 z-10 w-[90px] min-w-[90px] max-w-[90px]">
+                                            <span class="font-bold text-[10px] sm:text-sm text-orange-600 dark:text-orange-400">
+                                                <%= grandTidakHadir > 0 ? grandTidakHadir + 'x' : '-' %>
+                                            </span>
+                                        </td>
+                                    </tr>
                             </tbody>
                         </table>
                     </div>
@@ -251,7 +480,7 @@
                 </h3>
                 <form action="/ronda/update-status" method="POST">
                     <input type="hidden" id="statusScheduleId" name="id">
-                    <input type="hidden" name="redirectUrl" value="/ronda/control?month=<%= month %>&year=<%= year %>">
+                    <input type="hidden" name="redirectUrl" value="/ronda/control?year=<%= year %>">
                     
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nama Warga</label>
@@ -261,11 +490,11 @@
 
                     <div class="mb-5">
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status Kehadiran</label>
-                        <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500">
-                            <option value="scheduled" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Scheduled (Reset)</option>
-                            <option value="hadir" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Hadir</option>
-                            <option value="alpa" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Alpa (Denda)</option>
-                            <option value="reschedule" class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">Reschedule</option>
+                        <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 border border-gray-200 dark:border-gray-700 dark:[color-scheme:dark]">
+                            <option value="scheduled">Scheduled (Reset)</option>
+                            <option value="hadir">Hadir</option>
+                            <option value="alpa">Alpa (Denda)</option>
+                            <option value="reschedule">Reschedule</option>
                         </select>
                     </div>
                     
@@ -283,6 +512,98 @@
         </div>
 
         <script>
+            let sortDirection = 1; // 1 asc, -1 desc
+            let lastColIndex = -1; // Reset to -1 to ensure first click or auto-sort triggers ASC
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Force sort by Warga (Tim Ronda) ASC on load
+                sortTable(0, 'string');
+            });
+
+            function sortTable(colIndexRelative, type) {
+                const table = document.querySelector('table');
+                const tbody = table.querySelector('tbody');
+                // All rows except the last one (Grand Total)
+                const rows = Array.from(tbody.querySelectorAll('tr')).slice(0, -1);
+                // The Grand Total row (to insert before)
+                const grandTotalRow = tbody.querySelector('tr:last-child');
+                const headerRow = table.querySelector('thead tr');
+                
+                // Calculate absolute column index
+                // For negative index, it counts from the end
+                let colIndex = colIndexRelative;
+                if (colIndexRelative < 0) {
+                    // Total columns in the header row
+                    const totalCols = headerRow.children.length;
+                    colIndex = totalCols + colIndexRelative;
+                }
+
+                // Toggle logic
+                if (lastColIndex === colIndex) {
+                    sortDirection *= -1;
+                } else {
+                    sortDirection = 1;
+                    lastColIndex = colIndex;
+                }
+
+                // Reset all icons
+                document.querySelectorAll('.sort-icon').forEach(icon => {
+                    icon.textContent = '⇵';
+                    icon.classList.remove('text-gray-900', 'dark:text-white', 'text-gray-400');
+                    icon.classList.add('text-gray-400');
+                });
+                
+                // Update active icon
+                const targetHeader = headerRow.children[colIndex];
+                if(targetHeader) {
+                    const icon = targetHeader.querySelector('.sort-icon');
+                    if(icon) {
+                        icon.textContent = sortDirection === 1 ? '↑' : '↓';
+                        icon.classList.remove('text-gray-400');
+                        icon.classList.add('text-gray-900', 'dark:text-white');
+                    }
+                }
+
+                // Sort rows
+                rows.sort((a, b) => {
+                    const cellA = a.children[colIndex];
+                    const cellB = b.children[colIndex];
+                    
+                    if (!cellA || !cellB) return 0;
+
+                    const valA = getCellValue(cellA, type);
+                    const valB = getCellValue(cellB, type);
+                    
+                    if (valA < valB) return -1 * sortDirection;
+                    if (valA > valB) return 1 * sortDirection;
+                    return 0;
+                });
+
+                // Re-append sorted rows
+                rows.forEach(row => tbody.insertBefore(row, grandTotalRow));
+            }
+
+            function getCellValue(cell, type) {
+                // Priority: Custom sort attribute for Tim Ronda (Warga column)
+                if (cell.hasAttribute('data-tim')) {
+                    const val = cell.getAttribute('data-tim');
+                    // Put empty values at the end when ascending ('z')
+                    return val ? val.toLowerCase() : 'z';
+                }
+
+                let text = cell.innerText.trim(); 
+                
+                if (type === 'number') {
+                    // Remove 'Rp', '.', ' ', 'x', '-'
+                    const cleanText = text.replace(/[^0-9-]/g, ''); 
+                    if (!cleanText || cleanText === '-') return 0;
+                    return parseInt(cleanText, 10);
+                }
+                
+                // Fallback for other string columns
+                return text.toLowerCase();
+            }
+
             function openStatusModal(id, currentStatus, name, date, keterangan) {
                 document.getElementById('statusScheduleId').value = id;
                 document.getElementById('statusWargaName').textContent = name;
@@ -334,7 +655,7 @@
                         </div>
                         <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-4">
                             <input type="hidden" name="id" id="qrisFineId">
-                            <input type="hidden" name="redirectUrl" value="/ronda/control?month=<%= month %>&year=<%= year %>">
+                            <input type="hidden" name="redirectUrl" value="/ronda/control?year=<%= year %>">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Bukti Transfer</label>
                                 <input type="file" name="foto_bukti" accept="image/*" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">

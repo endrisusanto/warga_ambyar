@@ -1,5 +1,9 @@
 <%- include('../partials/head') %>
     <%- include('../partials/navbar') %>
+    <style>
+        /* Fix select option visibility in dark mode */
+        .dark select option { background-color: #1f2937; color: #f3f4f6; }
+    </style>
         <% function safeJson(obj) { if (!obj) return 'null' ; return JSON.stringify(obj).replace(/"/g, '&quot;' ); } %>
 
             <div class="glass-card">
@@ -41,8 +45,9 @@
                             class="hidden md:flex w-full md:w-auto mt-2 md:mt-0 flex-col md:flex-row gap-2">
                             <div class="grid grid-cols-1 md:flex md:items-center gap-2 md:space-x-2">
                                 <!-- Year Filter -->
+                                <!-- Year Filter -->
                                 <select onchange="window.location.href='/iuran?year='+this.value"
-                                    class="glass-input w-full md:w-auto rounded-lg text-sm py-2 px-3 cursor-pointer">
+                                    class="glass-input w-full md:w-auto rounded-lg text-sm py-2 px-3 cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 dark:[color-scheme:dark]">
                                     <% for(let y=2024; y<=parseInt(moment().format('YYYY')) + 1; y++) { %>
                                         <option value="<%= y %>" <%=y==year ? 'selected' : '' %>><%= y %>
                                         </option>
@@ -79,7 +84,7 @@
                                     </button>
 
                                     <div id="export-dropdown"
-                                        class="hidden origin-top-right absolute right-0 mt-2 w-36 rounded-xl shadow-2xl bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden"
+                                        class="hidden origin-top-right absolute right-0 mt-2 w-36 rounded-xl shadow-2xl bg-white/95 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden"
                                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
                                         tabindex="-1">
                                         <div class="py-1" role="none">
@@ -105,7 +110,19 @@
                                 </div>
 
                                 <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
-                                    <form action="/iuran/generate" method="POST" class="w-full md:w-auto">
+                                    <form action="/iuran/generate" method="POST" class="w-full md:w-auto flex gap-2 items-center">
+                                        <select name="month" class="glass-input rounded-lg text-sm py-2 px-3 cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 dark:[color-scheme:dark]">
+                                            <% 
+                                            // Generate options for last 3 months and next 2 months
+                                            for(let i = -3; i <= 2; i++) {
+                                                const m = moment().add(i, 'months');
+                                                const value = m.format('YYYY-MM');
+                                                const label = m.format('MMMM YYYY');
+                                                const selected = i === 0 ? 'selected' : '';
+                                            %>
+                                                <option value="<%= value %>" <%= selected %>><%= label %></option>
+                                            <% } %>
+                                        </select>
                                         <button type="submit"
                                             class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 transition-colors border border-white/10">
                                             Generate
