@@ -346,7 +346,7 @@
                                                                             const j = item.jenis === 'kas_rt' ? 'Kas RT' : item.jenis === 'kas_gang' ? 'Kas Gang' : item.jenis === 'sampah' ? 'Sampah' : item.jenis;
                                                                             msg += `- ${moment(item.periode).format('MMM YYYY')} (${j}): Rp ${parseInt(item.jumlah).toLocaleString('id-ID')}\n`;
                                                                         });
-                                                                        msg += `\n*Total: Rp ${house.total.toLocaleString('id-ID')}*\n\nMohon segera dilunasi. Terima kasih.`;
+                                                                        msg += `\n*Total: Rp ${house.total.toLocaleString('id-ID')}*\n\nMohon segera dilunasi.\nLink Pembayaran: https://gang.ambyar.biz.id/iuran/pay\nTerima kasih.`;
                                                                         const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
                                                                     %>
                                                                         <a href="<%= waUrl %>" target="_blank"
