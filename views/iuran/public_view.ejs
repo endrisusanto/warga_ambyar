@@ -188,9 +188,37 @@
                 navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
             }
             function shareWa() {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent('Cek Detail Pembayaran Iuran Warga Ambyar');
-                window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+                <% if (typeof data !== 'undefined' && data) { %>
+                    // Build payment types list
+                    const paymentTypes = [];
+                    <% related.forEach(item => { 
+                        const type = (item.jenis === 'keamanan' || item.jenis === 'kas' || item.jenis === 'kas_rt') ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                    %>
+                        paymentTypes.push('<%= type %>');
+                    <% }) %>
+                    
+                    const uniqueTypes = [...new Set(paymentTypes)].join(' & ');
+                    
+                    // Get period from first related item
+                    <% if (related.length > 0) { %>
+                        const period = '<%= moment(related[0].periode).locale("id").format("MMM YY") %>';
+                    <% } else { %>
+                        const period = 'bulan ini';
+                    <% } %>
+                    
+                    const nama = '<%= data.nama %>';
+                    const blok = '<%= data.blok %>';
+                    const nomor = '<%= data.nomor_rumah %>';
+                    
+                    const message = `Halo Pak Ketu,\nSaya ${nama} (${blok}/${nomor}) sudah melakukan pembayaran iuran ${uniqueTypes} untuk bulan: ${period}.\nMohon verifikasi.\nTerima kasih.\n\nDetail: ${window.location.href}`;
+                    
+                    const encodedMessage = encodeURIComponent(message);
+                    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+                <% } else { %>
+                    const url = encodeURIComponent(window.location.href);
+                    const text = encodeURIComponent('Cek Detail Pembayaran Iuran Warga Ambyar');
+                    window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+                <% } %>
             }
         </script>
 
