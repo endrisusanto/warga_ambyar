@@ -1,0 +1,199 @@
+<%- include('../partials/head') %>
+    <title>
+        <%= title %>
+    </title>
+    <meta property="og:title" content="<%= title %>">
+    <meta property="og:description" content="Bukti pembayaran iuran warga.">
+    <% if(ogImage) { %>
+        <meta property="og:image" content="<%= ogImage %>">
+        <meta property="og:image:url" content="<%= ogImage %>">
+        <meta property="og:image:secure_url" content="<%= ogImage %>">
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:image:width" content="600">
+        <meta property="og:image:height" content="800">
+    <% } %>
+    </head>
+
+    <body class="bg-white min-h-screen text-gray-900 font-sans selection:bg-emerald-500 selection:text-white">
+
+        <!-- Background Effects -->
+        <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-400/20 blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-400/20 blur-[100px]"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen">
+
+            <div class="w-full text-center mb-8">
+                <h1
+                    class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-cyan-500 drop-shadow-sm mb-2">
+                    <%= title %>
+                </h1>
+                <p class="text-gray-500 text-sm font-medium">
+                    <%= dateLabel %>
+                </p>
+            </div>
+
+            <div class="w-full p-4 sm:p-8 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-white relative">
+
+                <% if (typeof data !== 'undefined' && data) { %>
+                    <!-- Detail Pembayaran Header -->
+                    <div class="p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4 text-center">Detail Pembayaran</h3>
+                        
+                        <!-- Warga Info -->
+                        <div class="text-center mb-6">
+                            <p class="text-sm text-gray-700">Warga: <%= data.nama %> (Blok <%= data.blok %>-<%= data.nomor_rumah %>)</p>
+                            <% if (payer) { %>
+                                <div class="text-xs text-emerald-400 mt-1 font-bold">(Dibayar oleh: <%= payer %>)</div>
+                            <% } %>
+                        </div>
+
+                        <!-- Timeline (Only if Bayar exists) -->
+                        <% if(data.tanggal_bayar) { %>
+                            <div class="py-2 flex justify-center mb-4">
+                                <div class="flex items-center bg-gray-200 rounded-full px-1 py-1">
+                                    <!-- Bayar Pill -->
+                                    <div class="flex items-center gap-2 px-3 py-1">
+                                        <span class="text-xs text-gray-600 font-bold uppercase tracking-wider">Bayar</span>
+                                        <span class="text-xs text-gray-700"><%= moment(data.tanggal_bayar).locale('id').format('D MMM YYYY, HH:mm') %></span>
+                                    </div>
+                                    
+                                    <% if (data.tanggal_konfirmasi) { %>
+                                        <!-- Arrow -->
+                                        <div class="px-1 text-gray-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </div>
+                                        <!-- Approved Pill -->
+                                        <div class="flex items-center gap-2 px-3 py-1 bg-emerald-100 rounded-full border border-emerald-200">
+                                            <span class="text-xs text-emerald-700 font-bold uppercase tracking-wider">Approved</span>
+                                            <span class="text-xs text-emerald-600 font-medium"><%= moment(data.tanggal_konfirmasi).locale('id').format('D MMM YYYY, HH:mm') %></span>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <!-- Status Badge -->
+                        <div class="flex items-center gap-2 justify-center mb-6">
+                            <% if(data.status === 'lunas') { %>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
+                            <% } else if(data.status === 'menunggu_konfirmasi') { %>
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200">MENUNGGU KONFIRMASI</span>
+                            <% } else { %>
+                                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200 uppercase"><%= data.status %></span>
+                            <% } %>
+                        </div>
+
+                        <!-- Payment Method Badge -->
+                        <% if(data.metode_pembayaran) { %>
+                            <div class="flex items-center gap-2 justify-center mb-6">
+                                <% if(data.metode_pembayaran === 'DANA') { %>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#118EE9]/20 text-[#118EE9] border border-[#118EE9]/30"><%= data.metode_pembayaran %></span>
+                                <% } else if(data.metode_pembayaran === 'QRIS') { %>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"><%= data.metode_pembayaran %></span>
+                                <% } else if(data.metode_pembayaran === 'Tunai') { %>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-600 border border-amber-500/30"><%= data.metode_pembayaran %></span>
+                                <% } %>
+                            </div>
+                        <% } %>
+
+                        <!-- Proof & Related -->
+                        <% if(data.bukti_bayar) { %>
+                            <div class="border border-gray-200 rounded p-2 bg-gray-50">
+                                <p class="text-xs font-bold mb-2 text-gray-700">Bukti Transfer:</p>
+                                <img src="/uploads/<%= data.bukti_bayar %>" class="w-full object-contain max-h-96 rounded mb-2">
+                                <a href="/uploads/<%= data.bukti_bayar %>" target="_blank" class="block text-gray-600 text-xs hover:underline text-center mb-4">Lihat Ukuran Penuh</a>
+
+                                <!-- Related Transactions List -->
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <p class="text-xs font-bold mb-2 text-emerald-400">Transaksi Terkait:</p>
+                                    <div class="space-y-1">
+                                        <% related.forEach(item => { 
+                                             const type = (item.jenis === 'keamanan' || item.jenis === 'kas' || item.jenis === 'kas_rt') ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                                             const date = moment(item.periode).locale('id').format('MMM YY');
+                                        %>
+                                            <div class="flex justify-between text-xs text-gray-700">
+                                                <span><%= type %> - <%= date %></span>
+                                                <span class="font-bold text-emerald-400">Rp <%= parseInt(item.jumlah).toLocaleString('id-ID') %></span>
+                                            </div>
+                                        <% }) %>
+                                        
+                                        <div class="flex justify-between text-xs font-bold text-gray-900 pt-1 border-t border-gray-200 mt-1">
+                                            <span>Total</span>
+                                            <span>Rp <%= total.toLocaleString('id-ID') %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% } else { %>
+                    <!-- Fallback: Image Snapshot (if data is minimal or undefined) -->
+                     <% if(typeof image !== 'undefined') { %>
+                        <div class="rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-gray-50">
+                            <img src="<%= image %>" class="w-full h-auto object-contain" alt="Bukti Pembayaran">
+                        </div>
+                     <% } %>
+                <% } %>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                    <button onclick="copyLink()"
+                        class="flex-1 flex justify-center items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:text-gray-900 transition-all">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        Copy Link
+                    </button>
+                    <button onclick="shareWa()"
+                        class="flex-1 flex justify-center items-center px-4 py-3 bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-500/50 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-emerald-900/20 backdrop-blur-sm">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        Share WA
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Home Button & Footer -->
+            <div class="mt-8 flex flex-col items-center gap-4">
+                <a href="/iuran"
+                    class="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:text-gray-900 transition-all shadow-lg">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    Kembali ke Aplikasi
+                </a>
+
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium tracking-wider uppercase">
+                    <span>Powered by</span>
+                    <span
+                        class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">Warga
+                        Ambyar</span>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function copyLink() {
+                navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
+            }
+            function shareWa() {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent('Cek Detail Pembayaran Iuran Warga Ambyar');
+                window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+            }
+        </script>
+
+    </body>
+
+    </html>

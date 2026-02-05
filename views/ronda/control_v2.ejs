@@ -48,8 +48,24 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
-                                Export Excel
+                                Excel
                             </a>
+                            <button onclick="exportToImage()"
+                                class="flex items-center gap-2 px-3 py-2 text-sm font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Image
+                            </button>
+                            <button onclick="exportToCSV()"
+                                class="flex items-center gap-2 px-3 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                CSV
+                            </button>
                         </div>
 
                         <div class="glass-card p-4 flex items-center justify-between">
@@ -280,7 +296,7 @@
         data-date="<%= moment(d).format('DD MMM YYYY') %>"
         data-keterangan="<%= cell.keterangan || '' %>"
         onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
-        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'izin' ? 'bg-yellow-100 text-yellow-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'))) %>"
+        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')) %>"
         title="Klik untuk ubah status">
         <%= cell.status %>
     </span>
@@ -673,5 +689,113 @@
                 </div>
             </div>
         </div>
+
+        <script src="/js/html2canvas.min.js"></script>
+        <script>
+            function exportToImage() {
+                const tableContainer = document.querySelector('.overflow-x-auto');
+                const btn = document.querySelector('button[onclick="exportToImage()"]');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = 'Scan...';
+                
+                html2canvas(tableContainer, {
+                    scale: 2,
+                    backgroundColor: '#ffffff', // Force white background
+                    onclone: (clonedDoc) => {
+                        const table = clonedDoc.querySelector('table');
+                        const thead = table.querySelector('thead');
+                        const ths = table.querySelectorAll('th');
+                        const tds = table.querySelectorAll('td');
+                        
+                        // Force Plain Styling
+                        table.style.fontFamily = 'Arial, sans-serif';
+                        table.style.borderCollapse = 'collapse';
+                        table.style.border = '1px solid black';
+                        
+                        // Reset Heading Colors
+                        if(thead) {
+                            thead.style.background = '#f0f0f0';
+                            thead.className = ''; // Remove dark mode classes
+                        }
+
+                        ths.forEach(th => {
+                            th.style.border = '1px solid black';
+                            th.style.background = '#ffffff';
+                            th.style.color = '#000000';
+                            th.style.fontWeight = 'bold';
+                            th.className = 'px-2 py-1 text-center'; // Reset classes
+                        });
+
+                        tds.forEach(td => {
+                            td.style.border = '1px solid black';
+                            td.style.background = '#ffffff';
+                            td.style.color = '#000000';
+                            td.className = 'px-2 py-1 text-center'; // Reset classes
+                            
+                            // Keep specific text clean
+                            // Replace badges with text if needed? 
+                            // Current UI has badges. User said "plain". 
+                            // Let's keep content but force colors.
+                            
+                            // Check for badges and force them to look plain or keep as color?
+                            // "plain border hitam kolom putih" implies the structure.
+                            // Let's strictly force black text.
+                            const badges = td.querySelectorAll('span, div');
+                            badges.forEach(b => {
+                                // If badge has background, keep it? or flatten?
+                                // "tanpa styling" usually means remove colorful badges.
+                                // Let's try to keep text readable.
+                                b.style.color = '#000000';
+                                // Optional: Remove bg colors from badges
+                                // b.style.backgroundColor = 'transparent';
+                            });
+                        });
+                    }
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'Control_Ronda_<%= year %>_' + new Date().getTime() + '.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    btn.innerHTML = originalText;
+                }).catch(err => {
+                    console.error(err);
+                    alert('Gagal export image');
+                    btn.innerHTML = originalText;
+                });
+            }
+
+            function exportToCSV() {
+                const table = document.querySelector('table');
+                let csv = [];
+                
+                // Header
+                const headerRow = table.querySelector('thead tr');
+                const headers = [];
+                headerRow.querySelectorAll('th').forEach(th => {
+                    headers.push('"' + th.innerText.trim() + '"');
+                });
+                csv.push(headers.join(','));
+                
+                // Rows
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cols = [];
+                    row.querySelectorAll('td').forEach(td => {
+                        cols.push('"' + td.innerText.replace(/\n/g, ' ').trim() + '"');
+                    });
+                    csv.push(cols.join(','));
+                });
+                
+                const csvFile = new Blob([csv.join('\n')], {type: "text/csv"});
+                const downloadLink = document.createElement("a");
+                downloadLink.download = "Control_Ronda_<%= year %>.csv";
+                downloadLink.href = window.URL.createObjectURL(csvFile);
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+        </script>
 
         <%- include('../partials/footer') %>

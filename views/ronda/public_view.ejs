@@ -52,7 +52,7 @@
                                         class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center space-x-3">
                                             <div
-                                                class="w-2.5 h-2.5 rounded-full shadow-lg shadow-current <%= s.status === 'hadir' ? 'bg-emerald-500 text-emerald-500' : (s.status === 'izin' ? 'bg-yellow-400 text-yellow-400' : (s.status === 'alpa' ? 'bg-red-500 text-red-500' : 'bg-gray-500 text-gray-500')) %>">
+                                                class="w-2.5 h-2.5 rounded-full shadow-lg shadow-current <%= s.status === 'hadir' ? 'bg-emerald-500 text-emerald-500' : (s.status === 'alpa' ? 'bg-red-500 text-red-500' : 'bg-gray-500 text-gray-500') %>">
                                             </div>
                                             <div>
                                                 <div class="text-sm font-bold text-gray-900">
@@ -89,8 +89,6 @@
                                                 statusClass = 'bg-transparent border border-green-600 text-green-600';
                                             } else if (s.status === 'hadir') {
                                                 statusClass = 'bg-transparent border border-green-600 text-green-600';
-                                            } else if (s.status === 'izin') {
-                                                statusClass = 'bg-transparent border border-yellow-600 text-yellow-600';
                                             } else {
                                                 statusClass = 'bg-transparent border border-red-600 text-red-600';
                                             }
@@ -213,8 +211,6 @@
                                     statusStr = ' 💸'; // Lunas
                                 } else if (s.status === 'hadir') {
                                     statusStr = ' ✅'; // Hadir
-                                } else if (s.status === 'izin') {
-                                    statusStr = ' ⚠️'; // Izin
                                 } else if (s.status === 'alpa') {
                                     statusStr = ' ❌'; // Alpa/Tanpa Keterangan
                                 }

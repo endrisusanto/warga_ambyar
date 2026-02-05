@@ -263,7 +263,7 @@
                                     Geser untuk lihat lainnya
                                 </p>
 
-                                <div class="flex md:grid md:grid-cols-3 gap-4 h-full overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-2 md:pb-0 exclude-scrollbar" style="-webkit-overflow-scrolling: touch;">
+                                <div id="financeStatsCarousel" class="flex md:grid md:grid-cols-3 gap-4 h-full overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-2 md:pb-0 exclude-scrollbar" style="-webkit-overflow-scrolling: touch;">
                                     <!-- 1. Arus Kas (Line) -->
                                     <div class="min-w-[85vw] md:min-w-0 flex-shrink-0 snap-center col-span-1 h-[400px] md:h-auto flex flex-col">
                                         <p class="text-xs text-center text-gray-500 mb-2 font-medium">Arus Kas (Line)</p>
@@ -1243,6 +1243,70 @@
                             if (totalRondaSlides > 1) {
                                 setInterval(nextRondaSlide, 5000);
                             }
+
+                            // Finance Widget Mobile Auto-Slide
+                            const financeCarousel = document.getElementById('financeStatsCarousel');
+                            if (financeCarousel) {
+                                let financeInterval;
+                                
+                                function startFinanceAutoSlide() {
+                                    // Only run on mobile (md breakpoint is 768px in Tailwind)
+                                    if (window.innerWidth >= 768) return;
+                                    
+                                    if (financeInterval) clearInterval(financeInterval);
+                                    
+                                    financeInterval = setInterval(() => {
+                                        if (window.innerWidth >= 768) return;
+                                        
+                                        const cardWidth = financeCarousel.children[0].offsetWidth;
+                                        // Try to get gap from computed style, default to 16px (1rem)
+                                        const gapStyle = window.getComputedStyle(financeCarousel).gap;
+                                        const gap = gapStyle ? parseInt(gapStyle) : 16;
+                                        const itemFullWidth = cardWidth + gap;
+                                        
+                                        const currentScroll = financeCarousel.scrollLeft;
+                                        const maxScroll = financeCarousel.scrollWidth - financeCarousel.clientWidth;
+                                        
+                                        // Calculate next slide position
+                                        // We add a small buffer (itemFullWidth / 2) to ensure we snap to the next one
+                                        // even if current scroll is slightly misaligned
+                                        let nextScroll = currentScroll + itemFullWidth;
+                                        
+                                        // If we are close to the end, loop back to start
+                                        if (currentScroll >= maxScroll - 50) {
+                                            financeCarousel.scrollTo({ left: 0, behavior: 'smooth' });
+                                        } else {
+                                            financeCarousel.scrollTo({ left: nextScroll, behavior: 'smooth' });
+                                        }
+                                    }, 4000); // 4 seconds per slide
+                                }
+                                
+                                // Pause on interaction
+                                financeCarousel.addEventListener('touchstart', () => {
+                                    if (financeInterval) clearInterval(financeInterval);
+                                }, { passive: true });
+                                
+                                // Resume after interaction
+                                financeCarousel.addEventListener('touchend', () => {
+                                     // Verify still mobile before restarting
+                                     if (window.innerWidth < 768) {
+                                         // Delay start to avoid fighting with user scroll momentum
+                                         setTimeout(startFinanceAutoSlide, 3000); 
+                                     }
+                                }, { passive: true });
+                                
+                                // Handle Resize
+                                window.addEventListener('resize', () => {
+                                    if (window.innerWidth >= 768) {
+                                        if (financeInterval) clearInterval(financeInterval);
+                                    } else {
+                                        startFinanceAutoSlide();
+                                    }
+                                });
+                                
+                                // Init
+                                startFinanceAutoSlide();
+                            }
                         </script>
 
                         <% if (typeof dashboardAlerts !=='undefined' && dashboardAlerts && dashboardAlerts.length> 0) {
@@ -1288,89 +1352,80 @@
                                                         <div class="complaint-slide transition-all duration-500 ease-out absolute top-0 left-0 w-full opacity-0 translate-x-full"
                                                             data-index="<%= index %>">
 
-                                                            <% if (alert.type==='approval' || (alert.type==='complaint'
-                                                                && !alert.raw)) { %>
-                                                                <!-- GENERIC & APPROVAL ALERT STYLE -->
-                                                                <div
-                                                                    class="flex flex-col w-full items-center justify-center text-center p-2">
-                                                                    <div
-                                                                        class="w-16 h-16 rounded-full flex items-center justify-center mb-4 shrink-0 
-                                                                        <%= alert.type === 'approval' ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.15)]' : 
-                                                                        'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.15)]' %> animate-bounce-slow">
-                                                                        <span class="text-3xl">
-                                                                            <%= alert.icon %>
-                                                                        </span>
-                                                                    </div>
-                                                                    <h3
-                                                                        class="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                                                                        <%= alert.title %>
-                                                                    </h3>
+                                                            <% if (alert.type==='approval' || alert.type==='payment' || (alert.type==='complaint' && !alert.raw)) { %>
+                                <!-- GENERIC, APPROVAL, & PAYMENT ALERT STYLE -->
+                                <div class="flex flex-col w-full items-center justify-center text-center p-2">
+                                    <% 
+                                        let colorClasses = 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.15)]';
+                                        let btnClasses = 'bg-yellow-600 shadow-yellow-600/20';
+                                        let listDotColor = 'bg-yellow-500';
 
-                                                                    <% if (alert.type==='approval' && alert.pendingUsers
-                                                                        && alert.pendingUsers.length> 0) { %>
-                                                                        <!-- List Pending Users -->
-                                                                        <div
-                                                                            class="w-full max-w-xs mx-auto bg-gray-50 dark:bg-white/5 rounded-xl p-3 mb-4 border border-gray-200 dark:border-white/10 text-left relative z-10">
-                                                                            <p
-                                                                                class="text-[10px] font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
-                                                                                Menunggu Persetujuan:</p>
-                                                                            <ul class="space-y-2">
-                                                                                <% alert.pendingUsers.forEach(u=> { %>
-                                                                                    <li
-                                                                                        class="flex items-center gap-2 text-sm text-700 dark:text-gray-300">
-                                                                                        <span
-                                                                                            class="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0"></span>
-                                                                                        <span
-                                                                                            class="font-medium truncate">
-                                                                                            <%= u.nama %>
-                                                                                        </span>
-                                                                                        <span
-                                                                                            class="text-xs text-gray-400 ml-auto whitespace-nowrap">
-                                                                                            <%= u.blok %>/<%=
-                                                                                                    u.nomor_rumah %>
-                                                                                        </span>
-                                                                                    </li>
-                                                                                    <% }); %>
-                                                                                        <% if (alert.totalPending>
-                                                                                            alert.pendingUsers.length) {
-                                                                                            %>
-                                                                                            <li
-                                                                                                class="text-xs text-center text-gray-500 dark:text-gray-500 mt-2 italic border-t border-gray-200 dark:border-white/5 pt-1">
-                                                                                                +<%= alert.totalPending
-                                                                                                    -
-                                                                                                    alert.pendingUsers.length
-                                                                                                    %> warga lainnya
-                                                                                            </li>
-                                                                                            <% } %>
-                                                                            </ul>
-                                                                        </div>
-                                                                        <% } else { %>
-                                                                            <!-- Fallback Description -->
-                                                                            <div
-                                                                                class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed max-w-xs mx-auto fallback-desc relative z-10">
-                                                                                <%- alert.desc ?
-                                                                                    alert.desc.replace(/text-gray-200/g, 'text-gray-800 dark:text-gray-200'
-                                                                                    ).replace(/text-gray-400/g, 'text-gray-600 dark:text-gray-400'
-                                                                                    ) : '' %>
-                                                                            </div>
-                                                                            <% } %>
+                                        if (alert.type === 'approval') {
+                                            colorClasses = 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.15)]';
+                                            btnClasses = 'bg-orange-600 shadow-orange-600/20';
+                                            listDotColor = 'bg-orange-500';
+                                        } else if (alert.type === 'payment') {
+                                            colorClasses = 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)]';
+                                            btnClasses = 'bg-emerald-600 shadow-emerald-600/20';
+                                            listDotColor = 'bg-emerald-500';
+                                        }
+                                    %>
+                                    
+                                    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4 shrink-0 <%= colorClasses %> animate-bounce-slow">
+                                        <span class="text-3xl"><%= alert.icon %></span>
+                                    </div>
+                                    
+                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                                        <%= alert.title %>
+                                    </h3>
 
-                                                                                <a href="<%= alert.link %>"
-                                                                                    class="px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all 
-                                                                        <%= alert.type === 'approval' ? 'bg-orange-600 shadow-orange-600/20' : 'bg-yellow-600 shadow-yellow-600/20' %> 
-                                                                        text-white hover:scale-[1.02] active:scale-95 flex items-center gap-2 relative z-20">
-                                                                                    <%= alert.btnText %>
-                                                                                        <svg class="w-4 h-4" fill="none"
-                                                                                            stroke="currentColor"
-                                                                                            viewBox="0 0 24 24">
-                                                                                            <path stroke-linecap="round"
-                                                                                                stroke-linejoin="round"
-                                                                                                stroke-width="2"
-                                                                                                d="M17 8l4 4m0 0l-4 4m4-4H3">
-                                                                                            </path>
-                                                                                        </svg>
-                                                                                </a>
-                                                                </div>
+                                    <% const listItems = alert.pendingUsers || alert.pendingItems; %>
+                                    
+                                    <% if ((alert.type==='approval' || alert.type==='payment') && listItems && listItems.length> 0) { %>
+                                        <!-- List Pending Users/Items -->
+                                        <div class="w-full max-w-xs mx-auto bg-gray-50 dark:bg-white/5 rounded-xl p-3 mb-4 border border-gray-200 dark:border-white/10 text-left relative z-10">
+                                            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-wider">
+                                                <%= alert.type === 'payment' ? 'Menunggu Verifikasi:' : 'Menunggu Persetujuan:' %>
+                                            </p>
+                                            <ul class="space-y-2">
+                                                <% listItems.forEach(u=> { %>
+                                                    <li class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                                        <span class="w-1.5 h-1.5 rounded-full <%= listDotColor %> shrink-0"></span>
+                                                        <div class="flex flex-col min-w-0">
+                                                            <span class="font-medium truncate"><%= u.nama %></span>
+                                                            <% if (alert.type === 'payment') { %>
+                                                                <span class="text-[10px] text-gray-500 truncate">
+                                                                    <%= u.jenis.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) %> 
+                                                                    (<%= new Date(u.periode + '-01').toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }) %>)
+                                                                </span>
+                                                            <% } %>
+                                                        </div>
+                                                        <span class="text-xs text-gray-400 ml-auto whitespace-nowrap self-start mt-0.5">
+                                                            <%= u.blok %>/<%= u.nomor_rumah %>
+                                                        </span>
+                                                    </li>
+                                                <% }); %>
+                                                <% if (alert.totalPending > listItems.length) { %>
+                                                    <li class="text-xs text-center text-gray-500 dark:text-gray-500 mt-2 italic border-t border-gray-200 dark:border-white/5 pt-1">
+                                                        +<%= alert.totalPending - listItems.length %> <%= alert.type === 'payment' ? 'transaksi' : 'warga' %> lainnya
+                                                    </li>
+                                                <% } %>
+                                            </ul>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Fallback Description -->
+                                        <div class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed max-w-xs mx-auto fallback-desc relative z-10">
+                                            <%- alert.desc ? alert.desc.replace(/text-gray-200/g, 'text-gray-800 dark:text-gray-200').replace(/text-gray-400/g, 'text-gray-600 dark:text-gray-400') : '' %>
+                                        </div>
+                                    <% } %>
+
+                                    <a href="<%= alert.link %>" class="px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all <%= btnClasses %> text-white hover:scale-[1.02] active:scale-95 flex items-center gap-2 relative z-20">
+                                        <%= alert.btnText %>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                        </svg>
+                                    </a>
+                                </div>
 
                                                                 <% } else if (alert.type==='complaint' && alert.raw) {
                                                                     %>

@@ -247,7 +247,23 @@ exports.viewDetail = async (req, res) => {
         const { filename } = req.params;
 
         // 1. Get Iuran Details (Main Info)
-        const iuranDetail = await Iuran.getByProof(filename);
+        const iuranList = await Iuran.getByProof(filename);
+        let iuranDetail = null;
+
+        if (Array.isArray(iuranList) && iuranList.length > 0) {
+            iuranDetail = iuranList[0];
+            
+            // Combine types nice look
+            const uniqueTypes = [...new Set(iuranList.map(item => item.jenis))];
+            const readableTypes = uniqueTypes.map(t => {
+                if (t === 'kas_rt') return 'Kas RT';
+                if (t === 'kas_gang') return 'Kas Gang';
+                if (t === 'sampah') return 'Sampah';
+                return t.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+            });
+            
+            iuranDetail.jenis = readableTypes.join(', ');
+        }
 
         // 2. Get Related Kas Transactions
         const kasTransactions = await Kas.getByProof(filename);
@@ -290,6 +306,132 @@ exports.delete = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal menghapus transaksi');
+        res.redirect('/keuangan');
+    }
+};
+exports.statistik = async (req, res) => {
+    try {
+        // 1. Keuangan Summary
+        const saldo = await Kas.getBalance();
+        const transactions = await Kas.getAll(); 
+        const currentMonth = moment().format('YYYY-MM');
+        
+        // Filter transactions for this month
+        const thisMonthTrans = transactions.filter(t => moment(t.tanggal).format('YYYY-MM') === currentMonth);
+        
+        const pemasukanBulanIni = thisMonthTrans
+            .filter(t => t.tipe === 'masuk')
+            .reduce((acc, curr) => acc + Number(curr.jumlah), 0);
+
+        const pengeluaranBulanIni = thisMonthTrans
+            .filter(t => t.tipe === 'keluar')
+            .reduce((acc, curr) => acc + Number(curr.jumlah), 0);
+
+        // 2. Piutang / Tunggakan Logic
+        const tunggakanData = await Iuran.getTunggakan();
+        
+        // Group by House
+        const groupedByHouse = {};
+        let totalPiutang = 0;
+        
+        tunggakanData.forEach(item => {
+            const key = `${item.blok}-${item.nomor_rumah}`;
+            if (!groupedByHouse[key]) {
+                groupedByHouse[key] = {
+                    blok: item.blok,
+                    nomor_rumah: item.nomor_rumah,
+                    nama: item.nama, // Head of family or representative
+                    total: 0,
+                    items: []
+                };
+            }
+            groupedByHouse[key].total += Number(item.jumlah);
+            groupedByHouse[key].items.push(item);
+            totalPiutang += Number(item.jumlah);
+        });
+        
+        // Convert to array and sort by Total Debt DESC
+        const piutangList = Object.values(groupedByHouse).sort((a,b) => b.total - a.total);
+
+        // Render standalone view (no default layout to allow custom full-screen scrolling)
+        res.render('keuangan/statistik', {
+            layout: false, 
+            title: 'Live Statistik',
+            saldo,
+            pemasukanBulanIni,
+            pengeluaranBulanIni,
+            totalPiutang,
+            piutangList,
+            moment
+        });
+
+    } catch (err) {
+        console.error('Error in statistik:', err);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.sync = async (req, res) => {
+    try {
+        // Role check
+        if (!req.session.user || !['admin', 'bendahara'].includes(req.session.user.role)) {
+            if(req.xhr) return res.status(403).json({ success: false, message: 'Unauthorized' });
+            req.flash('error_msg', 'Unauthorized');
+            return res.redirect('/keuangan');
+        }
+
+        console.log('Starting Kas Synchronization...');
+
+        // 1. Delete old auto-generated iuran entries from kas
+        // Pattern: 'Iuran Warga%' (Standard format generated in iuranController)
+        await db.query(`DELETE FROM kas WHERE tipe = 'masuk' AND keterangan LIKE 'Iuran Warga%'`);
+
+        // 2. Fetch all PAID iuran
+        const [paidIurans] = await db.query(`
+            SELECT i.*, w.blok, w.nomor_rumah 
+            FROM iuran i 
+            JOIN warga w ON i.warga_id = w.id 
+            WHERE i.status = 'lunas'
+        `);
+
+        // 3. Re-insert to kas
+        let count = 0;
+        // Use loop to avoid overload connection pool
+        for (const bill of paidIurans) {
+            let jenisLabel = '';
+            // Map jenis to readable label
+            switch(bill.jenis) {
+                case 'kas_rt': jenisLabel = 'Kas RT'; break;
+                case 'kas_gang': jenisLabel = 'Kas Gang'; break;
+                case 'sampah': jenisLabel = 'Kebersihan'; break; // User said 'Sampah', usually kebersihan is nicer, but let's stick to what user sees or expects
+                default: jenisLabel = bill.jenis; 
+            }
+            if(bill.jenis === 'sampah') jenisLabel = 'Sampah'; // Explicit override to match user request
+
+            const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')} [${jenisLabel}]`;
+            
+            // Prioritize tanggal_bayar (User payment timestamp) as requested
+            const kasDate = bill.tanggal_bayar || bill.tanggal_konfirmasi || new Date();
+            
+            await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
+            count++;
+        }
+
+        const msg = `Berhasil sinkronisasi. ${count} data pembayaran telah dicatat ulang di Kas.`;
+        console.log(msg);
+
+        // Jika request AJAX
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+            return res.json({ success: true, message: msg });
+        }
+        
+        req.flash('success_msg', msg);
+        res.redirect('/keuangan');
+
+    } catch (err) {
+        console.error('Error syncing kas:', err);
+        if (req.xhr) return res.status(500).json({ success: false, message: err.message });
+        req.flash('error_msg', 'Gagal sinkronisasi data.');
         res.redirect('/keuangan');
     }
 };

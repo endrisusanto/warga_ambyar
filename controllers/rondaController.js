@@ -567,10 +567,13 @@ exports.control = async (req, res) => {
 
         const year = req.query.year || moment().format('YYYY');
 
-        // Generate schedule for all months in the year
-        for (let month = 1; month <= 12; month++) {
-            const monthStr = String(month).padStart(2, '0');
-            await Ronda.generateSchedule(monthStr, year);
+        // Only generate schedule for years 2026 and onwards
+        if (parseInt(year) >= 2026) {
+            // Generate schedule for all months in the year
+            for (let month = 1; month <= 12; month++) {
+                const monthStr = String(month).padStart(2, '0');
+                await Ronda.generateSchedule(monthStr, year);
+            }
         }
 
         // Determine ALL Saturdays in the year
@@ -585,27 +588,19 @@ exports.control = async (req, res) => {
 
         // Get All Warga Wajib Ronda (Only Heads of Family) - Exclude Tim '-'
         const [warga] = await db.query(`
-            SELECT id, nama, blok, nomor_rumah, tim_ronda 
+            SELECT id, nama, blok, nomor_rumah, TRIM(tim_ronda) as tim_ronda 
             FROM warga 
             WHERE is_ronda = 1 
             AND status_keluarga = 'Kepala Keluarga'
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
+            ORDER BY tim_ronda ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
         `);
 
-        // Sort by Tim Ronda (ASC) then House Number (ASC)
-        warga.sort((a, b) => {
-            // Sort by Tim Ronda
-            const timA = a.tim_ronda || 'Z';
-            const timB = b.tim_ronda || 'Z';
-            if (timA !== timB) return timA.localeCompare(timB);
-            
-            // Then by house number
-            const aRumah = parseInt(a.nomor_rumah);
-            const bRumah = parseInt(b.nomor_rumah);
-            return aRumah - bRumah;
-        });
+
+        // Data already sorted by SQL ORDER BY clause
+        // No need for additional JavaScript sorting
 
         // Get Schedules for this year
         const [schedules] = await db.query(`
@@ -694,24 +689,33 @@ exports.exportControl = async (req, res) => {
 
         // Get All Warga Wajib Ronda - Exclude Tim '-'
         const [warga] = await db.query(`
-            SELECT id, nama, blok, nomor_rumah, tim_ronda 
+            SELECT id, nama, blok, nomor_rumah, TRIM(tim_ronda) as tim_ronda 
             FROM warga 
             WHERE is_ronda = 1 
             AND status_keluarga = 'Kepala Keluarga'
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
+            ORDER BY tim_ronda ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
         `);
 
-        // Sort by Tim Ronda (ASC) then House Number (ASC)
+
+        // Explicitly sort in JavaScript to guarantee order
         warga.sort((a, b) => {
-            const timA = a.tim_ronda || 'Z';
-            const timB = b.tim_ronda || 'Z';
-            if (timA !== timB) return timA.localeCompare(timB);
-            
-            const aRumah = parseInt(a.nomor_rumah);
-            const bRumah = parseInt(b.nomor_rumah);
-            return aRumah - bRumah;
+            // 1. Sort by Tim (A, B, C...)
+            const timA = (a.tim_ronda || 'Z').toUpperCase();
+            const timB = (b.tim_ronda || 'Z').toUpperCase();
+            if (timA < timB) return -1;
+            if (timA > timB) return 1;
+
+            // 2. Sort by Blok
+            if (a.blok < b.blok) return -1;
+            if (a.blok > b.blok) return 1;
+
+            // 3. Sort by Nomor Rumah (Numeric)
+            const numA = parseInt(a.nomor_rumah) || 0;
+            const numB = parseInt(b.nomor_rumah) || 0;
+            return numA - numB;
         });
 
         // Get Schedules for this wide range
@@ -786,7 +790,8 @@ exports.exportControl = async (req, res) => {
 
         // Rows
         let rowNum = 1;
-        Object.values(matrix).forEach(row => {
+        warga.forEach(w => {
+            const row = matrix[w.id];
             // First calculate totals so we can put them in the left columns
             let totalDenda = 0;
             let totalPaid = 0;
@@ -844,6 +849,56 @@ exports.exportControl = async (req, res) => {
 
                 // Conditional Coloring based on Value/Column
                 
+                // Determine upcoming Saturday index
+                // Logic Copied from index controller
+                const now = moment();
+                const currentDay = now.day();
+                const currentHour = now.hour();
+                let upcomingSatDate = null;
+                
+                // Find Sat of current week
+                const startOfWeek = now.clone().startOf('week'); // Sunday
+                const thisSaturday = startOfWeek.clone().add(6, 'days');
+
+                if ((currentDay === 6 && currentHour >= 18) || (currentDay === 0 && currentHour >= 6)) {
+                    upcomingSatDate = thisSaturday.clone().add(7, 'days').format('YYYY-MM-DD');
+                } else if (currentDay === 0 && currentHour < 6) {
+                    // Masih hitungan sabtu kemarin (jika dini hari minggu)
+                     // Tapi logic startOf('week') minggu adalah hari ke-0.
+                     // Jadi thisSaturday adalah Sabtu di minggu ini.
+                     // Jika skrg Minggu dini hari, berarti Sabtu kemarin adalah 'upcoming' (active)
+                     upcomingSatDate = thisSaturday.clone().subtract(7, 'days').format('YYYY-MM-DD'); // wait, logic check
+                     // Let's stick to simple logic: next Saturday from now
+                     // If now is Sat before 18, it is today.
+                } 
+                
+                // Simplified Logic to match UI:
+                // Find closest Saturday that is today or future?
+                // Or just use the exact logic from index:
+                 if (currentDay === 0 && currentHour < 6) {
+                    upcomingSatDate = now.clone().add(6, 'days').format('YYYY-MM-DD'); // Next sat
+                 } else {
+                    if (currentDay === 6 && currentHour >= 18) {
+                         upcomingSatDate = now.clone().add(7, 'days').format('YYYY-MM-DD');
+                    } else {
+                        // Find this week's Saturday
+                        upcomingSatDate = now.clone().day(6).format('YYYY-MM-DD');
+                    }
+                 }
+                 
+                 // Fix: moment().day(6) sets to THIS week's Sat. 
+                 // If today is Sunday (0), day(6) is next Sat. Correct.
+                 // If today is Mon (1), day(6) is this Sat. Correct.
+
+                // Find column index for upcoming Saturday
+                const upcomingIndex = saturdays.indexOf(upcomingSatDate);
+                const upcomingColNum = upcomingIndex !== -1 ? (9 + upcomingIndex) : -1;
+
+                if (colNumber === upcomingColNum) {
+                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } }; // Light Yellow
+                     cell.font = { bold: true };
+                }
+
                 // Summary Columns (Indices 5, 6, 7 -> colNumber 5, 6, 7)
                 if (colNumber === 5) { // Total Denda
                    // Optional: color if you want

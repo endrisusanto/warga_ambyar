@@ -5,6 +5,7 @@ const Kas = require('../models/Kas');
 const moment = require('moment');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const db = require('../config/db'); // Direct DB access for transactions/custom queries
 
 // Multer Config
@@ -250,6 +251,9 @@ exports.processPayment = (req, res) => {
 
                 let bukti = req.file ? req.file.filename : null;
                 const bayarTime = req.body.tanggal_bayar || moment().format('YYYY-MM-DD HH:mm:ss');
+                const metodePembayaran = req.body.metode_pembayaran || null;
+                
+                let firstPaymentId = null; // Store first payment ID for public link
 
                 for (const m of selectedMonths) {
                     const currentPeriode = m + '-01';
@@ -288,14 +292,16 @@ exports.processPayment = (req, res) => {
                             // We should probably keep the original warga_id (Head of Family) or update it? 
                             // Let's keep original warga_id but update payment details.
                             await db.query(
-                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = ?, dibayar_oleh = ? WHERE id = ?',
-                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id, existing[0].id]
+                                'UPDATE iuran SET jumlah = ?, status = ?, bukti_bayar = ?, tanggal_bayar = ?, dibayar_oleh = ?, metode_pembayaran = ? WHERE id = ?',
+                                [jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id, metodePembayaran, existing[0].id]
                             );
+                            if (!firstPaymentId) firstPaymentId = existing[0].id;
                         } else {
-                            await db.query(
-                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar, dibayar_oleh) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id]
+                            const [result] = await db.query(
+                                'INSERT INTO iuran (warga_id, periode, jenis, jumlah, status, bukti_bayar, tanggal_bayar, dibayar_oleh, metode_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                                [warga_id, currentPeriode, jenisItem, jumlahPerItem, 'menunggu_konfirmasi', bukti, bayarTime, payer_id, metodePembayaran]
                             );
+                            if (!firstPaymentId) firstPaymentId = result.insertId;
                         }
                     }
                 }
@@ -309,14 +315,15 @@ exports.processPayment = (req, res) => {
                 const wargaName = wargaInfo[0] ? wargaInfo[0].nama : 'Warga';
                 const rumah = wargaInfo[0] ? `${wargaInfo[0].blok}/${wargaInfo[0].nomor_rumah}` : '';
 
-                // Construct WhatsApp message
+                // Construct WhatsApp message with public URL
                 const jenisText = jenis.map(j => {
                     if (j === 'kas' || j === 'kas_rt') return 'Kas RT';
                     if (j === 'kas_gang') return 'Kas Gang';
                     return 'Sampah';
                 }).join(' & ');
                 const monthsText = selectedMonths.map(m => moment(m, 'YYYY-MM').format('MMM YYYY')).join(', ');
-                const message = `Halo Admin, saya ${wargaName} (${rumah}) sudah melakukan pembayaran iuran ${jenisText} untuk bulan: ${monthsText}. Mohon verifikasi. Terima kasih.`;
+                
+                const message = `Halo Pak Ketu,\nSaya ${wargaName} (${rumah}) sudah melakukan pembayaran iuran ${jenisText} \nuntuk bulan: ${monthsText}. \nMohon verifikasi. \nTerima kasih.`;
                 const waUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`;
 
                 req.flash('success_msg', `Pembayaran untuk ${selectedMonths.length} bulan berhasil diinput.`);
@@ -410,7 +417,7 @@ exports.reject = async (req, res) => {
 
         const bill = rows[0];
 
-        await db.query('UPDATE iuran SET status = ?, bukti_bayar = NULL WHERE id = ?', ['ditolak', id]);
+        await db.query('UPDATE iuran SET status = ?, bukti_bayar = NULL WHERE id = ?', ['belum_bayar', id]);
 
         // Send WhatsApp notification to warga
         if (bill.no_hp) {
@@ -629,6 +636,32 @@ exports.resetPayment = async (req, res) => {
     }
 };
 
+exports.resetBatch = async (req, res) => {
+    try {
+        if (!req.session.user || req.session.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
+        }
+        
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ success: false, message: 'No IDs provided' });
+        }
+
+        // Delete multiple iuran records to reset to "Belum Ditagih"
+        const placeholders = ids.map(() => '?').join(',');
+        const [result] = await db.query(`DELETE FROM iuran WHERE id IN (${placeholders})`, ids);
+
+        res.json({ 
+            success: true, 
+            count: result.affectedRows,
+            message: `${result.affectedRows} pembayaran berhasil direset`
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 exports.generateQris = (req, res) => {
     try {
         const { amount, merchantName } = req.body;
@@ -757,12 +790,26 @@ exports.exportExcel = async (req, res) => {
 
 exports.getPendingItems = async (req, res) => {
     try {
-        const { warga_id } = req.body;
-        const [rows] = await db.query(`
-            SELECT * FROM iuran 
-            WHERE warga_id = ? AND status = 'menunggu_konfirmasi'
-            ORDER BY periode ASC
-        `, [warga_id]);
+        const { warga_id, bukti_bayar, tanggal_bayar } = req.body;
+        
+        let query = "SELECT * FROM iuran WHERE warga_id = ? AND status = 'menunggu_konfirmasi'";
+        const params = [warga_id];
+
+        // Filter by Same Proof File (Strict)
+        if (bukti_bayar) {
+            query += " AND bukti_bayar = ?";
+            params.push(bukti_bayar);
+        }
+
+        // Filter by Same Payment Date (Strict)
+        if (tanggal_bayar) {
+            query += " AND DATE(tanggal_bayar) = DATE(?)";
+            params.push(tanggal_bayar);
+        }
+
+        query += " ORDER BY periode ASC";
+
+        const [rows] = await db.query(query, params);
         res.json({ success: true, items: rows });
     } catch (err) {
         console.error(err);
@@ -793,28 +840,30 @@ exports.confirmBatch = async (req, res) => {
         // Update Status
         await db.query(`UPDATE iuran SET status = 'lunas', tanggal_konfirmasi = NOW() WHERE id IN (${placeholders})`, ids);
 
-        // Add to Kas
+        // Add to Kas from batch
         for (const bill of rows) {
             let jenisLabel = bill.jenis;
             if (bill.jenis === 'kas_rt') jenisLabel = 'Kas RT';
             if (bill.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
-
-            const ket = `Iuran ${jenisLabel} ${bill.blok}/${bill.nomor_rumah} ${moment(bill.periode).format('MMM YYYY')}`;
-            const kasDate = bill.tanggal_bayar ? moment(bill.tanggal_bayar).format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss');
+            
+            // Add to Kas with Block/House Number
+            const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')}`;
+            const kasDate = moment().format('YYYY-MM-DD HH:mm:ss');
             await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
         }
 
         // Prepare Response (WA URL)
-        const bill = rows[0];
+        // Assume batch is for one warga (common case)
+        const first = rows[0];
         let waUrl = null;
-        if (bill.no_hp) {
-            const wargaPhone = bill.no_hp.replace(/^0/, '62').replace(/\D/g, '');
-            const totalAmount = rows.reduce((sum, item) => sum + item.jumlah, 0);
+        if (first.no_hp) {
+            const wargaPhone = first.no_hp.replace(/^0/, '62').replace(/\D/g, '');
+            const totalAmount = rows.reduce((sum, item) => sum + parseInt(item.jumlah), 0);
 
             // Format details
             const periods = [...new Set(rows.map(r => moment(r.periode).format('MMM YY')))].join(', ');
 
-            const message = `Halo ${bill.nama}, pembayaran iuran total Rp ${totalAmount.toLocaleString('id-ID')} (Periode: ${periods}) telah diverifikasi. Terima kasih!`;
+            const message = `Halo ${first.nama}, pembayaran iuran total Rp ${totalAmount.toLocaleString('id-ID')} (Periode: ${periods}) telah diverifikasi. Terima kasih!`;
             waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
         }
 
@@ -823,5 +872,165 @@ exports.confirmBatch = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.rejectBatch = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.json({ success: false, message: 'No IDs provided' });
+        }
+
+        const placeholders = ids.map(() => '?').join(',');
+        const [rows] = await db.query(`
+            SELECT i.*, w.nama, w.no_hp 
+            FROM iuran i 
+            JOIN warga w ON i.warga_id = w.id 
+            WHERE i.id IN (${placeholders})
+        `, ids);
+
+        if (rows.length === 0) return res.json({ success: false, message: 'Data not found' });
+
+        // Update status to rejected (reset to unpaid) and clear proof
+        await db.query(`UPDATE iuran SET status = 'belum_bayar', bukti_bayar = NULL WHERE id IN (${placeholders})`, ids);
+
+        const first = rows[0];
+        let waUrl = null;
+        if (first.no_hp) {
+            const wargaPhone = first.no_hp.replace(/^0/, '62').replace(/\D/g, '');
+            const totalAmount = rows.reduce((sum, item) => sum + parseInt(item.jumlah), 0);
+            
+            const message = `Halo ${first.nama}, pembayaran iuran sejumlah Rp ${totalAmount.toLocaleString('id-ID')} (${rows.length} item) DITOLAK karena bukti tidak valid. Mohon periksa dan upload ulang.`;
+            waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
+        }
+
+        res.json({ success: true, waUrl });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.uploadShareImage = (req, res) => {
+    const dir = './public/uploads/shares/';
+    try {
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    } catch (err) {
+        console.error('FS Error:', err);
+        return res.status(500).json({ success: false, error: 'FileSystem error: ' + err.message });
+    }
+
+    const shareStorage = multer.diskStorage({
+        destination: dir,
+        filename: function (req, file, cb) {
+            const ext = path.extname(file.originalname) || '.png';
+            cb(null, 'iuran-share-' + Date.now() + ext);
+        }
+    });
+    
+    // Increase limit to 5MB
+    const uploadShare = multer({ 
+        storage: shareStorage,
+        limits: { fileSize: 5 * 1024 * 1024 } 
+    }).single('image');
+
+    uploadShare(req, res, async (err) => {
+        if (err) {
+            console.error('Multer Error:', err);
+            return res.status(500).json({ success: false, error: 'Upload Error: ' + err.message });
+        }
+        if (!req.file) return res.status(400).json({ success: false, error: 'No file uploaded' });
+
+        try {
+            await db.query(`CREATE TABLE IF NOT EXISTS iuran_shares (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                image_filename VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
+
+            try { await db.query("ALTER TABLE iuran_shares ADD COLUMN iuran_id INT"); } catch(e){}
+
+            const [result] = await db.query("INSERT INTO iuran_shares (image_filename, iuran_id) VALUES (?, ?)", [req.file.filename, req.body.iuranId || null]);
+            res.json({ success: true, shareId: result.insertId });
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ success: false, error: e.message });
+        }
+    });
+};
+
+exports.viewPublic = async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Ensure table exists (handle edge case if accessed directly before any upload)
+        try {
+             await db.query(`CREATE TABLE IF NOT EXISTS iuran_shares (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                image_filename VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
+        } catch(e) {}
+
+        const [rows] = await db.query("SELECT * FROM iuran_shares WHERE id = ?", [id]);
+        
+        if (rows.length === 0) return res.status(404).send('Not Found');
+        
+        const share = rows[0];
+        
+        let iuranDetail = null;
+        let related = [];
+        let total = 0;
+        let payer = null;
+
+        if(share.iuran_id) {
+             const [details] = await db.query(`SELECT i.*, w.nama, w.blok, w.nomor_rumah, p.nama as payer_name 
+                 FROM iuran i 
+                 LEFT JOIN warga w ON i.warga_id = w.id 
+                 LEFT JOIN warga p ON i.dibayar_oleh = p.id
+                 WHERE i.id = ?`, [share.iuran_id]);
+             
+             if(details.length > 0) {
+                iuranDetail = details[0];
+                if(iuranDetail.payer_name && iuranDetail.payer_name !== iuranDetail.nama) {
+                    payer = iuranDetail.payer_name;
+                }
+
+                if(iuranDetail.bukti_bayar) {
+                    [related] = await db.query(`SELECT * FROM iuran WHERE bukti_bayar = ? ORDER BY periode DESC`, [iuranDetail.bukti_bayar]);
+                } else {
+                    related = [iuranDetail];
+                }
+                
+                total = related.reduce((acc, curr) => acc + parseInt(curr.jumlah), 0);
+             }
+        }
+
+        // Dynamic URL detection for OG Tags
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol; 
+        const host = req.get('host');
+        const baseUrl = `${protocol}://${host}`;
+        const appUrl = process.env.APP_URL || baseUrl;
+        
+        const ogImageUrl = `${appUrl}/uploads/shares/${share.image_filename}`;
+        const relativeImgUrl = `/uploads/shares/${share.image_filename}`;
+        
+        res.render('iuran/public_view', {
+            title: 'Detail Pembayaran Iuran',
+            dateLabel: moment(share.created_at).locale('id').format('dddd, DD MMMM YYYY HH:mm'),
+            image: relativeImgUrl,
+            ogImage: ogImageUrl,
+            data: iuranDetail,
+            related: related, // Pass related items
+            total: total,
+            payer: payer,
+            moment: moment
+        });
+    } catch(e) {
+        console.error(e);
+        res.redirect('/');
     }
 };

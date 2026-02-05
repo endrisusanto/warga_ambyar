@@ -280,7 +280,7 @@
                         const monthYear = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
                         // Map 'keamanan' to 'KAS' for display consistency
-                        const displayJenis = data.jenis === 'keamanan' ? 'KAS' : data.jenis.toUpperCase();
+                        const displayJenis = (data.jenis === 'keamanan' || data.jenis === 'kas' || data.jenis === 'kas_rt') ? 'KAS RT' : data.jenis.toUpperCase();
                         document.getElementById('modal-jenis').innerText = `Jenis: ${displayJenis} - ${monthYear}`;
 
                         document.getElementById('modal-nominal').innerText = `Nominal: Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}`;
@@ -297,7 +297,7 @@
                                     <div class="flex items-center bg-gray-200 dark:bg-white/10 border border-white/10 rounded-full px-1 py-1">
                                         <div class="flex items-center gap-2 px-3 py-1">
                                             <span class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
-                                            <span class="text-xs text-gray-200">${bayarStr}</span>
+                                            <span class="text-xs text-gray-700 dark:text-gray-200">${bayarStr}</span>
                                         </div>
                                 `;
 
@@ -306,14 +306,14 @@
                                     const approveStr = approveObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace('.', ':');
 
                                     html += `
-                                        <div class="px-1 text-gray-600">
+                                        <div class="px-1 text-gray-600 dark:text-gray-400">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </div>
-                                        <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/20">
-                                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Approved</span>
-                                            <span class="text-xs text-emerald-300 font-medium">${approveStr}</span>
+                                        <div class="flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 rounded-full border border-emerald-200 dark:border-emerald-500/20">
+                                            <span class="text-xs text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider">Approved</span>
+                                            <span class="text-xs text-emerald-600 dark:text-emerald-300 font-medium">${approveStr}</span>
                                         </div>
                                     `;
                                 }
@@ -340,6 +340,25 @@
                             statusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30';
                         }
 
+                        // Payment Method Badge
+                        const metodeContainer = document.getElementById('modal-metode-container');
+                        const metodeBadge = document.getElementById('modal-metode-badge');
+                        if (data.metode_pembayaran) {
+                            metodeContainer.classList.remove('hidden');
+                            metodeBadge.innerText = data.metode_pembayaran;
+                            
+                            // Apply color based on payment method
+                            if (data.metode_pembayaran === 'DANA') {
+                                metodeBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#118EE9]/20 text-[#118EE9] border border-[#118EE9]/30';
+                            } else if (data.metode_pembayaran === 'QRIS') {
+                                metodeBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-600 border border-emerald-500/30';
+                            } else if (data.metode_pembayaran === 'Tunai') {
+                                metodeBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-600 border border-amber-500/30';
+                            }
+                        } else {
+                            metodeContainer.classList.add('hidden');
+                        }
+
                         const proofDiv = document.getElementById('modal-proof');
                         const img = proofDiv.querySelector('img');
                         const link = proofDiv.querySelector('a');
@@ -360,16 +379,21 @@
                                     const rawTrans = document.getElementById('allTransactionsData').getAttribute('data-transactions');
                                     const allTrans = JSON.parse(rawTrans);
 
-                                    // Filter by same proof file
-                                    const related = allTrans.filter(t => t.bukti_bayar === data.bukti_bayar);
+                                    // Filter by same proof file AND same payment date to be strict
+                                    const rawDate = data.tanggal_bayar ? new Date(data.tanggal_bayar).toISOString().split('T')[0] : null;
+                                    
+                                    const related = allTrans.filter(t => {
+                                        const tDate = t.tanggal_bayar ? new Date(t.tanggal_bayar).toISOString().split('T')[0] : null;
+                                        return t.bukti_bayar === data.bukti_bayar && tDate === rawDate;
+                                    });
 
-                                    if (related.length > 0 && data.status === 'lunas') {
+                                    if (related.length > 0) {
                                         let total = 0;
                                         related.forEach(t => {
                                             const amount = parseInt(t.jumlah);
                                             total += amount;
                                             const date = new Date(t.periode).toLocaleDateString('id-ID', { month: 'short', year: '2-digit' });
-                                            const type = t.jenis === 'keamanan' ? 'Kas RT' : (t.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                                            const type = (t.jenis === 'keamanan' || t.jenis === 'kas' || t.jenis === 'kas_rt') ? 'Kas RT' : (t.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
 
                                             const div = document.createElement('div');
                                             div.className = 'flex justify-between text-xs text-gray-700 dark:text-gray-300';
@@ -423,20 +447,45 @@
                             ` + buttonsHtml;
                         }
 
+                        // Populate Share Button in Top Right
+                        const shareBtnContainer = document.getElementById('modal-share-btn-container');
+                        if (shareBtnContainer) {
+                            shareBtnContainer.innerHTML = '';
+                            shareBtnContainer.classList.add('hidden');
+                            if (data.status === 'menunggu_konfirmasi' || data.status === 'lunas') {
+                                shareBtnContainer.innerHTML = `
+                                    <button onclick="shareViaWA('${data.id}')" title="Share Status ke WhatsApp" class="inline-flex items-center gap-2 px-4 py-2 text-white bg-green-500 hover:bg-green-600 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" /></svg>
+                                        <span class="font-bold text-sm">Share WA</span>
+                                    </button>
+                                `;
+                                shareBtnContainer.classList.remove('hidden');
+                            }
+                        }
+
                         actionsDiv.innerHTML = buttonsHtml;
+
+                        // Remove existing batch container if any
+                        const existingBatch = document.getElementById('batch-selection-container');
+                        if (existingBatch) existingBatch.remove();
 
                         // Check for other pending items if this one is pending
                         if ((userRole === 'admin' || userRole === 'bendahara') && data.status === 'menunggu_konfirmasi') {
                             fetch('/iuran/get-pending-items', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ warga_id: data.warga_id })
+                                body: JSON.stringify({ 
+                                    warga_id: data.warga_id,
+                                    bukti_bayar: data.bukti_bayar,
+                                    tanggal_bayar: data.tanggal_bayar 
+                                })
                             })
                                 .then(res => res.json())
                                 .then(resp => {
                                     if (resp.success && resp.items.length > 1) {
                                         // Show batch selection
                                         const container = document.createElement('div');
+                                        container.id = 'batch-selection-container';
                                         container.className = "mt-4 p-3 bg-gray-100 dark:bg-white/5 rounded-lg border border-white/10";
 
                                         let totalAmount = 0;
@@ -446,7 +495,7 @@
                                         resp.items.forEach(item => {
                                             const date = new Date(item.periode);
                                             const mY = date.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' });
-                                            const j = item.jenis === 'keamanan' ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                                            const j = (item.jenis === 'keamanan' || item.jenis === 'kas' || item.jenis === 'kas_rt') ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
                                             const amount = parseInt(item.jumlah);
                                             totalAmount += amount;
 
@@ -477,6 +526,24 @@
                                             approveBtn.setAttribute('onclick', 'approveBatch()');
                                             approveBtn.innerText = 'Approve Selected (' + resp.items.length + ')';
                                             approveBtn.className = approveBtn.className.replace('bg-white/15', 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30').replace('text-gray-200', '');
+                                        }
+
+                                        // Update Reject Button
+                                        const rejectBtn = actionsDiv.querySelector('a[href^="/iuran/reject"]');
+                                        if (rejectBtn) {
+                                            rejectBtn.removeAttribute('href');
+                                            rejectBtn.removeAttribute('onclick');
+                                            rejectBtn.setAttribute('onclick', 'rejectBatch()');
+                                            rejectBtn.innerText = 'Reject Selected (' + resp.items.length + ')';
+                                            rejectBtn.className = rejectBtn.className.replace('bg-gray-200', 'bg-red-500/10 border-red-500/20 text-red-500').replace('text-gray-700', 'text-red-500'); 
+                                        }
+
+                                        // Update Reset Button (for admin only)
+                                        const resetBtn = actionsDiv.querySelector('button[onclick="resetPayment()"]');
+                                        if (resetBtn) {
+                                            resetBtn.removeAttribute('onclick');
+                                            resetBtn.setAttribute('onclick', 'resetBatch()');
+                                            resetBtn.innerText = 'Reset Selected (' + resp.items.length + ')';
                                         }
                                     }
                                 });
@@ -543,6 +610,58 @@
                     }
                 }
 
+                async function rejectBatch() {
+                    const checkboxes = document.querySelectorAll('input[name="batch_ids"]:checked');
+                    if (checkboxes.length === 0) return alert('Pilih minimal satu item');
+
+                    const ids = Array.from(checkboxes).map(cb => cb.value);
+                    if (!confirm(`Tolak ${ids.length} pembayaran terpilih?`)) return;
+
+                    const btn = document.querySelector('[onclick="rejectBatch()"]');
+                    if (btn) btn.innerText = 'Processing...';
+
+                    try {
+                        const response = await fetch('/iuran/reject-batch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ids })
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            if (result.waUrl) {
+                                const modal = document.getElementById('successModal');
+                                if (modal) {
+                                    const btn = document.getElementById('wa-link-btn');
+                                    btn.href = result.waUrl;
+                                    modal.querySelector('h3').innerText = 'Penolakan Berhasil';
+                                    modal.querySelector('p').innerText = 'Pembayaran ditolak. Kirim notifikasi ke Warga via WhatsApp?';
+                                    
+                                    // Change icon/color to red for reject feedback
+                                    const icon = modal.querySelector('svg.text-green-600');
+                                    if(icon) icon.classList.replace('text-green-600', 'text-red-600');
+
+                                    const backBtn = modal.querySelector('button');
+                                    backBtn.onclick = function () { location.reload(); };
+                                    btn.onclick = function () { setTimeout(() => location.reload(), 1000); };
+                                    
+                                    document.getElementById('paymentModal').classList.add('hidden');
+                                    modal.classList.remove('hidden');
+                                } else {
+                                     window.open(result.waUrl, '_blank');
+                                     location.reload();
+                                }
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert('Gagal: ' + result.message);
+                        }
+                    } catch (e) {
+                        alert('Error: ' + e.message);
+                    }
+                }
+
                 function updateBatchTotal() {
                     const checkboxes = document.querySelectorAll('input[name="batch_ids"]:checked');
                     let total = 0;
@@ -560,6 +679,10 @@
                     const approveBtn = document.querySelector('[onclick="approveBatch()"]');
                     if (approveBtn) {
                         approveBtn.innerText = 'Approve Selected (' + checkboxes.length + ')';
+                    }
+                    const rejectBtn = document.querySelector('[onclick="rejectBatch()"]');
+                    if (rejectBtn) {
+                        rejectBtn.innerText = 'Reject Selected (' + checkboxes.length + ')';
                     }
                 }
 
@@ -590,6 +713,290 @@
                     } catch (err) {
                         alert('Error: ' + err.message);
                     }
+                }
+
+                async function resetBatch() {
+                    const checkboxes = document.querySelectorAll('input[name="batch_ids"]:checked');
+                    if (checkboxes.length === 0) return alert('Pilih minimal satu item');
+
+                    const ids = Array.from(checkboxes).map(cb => cb.value);
+                    if (!confirm(`Reset ${ids.length} pembayaran terpilih menjadi Belum Ditagih? Data pembayaran akan dihapus.`)) return;
+
+                    const btn = document.querySelector('[onclick="resetBatch()"]');
+                    if (btn) btn.innerText = 'Processing...';
+
+                    try {
+                        const response = await fetch('/iuran/reset-batch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ids })
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert(`Berhasil mereset ${result.count || ids.length} pembayaran`);
+                            location.reload();
+                        } else {
+                            alert('Gagal reset: ' + (result.message || 'Unknown error'));
+                            if (btn) btn.innerText = 'Reset Selected (' + ids.length + ')';
+                        }
+                    } catch (err) {
+                        alert('Error: ' + err.message);
+                        if (btn) btn.innerText = 'Reset Selected (' + ids.length + ')';
+                    }
+                }
+
+                function shareViaWA(id) {
+                    const modalContent = document.querySelector('#paymentModal .p-6'); // Capture content div
+                    const btn = document.querySelector(`button[onclick="shareViaWA('${id}')"]`);
+                    if(!btn || !modalContent) return;
+
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'Generating...';
+                    
+                    html2canvas(modalContent, {
+                        scale: 2,
+                        backgroundColor: '#ffffff', 
+                        useCORS: true,
+                        onclone: (doc) => {
+                            // Hide share button in capture (already done by placement, but good to keep safe)
+                            const shareBtn = doc.getElementById('modal-share-btn-container'); 
+                            if(shareBtn) shareBtn.style.display = 'none';
+
+                            // Simplify Badge (Text Only with Parentheses)
+                            const badge = doc.getElementById('modal-status-badge');
+                            if(badge) {
+                                badge.style.background = 'transparent';
+                                badge.style.border = 'none';
+                                badge.style.borderRadius = '0';
+                                badge.style.padding = '0';
+                                badge.style.display = 'inline-block';
+                                badge.style.height = 'auto';
+                                badge.style.lineHeight = 'normal';
+                                badge.style.boxShadow = 'none';
+                                badge.textContent = `(${badge.textContent})`;
+                            }
+
+                            // Simplify Metode Pembayaran Badge (Text Only with Parentheses)
+                            const metodeBadge = doc.getElementById('modal-metode-badge');
+                            if(metodeBadge) {
+                                metodeBadge.style.background = 'transparent';
+                                metodeBadge.style.border = 'none';
+                                metodeBadge.style.borderRadius = '0';
+                                metodeBadge.style.padding = '0';
+                                metodeBadge.style.display = 'inline-block';
+                                metodeBadge.style.height = 'auto';
+                                metodeBadge.style.lineHeight = 'normal';
+                                metodeBadge.style.boxShadow = 'none';
+                                metodeBadge.style.color = '#4b5563'; // Gray color
+                                metodeBadge.style.fontSize = '10px';
+                                metodeBadge.style.fontWeight = 'bold';
+                                metodeBadge.textContent = `(${metodeBadge.textContent})`;
+                            }
+
+                            // Process and Move Timeline below "Dibayar oleh"
+                            const timelineContainer = doc.getElementById('modal-timeline');
+                            const wargaElement = doc.getElementById('modal-warga');
+                            
+                            if(timelineContainer && wargaElement) {
+                                // Extract and simplify timeline first
+                                let children = Array.from(timelineContainer.children);
+                                const unwrappedChildren = (children.length === 1 && children[0].tagName === 'DIV') 
+                                    ? Array.from(children[0].children) 
+                                    : children;
+                                
+                                let texts = [];
+                                unwrappedChildren.forEach(c => {
+                                    const text = c.textContent.replace(/\s+/g, ' ').trim();
+                                    // Filter: Only capture "Bayar ..." or "Approved ..." nodes
+                                    if(text.includes('Bayar') || text.includes('Approved')) {
+                                        // Keep full text with timestamp
+                                        // Format: "Bayar 5 Feb 2026, 12:00" or "Approved 5 Feb 2026, 14:30"
+                                        texts.push(text);
+                                    }
+                                });
+
+                                // Create detailed timeline text with timestamps
+                                let timelineText = '';
+                                if(texts.length > 1) {
+                                    // Format: "(Bayar: 5 Feb 2026, 12:00 > Approved: 5 Feb 2026, 14:30)"
+                                    const bayarParts = texts[0].split(' ', 1); // Get "Bayar"
+                                    const bayarTimestamp = texts[0].substring(bayarParts[0].length).trim(); // Get "5 Feb 2026, 12:00"
+                                    
+                                    const approvedParts = texts[1].split(' ', 1); // Get "Approved"
+                                    const approvedTimestamp = texts[1].substring(approvedParts[0].length).trim(); // Get "5 Feb 2026, 14:30"
+                                    
+                                    timelineText = `(${bayarParts[0]}: ${bayarTimestamp} > ${approvedParts[0]}: ${approvedTimestamp})`;
+                                } else if (texts.length === 1) {
+                                    // Format: "(Bayar: 5 Feb 2026, 12:00)"
+                                    const parts = texts[0].split(' ', 1);
+                                    const timestamp = texts[0].substring(parts[0].length).trim();
+                                    timelineText = `(${parts[0]}: ${timestamp})`;
+                                }
+
+                                // Append timeline below payer info
+                                if(timelineText) {
+                                    const timelineDiv = doc.createElement('div');
+                                    timelineDiv.className = 'text-xs mt-1';
+                                    timelineDiv.style.cssText = 'font-size: 9px; color: #4b5563; margin-top: 4px; font-weight: normal;';
+                                    timelineDiv.textContent = timelineText;
+                                    wargaElement.appendChild(timelineDiv);
+                                }
+
+                                // Hide original timeline container
+                                timelineContainer.style.display = 'none';
+                            }
+
+                            // Hide Proof Image and Show List
+                            const proofDiv = doc.getElementById('modal-proof');
+                            if(proofDiv) {
+                                proofDiv.style.border = 'none';
+                                proofDiv.style.background = 'transparent';
+                                proofDiv.style.padding = '0';
+                                
+                                // Hide Image components
+                                const img = proofDiv.querySelector('img');
+                                const label = proofDiv.querySelector('p'); // First p is "Bukti Transfer"
+                                const link = proofDiv.querySelector('a');
+                                if(img) img.style.display = 'none';
+                                if(label) label.style.display = 'none';
+                                if(link) link.style.display = 'none';
+
+                                // Expand Related Transactions List
+                                const relatedTrans = doc.getElementById('modal-related-transactions');
+                                if(relatedTrans) {
+                                    relatedTrans.classList.remove('hidden');
+                                    relatedTrans.style.display = 'block';
+                                    relatedTrans.style.marginTop = '0';
+                                    relatedTrans.style.borderTop = '2px dashed #ccc'; // Add divider
+                                    relatedTrans.style.paddingTop = '10px';
+
+                                    const list = doc.getElementById('modal-related-list');
+                                    if(list) {
+                                        list.style.maxHeight = 'none';
+                                        list.style.overflow = 'visible';
+                                        
+                                        // Change bullet points from • to -
+                                        const listItems = list.querySelectorAll('div');
+                                        listItems.forEach(item => {
+                                            const textContent = item.textContent;
+                                            if(textContent.includes('•')) {
+                                                item.textContent = textContent.replace('•', '-');
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                            // Ensure light mode styles for the clone
+                            const el = doc.querySelector('#paymentModal .p-6');
+                            if(el) {
+                                el.style.color = 'black';
+                                el.style.background = 'white';
+                                el.style.overflow = 'visible';
+                                el.style.height = 'auto';
+                                el.style.maxHeight = 'none';
+                            }
+                            const root = doc.documentElement;
+                            root.classList.remove('dark');
+                        }
+                    }).then(canvas => {
+                        canvas.toBlob(blob => {
+                            const formData = new FormData();
+                            formData.append('image', blob, 'payment-detail.jpg');
+                            formData.append('iuranId', id);
+                            
+                            fetch('/iuran/share-image', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(async res => {
+                                const text = await res.text();
+                                try {
+                                    return JSON.parse(text);
+                                } catch (e) {
+                                    throw new Error('Server Error: ' + text.substring(0, 100)); // Show snippet
+                                }
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    // 1. Get Warga Details
+                                    // Format: "Warga: Arbas (Blok F7-20)"
+                                    const wargaRaw = document.getElementById('modal-warga').textContent; 
+                                    let wargaName = 'Saya';
+                                    let houseInfo = ''; 
+
+                                    // Extract Name and House
+                                    const match = wargaRaw.match(/Warga: (.*?) \((.*?)\)/);
+                                    if (match) {
+                                        wargaName = match[1];
+                                        // Process House: "Blok F7-20" -> "F7/20"
+                                        houseInfo = match[2].replace('Blok ', '').replace('-', '/');
+                                    } else {
+                                        // Fallback
+                                        wargaName = wargaRaw.replace('Warga: ', '');
+                                    }
+
+                                    // 2. Get Types and Months from Related List (if populated)
+                                    let types = new Set();
+                                    let months = new Set();
+                                    
+                                    const listItems = document.querySelectorAll('#modal-related-list > div');
+                                    if (listItems.length > 0) {
+                                        listItems.forEach(div => {
+                                            // Structure: input, span(Text), span(Amount)
+                                            // Text: "Kas Gang - Jan 24"
+                                            const spans = div.querySelectorAll('span');
+                                            // Usually span[0] is the text if no checkbox? 
+                                            // Wait, structure in Step 459: 
+                                            // <div class="flex justify-between items-center ...">
+                                            //    <span class="text-sm">Kas Gang - Jan 26</span>
+                                            //    <span class="text-sm font-bold">Rp 10.000</span>
+                                            // </div>
+                                            if (spans.length > 0) {
+                                                const text = spans[0].textContent;
+                                                const parts = text.split(' - ');
+                                                if (parts.length >= 2) {
+                                                    types.add(parts[0]);
+                                                    months.add(parts[1]);
+                                                }
+                                            }
+                                        });
+                                    }
+                                    
+                                    // Fallback if set is empty (e.g. legacy or empty list)
+                                    if (types.size === 0) {
+                                        const raw = document.getElementById('modal-jenis').textContent;
+                                        if(raw) {
+                                            const parts = raw.split(' - ');
+                                            if(parts.length >= 2) {
+                                                types.add(parts[0].replace('Jenis: ', ''));
+                                                months.add(parts[1]);
+                                            }
+                                        }
+                                    }
+                                    
+                                    const jenisStr = Array.from(types).join(' & ');
+                                    const bulanStr = Array.from(months).join(', ');
+
+                                    const url = window.location.origin + '/iuran/v/' + data.shareId;
+                                    
+                                    const text = `Halo Pak Ketu,\nSaya ${wargaName} (${houseInfo}) sudah melakukan pembayaran iuran ${jenisStr} \nuntuk bulan: ${bulanStr}. \nMohon verifikasi. \nTerima kasih.\n\nDetail: ${url}`;
+                                    const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                                    
+                                    window.open(waLink, '_blank');
+                                } else {
+                                    alert('Gagal membuat share image: ' + (data.error || 'Unknown error'));
+                                }
+                                btn.innerHTML = originalText;
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                alert('Error sharing: ' + err.message);
+                                btn.innerHTML = originalText;
+                            });
+                        }, 'image/jpeg', 0.7);
+                    });
                 }
 
                 function toggleExportDropdown(event) {
@@ -779,20 +1186,23 @@
                 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
                     <!-- Modal Content -->
                     <div
-                        class="glass-card w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
+                        class="glass-card relative w-full max-w-lg transform overflow-hidden transition-all pointer-events-auto max-h-[90vh] flex flex-col">
+                        <div id="modal-share-btn-container" class="absolute top-4 right-4 z-10 hidden"></div>
                         <div class="p-6 overflow-y-auto">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4"
                                 id="modal-title">Detail
                                 Pembayaran</h3>
                             <div class="space-y-3">
                                 <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-warga"></p>
-                                <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-jenis"></p>
-                                <p class="text-sm text-gray-700 dark:text-gray-300" id="modal-nominal"></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300 hidden" id="modal-jenis"></p>
+                                <p class="text-sm text-gray-700 dark:text-gray-300 hidden" id="modal-nominal"></p>
                                 <div id="modal-timeline" class="hidden py-2 flex justify-center"></div>
                                 <div class="flex items-center gap-2 pt-1 justify-center">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">Status:</p>
                                     <span id="modal-status-badge"
                                         class="px-3 py-1 rounded-full text-xs font-semibold"></span>
+                                </div>
+                                <div id="modal-metode-container" class="hidden flex items-center gap-2 pt-2 justify-center">
+                                    <span id="modal-metode-badge" class="px-3 py-1 rounded-full text-xs font-semibold"></span>
                                 </div>
                                 <div id="modal-proof"
                                     class="hidden mt-4 border border-white/10 rounded p-2 bg-gray-100 dark:bg-white/5">
@@ -848,14 +1258,14 @@
                             sekarang?
                         </p>
                         <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                            <a id="wa-link-btn" href="#" target="_blank" onclick="closeSuccessModal()"
+                            <button id="wa-notif-btn" onclick="sendWANotification()" type="button"
                                 class="inline-flex justify-center px-4 py-2 text-sm font-bold rounded-xl text-white bg-[#25D366] hover:bg-[#128C7E] shadow-lg transition-all items-center gap-2">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path
                                         d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
                                 </svg>
                                 Kirim Notifikasi (WA)
-                            </a>
+                            </button>
                             <button type="button" onclick="closeSuccessModal()"
                                 class="inline-flex justify-center px-4 py-2 text-sm font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-white/10 hover:bg-white/20 border border-white/10 transition-all">
                                 Kembali ke Web
@@ -867,14 +1277,23 @@
 
             <% if (typeof newPaymentWaUrl !=='undefined' && newPaymentWaUrl) { %>
                 <script>
+                    let waNotificationUrl = "";
+                    
                     document.addEventListener('DOMContentLoaded', function () {
                         const modal = document.getElementById('successModal');
-                        const btn = document.getElementById('wa-link-btn');
-                        if (modal && btn) {
-                            btn.href = "<%- newPaymentWaUrl %>";
+                        waNotificationUrl = "<%- newPaymentWaUrl %>";
+                        
+                        if (modal && waNotificationUrl) {
                             modal.classList.remove('hidden');
                         }
                     });
+
+                    function sendWANotification() {
+                        if (waNotificationUrl) {
+                            window.open(waNotificationUrl, '_blank');
+                            closeSuccessModal();
+                        }
+                    }
 
                     function closeSuccessModal() {
                         document.getElementById('successModal').classList.add('hidden');

@@ -9,6 +9,7 @@ router.post('/delete/:id', isAdminOrBendahara, keuanganController.delete);
 router.get('/export', isAuthenticated, keuanganController.export);
 router.get('/detail/:filename', isAuthenticated, keuanganController.getDetailByProof);
 router.get('/transaksi/:filename', isAuthenticated, keuanganController.viewDetail);
+router.post('/sync', isAdminOrBendahara, keuanganController.sync);
 
 
 module.exports = router;

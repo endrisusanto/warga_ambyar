@@ -50,6 +50,24 @@ exports.index = async (req, res) => {
                 });
             }
 
+            // 2. Pending Payment Verification
+            const pendingPayments = await Iuran.getPendingVerification();
+            const payCount = pendingPayments.length;
+
+            if (payCount > 0) {
+                data.dashboardAlerts.push({
+                    type: 'payment',
+                    icon: '💸',
+                    color: 'emerald',
+                    title: 'Verifikasi Pembayaran',
+                    desc: `Terdapat <strong class="text-emerald-400">${payCount}</strong> pembayaran menunggu verifikasi.`,
+                    btnText: 'Cek Pembayaran',
+                    link: '/iuran',
+                    pendingItems: pendingPayments.slice(0, 3),
+                    totalPending: payCount
+                });
+            }
+
             // 2. Complaint Alerts logic will follow below...
         } catch (e) {
             console.error('Error alerts logic:', e);

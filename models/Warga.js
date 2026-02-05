@@ -6,7 +6,15 @@ const Warga = {
             SELECT w.*, u.role, u.username 
             FROM warga w 
             LEFT JOIN users u ON u.warga_id = w.id 
-            ORDER BY CASE WHEN w.approval_status = 'pending' THEN 0 ELSE 1 END, w.blok, w.nomor_rumah, w.status_keluarga
+            ORDER BY 
+                CASE WHEN w.approval_status = 'pending' THEN 0 ELSE 1 END,
+                CASE 
+                    WHEN w.tim_ronda IS NULL OR w.tim_ronda = '' OR w.tim_ronda = '-' THEN 'ZZZ'
+                    ELSE w.tim_ronda 
+                END ASC,
+                w.blok ASC, 
+                CAST(w.nomor_rumah AS UNSIGNED) ASC,
+                w.status_keluarga
         `);
         return rows;
     },

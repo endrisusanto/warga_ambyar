@@ -12,12 +12,18 @@ router.post('/pay', ensureAuthenticated, iuranController.processPayment);
 router.get('/confirm/:id', ensureAuthenticated, iuranController.confirm);
 router.post('/confirm-batch', ensureAuthenticated, iuranController.confirmBatch);
 router.post('/get-pending-items', ensureAuthenticated, iuranController.getPendingItems);
+router.post('/reject-batch', ensureAuthenticated, iuranController.rejectBatch);
 router.get('/reject/:id', ensureAuthenticated, iuranController.reject);
 router.get('/arrears', ensureAuthenticated, iuranController.arrears);
 router.get('/arrears/export/excel', ensureAuthenticated, iuranController.exportArrearsExcel);
 router.post('/check-status', ensureAuthenticated, iuranController.checkStatus);
 router.get('/cleanup-duplicates', ensureAuthenticated, iuranController.cleanupDuplicates);
 router.post('/reset', ensureAuthenticated, iuranController.resetPayment);
+router.post('/reset-batch', ensureAuthenticated, iuranController.resetBatch);
 router.post('/generate-qris', ensureAuthenticated, iuranController.generateQris);
+
+// WhatsApp Share Routes
+router.post('/share-image', ensureAuthenticated, iuranController.uploadShareImage);
+router.get('/v/:id', iuranController.viewPublic);
 
 module.exports = router;

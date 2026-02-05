@@ -1,5 +1,4 @@
 <%- include('../partials/head') %>
-    <!-- Navbar removed for clean receipt view, or keep it? Let's keep it for navigation -->
     <%- include('../partials/navbar') %>
 
         <div class="min-h-screen pb-20 pt-10">
@@ -56,13 +55,13 @@
                     <div class="relative px-6 pt-12 pb-6 sm:px-10 sm:pt-16">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                             <div>
-                                <h1 class="text-3xl sm:text-4xl font-black text-white flex items-center tracking-tight">
+                                <h1 class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white flex items-center tracking-tight">
                                     <span
-                                        class="bg-emerald-500/20 p-2.5 rounded-2xl mr-4 border border-emerald-500/30 shadow-lg shadow-emerald-500/10">🧾</span>
+                                        class="bg-emerald-600 text-white dark:bg-emerald-500/20 dark:text-inherit p-2.5 rounded-2xl mr-4 border border-emerald-500/30 shadow-lg shadow-emerald-500/10">🧾</span>
                                     Detail Pembayaran
                                 </h1>
-                                <p class="text-emerald-300/60 mt-3 ml-2 text-sm font-medium">ID Transaksi: <span
-                                        class="text-emerald-400">#<%= iuran ? iuran.id : 'MANUAL_KAS' %></span></p>
+                                <p class="text-gray-500 dark:text-emerald-300/60 mt-3 ml-2 text-sm font-medium">ID Transaksi: <span
+                                        class="text-emerald-700 dark:text-emerald-400">#<%= iuran ? iuran.id : 'MANUAL_KAS' %></span></p>
                             </div>
                         </div>
                     </div>
@@ -70,10 +69,10 @@
                     <% if (iuran && iuran.tanggal_bayar) { %>
                         <div class="mb-8 flex justify-center">
                             <div
-                                class="flex items-center bg-gray-200 dark:bg-white/10 border border-white/10 rounded-full px-1 py-1 shadow-inner">
+                                class="flex items-center bg-white border-gray-300 dark:bg-white/10 dark:border-white/10 border rounded-full px-1 py-1 shadow-sm dark:shadow-inner">
                                 <div class="flex items-center gap-2 px-3 py-1">
-                                    <span class="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
-                                    <span class="text-xs text-gray-200">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Bayar</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-200 font-medium">
                                         <%= moment(iuran.tanggal_bayar).format('DD MMM YYYY, HH:mm') %>
                                     </span>
                                 </div>
@@ -87,10 +86,9 @@
                                         </svg>
                                     </div>
                                     <div
-                                        class="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                                        <span
-                                            class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Approved</span>
-                                        <span class="text-xs text-emerald-300 font-medium">
+                                        class="flex items-center gap-2 px-3 py-1 bg-emerald-600 text-white rounded-full border border-emerald-600 shadow-sm">
+                                        <span class="text-xs font-bold uppercase tracking-wider">Approved</span>
+                                        <span class="text-xs font-medium">
                                             <%= moment(iuran.tanggal_konfirmasi).format('DD MMM YYYY, HH:mm') %>
                                         </span>
                                     </div>
@@ -114,7 +112,7 @@
                                                         <%= iuran.nama ? iuran.nama.charAt(0) : 'W' %>
                                                     </div>
                                                     <div>
-                                                        <div class="text-lg font-bold text-white">
+                                                        <div class="text-lg font-bold text-gray-900 dark:text-white">
                                                             <%= iuran.warga_nama %>
                                                         </div>
                                                         <div class="text-sm text-gray-600 dark:text-gray-400">Blok <%= iuran.blok %>-<%=
@@ -129,7 +127,7 @@
                                                     <label
                                                         class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Dibayarkan
                                                         Oleh</label>
-                                                    <div class="text-gray-200">
+                                                    <div class="text-gray-800 dark:text-gray-200">
                                                         <%= iuran.payer_nama %>
                                                     </div>
                                                 </div>
@@ -139,14 +137,14 @@
                                                         <div>
                                                             <label
                                                                 class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Periode</label>
-                                                            <div class="text-emerald-300 font-semibold">
+                                                            <div class="text-emerald-700 dark:text-emerald-300 font-semibold">
                                                                 <%= moment(iuran.periode).format('MMMM YYYY') %>
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label
                                                                 class="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Jenis</label>
-                                                            <div class="text-white font-medium capitalize">
+                                                            <div class="text-gray-900 dark:text-white font-medium capitalize">
                                                                 <%= iuran.jenis.replace('_', ' ' ) %>
                                                             </div>
                                                         </div>
@@ -160,10 +158,12 @@
                                             <% } %>
 
                                                 <!-- Transaction Breakdown -->
-                                                <div class="bg-black/30 rounded-xl p-5 border border-white/5">
+                                                <div class="bg-white dark:bg-black/30 rounded-xl p-5 border border-gray-200 dark:border-white/5 shadow-sm">
                                                     <h3
-                                                        class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-4 border-b border-white/10 pb-2">
-                                                        Rincian Transaksi</h3>
+                                                        class="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 border-b border-gray-200 dark:border-white/10 pb-2 flex justify-between">
+                                                        <span>Rincian Transaksi</span>
+                                                        <span class="text-[10px] text-gray-500 font-normal normal-case">v2.1</span>
+                                                    </h3>
                                                     <div class="space-y-3">
                                                         <% let total=0; %>
                                                             <% kas.forEach(t=> {
@@ -171,44 +171,36 @@
                                                                 if(t.tipe === 'masuk') total += amount;
                                                                 else total -= amount;
                                                                 %>
-                                                                <div
-                                                                    class="flex justify-between items-start text-sm group hover:bg-gray-100 dark:bg-white/5 p-1 rounded transition-colors">
+                                                                <div class="flex justify-between items-start text-sm group hover:bg-gray-100 dark:bg-white/5 p-1 rounded transition-colors">
                                                                     <div class="flex-1">
-                                                                        <div class="text-gray-200 font-medium">
-                                                                            <%= t.keterangan %>
+                                                                        <% 
+                                                                            let ket = t.keterangan;
+                                                                            let badge = '';
+                                                                            let badgeColor = 'bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/30';
+                                                                            
+                                                                            const match = ket.match(/\[(.*?)\]/);
+                                                                            if (match) {
+                                                                                badge = match[1];
+                                                                                ket = ket.replace(match[0], '').trim();
+                                                                                
+                                                                                const b = badge.toLowerCase();
+                                                                                if(b.includes('rt')) badgeColor = 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-500/30';
+                                                                                else if(b.includes('gang')) badgeColor = 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30';
+                                                                                else if(b.includes('sampah') || b.includes('kebersihan')) badgeColor = 'bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-500/30';
+                                                                            }
+                                                                        %>
+                                                                        <div class="text-gray-800 dark:text-gray-200 font-medium">
+                                                                            <%= ket %>
+                                                                            <% if(badge) { %>
+                                                                                <span class="inline-block ml-1 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border <%= badgeColor %>"><%= badge %></span>
+                                                                            <% } %>
                                                                         </div>
                                                                         <div class="text-xs text-gray-500">
-                                                                            <%= moment(t.tanggal).format('DD MMM YYYY')
-                                                                                %>
+                                                                            <%= moment(t.tanggal).format('DD MMM YYYY') %>
                                                                         </div>
                                                                     </div>
-                                                                    <div
-                                                                        class="font-bold font-mono pl-4 flex items-center <%= t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400' %>">
-                                                                        <%= t.tipe==='masuk' ? '+' : '-' %> Rp <%=
-                                                                                amount.toLocaleString('id-ID') %>
-                                                                                <% if(user && (user.role==='admin' ||
-                                                                                    user.role==='bendahara' )) { %>
-                                                                                    <form
-                                                                                        action="/keuangan/delete/<%= t.id %>"
-                                                                                        method="POST" class="ml-2"
-                                                                                        onsubmit="return confirm('Hapus elemen transaksi ini? (Tindakan ini tidak bisa dibatalkan)');">
-                                                                                        <button type="submit"
-                                                                                            class="text-red-500/50 hover:text-red-400 transition-colors p-1"
-                                                                                            title="Hapus item ini">
-                                                                                            <svg class="w-4 h-4"
-                                                                                                fill="none"
-                                                                                                stroke="currentColor"
-                                                                                                viewBox="0 0 24 24">
-                                                                                                <path
-                                                                                                    stroke-linecap="round"
-                                                                                                    stroke-linejoin="round"
-                                                                                                    stroke-width="2"
-                                                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                                                                </path>
-                                                                                            </svg>
-                                                                                        </button>
-                                                                                    </form>
-                                                                                    <% } %>
+                                                                    <div class="font-bold font-mono pl-4 flex items-center <%= t.tipe === 'masuk' ? 'text-emerald-400' : 'text-red-400' %>">
+                                                                        <%= t.tipe==='masuk' ? '+' : '-' %> Rp <%= amount.toLocaleString('id-ID') %>
                                                                     </div>
                                                                 </div>
                                                                 <% }) %>
@@ -220,11 +212,11 @@
                                                                         <% } %>
 
                                                                             <div
-                                                                                class="border-t border-white/10 pt-3 flex justify-between items-center mt-2">
+                                                                                class="border-t border-gray-200 dark:border-white/10 pt-3 flex justify-between items-center mt-2">
                                                                                 <span
                                                                                     class="text-gray-600 dark:text-gray-400 font-bold">Total</span>
                                                                                 <span
-                                                                                    class="text-xl font-bold text-white">Rp
+                                                                                    class="text-xl font-bold text-gray-900 dark:text-white">Rp
                                                                                     <%= total.toLocaleString('id-ID') %>
                                                                                 </span>
                                                                             </div>
@@ -276,7 +268,7 @@
                             <!-- Footer -->
                             <div class="border-t border-white/10 pt-6 pb-10 flex justify-center">
                                 <a href="/keuangan"
-                                    class="glass-button px-6 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:text-white border border-white/10 flex items-center transition-all bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10">
+                                    class="glass-button px-6 py-2 rounded-xl text-gray-700 dark:text-gray-300 border border-white/10 flex items-center transition-all bg-gray-100 dark:bg-white/5 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 dark:hover:bg-emerald-600 dark:hover:border-emerald-600 shadow-sm hover:shadow-emerald-500/30">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>

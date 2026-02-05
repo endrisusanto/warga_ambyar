@@ -22,6 +22,16 @@ const Iuran = {
         `);
         return rows;
     },
+    getPendingVerification: async () => {
+        const [rows] = await db.query(`
+            SELECT i.*, w.nama, w.blok, w.nomor_rumah 
+            FROM iuran i 
+            JOIN warga w ON i.warga_id = w.id 
+            WHERE i.status = 'menunggu_konfirmasi'
+            ORDER BY i.created_at DESC
+        `);
+        return rows;
+    },
     getByWargaId: async (warga_id) => {
         const [rows] = await db.query('SELECT * FROM iuran WHERE warga_id = ? ORDER BY periode DESC', [warga_id]);
         return rows;
@@ -133,9 +143,8 @@ const Iuran = {
             JOIN warga w ON i.warga_id = w.id
             LEFT JOIN warga p ON i.dibayar_oleh = p.id
             WHERE i.bukti_bayar = ?
-            LIMIT 1
         `, [filename]);
-        return rows[0];
+        return rows;
     }
 };
 

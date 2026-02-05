@@ -45,6 +45,7 @@ CREATE TABLE iuran (
     jumlah DECIMAL(10, 2) NOT NULL,
     status ENUM('lunas', 'menunggu_konfirmasi', 'belum_bayar') DEFAULT 'belum_bayar',
     bukti_bayar VARCHAR(255),
+    metode_pembayaran ENUM('DANA', 'QRIS', 'Tunai') DEFAULT NULL,
     tanggal_bayar DATETIME,
     tanggal_konfirmasi DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

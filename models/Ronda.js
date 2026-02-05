@@ -4,6 +4,11 @@ const moment = require('moment');
 const Ronda = {
     // Generate schedule for a specific month (only Saturdays)
     generateSchedule: async (month, year) => {
+        // Don't generate schedules for years before 2026
+        if (parseInt(year) < 2026) {
+            return;
+        }
+        
         // Determine Saturdays in the month
         const startDate = moment(`${year}-${month}-01`, 'YYYY-MM-DD');
         const endDate = startDate.clone().endOf('month');
@@ -132,19 +137,22 @@ const Ronda = {
 
         await db.query(query, params);
 
-        // Jika status berubah menjadi 'hadir', batalkan semua jadwal 'scheduled' 
+        // Jika status berubah menjadi 'hadir' atau 'alpa', batalkan semua jadwal 
         // untuk warga yang sama dalam range 4 minggu ke depan dari tanggal jadwal ini
-        if (status === 'hadir') {
+        // karena kewajiban ronda sudah terpenuhi (hadir = datang, alpa = bayar denda)
+        if (status === 'hadir' || status === 'alpa') {
             const [currentSchedule] = await db.query("SELECT tanggal, warga_id FROM ronda_jadwal WHERE id = ?", [id]);
             if (currentSchedule.length > 0) {
                 const currentDate = currentSchedule[0].tanggal;
                 const wargaId = currentSchedule[0].warga_id;
                 const fourWeeksLater = moment(currentDate).add(4, 'weeks').format('YYYY-MM-DD');
                 
-                // Batalkan jadwal scheduled dalam range 4 minggu
+                // Hapus SEMUA jadwal dalam range 4 minggu (scheduled, reschedule, alpa yang belum dibayar)
+                // karena kewajiban sudah terpenuhi
+                // Tapi jangan hapus yang sudah hadir atau alpa yang sudah dibayar
                 await db.query(
-                    "DELETE FROM ronda_jadwal WHERE warga_id = ? AND status = 'scheduled' AND tanggal > ? AND tanggal <= ?",
-                    [wargaId, currentDate, fourWeeksLater]
+                    "DELETE FROM ronda_jadwal WHERE warga_id = ? AND id != ? AND tanggal > ? AND tanggal <= ? AND (status IN ('scheduled', 'reschedule') OR (status = 'alpa' AND (status_bayar IS NULL OR status_bayar = '')))",
+                    [wargaId, id, currentDate, fourWeeksLater]
                 );
             }
         }
@@ -284,28 +292,28 @@ const Ronda = {
         
         for (const r of rows) {
             // Cek apakah warga sudah hadir dalam 4 minggu sebelum tanggal jadwal ini
-            const fourWeeksBefore = moment(r.tanggal).subtract(4, 'weeks').format('YYYY-MM-DD');
-            const [hadirRecords] = await db.query(
-                "SELECT id FROM ronda_jadwal WHERE warga_id = ? AND status = 'hadir' AND tanggal >= ? AND tanggal < ?",
-                [r.warga_id, fourWeeksBefore, r.tanggal]
-            );
-
-            // Jika sudah hadir dalam 4 minggu terakhir, hapus jadwal ini (rantai sudah selesai)
-            if (hadirRecords.length > 0) {
-                await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [r.id]);
-                continue;
-            }
+            // REVISI FINAL: Hapus pengecekan 4 minggu sebelumnya.
+            // Asumsinya: Jadwal yang ada di database adalah valid.
+            // Jika jadwal tgl 31 Jan masih 'scheduled' padahal sekarang 5 Feb, 
+            // berarti dia mangkir dari siklus barunya (meskipun tgl 3 Jan dia hadir).
+            // Jadi, SEMUA jadwal masa lalu yang masih 'scheduled' WAJIB di-reschedule.
+            
+            // Lanjut proses reschedule...
 
             // Check move count from keterangan
+            // Pattern bisa berupa "Auto Move (N)" atau "Auto Reschedule (N)"
             let moveCount = 0;
-            const match = (r.keterangan || '').match(/Auto Move \((\d+)\)/);
-            if (match) {
-                moveCount = parseInt(match[1]);
+            const matchMove = (r.keterangan || '').match(/Auto Move \((\d+)\)/);
+            const matchReschedule = (r.keterangan || '').match(/Auto Reschedule \((\d+)\)/);
+            if (matchMove) {
+                moveCount = parseInt(matchMove[1]);
+            } else if (matchReschedule) {
+                moveCount = parseInt(matchReschedule[1]);
             }
 
             if (moveCount >= 3) {
                 // Already moved 3 times, this is the 4th miss -> Denda
-                await db.query("UPDATE ronda_jadwal SET status = 'alpa', denda = 50000, keterangan = CONCAT(IFNULL(keterangan, ''), ' [Otomatis Denda - 4 Minggu]') WHERE id = ?", [r.id]);
+                await db.query("UPDATE ronda_jadwal SET status = 'alpa', denda = 50000, keterangan = CONCAT(IFNULL(keterangan, ''), ' [Otomatis Denda - 4x Reschedule]') WHERE id = ?", [r.id]);
             } else {
                 // Move to next week
                 const nextDate = moment(r.tanggal).add(7, 'days').format('YYYY-MM-DD');
@@ -317,7 +325,7 @@ const Ronda = {
                 const [exists] = await db.query("SELECT id FROM ronda_jadwal WHERE warga_id = ? AND tanggal = ?", [r.warga_id, nextDate]);
                 if (exists.length === 0) {
                      await db.query("INSERT INTO ronda_jadwal (tanggal, warga_id, status, keterangan) VALUES (?, ?, 'scheduled', ?)", 
-                        [nextDate, r.warga_id, `Auto Move (${moveCount + 1})`]);
+                        [nextDate, r.warga_id, `Auto Reschedule (${moveCount + 1})`]);
                 }
             }
         }
