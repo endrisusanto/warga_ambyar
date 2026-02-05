@@ -246,9 +246,10 @@
                                                         else if(b.includes('gang')) badgeColor = 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30';
                                                         else if(b.includes('sampah') || b.includes('kebersihan')) badgeColor = 'bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-500/30';
                                                     }
+                                                    let trendIcon = t.tipe === 'masuk' ? '📈' : '📉';
                                                 %>
                                                 <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                                    <%= ket %>
+                                                    <span class="mr-1"><%= trendIcon %></span><%= ket %>
                                                     <% if(badge) { %>
                                                         <span class="inline-block ml-2 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border <%= badgeColor %>"><%= badge %></span>
                                                     <% } %>
