@@ -89,6 +89,17 @@
                                                 </span>
                                             </div>
                                             <% } %>
+
+                                            <% if(userData.role === 'admin') { %>
+                                                <a href="/monitoring" class="mt-4 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 rounded-lg text-sm font-bold transition-all flex items-center gap-2 group">
+                                                    <span class="relative flex h-2 w-2">
+                                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                    </span>
+                                                    Monitoring System
+                                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                                </a>
+                                            <% } %>
                                     </div>
                                 </div>
 

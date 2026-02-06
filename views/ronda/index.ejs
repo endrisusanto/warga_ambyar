@@ -502,19 +502,22 @@
                             <ul class="space-y-3">
                                 <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
                                     loopItems = [...teamMembers];
-                                    const memberIds = new Set(teamMembers.map(function(m) { return m.id; }));
+                                    const teamHouseKeys = new Set(teamMembers.map(function(m) { return m.blok + '-' + m.nomor_rumah; }));
                                     schedules.forEach(function(sch) {
-                                    if (!memberIds.has(sch.warga_id)) {
-                                    loopItems.push(sch);
-                                    }
+                                        const houseKey = sch.blok + '-' + sch.nomor_rumah;
+                                        if (!teamHouseKeys.has(houseKey)) {
+                                            loopItems.push(sch);
+                                        }
                                     });
                                     } else {
                                     loopItems = schedules;
                                     }
 
                                     loopItems.forEach(function(item) {
-                                    let s = schedules.find(function(sc) { return sc.warga_id === (item.warga_id ||
-                                    item.id); });
+                                    // HOUSE-BASED: Match by blok and nomor_rumah instead of warga_id
+                                    let s = schedules.find(function(sc) { 
+                                        return sc.blok === item.blok && sc.nomor_rumah === item.nomor_rumah;
+                                    });
                                     if (!s) {
                                     s = {
                                     id: '',
@@ -529,7 +532,7 @@
                                     }
                                     const isGuest = teamMembers && teamMembers.length > 0 &&
                                     !teamMembers.some(function(m) {
-                                    return m.id === (item.warga_id || item.id);
+                                        return m.blok === s.blok && m.nomor_rumah === s.nomor_rumah;
                                     });
                                     %>
                                     <li

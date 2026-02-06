@@ -1,0 +1,363 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar', { useWideContainer: true }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="glass-card mb-6 md:mb-8 p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-500/20">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-2 md:gap-3">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                Live User Monitoring
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-1 font-medium">Memantau pengguna yang sedang aktif di sistem Gang Ambyar secara real-time.</p>
+        </div>
+        <div class="flex items-center gap-2 md:gap-3 bg-white/50 dark:bg-black/20 backdrop-blur-md px-3 md:px-4 py-2 rounded-2xl border border-white/20 w-full md:w-auto justify-between md:justify-start">
+            <div class="text-right">
+                <div class="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">Total Online</div>
+                <div class="text-xl md:text-2xl font-black text-green-500"><%= onlineUsers.length %></div>
+            </div>
+            <div class="h-6 md:h-8 w-px bg-gray-300 dark:bg-white/10 mx-1 md:mx-2"></div>
+            <div class="text-right">
+                <div class="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">Recent Active</div>
+                <div class="text-xl md:text-2xl font-black text-indigo-500"><%= onlineUsers.length + offlineUsers.length %></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Online Users List -->
+        <div class="lg:col-span-2 space-y-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <svg class="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Sedang Online
+            </h2>
+
+            <% if (onlineUsers.length === 0) { %>
+                <div class="glass-card p-12 text-center border-dashed border-2 border-white/10">
+                    <div class="text-4xl mb-4">💤</div>
+                    <p class="text-gray-500 font-medium">Tidak ada pengguna yang online saat ini.</p>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% onlineUsers.forEach(u => { %>
+                        <div class="glass-card p-4 hover:shadow-xl hover:scale-[1.02] transition-all border-green-500/30 bg-green-500/5 group relative overflow-hidden">
+                            <!-- Background Decor -->
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+                            
+                            <div class="flex items-start gap-4 relative z-10">
+                                <div class="relative">
+                                    <img src="<%= u.foto_profil ? '/uploads/profiles/' + u.foto_profil : 'https://ui-avatars.com/api/?name=' + (u.nama_warga || u.username) + '&background=random' %>" 
+                                         class="w-14 h-14 rounded-2xl object-cover ring-2 ring-green-500/50 shadow-lg">
+                                    <span class="absolute -bottom-1 -right-1 flex h-4 w-4">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white dark:border-gray-900"></span>
+                                    </span>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="font-bold text-gray-900 dark:text-gray-100 truncate"><%= u.nama_warga || u.username %></h3>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-500 text-white shadow-sm"><%= u.role %></span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 font-medium mb-3">Blok <%= u.blok || '-' %> No. <%= u.nomor_rumah || '-' %></p>
+                                    
+                                    <div class="space-y-1.5 pt-2 border-t border-white/10">
+                                        <div class="flex items-center gap-2 text-[10px] text-gray-600 dark:text-gray-400">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                            <span class="truncate" title="<%= u.last_user_agent %>"><%= u.last_user_agent ? (u.last_user_agent.includes('Mobile') ? '📱 Mobile Device' : '💻 Desktop Browser') : 'Unknown' %></span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-[10px] text-gray-600 dark:text-gray-400">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            <span><%= u.last_ip || 'Hidden IP' %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+
+            <!-- Recent Activity / Offline Users -->
+            <div class="pt-8">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-6">
+                    <svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Aktivitas Terakhir
+                </h2>
+                
+                <div class="glass-card overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10">
+                        <thead class="bg-gray-50 dark:bg-white/5">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Pengguna</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Device & IP</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Akses Terakhir</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                            <% offlineUsers.forEach(u => { %>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-3">
+                                            <img src="<%= u.foto_profil ? '/uploads/profiles/' + u.foto_profil : 'https://ui-avatars.com/api/?name=' + (u.nama_warga || u.username) + '&background=random' %>" 
+                                                 class="w-8 h-8 rounded-lg object-cover">
+                                            <div>
+                                                <div class="text-sm font-bold text-gray-900 dark:text-gray-100"><%= u.nama_warga || u.username %></div>
+                                                <div class="text-[10px] text-gray-500 font-medium tracking-wide">Blok <%= u.blok || '-' %>-<%= u.nomor_rumah || '-' %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-[10px] text-gray-600 dark:text-gray-400 font-medium flex items-center gap-1.5">
+                                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                                <%= u.last_user_agent ? (u.last_user_agent.includes('Mobile') ? 'Mobile' : 'Desktop') : 'Unknown' %>
+                                            </span>
+                                            <span class="text-[10px] text-gray-500 font-mono tracking-tighter"><%= u.last_ip %></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400"><%= moment(u.last_active).fromNow() %></div>
+                                        <div class="text-[10px] text-gray-400"><%= moment(u.last_active).format('HH:mm, DD MMM') %></div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% if (offlineUsers.length === 0) { %>
+                        <div class="p-8 text-center text-gray-500 text-sm font-medium">Belum ada data aktivitas.</div>
+                    <% } %>
+                </div>
+            </div>
+            <!-- Detailed System Logs -->
+            <div class="pt-8">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-6">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Server System Logs
+                </h2>
+                
+                <!-- Filter Controls -->
+                <div class="glass-card p-4 mb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Date Filter -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Filter Tanggal</label>
+                            <input type="date" id="logDateFilter" 
+                                   value="<%= (typeof req !== 'undefined' && req.query && req.query.date) ? req.query.date : moment().format('YYYY-MM-DD') %>"
+                                   class="w-full rounded-lg px-4 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                   onchange="filterLogs()">
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Cari</label>
+                            <input type="text" id="logSearchInput" 
+                                   placeholder="Cari user, action..."
+                                   class="w-full rounded-lg px-4 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                   onkeyup="searchLogs()">
+                        </div>
+                        
+                        <!-- Action Filter -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Action</label>
+                            <% const selectedAction = (typeof req !== 'undefined' && req.query && req.query.action) ? req.query.action : ''; %>
+                            <select id="logActionFilter" 
+                                    class="w-full rounded-lg px-4 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-gray-100 cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    onchange="filterLogs()">
+                                <option value="">Semua Action</option>
+                                <option value="VIEW" <%= selectedAction === 'VIEW' ? 'selected' : '' %>>VIEW</option>
+                                <option value="SUBMIT" <%= selectedAction === 'SUBMIT' ? 'selected' : '' %>>SUBMIT</option>
+                                <option value="UPLOAD" <%= selectedAction === 'UPLOAD' ? 'selected' : '' %>>UPLOAD</option>
+                                <option value="LOGIN" <%= selectedAction === 'LOGIN' ? 'selected' : '' %>>LOGIN</option>
+                                <option value="LOGOUT" <%= selectedAction === 'LOGOUT' ? 'selected' : '' %>>LOGOUT</option>
+                                <option value="DELETE" <%= selectedAction === 'DELETE' ? 'selected' : '' %>>DELETE</option>
+                                <option value="UPDATE" <%= selectedAction === 'UPDATE' ? 'selected' : '' %>>UPDATE</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Reset Button -->
+                        <div class="sm:col-span-2 lg:col-span-1 flex items-end">
+                            <button onclick="resetFilters()" 
+                                    class="w-full px-6 py-2.5 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                                Reset Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card overflow-hidden">
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10">
+                            <thead class="bg-gray-50 dark:bg-white/5">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Time</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Details</th>
+                                    <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody" class="divide-y divide-gray-200 dark:divide-white/10 font-mono text-xs">
+                                <% if(typeof activityLogs !== 'undefined' && activityLogs.length > 0) { %>
+                                    <% activityLogs.forEach(log => { %>
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                            <td class="px-4 py-2 whitespace-nowrap text-gray-500"><%= moment(log.created_at).format('HH:mm:ss') %></td>
+                                            <td class="px-4 py-2 whitespace-nowrap font-bold text-gray-700 dark:text-gray-300"><%= log.username || 'Guest' %></td>
+                                            <td class="px-4 py-2 whitespace-nowrap">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase 
+                                                    <%= log.action === 'UPLOAD' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 
+                                                        log.action === 'LOGIN' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 
+                                                        log.action === 'LOGOUT' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' : 
+                                                        log.action === 'SUBMIT' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' :
+                                                        'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400' %>">
+                                                    <%= log.action %>
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2 text-gray-600 dark:text-gray-400 max-w-sm truncate" title="<%= log.details %>">
+                                                <%= log.details %>
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-right text-gray-500"><%= log.ip_address.replace('::ffff:', '') %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No detailed logs available yet.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Statistics -->
+        <div class="space-y-6">
+            <div class="glass-card p-6 bg-indigo-600 dark:bg-indigo-700 text-white border-0">
+                <h3 class="font-black text-xl mb-6 flex justify-between items-center">
+                    Statistik
+                    <svg class="w-6 h-6 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <span class="text-indigo-100 text-sm font-bold">Total Pengguna Aktif</span>
+                        <span class="text-3xl font-black"><%= onlineUsers.length + offlineUsers.length %></span>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2">
+                        <div class="bg-white rounded-full h-2" style="width: <%= ((onlineUsers.length + offlineUsers.length) / 100) * 100 %>%"></div>
+                    </div>
+                    
+                    <div class="pt-4 grid grid-cols-2 gap-4 border-t border-white/10 mt-4">
+                        <div>
+                            <div class="text-[10px] font-black uppercase text-indigo-100 tracking-widest">Growth</div>
+                            <div class="text-sm font-bold">+12% vs last week</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-black uppercase text-indigo-100 tracking-widest">Engagement</div>
+                            <div class="text-sm font-bold">Very High</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Distribution -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Distribusi Perangkat
+                </h3>
+                <% 
+                    const usersList = (typeof allUsers !== 'undefined') ? allUsers : [];
+                    const devices = usersList.reduce((acc, u) => {
+                        const dev = u.last_user_agent ? (u.last_user_agent.includes('Mobile') ? 'Mobile' : 'Desktop') : 'Other';
+                        acc[dev] = (acc[dev] || 0) + 1;
+                        return acc;
+                    }, {});
+                    const total = usersList.length || 1;
+                %>
+                <div class="space-y-4">
+                    <% Object.entries(devices).forEach(([name, count]) => { %>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-tighter">
+                                <span><%= name %></span>
+                                <span><%= Math.round((count/total)*100) %>%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 dark:bg-white/5 rounded-full h-2 overflow-hidden">
+                                <div class="bg-indigo-500 rounded-full h-2" style="width: <%= (count/total)*100 %>%"></div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let autoRefreshInterval;
+    
+    // Filter logs based on date and action
+    function filterLogs() {
+        const dateFilter = document.getElementById('logDateFilter').value;
+        const actionFilter = document.getElementById('logActionFilter').value;
+        
+        // Reload page with query params
+        const params = new URLSearchParams();
+        if (dateFilter) params.set('date', dateFilter);
+        if (actionFilter) params.set('action', actionFilter);
+        
+        window.location.href = '/monitoring?' + params.toString();
+    }
+    
+    // Search logs in real-time (client-side)
+    function searchLogs() {
+        const searchTerm = document.getElementById('logSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#logsTableBody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Reset all filters
+    function resetFilters() {
+        document.getElementById('logDateFilter').value = '<%= moment().format('YYYY-MM-DD') %>';
+        document.getElementById('logActionFilter').value = '';
+        document.getElementById('logSearchInput').value = '';
+        window.location.href = '/monitoring';
+    }
+    
+    // Auto-refresh every 30 seconds (pause if user is filtering)
+    function startAutoRefresh() {
+        autoRefreshInterval = setInterval(() => {
+            // Only auto-refresh if no search term is active
+            const searchTerm = document.getElementById('logSearchInput').value;
+            if (!searchTerm) {
+                window.location.reload();
+            }
+        }, 30000);
+    }
+    
+    startAutoRefresh();
+</script>
+
+<%- include('../partials/footer') %>

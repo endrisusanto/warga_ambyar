@@ -586,21 +586,39 @@ exports.control = async (req, res) => {
             day.add(1, 'days');
         }
 
-        // Get All Warga Wajib Ronda (Only Heads of Family) - Exclude Tim '-'
-        const [warga] = await db.query(`
-            SELECT id, nama, blok, nomor_rumah, TRIM(tim_ronda) as tim_ronda 
-            FROM warga 
+        // Get All HOUSES (unique blok + nomor_rumah) with their representatives
+        // HOUSE-BASED SCHEDULING: One row per house, not per user
+        const [houses] = await db.query(`
+            SELECT 
+                blok, 
+                nomor_rumah,
+                tim_ronda,
+                (SELECT id FROM warga w2 
+                 WHERE w2.blok = w1.blok 
+                 AND w2.nomor_rumah = w1.nomor_rumah 
+                 AND w2.is_ronda = 1
+                 ORDER BY 
+                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
+                    w2.id
+                 LIMIT 1
+                ) as representative_id,
+                (SELECT nama FROM warga w2 
+                 WHERE w2.blok = w1.blok 
+                 AND w2.nomor_rumah = w1.nomor_rumah 
+                 AND w2.is_ronda = 1
+                 ORDER BY 
+                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
+                    w2.id
+                 LIMIT 1
+                ) as representative_nama
+            FROM warga w1
             WHERE is_ronda = 1 
-            AND status_keluarga = 'Kepala Keluarga'
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
-            ORDER BY tim_ronda ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+            GROUP BY blok, nomor_rumah, tim_ronda
+            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
         `);
-
-
-        // Data already sorted by SQL ORDER BY clause
-        // No need for additional JavaScript sorting
 
         // Get Schedules for this year
         const [schedules] = await db.query(`
@@ -608,22 +626,35 @@ exports.control = async (req, res) => {
             WHERE tanggal BETWEEN ? AND ?
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
-        // Build Matrix
+        // Build Matrix based on HOUSES (blok + nomor_rumah)
         const matrix = {};
-        warga.forEach(w => {
-            matrix[w.id] = {
-                info: w,
+        houses.forEach(h => {
+            if (!h.representative_id) return; // Skip houses without representatives
+            
+            // Use house identifier as key (blok-nomor_rumah)
+            const houseKey = `${h.blok}-${h.nomor_rumah}`;
+            matrix[houseKey] = {
+                info: {
+                    id: h.representative_id,
+                    nama: h.representative_nama,
+                    blok: h.blok,
+                    nomor_rumah: h.nomor_rumah,
+                    tim_ronda: h.tim_ronda
+                },
                 dates: {}
             };
             saturdays.forEach(d => {
-                matrix[w.id].dates[d] = { status: null, denda: 0 };
+                matrix[houseKey].dates[d] = { status: null, denda: 0 };
             });
         });
 
+        // Map schedules to houses (not users)
         schedules.forEach(s => {
             const d = moment(s.tanggal).format('YYYY-MM-DD');
-            if (matrix[s.warga_id] && matrix[s.warga_id].dates[d]) {
-                matrix[s.warga_id].dates[d] = s;
+            const houseKey = `${s.blok}-${s.nomor_rumah}`;
+            
+            if (matrix[houseKey] && matrix[houseKey].dates[d]) {
+                matrix[houseKey].dates[d] = s;
             }
         });
 
@@ -687,36 +718,39 @@ exports.exportControl = async (req, res) => {
             day.add(7, 'days'); // Optimization: add 7 days instead of 1
         }
 
-        // Get All Warga Wajib Ronda - Exclude Tim '-'
-        const [warga] = await db.query(`
-            SELECT id, nama, blok, nomor_rumah, TRIM(tim_ronda) as tim_ronda 
-            FROM warga 
+        // Get All HOUSES (unique blok + nomor_rumah) with their representatives
+        // HOUSE-BASED SCHEDULING: One row per house, not per user
+        const [houses] = await db.query(`
+            SELECT 
+                blok, 
+                nomor_rumah,
+                tim_ronda,
+                (SELECT id FROM warga w2 
+                 WHERE w2.blok = w1.blok 
+                 AND w2.nomor_rumah = w1.nomor_rumah 
+                 AND w2.is_ronda = 1
+                 ORDER BY 
+                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
+                    w2.id
+                 LIMIT 1
+                ) as representative_id,
+                (SELECT nama FROM warga w2 
+                 WHERE w2.blok = w1.blok 
+                 AND w2.nomor_rumah = w1.nomor_rumah 
+                 AND w2.is_ronda = 1
+                 ORDER BY 
+                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
+                    w2.id
+                 LIMIT 1
+                ) as representative_nama
+            FROM warga w1
             WHERE is_ronda = 1 
-            AND status_keluarga = 'Kepala Keluarga'
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
-            ORDER BY tim_ronda ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+            GROUP BY blok, nomor_rumah, tim_ronda
+            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
         `);
-
-
-        // Explicitly sort in JavaScript to guarantee order
-        warga.sort((a, b) => {
-            // 1. Sort by Tim (A, B, C...)
-            const timA = (a.tim_ronda || 'Z').toUpperCase();
-            const timB = (b.tim_ronda || 'Z').toUpperCase();
-            if (timA < timB) return -1;
-            if (timA > timB) return 1;
-
-            // 2. Sort by Blok
-            if (a.blok < b.blok) return -1;
-            if (a.blok > b.blok) return 1;
-
-            // 3. Sort by Nomor Rumah (Numeric)
-            const numA = parseInt(a.nomor_rumah) || 0;
-            const numB = parseInt(b.nomor_rumah) || 0;
-            return numA - numB;
-        });
 
         // Get Schedules for this wide range
         const [schedules] = await db.query(`
@@ -724,22 +758,32 @@ exports.exportControl = async (req, res) => {
             WHERE tanggal BETWEEN ? AND ?
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
-        // Build Matrix
+        // Build Matrix based on HOUSES
         const matrix = {};
-        warga.forEach(w => {
-            matrix[w.id] = {
-                info: w,
+        houses.forEach(h => {
+            if (!h.representative_id) return;
+            
+            const houseKey = `${h.blok}-${h.nomor_rumah}`;
+            matrix[houseKey] = {
+                info: {
+                    id: h.representative_id,
+                    nama: h.representative_nama,
+                    blok: h.blok,
+                    nomor_rumah: h.nomor_rumah,
+                    tim_ronda: h.tim_ronda
+                },
                 dates: {}
             };
             saturdays.forEach(d => {
-                matrix[w.id].dates[d] = { status: null, denda: 0 };
+                matrix[houseKey].dates[d] = { status: null, denda: 0 };
             });
         });
 
         schedules.forEach(s => {
             const d = moment(s.tanggal).format('YYYY-MM-DD');
-            if (matrix[s.warga_id] && matrix[s.warga_id].dates[d]) {
-                matrix[s.warga_id].dates[d] = s;
+            const houseKey = `${s.blok}-${s.nomor_rumah}`;
+            if (matrix[houseKey] && matrix[houseKey].dates[d]) {
+                matrix[houseKey].dates[d] = s;
             }
         });
 
@@ -790,8 +834,8 @@ exports.exportControl = async (req, res) => {
 
         // Rows
         let rowNum = 1;
-        warga.forEach(w => {
-            const row = matrix[w.id];
+        Object.keys(matrix).forEach(houseKey => {
+            const row = matrix[houseKey];
             // First calculate totals so we can put them in the left columns
             let totalDenda = 0;
             let totalPaid = 0;

@@ -82,7 +82,6 @@ require('./utils/fixKasTanggalType')();
 require('./utils/addTanggalKonfirmasiCol')();
 require('./utils/houseBasedRondaMigration')();
 require('./utils/activityTrackingMigration')();
-require('./utils/activityLogsMigration')();
 
 // Fetch Admin Contact
 const getAdminContact = require('./utils/getAdminContact');
