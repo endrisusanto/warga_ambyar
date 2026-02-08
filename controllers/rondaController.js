@@ -215,27 +215,66 @@ exports.updateTeam = async (req, res) => {
     }
 };
 
-exports.updateStatus = async (req, res) => {
-    try {
-        const { id, status, keterangan, redirectUrl } = req.body;
+exports.updateStatus = (req, res) => {
+    const uploadSelfie = multer({ storage: storage }).single('bukti_hadir');
 
-        if (status === 'reschedule') {
-            await Ronda.reschedule(id, keterangan);
-            req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu depan');
-        } else {
-            await Ronda.updateStatus(id, status, keterangan);
-            req.flash('success_msg', 'Status ronda diperbarui');
+    uploadSelfie(req, res, async (err) => {
+        if (err) {
+            console.error('[ERROR] Multer:', err);
+            req.flash('error_msg', 'Gagal upload foto: ' + err.message);
+            return res.redirect(req.get('Referer') || '/ronda');
         }
 
-        if (redirectUrl) {
-            return res.redirect(redirectUrl);
+        try {
+            let { id, status } = req.body;
+            const { warga_id, date } = req.body; 
+            const keterangan = req.body.keterangan || '';
+            const redirectUrl = req.body.redirectUrl;
+
+            // Handle "virtual" schedules (not yet in DB)
+            if (!id && warga_id && date) {
+                try {
+                    console.log(`[DEBUG] Creating schedule for WargaID: ${warga_id}, Date: ${date}`);
+                    id = await Ronda.ensureSchedule(date, warga_id);
+                } catch (createErr) {
+                    console.error('[ERROR] Failed to ensure schedule:', createErr);
+                    req.flash('error_msg', 'Gagal membuat jadwal baru: ' + createErr.message);
+                    return res.redirect(req.get('Referer') || '/ronda');
+                }
+            }
+
+            console.log(`[DEBUG] Updating status for ID: ${id} to ${status}`);
+
+            if (!id || !status) {
+                req.flash('error_msg', 'Data tidak lengkap (ID/Status missing)');
+                return res.redirect(req.get('Referer') || '/ronda');
+            }
+
+            if (status === 'reschedule') {
+                await Ronda.reschedule(id, keterangan);
+                req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu depan');
+            } else {
+                await Ronda.updateStatus(id, status, keterangan);
+                
+                // If 'hadir' and file exists, update photo proof
+                if (status === 'hadir' && req.file) {
+                    await Ronda.updatePhotos(id, [req.file.filename]);
+                }
+                
+                req.flash('success_msg', 'Status ronda diperbarui');
+            }
+
+            if (redirectUrl) {
+                return res.redirect(redirectUrl);
+            }
+            res.redirect(req.get('Referer') || '/ronda');
+
+        } catch (err) {
+            console.error('[ERROR] Controller Exception:', err);
+            req.flash('error_msg', 'Gagal update status: ' + err.message);
+            res.redirect(req.get('Referer') || '/ronda');
         }
-        res.redirect(req.get('Referer') || '/ronda');
-    } catch (err) {
-        console.error(err);
-        req.flash('error_msg', 'Gagal update status');
-        res.redirect(req.get('Referer') || '/ronda');
-    }
+    });
 };
 
 exports.payFine = async (req, res) => {
@@ -554,11 +593,71 @@ exports.viewPublic = async (req, res) => {
             ogImage: img ? '/uploads/shares/' + img : null,
             moment
         });
-
     } catch (e) {
         console.error(e);
         res.status(500).send('Error loading page');
     }
+};
+
+exports.updatePublicStatus = (req, res) => {
+    // Debug: Log entry
+    console.log('[DEBUG] updatePublicStatus called');
+
+    const uploadSelfie = multer({ storage: storage }).single('bukti_hadir');
+
+    uploadSelfie(req, res, async (err) => {
+        // Debug: Log after multer
+        console.log('[DEBUG] Multer processed. Body:', req.body);
+        console.log('[DEBUG] File:', req.file);
+
+        if (err) {
+            console.error('[ERROR] Multer:', err);
+            req.flash('error_msg', 'Gagal upload foto: ' + err.message);
+            return res.redirect(req.get('Referer') || '/');
+        }
+
+        try {
+            const { id, status } = req.body;
+            console.log(`[DEBUG] Updating status for ID: ${id} to ${status}`);
+
+            if (!id || !status) {
+                console.warn('[WARN] ID or Status missing');
+                req.flash('error_msg', 'Data tidak lengkap');
+                return res.redirect(req.get('Referer') || '/');
+            }
+
+            // Default keterangan for public updates
+            const keterangan = req.body.keterangan || 'Update via Public View';
+
+            const Ronda = require('../models/Ronda');
+            
+            // 1. Update Status
+            if (status === 'reschedule') {
+                await Ronda.reschedule(id, keterangan);
+                console.log('[DEBUG] Reschedule success');
+                req.flash('success_msg', 'Jadwal berhasil diganti ke minggu depan');
+            } else {
+                await Ronda.updateStatus(id, status, keterangan);
+                console.log('[DEBUG] UpdateStatus success');
+                
+                // 2. If 'hadir' and file exists, update photo proof
+                if (status === 'hadir' && req.file) {
+                    // Start: Handle existing photos if any
+                    // For now, simpler approach: overwrite/set array
+                    await Ronda.updatePhotos(id, [req.file.filename]);
+                    console.log('[DEBUG] Photo updated:', req.file.filename);
+                }
+                
+                req.flash('success_msg', 'Status berhasil diupdate');
+            }
+
+            res.redirect(req.get('Referer') || '/');
+        } catch (err) {
+            console.error('[ERROR] Controller Exception:', err);
+            req.flash('error_msg', 'Gagal update status: ' + err.message);
+            res.redirect(req.get('Referer') || '/');
+        }
+    });
 };
 
 exports.control = async (req, res) => {

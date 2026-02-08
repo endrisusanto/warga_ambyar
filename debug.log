@@ -68,3 +68,5 @@ ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
 ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
 ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
 ERROR Ronda: Table 'rt_rw_db.ronda_jadwal' doesn't exist
+ERROR Ronda: Unknown column 'blok' in 'window partition by'
+ERROR Ronda: Unknown column 'blok' in 'window partition by'

@@ -155,34 +155,11 @@
                     upcomingSaturday = new Date(today);
                     upcomingSaturday.setDate(today.getDate() - 1); // Yesterday (Saturday)
                 } else {
-                    // Find this week's Saturday
-                    // Sunday = 0, Monday = 1, ..., Saturday = 6
-                    // Days until Saturday from today
-                    let daysUntilSaturday;
-                    if (currentDay === 0) {
-                        // Sunday (after 6 AM) - upcoming Saturday is this week's Saturday
-                        // Sunday(0) + 6 days = next Saturday
-                        // But we want THIS week's Saturday, which is 6 days ahead
-                        // Actually: Sun(0) Mon(1) Tue(2) Wed(3) Thu(4) Fri(5) Sat(6)
-                        // From Sunday to Saturday = 6 - 0 = 6 days
-                        // BUT: If today is Sunday Feb 2, Saturday this week is Feb 7
-                        // Feb 2 + 5 = Feb 7 ✓
-                        // The issue: we're in a new week starting Sunday
-                        // So Saturday of THIS week (that contains this Sunday) is 5 days away
-                        daysUntilSaturday = 5; // This week's Saturday (5 days from Sunday)
-                    } else if (currentDay === 6) {
-                        // Saturday
-                        if (currentHour >= 18) {
-                            // After 6 PM - ronda done, next Saturday is upcoming
-                            daysUntilSaturday = 7;
-                        } else {
-                            // Before 6 PM - today is upcoming
-                            daysUntilSaturday = 0;
-                        }
-                    } else {
-                        // Monday to Friday - calculate days until Saturday
-                        daysUntilSaturday = 6 - currentDay;
-                    }
+                    // Calculate days until next Saturday
+                    // If today is Sat(6), diff is 0 (Always show TODAY as upcoming on Saturday)
+                    // If today is Sun(0), diff is 6 (Show next Saturday)
+                    // If today is Mon(1), diff is 5 (Show next Saturday)
+                    let daysUntilSaturday = 6 - currentDay;
                     
                     upcomingSaturday = new Date(today);
                     upcomingSaturday.setDate(today.getDate() + daysUntilSaturday);
@@ -535,8 +512,8 @@
                                         return m.blok === s.blok && m.nomor_rumah === s.nomor_rumah;
                                     });
                                     %>
-                                    <li
-                                        class="flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-gray-100 dark:bg-white/5 border-white/5 hover:bg-gray-200 dark:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group">
+                                    <li onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>', '<%= s.warga_id %>', '<%= date %>')"
+                                        class="cursor-pointer flex justify-between items-center <%= isHighlighted ? 'bg-white shadow-sm hover:bg-gray-50 border-gray-200' : 'bg-gray-100 dark:bg-white/5 border-white/5 hover:bg-gray-200 dark:bg-white/10' %> rounded-2xl px-4 py-3 border transition-all group hover:shadow-md">
                                         <div class="flex-grow min-w-0 mr-3">
                                             <div class="flex items-center gap-2">
                                                 <div
@@ -625,81 +602,41 @@
 
                                         <div class="flex items-center gap-2 shrink-0">
                                             <% if(true) { %>
-                                                <% if((user.role === 'admin' || s.status==='scheduled' || s.status==='reschedule' ||
-                                                    s.status==='' ) && s.id) { %>
-                                                    <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status || `scheduled` %>', '<%= (s.keterangan || ``).replace(/'/g, "\\'") %>')"
-                                                        class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
-                                                        title="Ubah Status">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                        </svg>
-                                                    </button>
+                                                    <% if(s.denda > 0) { %>
+                                                        <% if(s.status_bayar === 'pending') { %>
+                                                            <% if(user.role === 'admin') { %>
+                                                                <button onclick="openVerifyFineModal('<%= s.id %>', '<%= s.bukti_bayar %>')"
+                                                                    class="px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm">
+                                                                    Verifikasi
+                                                                </button>
+                                                            <% } else { %>
+                                                                <span class="px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-400/30 text-xs font-bold cursor-help" title="Menunggu Verifikasi Admin">
+                                                                    ⏳ Pending
+                                                                </span>
+                                                            <% } %>
+                                                        <% } else { %>
+                                                            <button onclick="openPayFineModal('<%= s.id %>', '<%= s.denda %>', '<%= s.nama %>', '<%= s.blok %>', '<%= s.nomor_rumah %>', '<%= date %>')"
+                                                                class="p-2 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/30 transition-all icon-only-btn"
+                                                                title="Setor Denda">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                                </svg>
+                                                            </button>
+                                                        <% } %>
                                                     <% } %>
-                                                        <% if(s.denda> 0) { %>
-                                                            <% if(s.status_bayar==='pending' ) { %>
-                                                                <% if(user.role==='admin' ) { %>
-                                                                    <button
-                                                                        onclick="openVerifyFineModal('<%= s.id %>', '<%= s.bukti_bayar %>')"
-                                                                        class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all text-xs font-bold"
-                                                                        title="Verifikasi Pembayaran">
-                                                                        Verifikasi
-                                                                    </button>
-                                                                    <% } else { %>
-                                                                        <span
-                                                                            class="p-2 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold cursor-help"
-                                                                            title="Menunggu Verifikasi Admin">
-                                                                            ⏳
-                                                                        </span>
-                                                                        <% } %>
-                                                                            <% } else { %>
-                                                                                <button
-                                                                                    onclick="openPayFineModal('<%= s.id %>', '<%= s.denda %>')"
-                                                                                    class="p-2 rounded-full bg-green-500/20 text-green-300 hover:bg-green-500/30 border border-green-400/30 transition-all"
-                                                                                    title="Bayar Denda">
-                                                                                    <svg class="w-4 h-4" fill="none"
-                                                                                        stroke="currentColor"
-                                                                                        viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round"
-                                                                                            stroke-linejoin="round"
-                                                                                            stroke-width="2"
-                                                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                                                        </path>
-                                                                                    </svg>
-                                                                                </button>
-                                                                                <% } %>
-                                                                                    <% } %>
+
+                                                    <% if((user.role === 'admin' || s.status==='scheduled' || s.status==='reschedule' || s.status==='' ) && s.id) { %>
+                                                        <button onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status || `scheduled` %>', '<%= s.warga_id %>', '<%= date %>')"
+                                                            class="p-2 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30 transition-all"
+                                                            title="Ubah Status">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                                            </svg>
+                                                        </button>
+                                                    <% } %>
                                                                                         <% } %>
 
-                                                                                            <!-- Upload Foto Button -->
-                                                                                            <% if((user.role==='admin'
-                                                                                                || isToday || isThisWeek
-                                                                                                || s.status==='hadir' )
-                                                                                                && s.id) { %>
-                                                                                                <button
-                                                                                                    onclick="openUploadModal('<%= s.id %>', '<%= s.nama %>')"
-                                                                                                    class="p-2 rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30 transition-all"
-                                                                                                    title="Upload Foto">
-                                                                                                    <svg class="w-4 h-4"
-                                                                                                        fill="none"
-                                                                                                        stroke="currentColor"
-                                                                                                        viewBox="0 0 24 24">
-                                                                                                        <path
-                                                                                                            stroke-linecap="round"
-                                                                                                            stroke-linejoin="round"
-                                                                                                            stroke-width="2"
-                                                                                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                                                                                        </path>
-                                                                                                        <path
-                                                                                                            stroke-linecap="round"
-                                                                                                            stroke-linejoin="round"
-                                                                                                            stroke-width="2"
-                                                                                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
-                                                                                                        </path>
-                                                                                                    </svg>
-                                                                                                </button>
-                                                                                                <% } %>
+
                                         </div>
                                     </li>
                                     <% }) %>
@@ -709,59 +646,7 @@
                     <% }) %>
         </div>
 
-        <!-- Status Modal -->
-        <div id="statusModal"
-            class="fixed inset-0 bg-black/60 hidden overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
-            <div class="relative top-20 mx-auto p-6 glass-card w-full max-w-md shadow-2xl">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Absensi Ronda
-                </h3>
-                <form action="/ronda/update-status" method="POST">
-                    <input type="hidden" id="scheduleId" name="id">
-                    <div class="mb-5">
-                        <label
-                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nama
-                            Warga</label>
-                        <div id="wargaName"
-                            class="text-gray-900 dark:text-gray-100 font-bold bg-gray-100 dark:bg-white/5 p-3 rounded-xl border border-white/10">
-                        </div>
-                    </div>
-                    <div class="mb-5">
-                        <label
-                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status
-                            Kehadiran</label>
-                        <select name="status" id="statusSelect"
-    class="glass-input mt-1 block w-full rounded-xl p-3 outline-none cursor-pointer">
-    <option value="scheduled" class="text-gray-900">Reset (Scheduled)</option>
-    <option value="hadir" class="text-gray-900">Hadir</option>
-    <option value="reschedule" class="text-gray-900">Reschedule (Ganti Minggu Depan)</option>
-    <option value="alpa" class="text-gray-900">Alpa (Denda 50rb)</option>
-</select>
-                    </div>
-                    <div class="mb-6">
-                        <label
-                            class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Keterangan
-                            (Opsional)</label>
-                        <textarea name="keterangan" id="statusKeterangan" rows="3" placeholder="Tambahkan catatan jika diperlukan..."
-    class="glass-input mt-1 block w-full rounded-xl p-3 outline-none resize-none"></textarea>
-                    </div>
-                    <div class="flex justify-end gap-3">
-                        <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')"
-                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-200 transition-colors">
-                            Batal
-                        </button>
-                        <button type="submit"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg transition-all">
-                            Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+
 
         <!-- Upload Modal -->
         <div id="uploadModal"
@@ -955,22 +840,78 @@
                 if (e.key === 'Escape') closeCarousel();
             });
 
-            function openStatusModal(id, name, status, keterangan) {
-                document.getElementById('scheduleId').value = id;
-                document.getElementById('wargaName').innerText = name;
+            let currentModalStep = 1;
+
+            function openStatusModal(id, name, currentStatus, wargaId, date) {
+                // Ensure inputs exist
+                if(document.getElementById('modalScheduleId')) document.getElementById('modalScheduleId').value = id;
+                if(document.getElementById('modalWargaId')) document.getElementById('modalWargaId').value = wargaId;
+                if(document.getElementById('modalDate')) document.getElementById('modalDate').value = date;
+                if(document.getElementById('modalCitizenName')) document.getElementById('modalCitizenName').innerText = name;
                 
-                // Set status if provided
-                if (status) {
-                    const statusSelect = document.getElementById('statusSelect');
-                    if (statusSelect) statusSelect.value = status;
+                const modal = document.getElementById('statusModal');
+                if(modal) modal.classList.remove('hidden');
+
+                // Reset Steps
+                currentModalStep = 1;
+                if(document.getElementById('step-status')) document.getElementById('step-status').classList.remove('hidden');
+                if(document.getElementById('step-upload')) document.getElementById('step-upload').classList.add('hidden');
+                if(document.getElementById('btn-save')) document.getElementById('btn-save').textContent = 'Simpan Perubahan';
+                if(document.getElementById('modal-title')) document.getElementById('modal-title').textContent = 'Update Kehadiran';
+                if(document.getElementById('modal-subtitle')) document.getElementById('modal-subtitle').classList.remove('hidden');
+
+                // Reset Radio
+                const radios = document.getElementsByName('status');
+                for (let r of radios) {
+                    if (r.value === currentStatus) r.checked = true;
+                    else r.checked = false;
+                }
+            }
+
+            function closeStatusModal() {
+                const modal = document.getElementById('statusModal');
+                if(modal) modal.classList.add('hidden');
+            }
+
+            function handleSaveStep() {
+                const form = document.querySelector('#statusModal form');
+                const radios = document.getElementsByName('status');
+                let selected = null;
+                for (let r of radios) {
+                    if (r.checked) selected = r.value;
                 }
 
-                if (keterangan) {
-                    const ket = document.getElementById('statusKeterangan');
-                    if (ket) ket.value = keterangan;
+                if (!selected) {
+                    alert('Pilih status terlebih dahulu!');
+                    return;
                 }
 
-                document.getElementById('statusModal').classList.remove('hidden');
+                if (selected === 'hadir' && currentModalStep === 1) {
+                    // Go to Step 2
+                    currentModalStep = 2;
+                    document.getElementById('step-status').classList.add('hidden');
+                    document.getElementById('step-upload').classList.remove('hidden');
+                    document.getElementById('modal-title').textContent = 'Ambil Selfie';
+                    document.getElementById('modal-subtitle').classList.add('hidden');
+                    document.getElementById('btn-save').textContent = 'Kirim Bukti';
+                } else {
+                    // Submit
+                    form.submit();
+                }
+            }
+
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.getElementById('image-preview');
+                        if(img) {
+                            img.src = e.target.result;
+                            img.classList.remove('hidden');
+                        }
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
             }
 
             function openUploadModal(id, name) {
@@ -1047,48 +988,60 @@
             }
         </script>
 
-        <!-- Pay Fine Modal -->
-        <div id="payFineModal" class="fixed inset-0 z-[10000] hidden overflow-y-auto" aria-labelledby="modal-title"
-            role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"
-                    onclick="closePayFineModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div
-                    class="inline-block align-bottom bg-gray-900/90 backdrop-blur-xl rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-white/10">
-                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Bayar Denda Ronda</h3>
-                        <div class="mt-4 text-center">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Scan QRIS di bawah ini untuk
-                                membayar denda sebesar
-                                <span class="font-bold text-red-400" id="payFineAmount">Rp 50.000</span>
-                            </p>
-                            <div class="flex justify-center bg-white p-4 rounded-xl mx-auto w-fit">
-                                <canvas id="qrisCanvas"></canvas>
+        <!-- Pay Fine Modal (Refined) -->
+        <div id="payFineModal" class="fixed inset-0 z-[10000] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closePayFineModal()"></div>
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                        <div class="bg-white dark:bg-slate-900 px-6 pb-6 pt-8 sm:p-8 sm:pb-8">
+                            <div class="text-center">
+                                <h3 class="text-2xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2" id="modal-title">
+                                    Bayar Denda
+                                </h3>
+                                <p class="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                    Scan QRIS di bawah ini untuk membayar denda sebesar
+                                    <span class="block text-3xl font-bold text-red-500 mt-2" id="payFineAmount">Rp 50.000</span>
+                                </p>
+                                
+                                <div class="flex justify-center bg-white p-4 rounded-xl mx-auto w-fit mt-6 shadow-lg border border-slate-100 dark:border-slate-800">
+                                    <canvas id="qrisCanvas"></canvas>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-500 mt-3 font-mono bg-slate-100 dark:bg-slate-800/50 py-1 px-3 rounded-full inline-block">NMID: ID1020020020020 (Warga Ambyar)</p>
                             </div>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">NMID: ID1020020020020 (Warga
-                                Ambyar)</p>
+
+                            <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-8">
+                                <input type="hidden" name="id" id="payFineId">
+                                
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">
+                                        Upload Bukti Transfer
+                                    </label>
+                                    
+                                    <label for="proof-file-upload" class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group overflow-hidden">
+                                        <div id="proof-upload-placeholder" class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg class="w-10 h-10 mb-3 text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                            <p class="text-sm text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-500">Klik untuk upload</span> bukti pembayaran</p>
+                                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">PNG, JPG (Max. 5MB)</p>
+                                        </div>
+                                        <img id="proof-preview" class="absolute inset-0 w-full h-full object-contain p-2 hidden" />
+                                        <input id="proof-file-upload" name="foto_bukti" type="file" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewProofImage(this)" />
+                                    </label>
+                                    <p id="file-chosen-text" class="text-xs text-center text-slate-500 dark:text-slate-400 mt-1 italic">Belum ada file dipilih</p>
+                                </div>
+
+                                <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3">
+                                    <button type="button" onclick="closePayFineModal()"
+                                        class="w-full inline-flex justify-center rounded-xl bg-white dark:bg-slate-800 px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-600 transition-all">
+                                        Batal
+                                    </button>
+                                    <button type="submit"
+                                        class="w-full inline-flex justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-200">
+                                        Kirim Bukti
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <form action="/ronda/pay-fine-upload" method="POST" enctype="multipart/form-data" class="mt-4">
-                            <input type="hidden" name="id" id="payFineId">
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload
-                                    Bukti
-                                    Transfer</label>
-                                <input type="file" name="foto_bukti" accept="image/*" required
-                                    class="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
-                            </div>
-                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                                <button type="submit"
-                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:col-start-2 sm:text-sm">
-                                    Kirim Bukti
-                                </button>
-                                <button type="button" onclick="closePayFineModal()"
-                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
-                                    Batal
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -1096,17 +1049,59 @@
 
         <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
         <script>
-            function openPayFineModal(id, denda) {
+            async function openPayFineModal(id, denda, nama, blok, nomor, date) {
                 document.getElementById('payFineId').value = id;
                 document.getElementById('payFineAmount').innerText = 'Rp ' + parseInt(denda).toLocaleString('id-ID');
                 document.getElementById('payFineModal').classList.remove('hidden');
 
-                // Generate QRIS (Base String from ENV + ID for uniqueness)
-                const qrisData = "<%= typeof staticQris !== 'undefined' ? staticQris : '' %>" + id;
+                // Reset Canvas
+                const canvas = document.getElementById('qrisCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Show Loading
+                ctx.font = "14px Arial";
+                ctx.fillText("Loading QRIS...", 50, 50);
 
-                QRCode.toCanvas(document.getElementById('qrisCanvas'), qrisData, { width: 200, margin: 2 }, function (error) {
-                    if (error) console.error(error)
-                })
+                // Construct Merchant Name (Custom Short Format)
+                // Format: DENDA [DD/MM] [NAMA_DEPAN] [BLOK-NO]
+                try {
+                    const d = new Date(date);
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const dateStr = `${day}/${month}`;
+                    
+                    const firstName = nama.split(' ')[0].substring(0, 10).toUpperCase();
+                    const house = `${blok}-${nomor}`;
+                    
+                    let merchantName = `DENDA ${dateStr} ${firstName} ${house}`.toUpperCase();
+                    // Max 25 chars constraint typical for static QRIS merchant name overrides in some libs, 
+                    // though standard allows more. Keeping it short as requested.
+                    if(merchantName.length > 25) merchantName = merchantName.substring(0, 25);
+                    
+                    console.log('Generating QRIS for:', merchantName);
+
+                    // Fetch generated QRIS from backend
+                    const response = await fetch('/iuran/generate-qris', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: parseInt(denda), merchantName: merchantName })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.qr_string) {
+                         QRCode.toCanvas(canvas, data.qr_string, { width: 200, margin: 2 }, function (error) {
+                            if (error) console.error(error)
+                        });
+                    } else {
+                        alert('Gagal generate QRIS: ' + (data.error || 'Unknown error'));
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                    alert('Error preparing QRIS');
+                }
             }
 
             function closePayFineModal() {
@@ -1121,6 +1116,30 @@
 
             function closeVerifyFineModal() {
                 document.getElementById('verifyFineModal').classList.add('hidden');
+            }
+
+            function previewProofImage(input) {
+                const placeholder = document.getElementById('proof-upload-placeholder');
+                const preview = document.getElementById('proof-preview');
+                const fileChosenText = document.getElementById('file-chosen-text');
+                
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                    }
+                    
+                    reader.readAsDataURL(input.files[0]);
+                    if(fileChosenText) fileChosenText.textContent = input.files[0].name;
+                } else {
+                     preview.src = '#';
+                     preview.classList.add('hidden');
+                     placeholder.classList.remove('hidden');
+                     if(fileChosenText) fileChosenText.textContent = 'Belum ada file dipilih';
+                }
             }
         </script>
 
@@ -1166,4 +1185,95 @@
             </div>
         </div>
 
+        <!-- Status Update Modal -->
+        <div id="statusModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <!-- Overlay -->
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeStatusModal()"></div>
+
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                        <form action="/ronda/update-status" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id" id="modalScheduleId">
+                            <input type="hidden" name="warga_id" id="modalWargaId">
+                            <input type="hidden" name="date" id="modalDate">
+                            
+                            <div class="bg-white dark:bg-slate-900 px-6 pb-6 pt-8 sm:p-8 sm:pb-8">
+                                <div class="text-center">
+                                    <h3 class="text-3xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2" id="modal-title">
+                                        Update Kehadiran
+                                    </h3>
+                                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400" id="modal-subtitle">
+                                        Konfirmasi status kehadiran untuk 
+                                        <span id="modalCitizenName" class="block text-xl font-bold text-slate-800 dark:text-slate-100 mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700"></span>
+                                    </p>
+                                    
+                                    <!-- Step 1: Status Selection -->
+                                    <div id="step-status" class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <!-- Hadir -->
+                                        <label class="cursor-pointer group relative">
+                                            <input type="radio" name="status" value="hadir" class="peer sr-only">
+                                            <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/30 dark:peer-checked:bg-emerald-900/20 peer-checked:ring-2 peer-checked:ring-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">✅</div>
+                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
+                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Datang tepat waktu</div>
+                                            </div>
+                                        </label>
+                                        
+                                        <!-- Ganti Hari -->
+                                        <label class="cursor-pointer group relative">
+                                            <input type="radio" name="status" value="reschedule" class="peer sr-only">
+                                            <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-orange-500 peer-checked:bg-orange-50/30 dark:peer-checked:bg-orange-900/20 peer-checked:ring-2 peer-checked:ring-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">🔄</div>
+                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Ganti Hari</div>
+                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Pindah minggu depan</div>
+                                            </div>
+                                        </label>
+                                        
+                                        <!-- Alpa -->
+                                        <label class="cursor-pointer group relative">
+                                            <input type="radio" name="status" value="alpa" class="peer sr-only">
+                                            <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-red-500 peer-checked:bg-red-50/30 dark:peer-checked:bg-red-900/20 peer-checked:ring-2 peer-checked:ring-red-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">❌</div>
+                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
+                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Tidak ada kabar</div>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <!-- Step 2: Upload Bukti Hadir -->
+                                    <div id="step-upload" class="hidden mt-6 animate-fade-in-up">
+                                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Silakan ambil foto selfie sebagai bukti kehadiran.</p>
+                                        <div class="flex items-center justify-center w-full">
+                                            <label for="dropzone-file-index" class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors overflow-hidden group">
+                                                <div class="flex flex-col items-center justify-center pt-5 pb-6 z-10 group-hover:scale-105 transition-transform duration-300">
+                                                    <div class="bg-indigo-100 dark:bg-indigo-900/50 p-4 rounded-full mb-3">
+                                                        <svg class="w-10 h-10 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                    </div>
+                                                    <p class="text-sm text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-600 dark:text-indigo-400">Klik Kamera</span> untuk ambil foto</p>
+                                                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Pastikan wajah terlihat jelas</p>
+                                                </div>
+                                                <img id="image-preview" src="#" alt="Preview" class="absolute inset-0 w-full h-full object-cover hidden opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                <input id="dropzone-file-index" name="bukti_hadir" type="file" accept="image/*" capture="user" class="hidden" onchange="previewImage(this)" />
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50/80 dark:bg-slate-800/80 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 gap-3 border-t border-gray-100 dark:border-slate-700">
+                                <button type="button" id="btn-save" onclick="handleSaveStep()" class="inline-flex w-full justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-indigo-500/20 hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-200 sm:w-auto">
+                                    Lanjut / Simpan
+                                </button>
+                                <button type="button" onclick="closeStatusModal()" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white dark:bg-slate-800 px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-600 transition-all sm:mt-0 sm:w-auto">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <%- include('../partials/footer') %>

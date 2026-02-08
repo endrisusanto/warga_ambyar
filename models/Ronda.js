@@ -435,6 +435,27 @@ const Ronda = {
                 }
             }
         }
+    },
+    // Ensure a schedule entry exists (create if not)
+    ensureSchedule: async (date, wargaId) => {
+        // Check existing
+        const [existing] = await db.query(
+            "SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?",
+            [date, wargaId]
+        );
+        
+        if (existing.length > 0) return existing[0].id;
+
+        // Fetch Warga details
+        const [warga] = await db.query("SELECT blok, nomor_rumah FROM warga WHERE id = ?", [wargaId]);
+        if (warga.length === 0) throw new Error('Warga not found');
+
+        // Insert
+        const [result] = await db.query(
+            "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status) VALUES (?, ?, ?, ?, 'scheduled')",
+            [date, wargaId, warga[0].blok, warga[0].nomor_rumah]
+        );
+        return result.insertId;
     }
 };
 

@@ -300,5 +300,6 @@ router.get('/cleanup-schedules', ensureAuthenticated, async (req, res) => {
 
 router.get('/view', rondaController.viewPublic);
 router.get('/v/:id', rondaController.viewPublic);
+router.post('/v/update-status', rondaController.updatePublicStatus);
 
 module.exports = router;

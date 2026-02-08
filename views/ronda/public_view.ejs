@@ -19,6 +19,31 @@
                 <div
                     class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen">
 
+                    <!-- Flash Messages -->
+                    <div class="w-full mb-4">
+                        <% if(locals.success_msg && locals.success_msg.length > 0) { %>
+                            <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded-xl relative mb-4 shadow-sm animate-fade-in-down" role="alert">
+                                <div class="flex items-center">
+                                    <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="block sm:inline font-bold"><%= success_msg %></span>
+                                </div>
+                            </div>
+                        <% } %>
+                    
+                        <% if(locals.error_msg && locals.error_msg.length > 0) { %>
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4 shadow-sm animate-fade-in-down" role="alert">
+                                <div class="flex items-center">
+                                    <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <span class="block sm:inline font-bold"><%= error_msg %></span>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+
                     <div class="w-full text-center mb-8">
                         <h1
                             class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-sm mb-2">
@@ -60,44 +85,50 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <% 
-                                        // Prioritas badge: Ganti Hari Hadir > Ganti Hari > Status lainnya
-                                        const isGuest = s.is_ganti_hari;
-                                        
-                                        if(isGuest && s.status === 'hadir') {
-                                            // Badge Ganti Hari yang sudah Hadir (biru)
-                                        %>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-blue-600 text-blue-600">
-                                                🔄 Hadir
-                                            </span>
-                                        <%
-                                        } else if(isGuest || s.status === 'reschedule') {
-                                            // Badge Ganti Hari (untuk isGuest atau reschedule yang belum hadir)
-                                        %>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-orange-600 text-orange-600">
-                                                🔄 Ganti Hari
-                                            </span>
-                                        <%
-                                        } else if(s.status && s.status !=='scheduled') { 
-                                            // Badge status lainnya
-                                            let statusText = s.status;
-                                            let statusClass = '';
-                                            if (s.status_bayar === 'paid') {
-                                                statusText = 'Pay Up';
-                                                statusClass = 'bg-transparent border border-green-600 text-green-600';
-                                            } else if (s.status === 'hadir') {
-                                                statusClass = 'bg-transparent border border-green-600 text-green-600';
-                                            } else {
-                                                statusClass = 'bg-transparent border border-red-600 text-red-600';
-                                            }
-                                        %>
-                                            <span
-                                                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
-                                                <%= statusText %>
-                                            </span>
-                                        <% } %>
+                                            <div onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>')" class="cursor-pointer hover:opacity-80 transition-opacity">
+                                                <% 
+                                                // Prioritas badge: Ganti Hari Hadir > Ganti Hari > Status lainnya
+                                                const isGuest = s.is_ganti_hari;
+                                                
+                                                if(isGuest && s.status === 'hadir') {
+                                                    // Badge Ganti Hari yang sudah Hadir (biru)
+                                                %>
+                                                    <span
+                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-blue-600 text-blue-600">
+                                                        🔄 Hadir
+                                                    </span>
+                                                <%
+                                                } else if(isGuest || s.status === 'reschedule') {
+                                                    // Badge Ganti Hari (untuk isGuest atau reschedule yang belum hadir)
+                                                %>
+                                                    <span
+                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-orange-600 text-orange-600">
+                                                        🔄 Ganti Hari
+                                                    </span>
+                                                <%
+                                                } else if(s.status && s.status !=='scheduled') { 
+                                                    // Badge status lainnya
+                                                    let statusText = s.status;
+                                                    let statusClass = '';
+                                                    if (s.status_bayar === 'paid') {
+                                                        statusText = 'Pay Up';
+                                                        statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                                    } else if (s.status === 'hadir') {
+                                                        statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                                    } else {
+                                                        statusClass = 'bg-transparent border border-red-600 text-red-600';
+                                                    }
+                                                %>
+                                                    <span
+                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
+                                                        <%= statusText %>
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-gray-400 text-gray-400">
+                                                        ? Input
+                                                    </span>
+                                                <% } %>
+                                            </div>
                                     </div>
                                     <% }) %>
                             </div>
@@ -195,10 +226,166 @@
                         </div>
                     </div>
 
+                    <!-- Status Update Modal -->
+                    <div id="statusModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                        <!-- Overlay with blur -->
+                        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeStatusModal()"></div>
+
+                        <div class="fixed inset-0 z-10 overflow-y-auto">
+                            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                                <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                    <form action="/ronda/v/update-status" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="id" id="modalScheduleId">
+                                        
+                                        <div class="bg-white dark:bg-slate-900 px-6 pb-6 pt-8 sm:p-8 sm:pb-8">
+                                            <div class="text-center">
+                                                <h3 class="text-3xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2" id="modal-title">
+                                                    Update Kehadiran
+                                                </h3>
+                                                <p class="text-sm font-medium text-slate-600 dark:text-slate-400" id="modal-subtitle">
+                                                    Konfirmasi status kehadiran untuk 
+                                                    <span id="modalCitizenName" class="block text-xl font-bold text-slate-800 dark:text-slate-100 mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700"></span>
+                                                </p>
+                                                
+                                                <!-- Step 1: Status Selection -->
+                                                <div id="step-status" class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                    <!-- Hadir -->
+                                                    <label class="cursor-pointer group relative">
+                                                        <input type="radio" name="status" value="hadir" class="peer sr-only">
+                                                        <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/30 dark:peer-checked:bg-emerald-900/20 peer-checked:ring-2 peer-checked:ring-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">✅</div>
+                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
+                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Datang tepat waktu</div>
+                                                        </div>
+                                                    </label>
+                                                    
+                                                    <!-- Ganti Hari -->
+                                                    <label class="cursor-pointer group relative">
+                                                        <input type="radio" name="status" value="reschedule" class="peer sr-only">
+                                                        <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-orange-500 peer-checked:bg-orange-50/30 dark:peer-checked:bg-orange-900/20 peer-checked:ring-2 peer-checked:ring-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">🔄</div>
+                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Ganti Hari</div>
+                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Pindah minggu depan</div>
+                                                        </div>
+                                                    </label>
+                                                    
+                                                    <!-- Alpa -->
+                                                    <label class="cursor-pointer group relative">
+                                                        <input type="radio" name="status" value="alpa" class="peer sr-only">
+                                                        <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-red-500 peer-checked:bg-red-50/30 dark:peer-checked:bg-red-900/20 peer-checked:ring-2 peer-checked:ring-red-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">❌</div>
+                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
+                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Tidak ada kabar</div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+
+                                                <!-- Step 2: Upload Bukti Hadir -->
+                                                <div id="step-upload" class="hidden mt-6 animate-fade-in-up">
+                                                    <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Silakan ambil foto selfie sebagai bukti kehadiran.</p>
+                                                    <div class="flex items-center justify-center w-full">
+                                                        <label for="dropzone-file" class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors overflow-hidden group">
+                                                            <div class="flex flex-col items-center justify-center pt-5 pb-6 z-10 group-hover:scale-105 transition-transform duration-300">
+                                                                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-4 rounded-full mb-3">
+                                                                    <svg class="w-10 h-10 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                                </div>
+                                                                <p class="text-sm text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-600 dark:text-indigo-400">Klik Kamera</span> untuk ambil foto</p>
+                                                                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Pastikan wajah terlihat jelas</p>
+                                                            </div>
+                                                            <img id="image-preview" src="#" alt="Preview" class="absolute inset-0 w-full h-full object-cover hidden opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                            <input id="dropzone-file" name="bukti_hadir" type="file" accept="image/*" capture="user" class="hidden" onchange="previewImage(this)" />
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="bg-gray-50/80 dark:bg-slate-800/80 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 gap-3 border-t border-gray-100 dark:border-slate-700">
+                                            <button type="button" id="btn-save" onclick="handleSaveStep()" class="inline-flex w-full justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-indigo-500/20 hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-200 sm:w-auto">
+                                                Lanjut / Simpan
+                                            </button>
+                                            <button type="button" onclick="closeStatusModal()" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white dark:bg-slate-800 px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-600 transition-all sm:mt-0 sm:w-auto">
+                                                Batal
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <script>
                         function copyLink() {
                             navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
                         }
+                        
+                        let currentModalStep = 1;
+
+                        function openStatusModal(id, nama, currentStatus) {
+                            document.getElementById('modalScheduleId').value = id;
+                            document.getElementById('modalCitizenName').textContent = nama;
+                            document.getElementById('statusModal').classList.remove('hidden');
+                            
+                            // Reset Steps
+                            currentModalStep = 1;
+                            document.getElementById('step-status').classList.remove('hidden');
+                            document.getElementById('step-upload').classList.add('hidden');
+                            document.getElementById('btn-save').textContent = 'Simpan Perubahan';
+                            document.getElementById('modal-title').textContent = 'Update Kehadiran';
+                            document.getElementById('modal-subtitle').classList.remove('hidden');
+                            
+                            // Reset Radio
+                            const radios = document.getElementsByName('status');
+                            for(let r of radios) {
+                                if(r.value === currentStatus) r.checked = true;
+                                else r.checked = false;
+                            }
+                        }
+                        
+                        function closeStatusModal() {
+                            document.getElementById('statusModal').classList.add('hidden');
+                        }
+                        
+                        function handleSaveStep() {
+                            const form = document.querySelector('form[action="/ronda/v/update-status"]');
+                            const radios = document.getElementsByName('status');
+                            let selected = null;
+                            for(let r of radios) {
+                                if(r.checked) selected = r.value;
+                            }
+                            
+                            if(!selected) {
+                                alert('Pilih status terlebih dahulu!');
+                                return;
+                            }
+                            
+                            if(selected === 'hadir' && currentModalStep === 1) {
+                                // Go to Step 2
+                                currentModalStep = 2;
+                                document.getElementById('step-status').classList.add('hidden');
+                                document.getElementById('step-upload').classList.remove('hidden');
+                                document.getElementById('modal-title').textContent = 'Ambil Selfie';
+                                document.getElementById('modal-subtitle').classList.add('hidden');
+                                document.getElementById('btn-save').textContent = 'Kirim Bukti';
+                            } else {
+                                // Submit
+                                form.submit();
+                            }
+                        }
+                        
+                        function previewImage(input) {
+                            if (input.files && input.files[0]) {
+                                var reader = new FileReader();
+                                reader.onload = function(e) {
+                                    const img = document.getElementById('image-preview');
+                                    img.src = e.target.result;
+                                    img.classList.remove('hidden');
+                                }
+                                reader.readAsDataURL(input.files[0]);
+                            }
+                        }
+
                         function shareWa() {
                             const url = encodeURIComponent(window.location.href);
 
