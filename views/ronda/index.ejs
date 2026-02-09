@@ -1075,13 +1075,12 @@
                     const house = `${blok}-${nomor}`;
                     
                     let merchantName = `DENDA ${dateStr} ${firstName} ${house}`.toUpperCase();
-                    // Max 25 chars constraint typical for static QRIS merchant name overrides in some libs, 
-                    // though standard allows more. Keeping it short as requested.
+                    // Max 25 chars for better compatibility
                     if(merchantName.length > 25) merchantName = merchantName.substring(0, 25);
                     
-                    console.log('Generating QRIS for:', merchantName);
+                    console.log('Generating QRIS for:', merchantName, 'Amount:', parseInt(denda));
 
-                    // Fetch generated QRIS from backend
+                    // Fetch generated QRIS from backend (same endpoint as iuran payment)
                     const response = await fetch('/iuran/generate-qris', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1091,16 +1090,32 @@
                     const data = await response.json();
                     
                     if (data.success && data.qr_string) {
-                         QRCode.toCanvas(canvas, data.qr_string, { width: 200, margin: 2 }, function (error) {
-                            if (error) console.error(error)
+                        // Generate QR Code with proper error handling
+                        QRCode.toCanvas(canvas, data.qr_string, { 
+                            width: 200, 
+                            margin: 2,
+                            errorCorrectionLevel: 'M'
+                        }, function (error) {
+                            if (error) {
+                                console.error('QR Code generation error:', error);
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.font = "12px Arial";
+                                ctx.fillText("Error generating QR", 30, 50);
+                            }
                         });
                     } else {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.font = "12px Arial";
+                        ctx.fillText("Gagal generate QRIS", 30, 50);
                         alert('Gagal generate QRIS: ' + (data.error || 'Unknown error'));
                     }
 
                 } catch (e) {
-                    console.error(e);
-                    alert('Error preparing QRIS');
+                    console.error('Error preparing QRIS:', e);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = "12px Arial";
+                    ctx.fillText("Network error", 50, 50);
+                    alert('Error preparing QRIS: ' + e.message);
                 }
             }
 

@@ -636,22 +636,65 @@
                 document.getElementById('payFineModal').classList.remove('hidden');
             }
             
-            function openQrisPayModal(id, denda, name) {
+            async function openQrisPayModal(id, denda, name) {
                 document.getElementById('qrisFineId').value = id;
                 document.getElementById('qrisAmountDisplay').innerText = 'Rp ' + parseInt(denda).toLocaleString('id-ID');
                 document.getElementById('qrisModal').classList.remove('hidden');
 
-                // Generate QRIS
-                const qrisData = "<%= typeof staticQris !== 'undefined' ? staticQris : '' %>" + id;
+                // Reset Canvas
                 const canvas = document.getElementById('qrisCanvas');
-                
-                // Clear previous
                 const context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Show Loading
+                context.font = "14px Arial";
+                context.fillText("Loading QRIS...", 50, 50);
 
-                QRCode.toCanvas(canvas, qrisData, { width: 200, margin: 2 }, function (error) {
-                    if (error) console.error(error);
-                });
+                try {
+                    // Simple merchant name format: DENDA RONDA [NAME]
+                    const firstName = name.split(' ')[0].substring(0, 15).toUpperCase();
+                    let merchantName = `DENDA RONDA ${firstName}`.toUpperCase();
+                    if(merchantName.length > 25) merchantName = merchantName.substring(0, 25);
+                    
+                    console.log('Generating QRIS for:', merchantName, 'Amount:', parseInt(denda));
+
+                    // Fetch generated QRIS from backend (same endpoint as iuran payment)
+                    const response = await fetch('/iuran/generate-qris', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: parseInt(denda), merchantName: merchantName })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.qr_string) {
+                        // Generate QR Code with proper error handling
+                        QRCode.toCanvas(canvas, data.qr_string, { 
+                            width: 200, 
+                            margin: 2,
+                            errorCorrectionLevel: 'M'
+                        }, function (error) {
+                            if (error) {
+                                console.error('QR Code generation error:', error);
+                                context.clearRect(0, 0, canvas.width, canvas.height);
+                                context.font = "12px Arial";
+                                context.fillText("Error generating QR", 30, 50);
+                            }
+                        });
+                    } else {
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        context.font = "12px Arial";
+                        context.fillText("Gagal generate QRIS", 30, 50);
+                        alert('Gagal generate QRIS: ' + (data.error || 'Unknown error'));
+                    }
+
+                } catch (error) {
+                    console.error('Error preparing QRIS:', error);
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.font = "12px Arial";
+                    context.fillText("Network error", 50, 50);
+                    alert('Error preparing QRIS: ' + error.message);
+                }
             }
         </script>
 
