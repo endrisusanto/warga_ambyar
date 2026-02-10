@@ -497,6 +497,41 @@ exports.uploadShareImage = (req, res) => {
     });
 };
 
+exports.createShare = async (req, res) => {
+    try {
+        const { date } = req.body;
+        if (!date) {
+            return res.json({ success: false, error: 'Date is required' });
+        }
+
+        // Create share record without image - OG image will be generated on public view page
+        const shareId = await Ronda.createShare(date, 'pending');
+        res.json({ success: true, shareId });
+    } catch (e) {
+        console.error('Error creating share:', e);
+        res.json({ success: false, error: e.message });
+    }
+};
+
+exports.updateShareImage = (req, res) => {
+    uploadShare(req, res, async (err) => {
+        if (err) return res.json({ success: false, error: err.message });
+        if (!req.file) return res.json({ success: false, error: 'No file uploaded' });
+
+        const { shareId } = req.body;
+        if (!shareId) return res.json({ success: false, error: 'Share ID is required' });
+
+        try {
+            await Ronda.updateShareImage(shareId, req.file.filename);
+            res.json({ success: true, filename: req.file.filename });
+        } catch (e) {
+            console.error(e);
+            res.json({ success: false, error: e.message });
+        }
+    });
+};
+
+
 exports.viewPublic = async (req, res) => {
     try {
         let { date, img } = req.query;
@@ -590,7 +625,8 @@ exports.viewPublic = async (req, res) => {
             schedule: daySchedule,
             allPhotos,
             teamName,
-            ogImage: img ? '/uploads/shares/' + img : null,
+            ogImage: (img && img !== 'pending') ? '/uploads/shares/' + img : null,
+            shareId: shareId,
             moment
         });
     } catch (e) {

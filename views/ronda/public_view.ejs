@@ -11,7 +11,7 @@
         <% } %>
             </head>
 
-            <body class="bg-white min-h-screen text-gray-900 font-sans selection:bg-indigo-500 selection:text-white">
+            <body class="bg-gray-50 dark:bg-slate-900 min-h-screen text-gray-900 dark:text-gray-100 font-sans selection:bg-indigo-500 selection:text-white">
 
                 <!-- Background Effects -->
 
@@ -57,13 +57,13 @@
                             <% } %>
                     </div>
 
-                    <div
+                    <div id="share-card"
                         class="w-full p-6 sm:p-8 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-white relative">
 
                         <!-- Anggota Bertugas -->
                         <div class="mb-8">
-                            <h2
-                                class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <h2 style="color: #111827 !important;"
+                                class="text-xs font-bold text-gray-900 dark:text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -85,47 +85,38 @@
                                                 </div>
                                             </div>
                                         </div>
-                                            <div onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>')" class="cursor-pointer hover:opacity-80 transition-opacity">
+                                            <div onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>')" class="cursor-pointer hover:opacity-80 transition-opacity text-xs font-bold uppercase tracking-wider">
                                                 <% 
-                                                // Prioritas badge: Ganti Hari Hadir > Ganti Hari > Status lainnya
                                                 const isGuest = s.is_ganti_hari;
                                                 
                                                 if(isGuest && s.status === 'hadir') {
-                                                    // Badge Ganti Hari yang sudah Hadir (biru)
                                                 %>
-                                                    <span
-                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-blue-600 text-blue-600">
-                                                        🔄 Hadir
-                                                    </span>
+                                                    <span class="text-blue-600">(Ganti Hari - Hadir)</span>
                                                 <%
                                                 } else if(isGuest || s.status === 'reschedule') {
-                                                    // Badge Ganti Hari (untuk isGuest atau reschedule yang belum hadir)
                                                 %>
-                                                    <span
-                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-orange-600 text-orange-600">
-                                                        🔄 Ganti Hari
-                                                    </span>
+                                                    <span class="text-orange-600">(Ganti Hari)</span>
                                                 <%
                                                 } else if(s.status && s.status !=='scheduled') { 
-                                                    // Badge status lainnya
                                                     let statusText = s.status;
                                                     let statusClass = '';
                                                     if (s.status_bayar === 'paid') {
-                                                        statusText = 'Pay Up';
-                                                        statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                                        statusText = 'Lunas';
+                                                        statusClass = 'text-green-600';
                                                     } else if (s.status === 'hadir') {
-                                                        statusClass = 'bg-transparent border border-green-600 text-green-600';
+                                                        statusText = 'Hadir';
+                                                        statusClass = 'text-green-600';
                                                     } else {
-                                                        statusClass = 'bg-transparent border border-red-600 text-red-600';
+                                                        statusText = 'Alpa';
+                                                        statusClass = 'text-red-600';
                                                     }
                                                 %>
-                                                    <span
-                                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
-                                                        <%= statusText %>
+                                                    <span class="<%= statusClass %>">
+                                                        (<%= statusText %>)
                                                     </span>
                                                 <% } else { %>
-                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-gray-400 text-gray-400">
-                                                        ? Input
+                                                    <span class="text-gray-400">
+                                                        (Scheduled)
                                                     </span>
                                                 <% } %>
                                             </div>
@@ -136,8 +127,8 @@
 
                         <!-- Dokumentasi -->
                         <div>
-                            <h2
-                                class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <h2 style="color: #111827 !important;"
+                                class="text-xs font-bold text-gray-900 dark:text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -177,14 +168,14 @@
                                 </div>
                                 <% } else { %>
                                     <div
-                                        class="text-center py-8 bg-gray-100 dark:bg-white/5 rounded-xl border border-white/10 border-dashed">
+                                        class="text-center py-8 bg-gray-100 rounded-xl border border-gray-200 border-dashed">
                                         <p class="text-gray-500 text-sm italic">Belum ada dokumentasi.</p>
                                     </div>
                                     <% } %>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="mt-8 pt-6 border-t border-white/10 flex gap-3">
+                        <div id="share-buttons" class="mt-8 pt-6 border-t border-white/10 flex gap-3">
                             <button onclick="copyLink()"
                                 class="flex-1 flex justify-center items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:text-gray-900 transition-all">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +200,7 @@
                     <!-- Home Button & Footer -->
                     <div class="mt-8 flex flex-col items-center gap-4">
                         <a href="/"
-                            class="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:text-gray-900 transition-all shadow-lg">
+                            class="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700 rounded-full text-sm font-bold text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-all shadow-lg">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -218,7 +209,7 @@
                             Home
                         </a>
 
-                        <div class="flex items-center gap-2 text-xs text-gray-500 font-medium tracking-wider uppercase">
+                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wider uppercase">
                             <span>Powered by</span>
                             <span
                                 class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">Warga
@@ -409,6 +400,81 @@
 
                                 const text = encodeURIComponent('Cek Jadwal Ronda: *' + document.title.replace('Jadwal Ronda ', '') + '*\n\n' + membersList);
                             window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+                        }
+                    </script>
+
+                    <script src="/js/html2canvas.min.js"></script>
+                    <script>
+                        // Auto-generate OG Image if missing
+                        const shareId = "<%= typeof shareId !== 'undefined' ? shareId : '' %>";
+                        const hasOgImage = "<%= ogImage ? 'yes' : '' %>";
+                        
+                        if (shareId && !hasOgImage) {
+                            window.addEventListener('load', function() {
+                                // Wait a bit for fonts and images
+                                setTimeout(generateOgImage, 1500);
+                            });
+                        }
+
+                        async function generateOgImage() {
+                            const card = document.getElementById('share-card');
+                            if(!card) return;
+
+                            try {
+                                const canvas = await html2canvas(card, { 
+                                    scale: 2, 
+                                    useCORS: true, 
+                                    logging: false,
+                                    backgroundColor: '#ffffff',
+                                    ignoreElements: (element) => {
+                                        return element.id === 'share-buttons';
+                                    },
+                                    onclone: (clonedDoc) => {
+                                        // Force light mode for screenshot
+                                        clonedDoc.documentElement.classList.remove('dark');
+                                        if (clonedDoc.body) clonedDoc.body.classList.remove('dark');
+
+                                        // Force text color to black for titles in the cloned document
+                                        const titles = clonedDoc.querySelectorAll('h2');
+                                        titles.forEach(t => {
+                                            t.style.color = '#111827';
+                                            t.style.setProperty('color', '#111827', 'important');
+                                            
+                                            // Force SVG color as well
+                                            const svg = t.querySelector('svg');
+                                            if(svg) {
+                                                svg.style.color = '#111827';
+                                                svg.style.setProperty('color', '#111827', 'important');
+                                            }
+                                        });
+
+                                        // Force specific elements to black
+                                        const listItems = clonedDoc.querySelectorAll('.text-gray-900');
+                                        listItems.forEach(item => {
+                                            item.style.color = '#111827';
+                                        });
+                                    }
+                                });
+                                
+                                canvas.toBlob(async (blob) => {
+                                    const formData = new FormData();
+                                    formData.append('image', blob, 'share-' + Date.now() + '.png');
+                                    formData.append('shareId', shareId);
+
+                                    const response = await fetch('/ronda/share/update-image', {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    
+                                    const result = await response.json();
+                                    if(result.success) {
+                                        console.log('OG Image updated successfully');
+                                        window.location.reload();
+                                    }
+                                }, 'image/png');
+                            } catch(e) {
+                                console.error('Failed to generate OG Image', e);
+                            }
                         }
                     </script>
 

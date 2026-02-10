@@ -940,48 +940,31 @@
             async function shareSchedule(date, btn) {
                 const originalText = btn.innerHTML;
 
-                if (typeof html2canvas === 'undefined') {
-                    alert('Fitur share sedang dimuat, coba sesaat lagi.');
-                    return;
-                }
-
-                const card = document.getElementById('card-' + date);
-                if (!card) return;
-
                 // Processing...
                 btn.innerHTML = '⏳ ...';
                 btn.disabled = true;
 
                 try {
-                    const canvas = await html2canvas(card, { scale: 2, useCORS: true, logging: false });
+                    // Create share record without screenshot
+                    const response = await fetch('/ronda/create-share', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date: date })
+                    });
 
-                    canvas.toBlob(async (blob) => {
-                        const formData = new FormData();
-                        formData.append('image', blob, 'schedule-' + date + '.png');
-
-                        const response = await fetch('/ronda/share-image', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        const result = await response.json();
-                        if (result.success) {
-                            if (result.shareId) {
-                                window.location.href = `/ronda/v/${result.shareId}`;
-                            } else {
-                                window.location.href = `/ronda/view?date=${date}&img=${result.filename}`;
-                            }
-                        } else {
-                            alert('Gagal generate view: ' + (result.error || 'Unknown error'));
-                        }
-
+                    const result = await response.json();
+                    if (result.success && result.shareId) {
+                        // Redirect to public view - it will handle OG image generation
+                        window.location.href = `/ronda/v/${result.shareId}`;
+                    } else {
+                        alert('Gagal membuat share link: ' + (result.error || 'Unknown error'));
                         btn.innerHTML = originalText;
                         btn.disabled = false;
-                    }, 'image/png');
+                    }
 
                 } catch (e) {
                     console.error(e);
-                    alert('Error processing view');
+                    alert('Error creating share link');
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 }

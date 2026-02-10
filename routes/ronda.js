@@ -17,6 +17,7 @@ router.post('/upload-photos/:id', ensureAuthenticated, rondaController.uploadPho
 router.post('/upload-condition/:date', ensureAuthenticated, rondaController.uploadCondition);
 router.post('/delete-photo', ensureAuthenticated, rondaController.deletePhoto);
 router.post('/share-image', ensureAuthenticated, rondaController.uploadShareImage);
+router.post('/create-share', ensureAuthenticated, rondaController.createShare);
 router.get('/control', ensureAuthenticated, rondaController.control);
 
 router.post('/update-fine-status', ensureAuthenticated, rondaController.updateFineStatus);
@@ -468,5 +469,6 @@ router.get('/cleanup-schedules', ensureAuthenticated, async (req, res) => {
 router.get('/view', rondaController.viewPublic);
 router.get('/v/:id', rondaController.viewPublic);
 router.post('/v/update-status', rondaController.updatePublicStatus);
+router.post('/share/update-image', rondaController.updateShareImage);
 
 module.exports = router;

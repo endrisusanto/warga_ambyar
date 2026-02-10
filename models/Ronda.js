@@ -355,6 +355,10 @@ const Ronda = {
         return rows[0];
     },
 
+    updateShareImage: async (id, filename) => {
+        await db.query("UPDATE ronda_shares SET image_filename = ? WHERE id = ?", [filename, id]);
+    },
+
     deletePhoto: async (filename) => {
         // Try to delete from ronda_jadwal
         // Since photos are stored as JSON array, we need to find rows containing the filename

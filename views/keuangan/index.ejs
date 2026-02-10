@@ -19,11 +19,11 @@
                     </div>
                     <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
                         <a href="/activity/timeline"
-                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
+                            class="glass-button inline-flex items-center px-4 py-2 h-10 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
                             <span class="mr-2">🕒</span> Log
                         </a>
                         <a href="/keuangan/export" target="_blank"
-                            class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
+                            class="glass-button inline-flex items-center px-4 py-2 h-10 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10">
                             <svg class="-ml-1 mr-2 h-5 w-5 text-gray-600 dark:text-gray-400"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -34,7 +34,7 @@
                         </a>
                         <% if(user.role==='admin' || user.role==='bendahara' ) { %>
                         <form action="/keuangan/sync" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menyinkronkan data kas dengan data iuran? Data kas kategori iuran akan digenerate ulang.');">
-                            <button type="submit" class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10" title="Sync ulang kas dengan data pembayaran">
+                            <button type="submit" class="glass-button inline-flex items-center px-4 py-2 h-10 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition border border-white/10" title="Sync ulang kas dengan data pembayaran">
                                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-600 dark:text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
@@ -44,7 +44,7 @@
                         <% } %>
                         <% if(user.role==='admin' || user.role==='bendahara' ) { %>
                             <button type="button" onclick="openModal()"
-                                class="glass-button inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 bg-emerald-500/20 hover:bg-emerald-500/30 transition border border-emerald-500/30">
+                                class="glass-button inline-flex items-center px-4 py-2 h-10 rounded-lg text-sm font-medium text-emerald-100 bg-emerald-500/20 hover:bg-emerald-500/30 transition border border-emerald-500/30">
                                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
