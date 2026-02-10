@@ -60,7 +60,7 @@
                                 <div
                                     class="flex items-center justify-center gap-2 bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg border border-white/10 h-[38px]">
                                     <span id="toggle-empty-label"
-                                        class="text-xs text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap w-[45px] text-center">Huni</span>
+                                        class="text-xs text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap w-[80px] text-center">Tidak Kosong</span>
                                     <button id="toggle-empty-btn" onclick="toggleEmptyRows()" type="button"
                                         class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-emerald-500"
                                         role="switch" aria-checked="true">
@@ -132,6 +132,12 @@
                                         class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-white/10 hover:bg-white/15 transition-colors border border-white/15">
                                         Tunggakan
                                     </a>
+                                    <% if(user && user.role==='admin') { %>
+                                    <button onclick="openBulkResetModal()"
+                                        class="glass-button w-full md:w-auto justify-center inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-red-400 hover:bg-red-500/10 transition-colors border border-red-500/30">
+                                        Bulk Reset
+                                    </button>
+                                    <% } %>
                                     <% } %>
                             </div>
 
@@ -1137,29 +1143,29 @@
                     const btn = document.getElementById('toggle-empty-btn');
                     const span = btn.querySelector('span');
                     const label = document.getElementById('toggle-empty-label');
-                    const rows = document.querySelectorAll('.status-kosong, .status-tidak-huni');
+                    const rows = document.querySelectorAll('.status-kosong');
 
                     if (hideEmpty) {
-                        // Hidden state (Switch ON - Green) -> Show "Huni"
+                        // Hidden state (Switch ON - Green) -> Show "Tidak Kosong"
                         btn.classList.remove('bg-gray-400');
                         btn.classList.add('bg-emerald-500');
                         span.classList.remove('translate-x-0');
                         span.classList.add('translate-x-4');
                         if (label) {
-                            label.innerText = 'Huni';
+                            label.innerText = 'Tidak Kosong';
                             label.classList.add('text-emerald-400');
                             label.classList.remove('text-gray-600', 'dark:text-gray-400');
                         }
 
                         rows.forEach(r => r.style.display = 'none');
                     } else {
-                        // Visible state (Switch OFF - Gray) -> Show "Semua"
+                        // Visible state (Switch OFF - Gray) -> Show "Kosong"
                         btn.classList.remove('bg-emerald-500');
                         btn.classList.add('bg-gray-400');
                         span.classList.remove('translate-x-4');
                         span.classList.add('translate-x-0');
                         if (label) {
-                            label.innerText = 'Semua';
+                            label.innerText = 'Kosong';
                             label.classList.remove('text-emerald-400');
                             label.classList.add('text-gray-600', 'dark:text-gray-400');
                         }
@@ -1301,6 +1307,195 @@
                 </script>
                 <% } %>
 
+                    <!-- Bulk Reset Modal -->
+                    <div id="bulkResetModal" class="hidden fixed inset-0 z-50" aria-labelledby="bulk-reset-title" role="dialog" aria-modal="true">
+                        <div class="fixed inset-0 bg-black/60 transition-opacity backdrop-blur-sm" onclick="closeBulkResetModal()"></div>
+                        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div class="glass-card relative w-full max-w-2xl transform overflow-hidden transition-all max-h-[90vh] flex flex-col">
+                                <div class="p-6">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4" id="bulk-reset-title">
+                                        Bulk Reset to Belum Ditagih
+                                    </h3>
+                                    
+                                    <!-- Filter Section -->
+                                    <div class="mb-4 p-3 bg-gray-100 dark:bg-white/5 rounded-lg border border-white/10">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <select id="bulk-reset-month" onchange="loadBulkResetData()" class="glass-input rounded-lg text-sm py-2 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10">
+                                                <option value="">Semua Bulan</option>
+                                                <% for(let i = -3; i <= 2; i++) {
+                                                    const m = moment().add(i, 'months');
+                                                    const value = m.format('YYYY-MM');
+                                                    const label = m.format('MMM YYYY');
+                                                %>
+                                                    <option value="<%= value %>"><%= label %></option>
+                                                <% } %>
+                                            </select>
+                                            
+                                            <select id="bulk-reset-status" onchange="loadBulkResetData()" class="glass-input rounded-lg text-sm py-2 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10">
+                                                <option value="">Semua Status</option>
+                                                <option value="belum_bayar">Belum Lunas</option>
+                                                <option value="menunggu_konfirmasi">Menunggu Konfirmasi</option>
+                                                <option value="lunas">Lunas</option>
+                                            </select>
+                                            
+                                            <select id="bulk-reset-jenis" onchange="loadBulkResetData()" class="glass-input rounded-lg text-sm py-2 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10">
+                                                <option value="">Semua Jenis</option>
+                                                <option value="kas_rt">Kas RT</option>
+                                                <option value="kas_gang">Kas Gang</option>
+                                                <option value="sampah">Sampah</option>
+                                            </select>
+                                        </div>
+                                        <div class="mt-2 flex justify-between items-center">
+                                            <button onclick="toggleSelectAll()" class="text-xs text-emerald-400 hover:text-emerald-300">
+                                                Select All / Deselect All
+                                            </button>
+                                            <span id="bulk-reset-count" class="text-xs text-gray-500 dark:text-gray-400">0 selected</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- List Section -->
+                                    <div id="bulk-reset-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar p-2">
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Loading...</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-100 dark:bg-white/5 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-white/10">
+                                    <button type="button" onclick="executeBulkReset()"
+                                        class="glass-button w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm border border-red-500/30">
+                                        Reset Selected
+                                    </button>
+                                    <button type="button" onclick="closeBulkResetModal()"
+                                        class="glass-button mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-white/12 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm border border-white/10">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        let bulkResetData = [];
+                        
+                        async function openBulkResetModal() {
+                            document.getElementById('bulkResetModal').classList.remove('hidden');
+                            await loadBulkResetData();
+                        }
+                        
+                        function closeBulkResetModal() {
+                            document.getElementById('bulkResetModal').classList.add('hidden');
+                        }
+                        
+                        async function loadBulkResetData() {
+                            const month = document.getElementById('bulk-reset-month').value;
+                            const status = document.getElementById('bulk-reset-status').value;
+                            const jenis = document.getElementById('bulk-reset-jenis').value;
+                            
+                            const listContainer = document.getElementById('bulk-reset-list');
+                            listContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Loading...</p>';
+                            
+                            try {
+                                // Get all transactions data
+                                const allDataEl = document.getElementById('allTransactionsData');
+                                if (!allDataEl) {
+                                    throw new Error('Data not found');
+                                }
+                                
+                                const allData = JSON.parse(allDataEl.getAttribute('data-transactions'));
+                                
+                                // Filter data
+                                bulkResetData = allData.filter(item => {
+                                    // Convert periode to YYYY-MM format for comparison
+                                    const itemMonth = item.periode ? item.periode.substring(0, 7) : '';
+                                    if (month && itemMonth !== month) return false;
+                                    if (status && item.status !== status) return false;
+                                    if (jenis && item.jenis !== jenis) return false;
+                                    return true;
+                                });
+                                
+                                // Render list
+                                if (bulkResetData.length === 0) {
+                                    listContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Tidak ada data</p>';
+                                    return;
+                                }
+                                
+                                let html = '';
+                                bulkResetData.forEach((item, index) => {
+                                    const date = new Date(item.periode);
+                                    const monthYear = date.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+                                    const jenisLabel = item.jenis === 'kas_rt' ? 'Kas RT' : (item.jenis === 'kas_gang' ? 'Kas Gang' : 'Sampah');
+                                    const statusClass = item.status === 'lunas' ? 'bg-green-500' : (item.status === 'menunggu_konfirmasi' ? 'bg-yellow-400' : 'bg-red-500');
+                                    const statusLabel = item.status === 'lunas' ? 'Lunas' : (item.status === 'menunggu_konfirmasi' ? 'Menunggu' : 'Belum Lunas');
+                                    
+                                    html += `
+                                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 p-2 rounded border border-white/5">
+                                            <input type="checkbox" name="bulk_reset_ids" value="${item.id}" onchange="updateBulkResetCount()" class="rounded border-gray-500 text-emerald-500 focus:ring-emerald-500 bg-gray-700">
+                                            <div class="flex-1">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${item.nama || 'Unknown'}</span>
+                                                    <span class="text-xs px-2 py-1 rounded-full ${statusClass} text-white">${statusLabel}</span>
+                                                </div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                                    ${jenisLabel} - ${monthYear} | ${item.blok}/${item.nomor_rumah} | Rp ${parseInt(item.jumlah).toLocaleString('id-ID')}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    `;
+                                });
+                                
+                                listContainer.innerHTML = html;
+                                updateBulkResetCount();
+                            } catch (error) {
+                                console.error(error);
+                                listContainer.innerHTML = '<p class="text-sm text-red-500 text-center py-8">Error loading data</p>';
+                            }
+                        }
+                        
+                        function toggleSelectAll() {
+                            const checkboxes = document.querySelectorAll('input[name="bulk_reset_ids"]');
+                            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                            checkboxes.forEach(cb => cb.checked = !allChecked);
+                            updateBulkResetCount();
+                        }
+                        
+                        function updateBulkResetCount() {
+                            const checkboxes = document.querySelectorAll('input[name="bulk_reset_ids"]:checked');
+                            document.getElementById('bulk-reset-count').innerText = `${checkboxes.length} selected`;
+                        }
+                        
+                        async function executeBulkReset() {
+                            const checkboxes = document.querySelectorAll('input[name="bulk_reset_ids"]:checked');
+                            if (checkboxes.length === 0) {
+                                return alert('Pilih minimal satu item untuk direset');
+                            }
+                            
+                            const ids = Array.from(checkboxes).map(cb => cb.value);
+                            if (!confirm(`Reset ${ids.length} pembayaran terpilih menjadi Belum Ditagih? Data pembayaran akan dihapus.`)) {
+                                return;
+                            }
+                            
+                            try {
+                                const response = await fetch('/iuran/reset-batch', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ ids })
+                                });
+                                
+                                const result = await response.json();
+                                
+                                if (result.success) {
+                                    alert(`Berhasil mereset ${result.count || ids.length} pembayaran`);
+                                    closeBulkResetModal();
+                                    location.reload();
+                                } else {
+                                    alert('Gagal reset: ' + (result.message || 'Unknown error'));
+                                }
+                            } catch (error) {
+                                alert('Error: ' + error.message);
+                            }
+                        }
+                    </script>
+
                     <div id="allTransactionsData" data-transactions="<%= JSON.stringify(allTransactions) %>"
                         class="hidden"></div>
                     <%- include('../partials/footer') %>
+```

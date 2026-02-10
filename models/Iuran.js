@@ -66,6 +66,7 @@ const Iuran = {
     },
     generateBillsForMonth: async (periode) => {
         // Generate for ONE representative per house (prioritize Kepala Keluarga)
+        // Get house info including status_huni
         const [houses] = await db.query(`
             SELECT 
                 w.blok, 
@@ -75,7 +76,13 @@ const Iuran = {
                     WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
                     ORDER BY CASE WHEN status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END, id ASC 
                     LIMIT 1
-                ) as representative_id
+                ) as representative_id,
+                (
+                    SELECT status_huni FROM warga w2 
+                    WHERE w2.blok = w.blok AND w2.nomor_rumah = w.nomor_rumah 
+                    ORDER BY FIELD(status_huni, 'kontrak', 'tetap', 'tidak huni', 'kosong') 
+                    LIMIT 1
+                ) as status_huni
             FROM warga w
             GROUP BY w.blok, w.nomor_rumah
         `);
@@ -83,38 +90,51 @@ const Iuran = {
         let count = 0;
         for (const h of houses) {
             if (!h.representative_id) continue;
+            
+            // Skip rumah kosong
+            if (h.status_huni === 'kosong') continue;
+            
+            // Tentukan nominal berdasarkan status_huni
+            const isNotOccupied = h.status_huni === 'tidak huni';
+            const kasRtAmount = isNotOccupied ? 0 : 10000;
+            const kasGangAmount = isNotOccupied ? 5000 : 10000;
+            const sampahAmount = isNotOccupied ? 0 : 25000;
 
-            // Iuran Kas RT
-            try {
-                await db.query(
-                    'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.representative_id, periode, 'kas_rt', 10000]
-                );
-                count++;
-            } catch (e) {
-                // Ignore duplicates
+            // Iuran Kas RT (skip jika tidak huni)
+            if (kasRtAmount > 0) {
+                try {
+                    await db.query(
+                        'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
+                        [h.representative_id, periode, 'kas_rt', kasRtAmount]
+                    );
+                    count++;
+                } catch (e) {
+                    // Ignore duplicates
+                }
             }
 
             // Iuran Kas Gang
             try {
                 await db.query(
                     'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.representative_id, periode, 'kas_gang', 10000]
+                    [h.representative_id, periode, 'kas_gang', kasGangAmount]
                 );
                 count++;
             } catch (e) {
                 // Ignore duplicates
             }
 
-            // Iuran Sampah
-            try {
-                await db.query(
-                    'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
-                    [h.representative_id, periode, 'sampah', 25000]
-                );
-                count++;
-            } catch (e) {
-                // Ignore duplicates
+            // Iuran Sampah (skip jika tidak huni)
+            if (sampahAmount > 0) {
+                try {
+                    await db.query(
+                        'INSERT INTO iuran (warga_id, periode, jenis, jumlah) VALUES (?, ?, ?, ?)',
+                        [h.representative_id, periode, 'sampah', sampahAmount]
+                    );
+                    count++;
+                } catch (e) {
+                    // Ignore duplicates
+                }
             }
         }
         return count;

@@ -26,7 +26,7 @@
                                 class="block w-full sm:text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                 <% if(user && user.role==='warga' && warga.length===1) { %>disabled<% } %>>
                                     <% warga.forEach(w=> { %>
-                                        <option value="<%= w.id %>">
+                                        <option value="<%= w.id %>" data-status-huni="<%= w.status_huni || 'tetap' %>">
                                             <%= w.nama %> - Blok <%= w.blok %> No. <%= w.nomor_rumah %>
                                         </option>
                                         <% }) %>
@@ -69,8 +69,8 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Jenis
                             Pembayaran</label>
                         <div class="flex flex-wrap justify-center gap-3">
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
-                                <input type="checkbox" name="jenis_iuran[]" value="kas_rt" class="peer sr-only" checked>
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-kas-rt">
+                                <input type="checkbox" name="jenis_iuran[]" value="kas_rt" class="peer sr-only" checked id="checkbox-kas-rt">
                                 <div
                                     class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500 peer-checked:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-emerald-500 peer-checked:[&_.check-ring]:border-emerald-500 peer-checked:[&_.status-text]:text-emerald-700 dark:peer-checked:[&_.status-text]:text-emerald-300 peer-checked:[&_.price-text]:text-emerald-600 dark:peer-checked:[&_.price-text]:text-emerald-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
                                     <span
@@ -79,7 +79,7 @@
                                         <span
                                             class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Kas
                                             RT</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-kas-rt">Rp
                                             10k</span>
                                     </div>
                                     <div
@@ -92,9 +92,9 @@
                                 </div>
                             </label>
 
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-kas-gang">
                                 <input type="checkbox" name="jenis_iuran[]" value="kas_gang" class="peer sr-only"
-                                    checked>
+                                    checked id="checkbox-kas-gang">
                                 <div
                                     class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-blue-50 dark:peer-checked:bg-blue-500/10 peer-checked:border-blue-500 peer-checked:shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-blue-500 peer-checked:[&_.check-ring]:border-blue-500 peer-checked:[&_.status-text]:text-blue-700 dark:peer-checked:[&_.status-text]:text-blue-300 peer-checked:[&_.price-text]:text-blue-600 dark:peer-checked:[&_.price-text]:text-blue-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
                                     <span
@@ -103,7 +103,7 @@
                                         <span
                                             class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Kas
                                             Gang</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-kas-gang">Rp
                                             10k</span>
                                     </div>
                                     <div
@@ -116,8 +116,8 @@
                                 </div>
                             </label>
 
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]">
-                                <input type="checkbox" name="jenis_iuran[]" value="sampah" class="peer sr-only" checked>
+                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-sampah">
+                                <input type="checkbox" name="jenis_iuran[]" value="sampah" class="peer sr-only" checked id="checkbox-sampah">
                                 <div
                                     class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-orange-50 dark:peer-checked:bg-orange-500/10 peer-checked:border-orange-500 peer-checked:shadow-[0_0_15px_rgba(249,115,22,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-orange-500 peer-checked:[&_.check-ring]:border-orange-500 peer-checked:[&_.status-text]:text-orange-700 dark:peer-checked:[&_.status-text]:text-orange-300 peer-checked:[&_.price-text]:text-orange-600 dark:peer-checked:[&_.price-text]:text-orange-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
                                     <span
@@ -125,7 +125,7 @@
                                     <div class="flex flex-col">
                                         <span
                                             class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Sampah</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors">Rp
+                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-sampah">Rp
                                             25k</span>
                                     </div>
                                     <div
@@ -376,7 +376,10 @@
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
 
             // Listeners
-            wargaSelect.addEventListener('change', refreshGrid);
+            wargaSelect.addEventListener('change', () => {
+                updatePricingByStatus();
+                refreshGrid();
+            });
             tahunSelect.addEventListener('change', refreshGrid);
             typeCheckboxes.forEach(cb => cb.addEventListener('change', () => {
                 // Re-check lunas status when types change (e.g. maybe Kas Lunas but Sampah Not)
@@ -385,6 +388,81 @@
                 refreshCheckboxesState();
                 calculateTotal();
             }));
+
+            // Pricing based on status_huni
+            let currentPricing = {
+                kas_rt: 10000,
+                kas_gang: 10000,
+                sampah: 25000
+            };
+
+            function updatePricingByStatus() {
+                const selectedOption = wargaSelect.options[wargaSelect.selectedIndex];
+                const statusHuni = selectedOption ? selectedOption.getAttribute('data-status-huni') : 'tetap';
+
+                const kasRtCheckbox = document.getElementById('checkbox-kas-rt');
+                const kasGangCheckbox = document.getElementById('checkbox-kas-gang');
+                const sampahCheckbox = document.getElementById('checkbox-sampah');
+                const kasRtLabel = document.getElementById('label-kas-rt');
+                const kasGangLabel = document.getElementById('label-kas-gang');
+                const sampahLabel = document.getElementById('label-sampah');
+                const priceKasRt = document.getElementById('price-kas-rt');
+                const priceKasGang = document.getElementById('price-kas-gang');
+                const priceSampah = document.getElementById('price-sampah');
+
+                // Reset to default
+                kasRtCheckbox.disabled = false;
+                kasGangCheckbox.disabled = false;
+                sampahCheckbox.disabled = false;
+                kasRtLabel.classList.remove('opacity-50', 'cursor-not-allowed');
+                kasGangLabel.classList.remove('opacity-50', 'cursor-not-allowed');
+                sampahLabel.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                if (statusHuni === 'kosong') {
+                    // Rumah kosong: semua disabled
+                    kasRtCheckbox.disabled = true;
+                    kasRtCheckbox.checked = false;
+                    kasGangCheckbox.disabled = true;
+                    kasGangCheckbox.checked = false;
+                    sampahCheckbox.disabled = true;
+                    sampahCheckbox.checked = false;
+                    kasRtLabel.classList.add('opacity-50', 'cursor-not-allowed');
+                    kasGangLabel.classList.add('opacity-50', 'cursor-not-allowed');
+                    sampahLabel.classList.add('opacity-50', 'cursor-not-allowed');
+                    priceKasRt.innerText = 'Rp 0';
+                    priceKasGang.innerText = 'Rp 0';
+                    priceSampah.innerText = 'Rp 0';
+                    currentPricing = { kas_rt: 0, kas_gang: 0, sampah: 0 };
+                } else if (statusHuni === 'tidak huni') {
+                    // Rumah tidak huni: Kas Gang 5k, Kas RT & Sampah disabled
+                    kasRtCheckbox.disabled = true;
+                    kasRtCheckbox.checked = false;
+                    kasRtLabel.classList.add('opacity-50', 'cursor-not-allowed');
+                    priceKasRt.innerText = 'Rp 0';
+                    
+                    kasGangCheckbox.disabled = false;
+                    kasGangCheckbox.checked = true;
+                    priceKasGang.innerText = 'Rp 5k';
+                    
+                    sampahCheckbox.disabled = true;
+                    sampahCheckbox.checked = false;
+                    sampahLabel.classList.add('opacity-50', 'cursor-not-allowed');
+                    priceSampah.innerText = 'Rp 0';
+                    
+                    currentPricing = { kas_rt: 0, kas_gang: 5000, sampah: 0 };
+                } else {
+                    // Rumah tetap/kontrak: harga normal
+                    kasRtCheckbox.checked = true;
+                    kasGangCheckbox.checked = true;
+                    sampahCheckbox.checked = true;
+                    priceKasRt.innerText = 'Rp 10k';
+                    priceKasGang.innerText = 'Rp 10k';
+                    priceSampah.innerText = 'Rp 25k';
+                    currentPricing = { kas_rt: 10000, kas_gang: 10000, sampah: 25000 };
+                }
+
+                calculateTotal();
+            }
 
             // Generate Month Grid Buttons
             function renderGrid(year) {
@@ -564,11 +642,13 @@
                 let typePrice = 0;
                 typeCheckboxes.forEach(cb => {
                     if (cb.checked) {
-                        // Kas RT and Kas Gang = 10k, Sampah = 25k
-                        if (cb.value === 'kas' || cb.value === 'kas_rt' || cb.value === 'kas_gang') {
-                            typePrice += 10000;
+                        // Use dynamic pricing based on status_huni
+                        if (cb.value === 'kas' || cb.value === 'kas_rt') {
+                            typePrice += currentPricing.kas_rt;
+                        } else if (cb.value === 'kas_gang') {
+                            typePrice += currentPricing.kas_gang;
                         } else if (cb.value === 'sampah') {
-                            typePrice += 25000;
+                            typePrice += currentPricing.sampah;
                         }
                     }
                 });
@@ -798,6 +878,7 @@
             });
 
             // Init
+            updatePricingByStatus(); // Set initial pricing
             refreshGrid();
         </script>
 
