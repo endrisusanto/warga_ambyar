@@ -74,6 +74,8 @@
                                         <div class="flex items-center gap-2 text-[10px] text-gray-600 dark:text-gray-400">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                             <span><%= u.last_ip || 'Hidden IP' %></span>
+                                            <span class="text-gray-400 mx-1">•</span>
+                                            <span class="ip-geo-location" data-ip="<%= u.last_ip %>">Waiting...</span>
                                         </div>
                                     </div>
                                 </div>
@@ -121,6 +123,7 @@
                                                 <%= u.last_user_agent ? (u.last_user_agent.includes('Mobile') ? 'Mobile' : 'Desktop') : 'Unknown' %>
                                             </span>
                                             <span class="text-[10px] text-gray-500 font-mono tracking-tighter"><%= u.last_ip %></span>
+                                            <div class="text-[10px] text-gray-400 font-medium ip-geo-location" data-ip="<%= u.last_ip %>">Waiting...</div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right">
@@ -201,8 +204,10 @@
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Time</th>
                                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Device</th>
                                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
                                     <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Details</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Location</th>
                                     <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">IP</th>
                                 </tr>
                             </thead>
@@ -212,6 +217,21 @@
                                         <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                                             <td class="px-4 py-2 whitespace-nowrap text-gray-500"><%= moment(log.created_at).format('HH:mm:ss') %></td>
                                             <td class="px-4 py-2 whitespace-nowrap font-bold text-gray-700 dark:text-gray-300"><%= log.username || 'Guest' %></td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-gray-500">
+                                                <% 
+                                                    let deviceIcon = '❓';
+                                                    let deviceName = 'Unknown';
+                                                    const ua = log.user_agent || '';
+                                                    if (ua.includes('Mobile') || ua.includes('Android') || ua.includes('iPhone')) {
+                                                        deviceIcon = '📱';
+                                                        deviceName = 'Mobile';
+                                                    } else if (ua.includes('Windows') || ua.includes('Macintosh') || ua.includes('Linux')) {
+                                                        deviceIcon = '💻';
+                                                        deviceName = 'Desktop';
+                                                    }
+                                                %>
+                                                <span title="<%= ua %>"><%= deviceIcon %> <%= deviceName %></span>
+                                            </td>
                                             <td class="px-4 py-2 whitespace-nowrap">
                                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase 
                                                     <%= log.action === 'UPLOAD' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 
@@ -225,12 +245,15 @@
                                             <td class="px-4 py-2 text-gray-600 dark:text-gray-400 max-w-sm truncate" title="<%= log.details %>">
                                                 <%= log.details %>
                                             </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-gray-500">
+                                                <span class="ip-geo-location" data-ip="<%= log.ip_address.replace('::ffff:', '') %>">Waiting...</span>
+                                            </td>
                                             <td class="px-4 py-2 whitespace-nowrap text-right text-gray-500"><%= log.ip_address.replace('::ffff:', '') %></td>
                                         </tr>
                                     <% }) %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">No detailed logs available yet.</td>
+                                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">No detailed logs available yet.</td>
                                     </tr>
                                 <% } %>
                             </tbody>
@@ -358,6 +381,93 @@
     }
     
     startAutoRefresh();
+
+    // Geolocation Script
+    document.addEventListener('DOMContentLoaded', () => {
+        const geoElements = document.querySelectorAll('.ip-geo-location');
+        const queue = Array.from(geoElements);
+        const BATCH_SIZE = 1; // Process 1 request at a time
+        const DELAY = 1500; // Delay between batches to respect rate limits
+
+        async function processQueue() {
+            if (queue.length === 0) return;
+
+            const batch = queue.splice(0, BATCH_SIZE);
+            
+            await Promise.all(batch.map(async (el) => {
+                const rawIp = el.dataset.ip;
+                if (!rawIp || rawIp === '::1' || rawIp === '127.0.0.1' || rawIp.startsWith('192.168.')) {
+                    el.textContent = 'Localhost/Private';
+                    return;
+                }
+
+                const ip = rawIp.replace('::ffff:', '');
+                const cacheKey = 'geo_ip_' + ip;
+                const cachedData = localStorage.getItem(cacheKey);
+
+                if (cachedData) {
+                    try {
+                        const data = JSON.parse(cachedData);
+                        // Check if cache is valid (e.g. 24 hours)
+                        if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
+                            el.textContent = data.location;
+                            return;
+                        }
+                    } catch (e) {
+                        localStorage.removeItem(cacheKey);
+                    }
+                }
+
+                try {
+                    // Using ipapi.co (HTTPS supported, rate limited)
+                    const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const data = await response.json();
+                    
+                    let location = 'Unknown';
+                    if (data.city && data.country_name) {
+                        location = `${data.city}, ${data.country_name}`;
+                    } else if (data.country_name) {
+                        location = data.country_name;
+                    }
+
+                    // Save to cache
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        location: location,
+                        timestamp: Date.now()
+                    }));
+
+                    el.textContent = location;
+
+                } catch (error) {
+                    console.error('Geo fetch error:', error);
+                    el.textContent = 'Loc. unavailable';
+                    
+                    // Optional: Fallback to ip-api.com (HTTP only) if current page is HTTP
+                    if (window.location.protocol === 'http:') {
+                        try {
+                            const res = await fetch(`http://ip-api.com/json/${ip}`);
+                            const d = await res.json();
+                            if (d.status === 'success') {
+                                const loc = `${d.city}, ${d.country}`;
+                                el.textContent = loc;
+                                localStorage.setItem(cacheKey, JSON.stringify({
+                                    location: loc,
+                                    timestamp: Date.now()
+                                }));
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+            }));
+
+            // Continue strictly after delay
+            setTimeout(processQueue, DELAY);
+        }
+
+        processQueue();
+    });
 </script>
 
 <%- include('../partials/footer') %>
