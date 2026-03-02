@@ -583,19 +583,18 @@
                             if (result.waUrl) {
                                 // Show Success Modal manually
                                 const modal = document.getElementById('successModal');
-                                const btn = document.getElementById('wa-link-btn');
-                                const backBtn = modal.querySelector('button'); // The "Kembali ke Web" button
+                                const btn = document.getElementById('wa-notif-btn');
+                                const backBtn = modal.querySelector('button[onclick="closeSuccessModal()"]');
 
                                 if (modal && btn) {
-                                    btn.href = result.waUrl;
-
                                     // Update text for Admin context
                                     modal.querySelector('h3').innerText = 'Verifikasi Berhasil';
                                     modal.querySelector('p').innerText = 'Pembayaran telah diverifikasi. Kirim notifikasi ke Warga via WhatsApp?';
 
                                     // Ensure closing reloads the page to update table
-                                    backBtn.onclick = function () { location.reload(); };
+                                    if(backBtn) backBtn.onclick = function () { location.reload(); };
                                     btn.onclick = function () {
+                                        window.open(result.waUrl, '_blank');
                                         setTimeout(() => location.reload(), 1000); // Reload after clicking WA
                                     };
 
@@ -638,8 +637,9 @@
                             if (result.waUrl) {
                                 const modal = document.getElementById('successModal');
                                 if (modal) {
-                                    const btn = document.getElementById('wa-link-btn');
-                                    btn.href = result.waUrl;
+                                    const btn = document.getElementById('wa-notif-btn');
+                                    const backBtn = modal.querySelector('button[onclick="closeSuccessModal()"]');
+                                    
                                     modal.querySelector('h3').innerText = 'Penolakan Berhasil';
                                     modal.querySelector('p').innerText = 'Pembayaran ditolak. Kirim notifikasi ke Warga via WhatsApp?';
                                     
@@ -647,9 +647,11 @@
                                     const icon = modal.querySelector('svg.text-green-600');
                                     if(icon) icon.classList.replace('text-green-600', 'text-red-600');
 
-                                    const backBtn = modal.querySelector('button');
-                                    backBtn.onclick = function () { location.reload(); };
-                                    btn.onclick = function () { setTimeout(() => location.reload(), 1000); };
+                                    if(backBtn) backBtn.onclick = function () { location.reload(); };
+                                    btn.onclick = function () { 
+                                        window.open(result.waUrl, '_blank');
+                                        setTimeout(() => location.reload(), 1000); 
+                                    };
                                     
                                     document.getElementById('paymentModal').classList.add('hidden');
                                     modal.classList.remove('hidden');

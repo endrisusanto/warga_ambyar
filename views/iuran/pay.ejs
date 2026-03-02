@@ -1,885 +1,825 @@
 <%- include('../partials/head') %>
-    <%- include('../partials/navbar') %>
-    <style>
-        @keyframes pulse-red-glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.4); }
-            50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); }
-        }
-        .animate-red-glow {
-            animation: pulse-red-glow 1.5s ease-in-out infinite;
-        }
-    </style>
+<%- include('../partials/navbar') %>
 
-        <div class="max-w-2xl mx-auto glass-card p-8 m-4">
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-3">
-                <span class="text-3xl">💳</span>
-                Input Pembayaran Iuran
-            </h3>
-            <form action="/iuran/pay" method="POST" enctype="multipart/form-data">
-                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+<style>
+  /* ── Wizard Styles ── */
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; animation: fadeInUp 0.35s ease; }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-                    <div class="sm:col-span-6">
-                        <label for="warga_id"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nama Warga</label>
-                        <div>
-                            <select id="warga_id" name="warga_id"
-                                class="block w-full sm:text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                <% if(user && user.role==='warga' && warga.length===1) { %>disabled<% } %>>
-                                    <% warga.forEach(w=> { %>
-                                        <option value="<%= w.id %>" data-status-huni="<%= w.status_huni || 'tetap' %>">
-                                            <%= w.nama %> - Blok <%= w.blok %> No. <%= w.nomor_rumah %>
-                                        </option>
-                                        <% }) %>
-                            </select>
-                            <% if(user && user.role==='warga' && warga.length===1) { %>
-                                <input type="hidden" name="warga_id" value="<%= warga[0].id %>">
-                                <p class="mt-2 text-xs text-gray-600 dark:text-gray-400">Anda hanya dapat membayar iuran
-                                    untuk rumah Anda
-                                    sendiri.</p>
-                                <% } %>
-                        </div>
-                    </div>
+  /* Breadcrumb */
+  .crumb-line { flex:1; height:2px; background:#d1d5db; transition:background .4s; }
+  .dark .crumb-line { background:rgba(255,255,255,.12); }
+  .crumb-line.done { background:#6366f1; }
+  .dark .crumb-line.done { background:#6366f1; }
+  .crumb-dot { width:36px; height:36px; border-radius:50%; border:2px solid #d1d5db;
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+    transition:all .4s; flex-shrink:0; background:#f3f4f6; color:#9ca3af; }
+  .dark .crumb-dot { border-color:rgba(255,255,255,.2); background:transparent; color:#9ca3af; }
+  .crumb-dot.active { border-color:#6366f1; background:#6366f1; color:#fff; box-shadow:0 0 18px rgba(99,102,241,.5); }
+  .crumb-dot.done { border-color:#6366f1; background:#6366f1; color:#fff; }
+  .crumb-label { font-size:11px; text-align:center; color:#6b7280; transition:color .4s; margin-top:4px; width:60px; }
+  .crumb-label.active { color:#6366f1; font-weight:700; }
+  .crumb-label.done { color:#6366f1; }
 
-                    <div class="sm:col-span-6">
-                        <label for="tahun"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tahun</label>
-                        <div>
-                            <select id="tahun" name="tahun"
-                                class="block w-full sm:text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-3 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
-                                <% const currentYear=new Date().getFullYear(); for(let y=currentYear - 1; y
-                                    <=currentYear + 1; y++) { %>
-                                    <option value="<%= y %>" <%=y===currentYear ? 'selected' : '' %>><%= y %>
-                                    </option>
-                                    <% } %>
-                            </select>
-                        </div>
-                    </div>
+  /* Month grid */
+  .month-btn { cursor:pointer; border:1.5px solid #e5e7eb; border-radius:12px; padding:10px 4px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition:all .2s; background:#f9fafb; position:relative; min-height:64px; }
+  .dark .month-btn { border-color:rgba(255,255,255,.1); background:rgba(255,255,255,.03); }
+  .month-btn:hover:not(.disabled) { border-color:#6366f1; background:rgba(99,102,241,.08); }
+  .month-btn input { position:absolute; opacity:0; width:0; height:0; }
+  .month-btn.selected { border-color:#6366f1; background:rgba(99,102,241,.15); box-shadow:0 0 12px rgba(99,102,241,.2); }
+  .month-btn.lunas { border-color:rgba(16,185,129,.5); background:rgba(16,185,129,.1); cursor:not-allowed; }
+  .month-btn.pending { border-color:rgba(245,158,11,.5); background:rgba(245,158,11,.08); }
+  .month-btn.disabled { opacity:.45; cursor:not-allowed; }
 
-                    <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Pilih Bulan
-                            (Checkbox)</label>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="month-grid">
-                            <!-- Generated by JS -->
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">*Bulan yang sudah lunas tidak dapat
-                            dipilih.</p>
-                    </div>
+  /* Jenis iuran card */
+  .jenis-card input { position:absolute; opacity:0; width:0; height:0; }
+  .jenis-card { cursor:pointer; border:1.5px solid #e5e7eb; border-radius:14px;
+    padding:14px 12px; display:flex; align-items:center; gap:12px; transition:all .25s;
+    background:#f9fafb; position:relative; }
+  .dark .jenis-card { border-color:rgba(255,255,255,.1); background:rgba(255,255,255,.03); }
+  .jenis-card:hover { border-color:rgba(99,102,241,.5); background:rgba(99,102,241,.06); }
+  .jenis-card.checked { border-color:#6366f1; background:rgba(99,102,241,.12); }
+  .jenis-card.disabled-card { opacity:.4; cursor:not-allowed; }
 
-                    <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Jenis
-                            Pembayaran</label>
-                        <div class="flex flex-wrap justify-center gap-3">
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-kas-rt">
-                                <input type="checkbox" name="jenis_iuran[]" value="kas_rt" class="peer sr-only" checked id="checkbox-kas-rt">
-                                <div
-                                    class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-500/10 peer-checked:border-emerald-500 peer-checked:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-emerald-500 peer-checked:[&_.check-ring]:border-emerald-500 peer-checked:[&_.status-text]:text-emerald-700 dark:peer-checked:[&_.status-text]:text-emerald-300 peer-checked:[&_.price-text]:text-emerald-600 dark:peer-checked:[&_.price-text]:text-emerald-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
-                                    <span
-                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">💰</span>
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Kas
-                                            RT</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-kas-rt">Rp
-                                            10k</span>
-                                    </div>
-                                    <div
-                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
-                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </label>
+  /* Payment method */
+  .pay-method { cursor:pointer; border:2px solid #e5e7eb; border-radius:14px; padding:16px 12px;
+    display:flex; flex-direction:column; align-items:center; gap:8px; transition:all .25s;
+    background:#f9fafb; position:relative; }
+  .dark .pay-method { border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.03); }
+  .pay-method input { position:absolute; opacity:0; }
+  .pay-method:hover { border-color:rgba(99,102,241,.4); }
+  .pay-method.selected-dana { border-color:#118EE9; background:rgba(17,142,233,.1); }
+  .pay-method.selected-qris { border-color:#10b981; background:rgba(16,185,129,.1); }
+  .pay-method.selected-tunai { border-color:#f59e0b; background:rgba(245,158,11,.1); }
 
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-kas-gang">
-                                <input type="checkbox" name="jenis_iuran[]" value="kas_gang" class="peer sr-only"
-                                    checked id="checkbox-kas-gang">
-                                <div
-                                    class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-blue-50 dark:peer-checked:bg-blue-500/10 peer-checked:border-blue-500 peer-checked:shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-blue-500 peer-checked:[&_.check-ring]:border-blue-500 peer-checked:[&_.status-text]:text-blue-700 dark:peer-checked:[&_.status-text]:text-blue-300 peer-checked:[&_.price-text]:text-blue-600 dark:peer-checked:[&_.price-text]:text-blue-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
-                                    <span
-                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">🏘️</span>
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Kas
-                                            Gang</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-kas-gang">Rp
-                                            10k</span>
-                                    </div>
-                                    <div
-                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
-                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </label>
+  /* Nav buttons */
+  .btn-next { background:#6366f1; color:#fff; border:none; border-radius:12px; padding:12px 28px;
+    font-weight:700; font-size:14px; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:8px; }
+  .btn-next:hover { background:#4f46e5; transform:translateY(-1px); box-shadow:0 8px 20px rgba(99,102,241,.35); }
+  .btn-prev { background:#f3f4f6; color:#6b7280; border:1.5px solid #e5e7eb;
+    border-radius:12px; padding:12px 24px; font-weight:600; font-size:14px; cursor:pointer; transition:all .2s; }
+  .dark .btn-prev { background:rgba(255,255,255,.06); color:#9ca3af; border-color:rgba(255,255,255,.1); }
+  .btn-prev:hover { background:#e5e7eb; color:#374151; }
+  .dark .btn-prev:hover { background:rgba(255,255,255,.12); color:#e5e7eb; }
+  .btn-submit { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none;
+    border-radius:12px; padding:14px 36px; font-weight:800; font-size:15px; cursor:pointer;
+    transition:all .2s; display:flex; align-items:center; gap:8px;
+    animation: pulse-red-glow 1.5s ease-in-out infinite; }
+  @keyframes pulse-red-glow {
+    0%,100% { box-shadow:0 0 8px rgba(239,68,68,.4); }
+    50% { box-shadow:0 0 22px rgba(239,68,68,.8); }
+  }
+  .btn-submit:hover { transform:translateY(-2px); }
 
-                            <label class="cursor-pointer group flex-1 sm:flex-none min-w-[140px]" id="label-sampah">
-                                <input type="checkbox" name="jenis_iuran[]" value="sampah" class="peer sr-only" checked id="checkbox-sampah">
-                                <div
-                                    class="px-4 py-3 h-full rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm peer-checked:bg-orange-50 dark:peer-checked:bg-orange-500/10 peer-checked:border-orange-500 peer-checked:shadow-[0_0_15px_rgba(249,115,22,0.2)] transition-all duration-300 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/10 relative overflow-hidden peer-checked:[&_.check-icon]:scale-100 peer-checked:[&_.check-ring]:bg-orange-500 peer-checked:[&_.check-ring]:border-orange-500 peer-checked:[&_.status-text]:text-orange-700 dark:peer-checked:[&_.status-text]:text-orange-300 peer-checked:[&_.price-text]:text-orange-600 dark:peer-checked:[&_.price-text]:text-orange-400 peer-checked:[&_.emoji]:grayscale-0 peer-checked:[&_.emoji]:opacity-100 peer-checked:[&_.emoji]:scale-110">
-                                    <span
-                                        class="emoji text-2xl grayscale transition-all duration-300 opacity-70 block">🗑️</span>
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="status-text text-sm font-bold text-gray-700 dark:text-gray-300 transition-colors">Sampah</span>
-                                        <span class="price-text text-xs text-gray-500 transition-colors" id="price-sampah">Rp
-                                            25k</span>
-                                    </div>
-                                    <div
-                                        class="check-ring ml-auto w-6 h-6 rounded-full border-2 border-gray-600 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center scale-90 peer-checked:scale-110">
-                                        <svg class="check-icon w-3.5 h-3.5 text-white transform scale-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
+  /* Dropzone */
+  #dropzone { border:2px dashed #d1d5db; border-radius:16px; padding:32px;
+    text-align:center; cursor:pointer; transition:all .25s; background:#f9fafb; }
+  .dark #dropzone { border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.03); }
+  #dropzone:hover, #dropzone.drag-over { border-color:#6366f1; background:rgba(99,102,241,.06); }
 
+  /* Summary card */
+  .summary-row { display:flex; justify-content:space-between; align-items:center;
+    padding:8px 0; border-bottom:1px solid #f3f4f6; font-size:13px; }
+  .dark .summary-row { border-bottom-color:rgba(255,255,255,.06); }
+  .summary-row:last-child { border-bottom:none; }
+</style>
 
-                    <div class="sm:col-span-6">
-                        <label for="tanggal_bayar"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Waktu
-                            Pembayaran</label>
-                        <input type="datetime-local" name="tanggal_bayar" id="tanggal_bayar"
-                            class="glass-input block w-full sm:text-sm text-gray-900 dark:text-gray-100 rounded-xl p-3">
-                        <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">Default adalah waktu sekarang (WIB).
-                        </p>
-                    </div>
+<div class="max-w-2xl mx-auto m-4 px-2">
 
-                    <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Transfer
-                            E-Wallet</label>
-                        <div
-                            class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-gray-100 dark:bg-white/5">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-[#118EE9]/20 flex items-center justify-center border border-[#118EE9]/30 shadow-[0_0_15px_rgba(17,142,233,0.3)]">
-                                    <span class="text-lg font-bold text-[#118EE9]">D</span>
-                                </div>
-                                <div>
-                                    <p class="text-base font-bold text-gray-900 dark:text-gray-100">DANA</p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">a.n. Karsidi</p>
-                                </div>
-                            </div>
-                            <button type="button" onclick="copyText('081222334261')"
-                                class="group flex items-center gap-3 bg-black/20 px-5 py-3 rounded-xl border border-white/5 hover:bg-gray-100 dark:bg-white/5 hover:border-white/20 transition-all active:scale-95 w-full sm:w-auto justify-between sm:justify-start">
-                                <span
-                                    class="text-lg font-mono font-bold text-[#118EE9] tracking-wider group-hover:text-[#40a9ff] transition-colors">081222334261</span>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+  <!-- ── BREADCRUMB ── -->
+  <div class="glass-card p-5 mb-4">
+    <div class="flex items-start justify-center gap-0">
+      <!-- Step 1 -->
+      <div class="flex flex-col items-center">
+        <div class="crumb-dot active" id="crumb-1">1</div>
+        <span class="crumb-label active" id="clabel-1">Periode</span>
+      </div>
+      <div class="crumb-line mt-[18px]" id="cline-1"></div>
+      <!-- Step 2 -->
+      <div class="flex flex-col items-center">
+        <div class="crumb-dot" id="crumb-2">2</div>
+        <span class="crumb-label" id="clabel-2">Jenis</span>
+      </div>
+      <div class="crumb-line mt-[18px]" id="cline-2"></div>
+      <!-- Step 3 -->
+      <div class="flex flex-col items-center">
+        <div class="crumb-dot" id="crumb-3">3</div>
+        <span class="crumb-label" id="clabel-3">Bayar</span>
+      </div>
+      <div class="crumb-line mt-[18px]" id="cline-3"></div>
+      <!-- Step 4 -->
+      <div class="flex flex-col items-center">
+        <div class="crumb-dot" id="crumb-4">4</div>
+        <span class="crumb-label" id="clabel-4">Konfirmasi</span>
+      </div>
+    </div>
+  </div>
 
-                    <div class="sm:col-span-6">
-                        <label for="bukti_bayar"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bukti Transfer
-                            Dana / Bukti Pembayaran QRIS
-                            <span class="text-red-400 text-xs ml-1">(Wajib)</span></label>
-                        <div>
-                            <div id="dropzone"
-                                class="relative border-2 border-dashed border-gray-500 hover:border-indigo-400 bg-gray-100 dark:bg-white/5 rounded-2xl p-6 transition-all group cursor-pointer text-center">
+  <!-- ── FORM ── -->
+  <form action="/iuran/pay" method="POST" enctype="multipart/form-data" id="pay-form">
 
-                                <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" class="hidden">
+    <!-- ═══ STEP 1 – Periode ═══ -->
+    <div class="wizard-step active glass-card p-6" id="step-1">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">📅 Pilih Periode</h3>
+      <p class="text-xs text-gray-500 mb-6">Pilih warga, tahun, dan bulan yang ingin dibayar.</p>
 
-                                <!-- Default View -->
-                                <div id="dropzone-content" class="flex flex-col items-center justify-center space-y-3">
-                                    <div
-                                        class="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                                        <svg class="w-8 h-8 text-gray-600 dark:text-gray-400 group-hover:text-indigo-400"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div class="text-gray-700 dark:text-gray-300 font-medium">Click to upload or drag &
-                                        drop</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX.
-                                        5MB)</div>
-                                </div>
+      <!-- Warga -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nama Warga</label>
+        <select id="warga_id" name="warga_id"
+          class="block w-full sm:text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          <% if(user && user.role==='warga' && warga.length===1) { %>disabled<% } %>>
+          <% warga.forEach(w=>{ %>
+            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value="<%= w.id %>" data-status-huni="<%= w.status_huni||'tetap' %>">
+              <%= w.nama %> – Blok <%= w.blok %> No. <%= w.nomor_rumah %>
+            </option>
+          <% }) %>
+        </select>
+        <% if(user && user.role==='warga' && warga.length===1) { %>
+          <input type="hidden" name="warga_id" value="<%= warga[0].id %>">
+        <% } %>
+      </div>
 
-                                <!-- Preview View -->
-                                <div id="preview-container" class="hidden relative group/preview">
-                                    <img id="preview-image" src="" alt="Preview"
-                                        class="mx-auto max-h-64 rounded-lg shadow-lg object-contain">
-                                    <div
-                                        class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/preview:opacity-100 transition-opacity rounded-lg">
-                                        <button type="button" id="remove-file"
-                                            class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transform scale-90 hover:scale-110 transition-all">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Upload juga foto bukti transaksi
-                                jika bayar tunai
-                                langsung.</p>
-                        </div>
+      <!-- Tahun -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tahun</label>
+        <select id="tahun" name="tahun"
+          class="block w-full sm:text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 transition-all">
+          <% const cy=new Date().getFullYear(); for(let y=cy-1;y<=cy+1;y++){ %>
+            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" value="<%= y %>" <%=y===cy?'selected':''%>><%= y %></option>
+          <% } %>
+        </select>
+      </div>
 
-                    </div>
+      <!-- Waktu Bayar -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Waktu Pembayaran</label>
+        <input type="datetime-local" name="tanggal_bayar" id="tanggal_bayar"
+          class="block w-full sm:text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 transition-all dark:[color-scheme:dark]">
+        <p class="mt-1 text-xs text-gray-500">Default waktu sekarang (WIB).</p>
+      </div>
 
-                    <!-- Payment Method Selection -->
-                    <div class="sm:col-span-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Metode Pembayaran
-                            <span class="text-red-400 text-xs ml-1">(Wajib)</span>
-                        </label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <!-- DANA Option -->
-                            <label class="relative flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-white/20 rounded-xl cursor-pointer hover:border-[#118EE9] dark:hover:border-[#118EE9] transition-all group has-[:checked]:border-[#118EE9] has-[:checked]:bg-[#118EE9]/10 has-[:checked]:shadow-lg">
-                                <input type="radio" name="metode_pembayaran" value="DANA" class="sr-only peer" required>
-                                <div class="w-10 h-10 rounded-full bg-[#118EE9]/20 flex items-center justify-center mb-2 group-has-[:checked]:bg-[#118EE9]/30">
-                                    <span class="text-lg font-bold text-[#118EE9]">D</span>
-                                </div>
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-300 group-has-[:checked]:text-[#118EE9]">DANA</span>
-                                <svg class="absolute top-2 right-2 w-5 h-5 text-[#118EE9] hidden peer-checked:block" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            </label>
+      <!-- Bulan Grid -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Pilih Bulan</label>
+        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="month-grid"></div>
+        <p class="text-xs text-gray-500 mt-2">*Bulan lunas tidak dapat dipilih.</p>
+      </div>
 
-                            <!-- QRIS Option -->
-                            <label class="relative flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-white/20 rounded-xl cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500 transition-all group has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10 has-[:checked]:shadow-lg">
-                                <input type="radio" name="metode_pembayaran" value="QRIS" class="sr-only peer">
-                                <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2 group-has-[:checked]:bg-emerald-500/30">
-                                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                                    </svg>
-                                </div>
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-300 group-has-[:checked]:text-emerald-600">QRIS</span>
-                                <svg class="absolute top-2 right-2 w-5 h-5 text-emerald-500 hidden peer-checked:block" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            </label>
+      <div class="flex justify-end">
+        <button type="button" class="btn-next" onclick="goStep(2)">
+          Lanjut <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
 
-                            <!-- Cash Option -->
-                            <label class="relative flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-white/20 rounded-xl cursor-pointer hover:border-amber-500 dark:hover:border-amber-500 transition-all group has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10 has-[:checked]:shadow-lg">
-                                <input type="radio" name="metode_pembayaran" value="Tunai" class="sr-only peer">
-                                <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center mb-2 group-has-[:checked]:bg-amber-500/30">
-                                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                    </svg>
-                                </div>
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-300 group-has-[:checked]:text-amber-600">Tunai</span>
-                                <svg class="absolute top-2 right-2 w-5 h-5 text-amber-500 hidden peer-checked:block" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            </label>
-                        </div>
-                        <p class="mt-2 text-xs text-gray-600 dark:text-gray-400">Pilih metode pembayaran yang Anda gunakan</p>
-                    </div>
+    <!-- ═══ STEP 2 – Jenis & Metode ═══ -->
+    <div class="wizard-step glass-card p-6" id="step-2">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">💳 Jenis & Metode</h3>
+      <p class="text-xs text-gray-500 mb-6">Pilih jenis iuran dan metode pembayaran.</p>
 
-                </div> <!-- Real End of Grid -->
-
-                <!-- Bottom Section Wrapper -->
-                <div class="space-y-6 mt-8">
-
-                    <!-- Total Tagihan -->
-                    <div class="border-t border-white/10 pt-6">
-                        <div
-                            class="flex justify-between items-center bg-gray-100 dark:bg-white/5 p-5 rounded-2xl border border-white/10 shadow-lg">
-                            <span class="text-gray-700 dark:text-gray-300 font-bold text-lg">Total Bayar</span>
-                            <span id="total-display" class="text-3xl font-extrabold text-indigo-400 drop-shadow-md">Rp
-                                0</span>
-                        </div>
-                    </div>
-
-                    <!-- QRIS Area -->
-                    <div id="qris-container" class="hidden">
-                        <div
-                            class="flex flex-col items-center justify-center bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="text-3xl">📱</span>
-                                <h3 class="text-lg font-bold text-white">Scan QRIS</h3>
-                            </div>
-
-                            <div class="bg-white p-3 rounded-xl shadow-inner">
-                                <canvas id="qrcode-canvas"></canvas>
-                            </div>
-
-                            <div class="mt-4 text-center">
-                                <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest">Merchant
-                                </p>
-                                <p class="text-sm font-bold text-indigo-300 mt-1 font-mono" id="merchant-name-display">
-                                    --</p>
-                            </div>
-
-                            <button type="button" onclick="downloadQris()"
-                                class="mt-6 flex items-center px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-1">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                                Simpan QRIS
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
-                        <a href="/iuran"
-                            class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 border border-white/10 hover:bg-gray-900 dark:hover:bg-gray-900 hover:text-white hover:border-gray-700 hover:shadow-[0_0_20px_rgba(0,0,0,0.6)] transition-all group">
-                            <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400 group-hover:text-white transition-colors transform group-hover:-translate-x-1 duration-200"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Batal
-                        </a>
-                        <button type="submit"
-                            class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold rounded-xl transition-all group bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white hover:scale-[1.02] active:scale-100 dark:hover:text-white animate-red-glow">
-                            <svg class="w-5 h-5 mr-2 text-red-500 dark:text-red-400 group-hover:text-white transition-colors"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                                </path>
-                            </svg>
-                            Bayar Sekarang
-                        </button>
-                    </div>
-                </div>
-            </form>
+      <!-- Jenis Iuran -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Jenis Iuran</label>
+        <div class="flex flex-col gap-3">
+          <label class="jenis-card checked" id="jcard-kas-rt">
+            <input type="checkbox" name="jenis_iuran[]" value="kas_rt" id="checkbox-kas-rt" checked>
+            <span class="text-2xl">💰</span>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 dark:text-gray-200 text-sm">Kas RT</p>
+              <p class="text-xs text-gray-500" id="price-kas-rt">Rp 10.000</p>
+            </div>
+            <div class="w-5 h-5 rounded-full border-2 border-indigo-400 flex items-center justify-center" id="check-icon-kas-rt">
+              <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </label>
+          <label class="jenis-card checked" id="jcard-kas-gang">
+            <input type="checkbox" name="jenis_iuran[]" value="kas_gang" id="checkbox-kas-gang" checked>
+            <span class="text-2xl">🏘️</span>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 dark:text-gray-200 text-sm">Kas Gang</p>
+              <p class="text-xs text-gray-500" id="price-kas-gang">Rp 10.000</p>
+            </div>
+            <div class="w-5 h-5 rounded-full border-2 border-indigo-400 flex items-center justify-center" id="check-icon-kas-gang">
+              <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </label>
+          <label class="jenis-card checked" id="jcard-sampah">
+            <input type="checkbox" name="jenis_iuran[]" value="sampah" id="checkbox-sampah" checked>
+            <span class="text-2xl">🗑️</span>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 dark:text-gray-200 text-sm">Sampah</p>
+              <p class="text-xs text-gray-500" id="price-sampah">Rp 25.000</p>
+            </div>
+            <div class="w-5 h-5 rounded-full border-2 border-indigo-400 flex items-center justify-center" id="check-icon-sampah">
+              <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </label>
         </div>
-
-        <!-- QRCode Lib -->
-        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-
-        <script>
-            const tglBayarInput = document.getElementById('tanggal_bayar');
-            if (tglBayarInput) {
-                const now = new Date();
-                const offset = now.getTimezoneOffset() * 60000;
-                const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
-                tglBayarInput.value = localISOTime;
-            }
-
-            const wargaSelect = document.getElementById('warga_id');
-            const tahunSelect = document.getElementById('tahun');
-            const monthGrid = document.getElementById('month-grid');
-            const typeCheckboxes = document.querySelectorAll('input[name="jenis_iuran[]"]');
-            const totalDisplay = document.getElementById('total-display');
-            const qrisContainer = document.getElementById('qris-container');
-            const qrCanvas = document.getElementById('qrcode-canvas');
-            const merchantNameDisplay = document.getElementById('merchant-name-display');
-
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
-
-            // Listeners
-            wargaSelect.addEventListener('change', () => {
-                updatePricingByStatus();
-                refreshGrid();
-            });
-            tahunSelect.addEventListener('change', refreshGrid);
-            typeCheckboxes.forEach(cb => cb.addEventListener('change', () => {
-                // Re-check lunas status when types change (e.g. maybe Kas Lunas but Sampah Not)
-                // Actually status check returns all types status. Logic UI needs to combine.
-                // Simpler: Just refresh Grid logic (which handles partials)
-                refreshCheckboxesState();
-                calculateTotal();
-            }));
-
-            // Pricing based on status_huni
-            let currentPricing = {
-                kas_rt: 10000,
-                kas_gang: 10000,
-                sampah: 25000
-            };
-
-            function updatePricingByStatus() {
-                const selectedOption = wargaSelect.options[wargaSelect.selectedIndex];
-                const statusHuni = selectedOption ? selectedOption.getAttribute('data-status-huni') : 'tetap';
-
-                const kasRtCheckbox = document.getElementById('checkbox-kas-rt');
-                const kasGangCheckbox = document.getElementById('checkbox-kas-gang');
-                const sampahCheckbox = document.getElementById('checkbox-sampah');
-                const kasRtLabel = document.getElementById('label-kas-rt');
-                const kasGangLabel = document.getElementById('label-kas-gang');
-                const sampahLabel = document.getElementById('label-sampah');
-                const priceKasRt = document.getElementById('price-kas-rt');
-                const priceKasGang = document.getElementById('price-kas-gang');
-                const priceSampah = document.getElementById('price-sampah');
-
-                // Reset to default
-                kasRtCheckbox.disabled = false;
-                kasGangCheckbox.disabled = false;
-                sampahCheckbox.disabled = false;
-                kasRtLabel.classList.remove('opacity-50', 'cursor-not-allowed');
-                kasGangLabel.classList.remove('opacity-50', 'cursor-not-allowed');
-                sampahLabel.classList.remove('opacity-50', 'cursor-not-allowed');
-
-                if (statusHuni === 'kosong') {
-                    // Rumah kosong: semua disabled
-                    kasRtCheckbox.disabled = true;
-                    kasRtCheckbox.checked = false;
-                    kasGangCheckbox.disabled = true;
-                    kasGangCheckbox.checked = false;
-                    sampahCheckbox.disabled = true;
-                    sampahCheckbox.checked = false;
-                    kasRtLabel.classList.add('opacity-50', 'cursor-not-allowed');
-                    kasGangLabel.classList.add('opacity-50', 'cursor-not-allowed');
-                    sampahLabel.classList.add('opacity-50', 'cursor-not-allowed');
-                    priceKasRt.innerText = 'Rp 0';
-                    priceKasGang.innerText = 'Rp 0';
-                    priceSampah.innerText = 'Rp 0';
-                    currentPricing = { kas_rt: 0, kas_gang: 0, sampah: 0 };
-                } else if (statusHuni === 'tidak huni') {
-                    // Rumah tidak huni: Kas Gang 5k, Kas RT & Sampah disabled
-                    kasRtCheckbox.disabled = true;
-                    kasRtCheckbox.checked = false;
-                    kasRtLabel.classList.add('opacity-50', 'cursor-not-allowed');
-                    priceKasRt.innerText = 'Rp 0';
-                    
-                    kasGangCheckbox.disabled = false;
-                    kasGangCheckbox.checked = true;
-                    priceKasGang.innerText = 'Rp 5k';
-                    
-                    sampahCheckbox.disabled = true;
-                    sampahCheckbox.checked = false;
-                    sampahLabel.classList.add('opacity-50', 'cursor-not-allowed');
-                    priceSampah.innerText = 'Rp 0';
-                    
-                    currentPricing = { kas_rt: 0, kas_gang: 5000, sampah: 0 };
-                } else {
-                    // Rumah tetap/kontrak: harga normal
-                    kasRtCheckbox.checked = true;
-                    kasGangCheckbox.checked = true;
-                    sampahCheckbox.checked = true;
-                    priceKasRt.innerText = 'Rp 10k';
-                    priceKasGang.innerText = 'Rp 10k';
-                    priceSampah.innerText = 'Rp 25k';
-                    currentPricing = { kas_rt: 10000, kas_gang: 10000, sampah: 25000 };
-                }
-
-                calculateTotal();
-            }
-
-            // Generate Month Grid Buttons
-            function renderGrid(year) {
-                monthGrid.innerHTML = '';
-                months.forEach((m, index) => {
-                    const mm = String(index + 1).padStart(2, '0');
-                    const value = `${year}-${mm}`;
-
-                    const label = document.createElement('label');
-                    label.className = "cursor-pointer border border-gray-200 dark:border-white/10 rounded-xl p-3 flex flex-col items-center justify-center transition-all hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-gray-900 shadow-sm relative";
-
-                    const input = document.createElement('input');
-                    input.type = "checkbox";
-                    input.name = "months[]";
-                    input.value = value;
-                    input.className = "hidden peer";
-                    input.onchange = calculateTotal; // Recalc on toggle
-
-                    const text = document.createElement('span');
-                    text.innerText = m;
-                    text.className = "font-bold text-base text-gray-900 dark:text-gray-100 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400 relative z-10";
-
-                    // Visual for checked state
-                    const ring = document.createElement('div');
-                    ring.className = "absolute inset-0 border-2 border-transparent peer-checked:border-indigo-400 peer-checked:bg-indigo-500/10 rounded-xl pointer-events-none";
-
-                    // Status indicator (dot)
-                    // Status indicator element container
-                    const statusContainer = document.createElement('div');
-                    statusContainer.id = `status-container-${value}`;
-                    statusContainer.className = "mt-1 relative z-10";
-
-                    // Default Dot (for unpaid/partial)
-                    const dot = document.createElement('div');
-                    dot.id = `status-dot-${value}`;
-                    dot.className = "w-2 h-2 rounded-full bg-gray-600";
-                    statusContainer.appendChild(dot);
-
-                    label.appendChild(input);
-                    label.appendChild(ring);
-                    label.appendChild(text);
-                    label.appendChild(statusContainer);
-
-                    monthGrid.appendChild(label);
-                });
-            }
-
-            let statusCache = []; // Store fetched status items
-
-            async function refreshGrid() {
-                const year = tahunSelect.value;
-                const warga_id = wargaSelect.value;
-
-                // Render grid checkboxes first
-                renderGrid(year);
-
-                // Fetch status
-                if (!warga_id) return;
-
-                try {
-                    const response = await fetch('/iuran/check-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ warga_id, year })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        statusCache = data.items;
-                        refreshCheckboxesState();
-                    }
-                } catch (e) { console.error(e); }
-
-                calculateTotal();
-            }
-
-            function refreshCheckboxesState() {
-                const selectedTypes = [];
-                typeCheckboxes.forEach(cb => { if (cb.checked) selectedTypes.push(cb.value); });
-
-                // Jika user uncheck semua filter, gunakan SEMUA jenis untuk visualisasi status (All View)
-                const allTypes = ['kas_rt', 'kas_gang', 'sampah'];
-                const typesToCheck = selectedTypes.length > 0 ? selectedTypes : allTypes;
-
-                const checkboxes = monthGrid.querySelectorAll('input[type="checkbox"]');
-
-                checkboxes.forEach(cb => { // cb.value = YYYY-MM
-                    const ym = cb.value;
-                    const label = cb.parentElement;
-
-                    // Reset Styling Default (Unchecked/Plain White)
-                    label.className = "cursor-pointer border border-gray-200 dark:border-white/10 rounded-xl p-3 flex flex-col items-center justify-center transition-all hover:bg-gray-50 dark:hover:bg-white/10 bg-white dark:bg-gray-900 shadow-sm relative h-16 sm:h-20";
-
-                    // Find status for this month
-                    const monthItems = statusCache.filter(item => item.ym === ym);
-
-                    let isFullyPaid = true;
-                    let isPartiallyPaid = false;
-                    let isPending = false;
-
-                    // Check against typesToCheck
-                    for (const type of typesToCheck) {
-                        const item = monthItems.find(i => {
-                            return (i.jenis === type) || (type === 'kas_rt' && (i.jenis === 'keamanan' || i.jenis === 'kas'));
-                        });
-
-                        // Logic: Jika ada ITEM yang belum lunas (atau tidak ada recordnya), maka bulan ini belum Fully Paid (untuk typesToCheck)
-                        if (!item || item.status !== 'lunas') {
-                            isFullyPaid = false;
-                        }
-                        if (item && item.status === 'lunas') {
-                            isPartiallyPaid = true;
-                        }
-                        if (item && item.status === 'menunggu_konfirmasi') {
-                            isPending = true;
-                        }
-                    }
-
-                    // UI Update
-                    const statusContainer = label.querySelector(`#status-container-${ym}`);
-                    statusContainer.innerHTML = ''; // Clear previous status
-                    cb.disabled = false;
-
-                    if (isFullyPaid) {
-                        cb.disabled = true;
-                        cb.checked = false;
-
-                        // Green Badge Style (Lunas)
-                        label.className = "cursor-not-allowed border border-emerald-500/30 rounded-xl p-2 flex flex-col items-center justify-center bg-emerald-50 dark:bg-emerald-500/10 backdrop-blur-xl relative h-16 sm:h-20";
-
-                        const badge = document.createElement('span');
-                        badge.className = "px-2 py-0.5 rounded-md bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg shadow-emerald-500/20";
-                        badge.innerText = "LUNAS";
-                        statusContainer.appendChild(badge);
-
-                    } else if (isPending) {
-                        // Pending / Verifikasi Style (Orange)
-                        label.className = "cursor-pointer border border-orange-500/30 rounded-xl p-2 flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-500/10 backdrop-blur-xl relative h-16 sm:h-20 hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-all";
-
-                        const badge = document.createElement('span');
-                        badge.className = "px-2 py-0.5 rounded-md bg-orange-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg shadow-orange-500/20";
-                        badge.innerText = "PROSES";
-                        statusContainer.appendChild(badge);
-
-                    } else if (isPartiallyPaid) {
-                        // Partial
-                        const dot = document.createElement('div');
-                        dot.className = "w-2 h-2 rounded-full bg-orange-400";
-                        statusContainer.appendChild(dot);
-
-                    } else {
-                        // Clean / Unpaid
-                        const dot = document.createElement('div');
-                        dot.className = "w-2 h-2 rounded-full bg-gray-600";
-                        statusContainer.appendChild(dot);
-                    }
-
-                    // Global Disable if No Types Selected
-                    // Tapi biarkan visual Lunas tetap terlihat (hanya disable interaksi)
-                    if (selectedTypes.length === 0) {
-                        cb.disabled = true;
-                        cb.checked = false;
-                        // Jika belum lunas, kasih efek visual disabled
-                        if (!isFullyPaid) {
-                            label.classList.add('opacity-50', 'cursor-not-allowed');
-                        }
-                    }
-                });
-            }
-
-            let qrisDebounce;
-
-            function calculateTotal() {
-                // Count selected months
-                const selectedMonths = monthGrid.querySelectorAll('input:checked');
-                const count = selectedMonths.length;
-
-                let typePrice = 0;
-                typeCheckboxes.forEach(cb => {
-                    if (cb.checked) {
-                        // Use dynamic pricing based on status_huni
-                        if (cb.value === 'kas' || cb.value === 'kas_rt') {
-                            typePrice += currentPricing.kas_rt;
-                        } else if (cb.value === 'kas_gang') {
-                            typePrice += currentPricing.kas_gang;
-                        } else if (cb.value === 'sampah') {
-                            typePrice += currentPricing.sampah;
-                        }
-                    }
-                });
-
-                const total = count * typePrice;
-
-                totalDisplay.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total);
-
-                if (total > 0) {
-                    clearTimeout(qrisDebounce);
-                    qrisDebounce = setTimeout(() => generateQris(total, count), 500);
-                } else {
-                    qrisContainer.classList.add('hidden');
-                }
-            }
-
-            // QRIS Logic (similar to before but adapted)
-            async function generateQris(amount, count) {
-                // Merchant Name Generation
-                // ... Similar logic ...
-                const firstMonth = monthGrid.querySelector('input:checked')?.value;
-                // Use first selected month for naming?
-                // E.g. JAN24, etc.
-
-                const wargaText = wargaSelect.options[wargaSelect.selectedIndex].text;
-                const match = wargaText.match(/Blok\s+(.+)\s+No\.\s+(\d+)/i);
-                let houseLabel = match ? `${match[1].trim()}/${match[2].trim().padStart(2, '0')}` : 'WARGA';
-
-                let monthLabel = "MNTH";
-                if (firstMonth) {
-                    const d = new Date(firstMonth + '-01');
-                    monthLabel = d.toLocaleString('id-ID', { month: 'short' }).toUpperCase() + String(d.getFullYear()).slice(-2);
-                }
-                if (count > 1) monthLabel += `|${count}BLN`;
-
-                const checked = [];
-                typeCheckboxes.forEach(cb => { if (cb.checked) checked.push(cb.value); });
-                let prefix = 'IURAN';
-                const hasKas = checked.includes('kas') || checked.includes('kas_rt') || checked.includes('kas_gang');
-                const hasSampah = checked.includes('sampah');
-
-                if (hasKas && hasSampah) prefix = "KAS+SMPH";
-                else if (hasKas) prefix = "KAS";
-                else if (hasSampah) prefix = "SAMPAH";
-
-                let merchantName = `${prefix} ${houseLabel} ${monthLabel}`.toUpperCase();
-                if (merchantName.length > 25) merchantName = merchantName.substring(0, 25);
-                merchantNameDisplay.innerText = merchantName;
-
-                // Fetch API
-                try {
-                    const response = await fetch('/iuran/generate-qris', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ amount, merchantName })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        qrisContainer.classList.remove('hidden');
-                        QRCode.toCanvas(qrCanvas, data.qr_string, { width: 250, margin: 2 }, function (error) {
-                            if (error) console.error(error);
-                        });
-                    }
-                } catch (e) { }
-            }
-
-            function downloadQris() {
-                // ... same ...
-                const qrCanvas = document.getElementById('qrcode-canvas');
-                const merchantName = merchantNameDisplay.innerText || 'QRIS';
-                const totalText = totalDisplay.innerText || 'Rp 0';
-                const compositeCanvas = document.createElement('canvas');
-                const ctx = compositeCanvas.getContext('2d');
-                const qrSize = 250;
-                const padding = 20;
-                const textHeight = 80;
-                compositeCanvas.width = qrSize + (padding * 2);
-                compositeCanvas.height = qrSize + textHeight + (padding * 2);
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
-                ctx.drawImage(qrCanvas, padding, padding, qrSize, qrSize);
-                ctx.fillStyle = '#1F2937';
-                ctx.font = 'bold 16px Arial, sans-serif';
-                ctx.textAlign = 'center';
-                const textY = qrSize + padding + 25;
-                ctx.fillText(merchantName, compositeCanvas.width / 2, textY);
-                ctx.fillStyle = '#4F46E5';
-                ctx.font = 'bold 20px Arial, sans-serif';
-                ctx.fillText(totalText, compositeCanvas.width / 2, textY + 30);
-                const filename = merchantName.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
-                compositeCanvas.toBlob(function (blob) {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.download = filename;
-                    link.href = url;
-                    link.click();
-                    URL.revokeObjectURL(url);
-                });
-            }
-
-            function copyText(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('Nomor DANA berhasil disalin: ' + text);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    // Fallback
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("Copy");
-                    textArea.remove();
-                    alert('Nomor DANA berhasil disalin: ' + text);
-                });
-            }
-
-            // Dropzone Logic
-            const dropzone = document.getElementById('dropzone');
-            const fileInput = document.getElementById('bukti_bayar');
-            const previewContainer = document.getElementById('preview-container');
-            const dropzoneContent = document.getElementById('dropzone-content');
-            const previewImage = document.getElementById('preview-image');
-            const removeBtn = document.getElementById('remove-file');
-
-            // Handle Drag Events
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, unhighlight, false);
-            });
-
-            function highlight(e) {
-                dropzone.classList.add('border-indigo-500', 'bg-gray-200 dark:bg-white/10');
-                dropzone.classList.remove('border-gray-500', 'bg-gray-100 dark:bg-white/5');
-            }
-
-            function unhighlight(e) {
-                dropzone.classList.remove('border-indigo-500', 'bg-gray-200 dark:bg-white/10');
-                dropzone.classList.add('border-gray-500', 'bg-gray-100 dark:bg-white/5');
-            }
-
-            // Handle Drop
-            dropzone.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
-
-            // Handle Click
-            dropzone.addEventListener('click', (e) => {
-                if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
-                    fileInput.click();
-                }
-            });
-
-            fileInput.addEventListener('change', function () {
-                handleFiles(this.files);
-            });
-
-            // Form Submit Validation
-            const paymentForm = document.querySelector('form[action="/iuran/pay"]');
-            if (paymentForm) {
-                paymentForm.addEventListener('submit', function (e) {
-                    if (fileInput.files.length === 0) {
-                        e.preventDefault();
-                        alert('Mohon upload bukti transfer dana / pembayaran QRIS (Wajib).');
-
-                        // Highlight dropzone
-                        dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        dropzone.classList.add('border-red-500', 'animate-pulse');
-                        setTimeout(() => {
-                            dropzone.classList.remove('border-red-500', 'animate-pulse');
-                        }, 2500);
-                    }
-                });
-            }
-
-            function handleFiles(files) {
-                if (files.length > 0) {
-                    const file = files[0];
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            previewImage.src = e.target.result;
-                            dropzoneContent.classList.add('hidden');
-                            previewContainer.classList.remove('hidden');
-                        }
-                        reader.readAsDataURL(file);
-
-                        // If files came from drop, async assign to input
-                        if (fileInput.files !== files) {
-                            // Can't directly assign FileList, but for form submission
-                            // standard usage is relying on input. 
-                            // If dropped, we need to manually put it in input?
-                            // modern browsers support: 
-                            const dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
-                            fileInput.files = dataTransfer.files;
-                        }
-                    } else {
-                        alert('Please upload an image file.');
-                    }
-                }
-            }
-
-            // Remove File
-            removeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileInput.value = ''; // Clear input
-                previewImage.src = '';
-                previewContainer.classList.add('hidden');
-                dropzoneContent.classList.remove('hidden');
-            });
-
-            // Init
-            updatePricingByStatus(); // Set initial pricing
-            refreshGrid();
-        </script>
-
-        <%- include('../partials/footer') %>
+      </div>
+
+      <!-- Metode Pembayaran -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Metode Pembayaran <span class="text-red-400 text-xs">(Wajib)</span></label>
+        <div class="grid grid-cols-3 gap-3">
+          <label class="pay-method" id="pm-dana">
+            <input type="radio" name="metode_pembayaran" value="DANA" required onclick="selectMethod('DANA')">
+            <div class="w-10 h-10 rounded-full bg-[#118EE9]/20 flex items-center justify-center">
+              <span class="font-bold text-[#118EE9] text-lg">D</span>
+            </div>
+            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">DANA</span>
+          </label>
+          <label class="pay-method" id="pm-qris">
+            <input type="radio" name="metode_pembayaran" value="QRIS" onclick="selectMethod('QRIS')">
+            <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            </div>
+            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">QRIS</span>
+          </label>
+          <label class="pay-method" id="pm-tunai">
+            <input type="radio" name="metode_pembayaran" value="Tunai" onclick="selectMethod('Tunai')">
+            <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Tunai</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Total Preview -->
+      <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-4 border border-gray-200 dark:border-white/10 mb-6 flex justify-between items-center">
+        <span class="text-gray-400 font-semibold">Total Estimasi</span>
+        <span id="total-step2" class="text-2xl font-extrabold text-indigo-400">Rp 0</span>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" class="btn-prev" onclick="goStep(1)">← Kembali</button>
+        <button type="button" class="btn-next" onclick="goStep(3)">
+          Lanjut <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 3 – Pembayaran ═══ -->
+    <div class="wizard-step glass-card p-6" id="step-3">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">📱 Lakukan Pembayaran</h3>
+      <p class="text-xs text-gray-500 mb-6">Lakukan transfer atau scan QRIS sesuai total bayar.</p>
+
+      <!-- DANA Info -->
+      <div id="info-dana" class="hidden mb-6">
+        <div class="glass-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/10 bg-white/5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#118EE9]/20 flex items-center justify-center border border-[#118EE9]/30 shadow-[0_0_15px_rgba(17,142,233,.3)]">
+              <span class="text-lg font-bold text-[#118EE9]">D</span>
+            </div>
+            <div>
+              <p class="text-base font-bold text-gray-900 dark:text-gray-100">DANA</p>
+              <p class="text-xs text-gray-400">a.n. Karsidi</p>
+            </div>
+          </div>
+          <button type="button" onclick="copyText('081222334261')"
+            class="group flex items-center gap-3 bg-white/5 px-5 py-3 rounded-xl border border-white/10 hover:border-white/30 transition-all active:scale-95 w-full sm:w-auto justify-between sm:justify-start">
+            <span class="text-lg font-mono font-bold text-[#118EE9] tracking-wider">081222334261</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- QRIS -->
+      <div id="info-qris" class="hidden mb-6">
+        <div class="flex flex-col items-center bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-3xl">📱</span>
+            <h3 class="text-lg font-bold text-white">Scan QRIS</h3>
+          </div>
+          <div class="bg-white p-3 rounded-xl shadow-inner">
+            <canvas id="qrcode-canvas"></canvas>
+          </div>
+          <div class="mt-4 text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-widest">Merchant</p>
+            <p class="text-sm font-bold text-indigo-300 mt-1 font-mono" id="merchant-name-display">--</p>
+          </div>
+          <button type="button" onclick="downloadQris()" class="mt-6 flex items-center px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-1">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Simpan QRIS
+          </button>
+        </div>
+      </div>
+
+      <!-- Tunai Info -->
+      <div id="info-tunai" class="hidden mb-6">
+        <div class="flex flex-col items-center gap-4 p-8 rounded-3xl border border-amber-500/30 bg-amber-500/5 text-center">
+          <span class="text-5xl">💵</span>
+          <p class="text-gray-700 dark:text-gray-300 font-semibold">Bayar tunai langsung kepada bendahara RT/Gang.</p>
+          <p class="text-xs text-gray-500">Upload bukti / foto saat pembayaran di langkah berikutnya.</p>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-4 border border-gray-200 dark:border-white/10 mb-6 flex justify-between items-center">
+        <span class="text-gray-400 font-semibold">Total Bayar</span>
+        <span id="total-step3" class="text-2xl font-extrabold text-indigo-400">Rp 0</span>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" class="btn-prev" onclick="goStep(2)">← Kembali</button>
+        <button type="button" class="btn-next" onclick="goStep(4)">
+          Sudah Bayar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 4 – Bukti & Konfirmasi ═══ -->
+    <div class="wizard-step glass-card p-6" id="step-4">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">✅ Bukti & Konfirmasi</h3>
+      <p class="text-xs text-gray-500 mb-6">Upload bukti pembayaran lalu konfirmasi.</p>
+
+      <!-- Upload Bukti -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Bukti Transfer Dana / Bukti Pembayaran QRIS
+          <span class="text-red-400 text-xs ml-1">(Wajib)</span>
+        </label>
+        <div id="dropzone">
+          <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*" class="hidden">
+          <div id="dropzone-content" class="flex flex-col items-center justify-center space-y-3">
+            <div class="w-16 h-16 bg-gray-200 dark:bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+              <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="text-gray-400 font-medium">Klik atau drag & drop gambar</div>
+            <div class="text-xs text-gray-600">PNG, JPG, GIF (maks. 5MB)</div>
+          </div>
+          <div id="preview-container" class="hidden relative">
+            <img id="preview-image" src="" alt="Preview" class="mx-auto max-h-64 rounded-lg shadow-lg object-contain">
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+              <button type="button" id="remove-file" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">Upload juga foto bukti transaksi jika bayar tunai langsung.</p>
+      </div>
+
+      <!-- Summary -->
+      <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-4 border border-gray-200 dark:border-white/10 mb-6">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Ringkasan Pembayaran</p>
+        <div class="summary-row"><span class="text-gray-500 dark:text-gray-400">Warga</span><span class="font-semibold text-gray-900 dark:text-gray-200" id="sum-warga">–</span></div>
+        <div class="summary-row"><span class="text-gray-500 dark:text-gray-400">Periode</span><span class="font-semibold text-gray-900 dark:text-gray-200" id="sum-periode">–</span></div>
+        <div class="summary-row"><span class="text-gray-500 dark:text-gray-400">Jenis Iuran</span><span class="font-semibold text-gray-900 dark:text-gray-200" id="sum-jenis">–</span></div>
+        <div class="summary-row"><span class="text-gray-500 dark:text-gray-400">Metode</span><span class="font-semibold text-gray-900 dark:text-gray-200" id="sum-metode">–</span></div>
+        <div class="flex justify-between items-center pt-3 mt-1">
+          <span class="font-bold text-gray-700 dark:text-gray-300 text-base">Total Bayar</span>
+          <span id="total-display" class="text-3xl font-extrabold text-indigo-400">Rp 0</span>
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button type="button" class="btn-prev" onclick="goStep(3)">← Kembali</button>
+        <button type="submit" class="btn-submit">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Bayar Sekarang
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- QRCode Lib -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<!-- Confetti Lib -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+// ── State ──
+let currentStep = 1;
+let currentMethod = '';
+let currentPricing = { kas_rt:10000, kas_gang:10000, sampah:25000 };
+let statusCache = [];
+let qrisDebounce;
+
+const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+
+// ── DOM refs ──
+const wargaSelect  = document.getElementById('warga_id');
+const tahunSelect  = document.getElementById('tahun');
+const monthGrid    = document.getElementById('month-grid');
+const typeCheckboxes = document.querySelectorAll('input[name="jenis_iuran[]"]');
+const totalDisplay = document.getElementById('total-display');
+const qrCanvas     = document.getElementById('qrcode-canvas');
+const merchantNameDisplay = document.getElementById('merchant-name-display');
+
+// ── Init ──
+(function init() {
+  const now = new Date();
+  const local = new Date(now - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('tanggal_bayar').value = local;
+  updatePricingByStatus();
+  refreshGrid();
+})();
+
+// ── Wizard Navigation ──
+function goStep(n) {
+  if (n === 2) {
+    const months = monthGrid.querySelectorAll('input:checked');
+    if (months.length === 0) { alert('Pilih minimal 1 bulan.'); return; }
+  }
+  if (n === 3) {
+    if (!currentMethod) { alert('Pilih metode pembayaran.'); return; }
+    renderStep3();
+  }
+  if (n === 4) {
+    buildSummary();
+  }
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-'+n).classList.add('active');
+  updateBreadcrumb(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateBreadcrumb(n) {
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('crumb-'+i);
+    const lbl = document.getElementById('clabel-'+i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active','done');
+    if (i < n) { dot.classList.add('done'); lbl.classList.add('done'); dot.innerHTML = '✓'; }
+    else if (i === n) { dot.classList.add('active'); lbl.classList.add('active'); dot.textContent = i; }
+    else { dot.textContent = i; }
+    if (i < 4) {
+      const line = document.getElementById('cline-'+i);
+      line.classList.toggle('done', i < n);
+    }
+  }
+}
+
+// ── Pricing ──
+function updatePricingByStatus() {
+  const opt = wargaSelect.options[wargaSelect.selectedIndex];
+  const status = opt ? opt.getAttribute('data-status-huni') : 'tetap';
+  const rtCb = document.getElementById('checkbox-kas-rt');
+  const gangCb = document.getElementById('checkbox-kas-gang');
+  const sampahCb = document.getElementById('checkbox-sampah');
+
+  // Reset
+  [rtCb, gangCb, sampahCb].forEach(cb => { cb.disabled = false; cb.checked = true; });
+  ['jcard-kas-rt','jcard-kas-gang','jcard-sampah'].forEach(id => {
+    document.getElementById(id).classList.remove('disabled-card');
+  });
+
+  if (status === 'kosong') {
+    [rtCb, gangCb, sampahCb].forEach(cb => { cb.disabled=true; cb.checked=false; });
+    ['jcard-kas-rt','jcard-kas-gang','jcard-sampah'].forEach(id => document.getElementById(id).classList.add('disabled-card'));
+    document.getElementById('price-kas-rt').textContent = 'Rp 0';
+    document.getElementById('price-kas-gang').textContent = 'Rp 0';
+    document.getElementById('price-sampah').textContent = 'Rp 0';
+    currentPricing = { kas_rt:0, kas_gang:0, sampah:0 };
+  } else if (status === 'tidak huni') {
+    rtCb.disabled=true; rtCb.checked=false; document.getElementById('jcard-kas-rt').classList.add('disabled-card');
+    sampahCb.disabled=true; sampahCb.checked=false; document.getElementById('jcard-sampah').classList.add('disabled-card');
+    gangCb.checked=true;
+    document.getElementById('price-kas-rt').textContent = 'Rp 0';
+    document.getElementById('price-kas-gang').textContent = 'Rp 5.000';
+    document.getElementById('price-sampah').textContent = 'Rp 0';
+    currentPricing = { kas_rt:0, kas_gang:5000, sampah:0 };
+  } else {
+    document.getElementById('price-kas-rt').textContent = 'Rp 10.000';
+    document.getElementById('price-kas-gang').textContent = 'Rp 10.000';
+    document.getElementById('price-sampah').textContent = 'Rp 25.000';
+    currentPricing = { kas_rt:10000, kas_gang:10000, sampah:25000 };
+  }
+  syncJenisCardStyles();
+  calculateTotal();
+}
+
+function syncJenisCardStyles() {
+  ['kas-rt','kas-gang','sampah'].forEach(k => {
+    const cb = document.getElementById('checkbox-'+k);
+    const card = document.getElementById('jcard-'+k);
+    card.classList.toggle('checked', cb.checked);
+  });
+}
+
+// ── Type checkboxes toggle ──
+typeCheckboxes.forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (!cb.disabled) syncJenisCardStyles();
+    refreshCheckboxesState();
+    calculateTotal();
+  });
+});
+// Make whole card clickable
+['kas-rt','kas-gang','sampah'].forEach(k => {
+  document.getElementById('jcard-'+k).addEventListener('click', () => {
+    const cb = document.getElementById('checkbox-'+k);
+    if (!cb.disabled) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+  });
+});
+
+// ── Method Selection ──
+function selectMethod(m) {
+  currentMethod = m;
+  ['dana','qris','tunai'].forEach(x => {
+    document.getElementById('pm-'+x).classList.remove('selected-dana','selected-qris','selected-tunai');
+  });
+  document.getElementById('pm-'+m.toLowerCase()).classList.add('selected-'+m.toLowerCase());
+}
+
+// ── Month Grid ──
+function renderGrid(year) {
+  monthGrid.innerHTML = '';
+  months.forEach((m, idx) => {
+    const mm = String(idx+1).padStart(2,'0');
+    const val = year+'-'+mm;
+    const label = document.createElement('label');
+    label.className = 'month-btn';
+    label.dataset.ym = val;
+    const inp = document.createElement('input');
+    inp.type='checkbox'; inp.name='months[]'; inp.value=val;
+    inp.onchange = calculateTotal;
+    const txt = document.createElement('span');
+    txt.className='font-bold text-sm text-gray-200 relative z-10'; txt.textContent=m;
+    const dot = document.createElement('div');
+    dot.id='sdot-'+val; dot.className='w-2 h-2 rounded-full bg-gray-600 mt-1';
+    label.appendChild(inp); label.appendChild(txt); label.appendChild(dot);
+    label.addEventListener('click', e => {
+      if (inp.disabled) e.preventDefault();
+      else { label.classList.toggle('selected', inp.checked); }
+    });
+    monthGrid.appendChild(label);
+  });
+}
+
+async function refreshGrid() {
+  const year = tahunSelect.value;
+  const warga_id = wargaSelect.value;
+  renderGrid(year);
+  if (!warga_id) return;
+  try {
+    const res = await fetch('/iuran/check-status', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ warga_id, year })
+    });
+    const data = await res.json();
+    if (data.success) { statusCache = data.items; refreshCheckboxesState(); }
+  } catch(e) { console.error(e); }
+  calculateTotal();
+}
+
+function refreshCheckboxesState() {
+  const selTypes = [];
+  typeCheckboxes.forEach(cb => { if(cb.checked) selTypes.push(cb.value); });
+  const allTypes = ['kas_rt','kas_gang','sampah'];
+  const checkTypes = selTypes.length > 0 ? selTypes : allTypes;
+  monthGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    const ym = cb.value;
+    const label = cb.parentElement;
+    const items = statusCache.filter(i => i.ym === ym);
+    let fullyPaid=true, partiallyPaid=false, pending=false;
+    for (const type of checkTypes) {
+      const item = items.find(i => (i.jenis===type)||(type==='kas_rt'&&(i.jenis==='keamanan'||i.jenis==='kas')));
+      if (!item || item.status!=='lunas') fullyPaid=false;
+      if (item && item.status==='lunas') partiallyPaid=true;
+      if (item && item.status==='menunggu_konfirmasi') pending=true;
+    }
+    const dot = document.getElementById('sdot-'+ym);
+    label.classList.remove('lunas','pending','disabled','selected');
+    cb.disabled=false;
+    if (fullyPaid) {
+      cb.disabled=true; cb.checked=false;
+      label.classList.add('lunas');
+      if (dot) { dot.className=''; dot.innerHTML='<span class="px-1.5 py-0.5 rounded bg-emerald-500 text-[9px] font-bold text-white">LUNAS</span>'; }
+    } else if (pending) {
+      label.classList.add('pending');
+      if (dot) { dot.className=''; dot.innerHTML='<span class="px-1.5 py-0.5 rounded bg-amber-500 text-[9px] font-bold text-white">PROSES</span>'; }
+    } else if (partiallyPaid) {
+      if (dot) dot.className='w-2 h-2 rounded-full bg-orange-400 mt-1';
+    } else {
+      if (dot) dot.className='w-2 h-2 rounded-full bg-gray-600 mt-1';
+    }
+    if (selTypes.length===0 && !fullyPaid) { cb.disabled=true; cb.checked=false; label.classList.add('disabled'); }
+    label.classList.toggle('selected', cb.checked);
+  });
+}
+
+// ── Calculate ──
+function calculateTotal() {
+  const checked = monthGrid.querySelectorAll('input:checked');
+  const count = checked.length;
+  let typePrice=0;
+  typeCheckboxes.forEach(cb => {
+    if (!cb.checked) return;
+    if (cb.value==='kas'||cb.value==='kas_rt') typePrice+=currentPricing.kas_rt;
+    else if (cb.value==='kas_gang') typePrice+=currentPricing.kas_gang;
+    else if (cb.value==='sampah') typePrice+=currentPricing.sampah;
+  });
+  const total = count * typePrice;
+  const fmt = new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0}).format(total);
+  if (totalDisplay) totalDisplay.innerText = fmt;
+  const s2 = document.getElementById('total-step2');
+  const s3 = document.getElementById('total-step3');
+  if (s2) s2.innerText = fmt;
+  if (s3) s3.innerText = fmt;
+  if (total > 0) {
+    clearTimeout(qrisDebounce);
+    qrisDebounce = setTimeout(() => generateQris(total, count), 600);
+  }
+}
+
+// ── QRIS ──
+async function generateQris(amount, count) {
+  const firstMonth = monthGrid.querySelector('input:checked')?.value;
+  const wargaText = wargaSelect.options[wargaSelect.selectedIndex].text;
+  const match = wargaText.match(/Blok\s+(.+)\s+No\.\s+(\d+)/i);
+  let houseLabel = match ? match[1].trim()+'/'+match[2].trim().padStart(2,'0') : 'WARGA';
+  let monthLabel = 'MNTH';
+  if (firstMonth) {
+    const d = new Date(firstMonth+'-01');
+    monthLabel = d.toLocaleString('id-ID',{month:'short'}).toUpperCase()+String(d.getFullYear()).slice(-2);
+  }
+  if (count > 1) monthLabel += '|'+count+'BLN';
+  const checked2 = [];
+  typeCheckboxes.forEach(cb => { if(cb.checked) checked2.push(cb.value); });
+  const hasKas = checked2.includes('kas')||checked2.includes('kas_rt')||checked2.includes('kas_gang');
+  const hasSampah = checked2.includes('sampah');
+  let prefix = 'IURAN';
+  if (hasKas && hasSampah) prefix='KAS+SMPH';
+  else if (hasKas) prefix='KAS';
+  else if (hasSampah) prefix='SAMPAH';
+  let merchantName = (prefix+' '+houseLabel+' '+monthLabel).toUpperCase();
+  if (merchantName.length > 25) merchantName = merchantName.substring(0,25);
+  if (merchantNameDisplay) merchantNameDisplay.innerText = merchantName;
+  try {
+    const res = await fetch('/iuran/generate-qris', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount, merchantName })
+    });
+    const data = await res.json();
+    if (data.success && qrCanvas) {
+      QRCode.toCanvas(qrCanvas, data.qr_string, { width:250, margin:2 }, err => { if(err) console.error(err); });
+    }
+  } catch(e) {}
+}
+
+// ── Step 3 Render ──
+function renderStep3() {
+  document.getElementById('info-dana').classList.add('hidden');
+  document.getElementById('info-qris').classList.add('hidden');
+  document.getElementById('info-tunai').classList.add('hidden');
+  if (currentMethod==='DANA') document.getElementById('info-dana').classList.remove('hidden');
+  else if (currentMethod==='QRIS') document.getElementById('info-qris').classList.remove('hidden');
+  else if (currentMethod==='Tunai') document.getElementById('info-tunai').classList.remove('hidden');
+  calculateTotal();
+}
+
+// ── Summary ──
+function buildSummary() {
+  const wargaOpt = wargaSelect.options[wargaSelect.selectedIndex];
+  document.getElementById('sum-warga').textContent = wargaOpt ? wargaOpt.text.split('–')[0].trim() : '–';
+  const cmonths = Array.from(monthGrid.querySelectorAll('input:checked')).map(i => {
+    const [y,m] = i.value.split('-');
+    return months[parseInt(m)-1]+' '+y;
+  });
+  document.getElementById('sum-periode').textContent = cmonths.length > 0 ? cmonths.join(', ') : '–';
+  const jenis = [];
+  typeCheckboxes.forEach(cb => { if(cb.checked) jenis.push(cb.value.replace('_',' ').toUpperCase()); });
+  document.getElementById('sum-jenis').textContent = jenis.join(', ') || '–';
+  document.getElementById('sum-metode').textContent = currentMethod || '–';
+  calculateTotal();
+}
+
+// ── Listeners ──
+wargaSelect.addEventListener('change', () => { updatePricingByStatus(); refreshGrid(); });
+tahunSelect.addEventListener('change', refreshGrid);
+
+// ── Copy ──
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => alert('Nomor DANA disalin: '+text)).catch(() => {
+    const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('Copy'); ta.remove(); alert('Nomor DANA disalin: '+text);
+  });
+}
+
+// ── Download QRIS ──
+function downloadQris() {
+  const merchantName = merchantNameDisplay.innerText || 'QRIS';
+  const totalText = totalDisplay.innerText || 'Rp 0';
+  const cc = document.createElement('canvas'); const ctx = cc.getContext('2d');
+  const qrSize=250, pad=20, th=80;
+  cc.width=qrSize+pad*2; cc.height=qrSize+th+pad*2;
+  ctx.fillStyle='#FFF'; ctx.fillRect(0,0,cc.width,cc.height);
+  ctx.drawImage(qrCanvas,pad,pad,qrSize,qrSize);
+  ctx.fillStyle='#1F2937'; ctx.font='bold 16px Arial'; ctx.textAlign='center';
+  ctx.fillText(merchantName,cc.width/2,qrSize+pad+25);
+  ctx.fillStyle='#4F46E5'; ctx.font='bold 20px Arial';
+  ctx.fillText(totalText,cc.width/2,qrSize+pad+55);
+  cc.toBlob(blob => {
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.download=merchantName.replace(/[^a-zA-Z0-9]/g,'_')+'.png'; a.href=url; a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+// ── Dropzone ──
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('bukti_bayar');
+const previewContainer = document.getElementById('preview-container');
+const dropzoneContent = document.getElementById('dropzone-content');
+const previewImage = document.getElementById('preview-image');
+const removeBtn = document.getElementById('remove-file');
+
+['dragenter','dragover','dragleave','drop'].forEach(e => dropzone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }));
+['dragenter','dragover'].forEach(e => dropzone.addEventListener(e, () => dropzone.classList.add('drag-over')));
+['dragleave','drop'].forEach(e => dropzone.addEventListener(e, () => dropzone.classList.remove('drag-over')));
+dropzone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+dropzone.addEventListener('click', e => { if(e.target!==removeBtn && !removeBtn?.contains(e.target)) fileInput.click(); });
+fileInput.addEventListener('change', function() { handleFiles(this.files); });
+
+function handleFiles(files) {
+  if (files.length > 0) {
+    const file = files[0];
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => { previewImage.src=e.target.result; dropzoneContent.classList.add('hidden'); previewContainer.classList.remove('hidden'); };
+      reader.readAsDataURL(file);
+      if (fileInput.files !== files) { const dt=new DataTransfer(); dt.items.add(file); fileInput.files=dt.files; }
+    } else { alert('Harap upload file gambar.'); }
+  }
+}
+
+removeBtn?.addEventListener('click', e => {
+  e.preventDefault(); e.stopPropagation();
+  fileInput.value=''; previewImage.src='';
+  previewContainer.classList.add('hidden'); dropzoneContent.classList.remove('hidden');
+});
+
+// ── Effect & Sound ──
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    // Coin/Success sound profile (Ping-Ting)
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
+    osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.15);
+    
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch(e) { console.log('AudioContext not supported'); }
+}
+
+// ── Form Validation & Submit ──
+const form = document.getElementById('pay-form');
+form.addEventListener('submit', e => {
+  if (fileInput.files.length === 0) {
+    e.preventDefault();
+    alert('Mohon upload bukti transfer dana / pembayaran QRIS (Wajib).');
+    dropzone.classList.add('border-red-500');
+    setTimeout(() => dropzone.classList.remove('border-red-500'), 2500);
+    return;
+  }
+
+  // Prevent immediate submit to play animations
+  e.preventDefault();
+  
+  // Sound & Confetti
+  playSuccessSound();
+  confetti({
+    particleCount: 150,
+    spread: 80,
+    origin: { y: 0.6 },
+    colors: ['#6366f1', '#10b981', '#f59e0b', '#ef4444'],
+    zIndex: 9999
+  });
+
+  // Loading state on button
+  const btn = document.querySelector('.btn-submit');
+  btn.innerHTML = '<svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
+  btn.disabled = true;
+  btn.classList.remove('hover:translate-y-[-2px]');
+  btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+  // Submit after 1.5s delay
+  setTimeout(() => {
+    form.submit();
+  }, 1500);
+});
+</script>
+
+<%- include('../partials/footer') %>
