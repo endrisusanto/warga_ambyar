@@ -721,38 +721,20 @@ exports.control = async (req, res) => {
             day.add(1, 'days');
         }
 
-        // Get All HOUSES (unique blok + nomor_rumah) with their representatives
-        // HOUSE-BASED SCHEDULING: One row per house, not per user
-        const [houses] = await db.query(`
+        // USER-BASED SCHEDULING: One row per user
+        const [wargas] = await db.query(`
             SELECT 
+                id as representative_id,
+                nama as representative_nama,
                 blok, 
                 nomor_rumah,
-                tim_ronda,
-                (SELECT id FROM warga w2 
-                 WHERE w2.blok = w1.blok 
-                 AND w2.nomor_rumah = w1.nomor_rumah 
-                 AND w2.is_ronda = 1
-                 ORDER BY 
-                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                    w2.id
-                 LIMIT 1
-                ) as representative_id,
-                (SELECT nama FROM warga w2 
-                 WHERE w2.blok = w1.blok 
-                 AND w2.nomor_rumah = w1.nomor_rumah 
-                 AND w2.is_ronda = 1
-                 ORDER BY 
-                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                    w2.id
-                 LIMIT 1
-                ) as representative_nama
-            FROM warga w1
+                tim_ronda
+            FROM warga
             WHERE is_ronda = 1 
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
-            GROUP BY blok, nomor_rumah, tim_ronda
-            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
         `);
 
         // Get Schedules for this year
@@ -761,14 +743,14 @@ exports.control = async (req, res) => {
             WHERE tanggal BETWEEN ? AND ?
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
-        // Build Matrix based on HOUSES (blok + nomor_rumah)
+        // Build Matrix based on USERS
         const matrix = {};
-        houses.forEach(h => {
-            if (!h.representative_id) return; // Skip houses without representatives
+        wargas.forEach(h => {
+            if (!h.representative_id) return; // Skip without representatives
             
-            // Use house identifier as key (blok-nomor_rumah)
-            const houseKey = `${h.blok}-${h.nomor_rumah}`;
-            matrix[houseKey] = {
+            // Use user identifier as key
+            const userKey = `${h.representative_id}`;
+            matrix[userKey] = {
                 info: {
                     id: h.representative_id,
                     nama: h.representative_nama,
@@ -779,17 +761,17 @@ exports.control = async (req, res) => {
                 dates: {}
             };
             saturdays.forEach(d => {
-                matrix[houseKey].dates[d] = { status: null, denda: 0 };
+                matrix[userKey].dates[d] = { status: null, denda: 0 };
             });
         });
 
-        // Map schedules to houses (not users)
+        // Map schedules to users
         schedules.forEach(s => {
             const d = moment(s.tanggal).format('YYYY-MM-DD');
-            const houseKey = `${s.blok}-${s.nomor_rumah}`;
+            const userKey = `${s.warga_id}`;
             
-            if (matrix[houseKey] && matrix[houseKey].dates[d]) {
-                matrix[houseKey].dates[d] = s;
+            if (matrix[userKey] && matrix[userKey].dates[d]) {
+                matrix[userKey].dates[d] = s;
             }
         });
 

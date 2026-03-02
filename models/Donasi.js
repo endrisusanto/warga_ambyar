@@ -7,7 +7,19 @@ const Donasi = {
             SELECT dc.*, 
                    u.username as creator_name,
                    COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as terkumpul,
-                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur
+                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur,
+                   (SELECT COUNT(DISTINCT CONCAT(blok, nomor_rumah)) FROM warga WHERE status_huni IN ('tetap', 'kontrak') AND approval_status = 'approved') as total_rumah,
+                   (
+                       SELECT COUNT(*) FROM (
+                           SELECT dt_in.campaign_id, w_in.blok, w_in.nomor_rumah, SUM(dt_in.jumlah) as total_bayar
+                           FROM donasi_transaksi dt_in
+                           JOIN users u_in ON dt_in.user_id = u_in.id
+                           JOIN warga w_in ON u_in.warga_id = w_in.id
+                           WHERE dt_in.status = 'verified'
+                           GROUP BY dt_in.campaign_id, w_in.blok, w_in.nomor_rumah
+                       ) grouped
+                       WHERE grouped.campaign_id = dc.id AND grouped.total_bayar >= dc.target_dana
+                   ) as rumah_lunas
             FROM donasi_campaign dc
             LEFT JOIN users u ON dc.created_by = u.id
             LEFT JOIN donasi_transaksi dt ON dc.id = dt.campaign_id
@@ -22,7 +34,19 @@ const Donasi = {
             SELECT dc.*, 
                    u.username as creator_name,
                    COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as terkumpul,
-                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur
+                   COUNT(CASE WHEN dt.status = 'verified' THEN 1 END) as jumlah_donatur,
+                   (SELECT COUNT(DISTINCT CONCAT(blok, nomor_rumah)) FROM warga WHERE status_huni IN ('tetap', 'kontrak') AND approval_status = 'approved') as total_rumah,
+                   (
+                       SELECT COUNT(*) FROM (
+                           SELECT dt_in.campaign_id, w_in.blok, w_in.nomor_rumah, SUM(dt_in.jumlah) as total_bayar
+                           FROM donasi_transaksi dt_in
+                           JOIN users u_in ON dt_in.user_id = u_in.id
+                           JOIN warga w_in ON u_in.warga_id = w_in.id
+                           WHERE dt_in.status = 'verified'
+                           GROUP BY dt_in.campaign_id, w_in.blok, w_in.nomor_rumah
+                       ) grouped
+                       WHERE grouped.campaign_id = dc.id AND grouped.total_bayar >= dc.target_dana
+                   ) as rumah_lunas
             FROM donasi_campaign dc
             LEFT JOIN users u ON dc.created_by = u.id
             LEFT JOIN donasi_transaksi dt ON dc.id = dt.campaign_id
@@ -33,23 +57,23 @@ const Donasi = {
     },
 
     createCampaign: async (data) => {
-        const { judul, deskripsi, target_dana, foto, tanggal_mulai, tanggal_selesai, created_by } = data;
+        const { judul, deskripsi, tipe_target, target_dana, allow_anonim, foto, tanggal_mulai, tanggal_selesai, created_by } = data;
         const [result] = await db.query(
-            `INSERT INTO donasi_campaign (judul, deskripsi, target_dana, foto, tanggal_mulai, tanggal_selesai, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [judul, deskripsi, target_dana, foto, tanggal_mulai, tanggal_selesai, created_by]
+            `INSERT INTO donasi_campaign (judul, deskripsi, tipe_target, target_dana, allow_anonim, foto, tanggal_mulai, tanggal_selesai, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [judul, deskripsi, tipe_target, target_dana, allow_anonim, foto, tanggal_mulai, tanggal_selesai, created_by]
         );
         return result.insertId;
     },
 
     updateCampaign: async (id, data) => {
-        const { judul, deskripsi, target_dana, foto, tanggal_mulai, tanggal_selesai, status } = data;
+        const { judul, deskripsi, tipe_target, target_dana, allow_anonim, foto, tanggal_mulai, tanggal_selesai, status } = data;
         await db.query(
             `UPDATE donasi_campaign 
-             SET judul = ?, deskripsi = ?, target_dana = ?, foto = ?, 
+             SET judul = ?, deskripsi = ?, tipe_target = ?, target_dana = ?, allow_anonim = ?, foto = ?, 
                  tanggal_mulai = ?, tanggal_selesai = ?, status = ?
              WHERE id = ?`,
-            [judul, deskripsi, target_dana, foto, tanggal_mulai, tanggal_selesai, status, id]
+            [judul, deskripsi, tipe_target, target_dana, allow_anonim, foto, tanggal_mulai, tanggal_selesai, status, id]
         );
     },
 
@@ -80,6 +104,23 @@ const Donasi = {
                 }
             });
         }
+        return rows;
+    },
+
+    getDonaturPerRumah: async (campaignId) => {
+        const [rows] = await db.query(`
+            SELECT 
+                CONCAT(w.blok, ' - ', w.nomor_rumah) as rumah,
+                COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as total_bayar,
+                MAX(dt.created_at) as last_payment,
+                GROUP_CONCAT(DISTINCT w.nama SEPARATOR ', ') as daftar_penghuni
+            FROM warga w
+            LEFT JOIN users u ON w.id = u.warga_id
+            LEFT JOIN donasi_transaksi dt ON dt.user_id = u.id AND dt.campaign_id = ? AND dt.status = 'verified'
+            WHERE w.status_huni IN ('tetap', 'kontrak') AND w.approval_status = 'approved'
+            GROUP BY w.blok, w.nomor_rumah
+            ORDER BY w.blok ASC, CAST(w.nomor_rumah AS UNSIGNED) ASC
+        `, [campaignId]);
         return rows;
     },
 

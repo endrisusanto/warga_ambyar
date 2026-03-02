@@ -122,6 +122,13 @@ exports.postCompleteProfile = async (req, res) => {
         const Warga = require('../models/Warga');
         const db = require('../config/db');
 
+        // Prevent rapid duplicate submissions for the same user
+        const [existing] = await db.query('SELECT warga_id FROM users WHERE id = ?', [userId]);
+        if (existing.length > 0 && existing[0].warga_id) {
+            req.flash('error_msg', 'Profil sudah lengkap. Menunggu verifikasi.');
+            return res.redirect('/dashboard');
+        }
+
         // Create Warga
         const wargaId = await Warga.create({
             nama,
@@ -132,7 +139,8 @@ exports.postCompleteProfile = async (req, res) => {
             email: req.session.user.email || null, // Auto-fill email from session
             status_huni: 'Tetap',
             is_ronda: status_keluarga === 'Kepala Keluarga' ? 1 : 0,
-            approval_status: 'pending' // Default pending for new Google users
+            approval_status: 'pending', // Default pending for new Google users
+            replaceDummy: true // Flag to tell model to replace dummy account
         });
 
         // Link to User

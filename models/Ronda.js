@@ -40,38 +40,28 @@ const Ronda = {
 
             // Get HOUSES (unique blok + nomor_rumah combinations) for this team
             // We select one representative from each house (preferably Kepala Keluarga)
-            const [houses] = await db.query(`
+            const [wargas] = await db.query(`
                 SELECT 
+                    id as representative_id,
                     blok, 
-                    nomor_rumah,
-                    (SELECT id FROM warga w2 
-                     WHERE w2.blok = w1.blok 
-                     AND w2.nomor_rumah = w1.nomor_rumah 
-                     AND w2.tim_ronda = w1.tim_ronda
-                     AND w2.is_ronda = 1
-                     ORDER BY 
-                        CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                        w2.id
-                     LIMIT 1
-                    ) as representative_id
-                FROM warga w1
+                    nomor_rumah
+                FROM warga
                 WHERE tim_ronda = ? AND is_ronda = 1
-                GROUP BY blok, nomor_rumah
-                ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+                ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
             `, [currentTeam]);
 
-            for (const house of houses) {
+            for (const house of wargas) {
                 if (!house.representative_id) continue;
                 
-                // Check if this house is already scheduled for this date
+                // Check if this USER is already scheduled for this date
                 const [existing] = await db.query(
-                    "SELECT id FROM ronda_jadwal WHERE tanggal = ? AND blok = ? AND nomor_rumah = ?",
-                    [dateStr, house.blok, house.nomor_rumah]
+                    "SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?",
+                    [dateStr, house.representative_id]
                 );
 
                 if (existing.length === 0) {
                     try {
-                        // Insert schedule for the HOUSE, with a representative user
+                        // Insert schedule for the USER
                         await db.query(
                             `INSERT INTO ronda_jadwal 
                             (tanggal, warga_id, blok, nomor_rumah, status) 
@@ -90,31 +80,17 @@ const Ronda = {
         const startDate = `${year}-${month}-01`;
         const endDate = moment(startDate).endOf('month').format('YYYY-MM-DD');
 
-        // HOUSE-BASED: Deduplicate ronda_jadwal (one row per house) and join by CURRENT representative
+        // USER-BASED: Deduplicate ronda_jadwal by user and join
         const [rows] = await db.query(`
             SELECT r.*, w.nama, w.no_hp, w.tim_ronda
             FROM (
-                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, blok, nomor_rumah ORDER BY (status != 'scheduled') DESC, id DESC) as rn
+                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, warga_id ORDER BY (status != 'scheduled') DESC, id DESC) as rn
                 FROM ronda_jadwal
                 WHERE tanggal BETWEEN ? AND ?
             ) r
-            LEFT JOIN (
-                SELECT w1.id, w1.nama, w1.no_hp, w1.tim_ronda, w1.blok, w1.nomor_rumah
-                FROM warga w1
-                WHERE w1.is_ronda = 1
-                AND w1.id = (
-                    SELECT id FROM warga w2 
-                    WHERE w2.blok = w1.blok 
-                    AND w2.nomor_rumah = w1.nomor_rumah 
-                    AND w2.is_ronda = 1
-                    ORDER BY 
-                        CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                        w2.id
-                    LIMIT 1
-                )
-            ) w ON r.blok = w.blok AND r.nomor_rumah = w.nomor_rumah
+            LEFT JOIN warga w ON r.warga_id = w.id
             WHERE r.rn = 1
-            ORDER BY r.tanggal ASC, r.blok, r.nomor_rumah
+            ORDER BY r.tanggal ASC, r.blok, CAST(r.nomor_rumah AS UNSIGNED), r.warga_id
         `, [startDate, endDate]);
 
         return rows;
@@ -130,29 +106,15 @@ const Ronda = {
             targetDate = now.clone().subtract(1, 'days').format('YYYY-MM-DD');
         }
 
-        // HOUSE-BASED: Deduplicate ronda_jadwal (one row per house) and join by CURRENT representative
+        // USER-BASED
         const [rows] = await db.query(`
             SELECT r.*, w.nama, w.tim_ronda, w.foto_profil
             FROM (
-                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, blok, nomor_rumah ORDER BY (status != 'scheduled') DESC, id DESC) as rn
+                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, warga_id ORDER BY (status != 'scheduled') DESC, id DESC) as rn
                 FROM ronda_jadwal
                 WHERE tanggal = ?
             ) r
-            LEFT JOIN (
-                SELECT w1.id, w1.nama, w1.tim_ronda, w1.foto_profil, w1.blok, w1.nomor_rumah
-                FROM warga w1
-                WHERE w1.is_ronda = 1
-                AND w1.id = (
-                    SELECT id FROM warga w2 
-                    WHERE w2.blok = w1.blok 
-                    AND w2.nomor_rumah = w1.nomor_rumah 
-                    AND w2.is_ronda = 1
-                    ORDER BY 
-                        CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                        w2.id
-                    LIMIT 1
-                )
-            ) w ON r.blok = w.blok AND r.nomor_rumah = w.nomor_rumah
+            LEFT JOIN warga w ON r.warga_id = w.id
             WHERE r.rn = 1
         `, [targetDate]);
         return rows;
@@ -174,29 +136,15 @@ const Ronda = {
 
         const nextDate = dateRows[0].tanggal;
 
-        // HOUSE-BASED: Deduplicate ronda_jadwal (one row per house) and join by CURRENT representative
+        // USER-BASED
         const [schedule] = await db.query(`
             SELECT r.*, w.nama, w.tim_ronda, w.foto_profil
             FROM (
-                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, blok, nomor_rumah ORDER BY (status != 'scheduled') DESC, id DESC) as rn
+                SELECT *, ROW_NUMBER() OVER(PARTITION BY tanggal, warga_id ORDER BY (status != 'scheduled') DESC, id DESC) as rn
                 FROM ronda_jadwal
                 WHERE tanggal = ?
             ) r
-            LEFT JOIN (
-                SELECT w1.id, w1.nama, w1.tim_ronda, w1.foto_profil, w1.blok, w1.nomor_rumah
-                FROM warga w1
-                WHERE w1.is_ronda = 1
-                AND w1.id = (
-                    SELECT id FROM warga w2 
-                    WHERE w2.blok = w1.blok 
-                    AND w2.nomor_rumah = w1.nomor_rumah 
-                    AND w2.is_ronda = 1
-                    ORDER BY 
-                        CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                        w2.id
-                    LIMIT 1
-                )
-            ) w ON r.blok = w.blok AND r.nomor_rumah = w.nomor_rumah
+            LEFT JOIN warga w ON r.warga_id = w.id
             WHERE r.rn = 1
         `, [nextDate]);
 
@@ -224,23 +172,17 @@ const Ronda = {
         await db.query(query, params);
 
         // Jika status berubah menjadi 'hadir' atau 'alpa', batalkan semua jadwal 
-        // untuk RUMAH yang sama dalam range 4 minggu ke depan dari tanggal jadwal ini
-        // karena kewajiban ronda sudah terpenuhi (hadir = datang, alpa = bayar denda)
-        // HOUSE-BASED: Use blok + nomor_rumah instead of warga_id
+        // untuk USER yang sama dalam range 4 minggu ke depan dari tanggal jadwal ini
         if (status === 'hadir' || status === 'alpa') {
-            const [currentSchedule] = await db.query("SELECT tanggal, blok, nomor_rumah FROM ronda_jadwal WHERE id = ?", [id]);
+            const [currentSchedule] = await db.query("SELECT tanggal, warga_id FROM ronda_jadwal WHERE id = ?", [id]);
             if (currentSchedule.length > 0) {
                 const currentDate = currentSchedule[0].tanggal;
-                const blok = currentSchedule[0].blok;
-                const nomorRumah = currentSchedule[0].nomor_rumah;
+                const wargaId = currentSchedule[0].warga_id;
                 const fourWeeksLater = moment(currentDate).add(4, 'weeks').format('YYYY-MM-DD');
                 
-                // Hapus SEMUA jadwal untuk RUMAH ini dalam range 4 minggu (scheduled, reschedule, alpa yang belum dibayar)
-                // karena kewajiban sudah terpenuhi
-                // Tapi jangan hapus yang sudah hadir atau alpa yang sudah dibayar
                 await db.query(
-                    "DELETE FROM ronda_jadwal WHERE blok = ? AND nomor_rumah = ? AND id != ? AND tanggal > ? AND tanggal <= ? AND (status IN ('scheduled', 'reschedule') OR (status = 'alpa' AND (status_bayar IS NULL OR status_bayar = '')))",
-                    [blok, nomorRumah, id, currentDate, fourWeeksLater]
+                    "DELETE FROM ronda_jadwal WHERE warga_id = ? AND id != ? AND tanggal > ? AND tanggal <= ? AND (status IN ('scheduled', 'reschedule') OR (status = 'alpa' AND (status_bayar IS NULL OR status_bayar = '')))",
+                    [wargaId, id, currentDate, fourWeeksLater]
                 );
             }
         }
@@ -257,7 +199,7 @@ const Ronda = {
         await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || 'Diganti ke minggu depan', id]);
 
         try {
-            // HOUSE-BASED: Insert new schedule for the HOUSE (blok + nomor_rumah), not just warga_id
+            // USER-BASED: Insert new schedule for the USER
             await db.query(
                 "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status) VALUES (?, ?, ?, ?, 'scheduled')",
                 [nextWeek, current.warga_id, current.blok, current.nomor_rumah]
@@ -284,22 +226,12 @@ const Ronda = {
     },
 
     getTeams: async () => {
-        // HOUSE-BASED: Only get one representative per house
+        // USER-BASED: Get all users that do ronda
         const [rows] = await db.query(`
             SELECT id, nama, blok, nomor_rumah, tim_ronda 
-            FROM warga w1 
+            FROM warga w 
             WHERE is_ronda = 1 
-            AND id = (
-                SELECT id FROM warga w2 
-                WHERE w2.blok = w1.blok 
-                AND w2.nomor_rumah = w1.nomor_rumah 
-                AND w2.is_ronda = 1
-                ORDER BY 
-                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                    w2.id
-                LIMIT 1
-            )
-            ORDER BY tim_ronda, blok, CAST(nomor_rumah AS UNSIGNED)
+            ORDER BY tim_ronda, blok, CAST(nomor_rumah AS UNSIGNED), id
         `);
         const teams = { A: [], B: [], C: [], D: [], Unassigned: [] };
         rows.forEach(r => {
@@ -431,8 +363,8 @@ const Ronda = {
                 await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [`Auto Reschedule (${moveCount + 1})`, r.id]);
                 
                 // 2. Insert new schedule (check duplicate first)
-                // HOUSE-BASED: Check by blok + nomor_rumah instead of warga_id
-                const [exists] = await db.query("SELECT id FROM ronda_jadwal WHERE blok = ? AND nomor_rumah = ? AND tanggal = ?", [r.blok, r.nomor_rumah, nextDate]);
+                // USER-BASED: Check by warga_id
+                const [exists] = await db.query("SELECT id FROM ronda_jadwal WHERE warga_id = ? AND tanggal = ?", [r.warga_id, nextDate]);
                 if (exists.length === 0) {
                      await db.query("INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status, keterangan) VALUES (?, ?, ?, ?, 'scheduled', ?)", 
                         [nextDate, r.warga_id, r.blok, r.nomor_rumah, `Auto Reschedule (${moveCount + 1})`]);

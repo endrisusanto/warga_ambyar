@@ -36,41 +36,32 @@
                 </div>
                 <div class="border-t border-white/10">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-white/10">
-                            <thead class="bg-gray-100 dark:bg-white/5">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Rumah</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Nama</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-center text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Status Huni</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Status Keluarga</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Role</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Approval</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        No HP</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Email</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-center text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                                        Ronda?</th>
-                                    <th scope="col" class="relative px-6 py-3">
-                                        <span class="sr-only">Edit</span>
-                                    </th>
-                                </tr>
-                            </thead>
+                                <table class="min-w-full divide-y divide-white/10" id="wargaTable">
+                                <thead class="bg-gray-100 dark:bg-white/5">
+                                    <tr>
+                                        <th scope="col" onclick="sortTable(0)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Rumah <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(1)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Nama <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(2)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-center text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Status Huni <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(3)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Status Keluarga <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(4)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Role <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(5)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Approval <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(6)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            No HP <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(7)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Email <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" onclick="sortTable(8)" class="cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 px-6 py-3 text-center text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Ronda? <span class="sort-icon text-xs opacity-50 ml-1 inline-block">⇅</span></th>
+                                        <th scope="col" class="relative px-6 py-3">
+                                            <span class="sr-only">Edit</span>
+                                        </th>
+                                    </tr>
+                                </thead>
                             <tbody class="bg-gray-100 dark:bg-white/5 divide-y divide-white/10">
                                 <% warga.forEach(w=> { %>
                                     <tr class="hover:bg-gray-200 dark:bg-white/10 transition-colors">
@@ -224,5 +215,87 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            let sortDirection = 1;
+            let lastSortCol = -1;
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Default sort by Rumah (index 0)
+                sortTable(0);
+            });
+
+            function sortTable(n) {
+                const table = document.getElementById('wargaTable');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const headers = table.querySelectorAll('th');
+
+                if (rows.length === 0) return;
+
+                if (lastSortCol === n) {
+                    sortDirection *= -1;
+                } else {
+                    sortDirection = 1;
+                    lastSortCol = n;
+                }
+
+                // Reset all sort icons
+                headers.forEach((th, i) => {
+                    const icon = th.querySelector('.sort-icon');
+                    if (icon) {
+                        icon.textContent = '⇅';
+                        icon.classList.add('opacity-50');
+                    }
+                });
+
+                // Update active sort icon
+                const activeTh = headers[n];
+                if (activeTh) {
+                    const icon = activeTh.querySelector('.sort-icon');
+                    if (icon) {
+                        icon.textContent = sortDirection === 1 ? '↑' : '↓';
+                        icon.classList.remove('opacity-50');
+                    }
+                }
+
+                rows.sort((a, b) => {
+                    // Extract text smartly (handles dropdowns inside tables)
+                    let valA = extractText(a.children[n]);
+                    let valB = extractText(b.children[n]);
+
+                    // Custom logic for column 0 (Rumah) to ensure correct number sorting
+                    if (n === 0) {
+                        const partsA = valA.split('-');
+                        const partsB = valB.split('-');
+                        if (partsA.length === 2 && partsB.length === 2) {
+                            const blokA = partsA[0].trim();
+                            const blokB = partsB[0].trim();
+                            if (blokA === blokB) {
+                                return (parseInt(partsA[1].trim()) - parseInt(partsB[1].trim())) * sortDirection;
+                            }
+                        }
+                    }
+
+                    if (valA < valB) return -1 * sortDirection;
+                    if (valA > valB) return 1 * sortDirection;
+                    return 0;
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            }
+
+            // Extract text from table cell, accounting for select dropdowns
+            function extractText(td) {
+                if (!td) return '';
+                const selectElement = td.querySelector('select');
+                if (selectElement) {
+                    return selectElement.options[selectElement.selectedIndex].text.trim().toLowerCase();
+                }
+                // Specifically for Rumah component, remove the hidden "Status_huni" class inside it so it only grabs block
+                // Actually innerText does not include text with "hidden" css styling in most browsers, but we will play safely:
+                return td.innerText.replace(/\n/g, ' ').trim().toLowerCase();
+            }
+        </script>
 
         <%- include('../partials/footer') %>

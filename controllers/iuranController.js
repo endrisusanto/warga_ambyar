@@ -448,6 +448,21 @@ exports.reject = async (req, res) => {
 exports.arrears = async (req, res) => {
     try {
         const tunggakan = await Iuran.getTunggakan();
+        
+        // Fetch unpaid ronda fines (Denda Ronda)
+        const [rondaDenda] = await db.query(`
+            SELECT r.id, r.warga_id, r.tanggal as periode, 'denda_ronda' as jenis, r.denda as jumlah, r.status,
+                   w.nama, w.no_hp, w.blok, w.nomor_rumah
+            FROM ronda_jadwal r
+            JOIN warga w ON r.warga_id = w.id
+            WHERE r.status = 'alpa' AND r.denda > 0 AND (r.status_bayar IS NULL OR r.status_bayar != 'paid')
+        `);
+        
+        tunggakan.push(...rondaDenda);
+        
+        // Sort by expected format
+        tunggakan.sort((a, b) => new Date(a.periode) - new Date(b.periode));
+
         const allWarga = await Warga.getAll();
         res.render('iuran/arrears', { title: 'Laporan Tunggakan', tunggakan, allWarga, moment, user: req.session.user });
     } catch (err) {
@@ -685,14 +700,14 @@ exports.generateQris = (req, res) => {
 exports.control = async (req, res) => {
     try {
         const year = req.query.year || moment().format('YYYY');
-        // Get all warga sorted by blok/no
-        const warga = await Warga.getAll();
+        // Get Heads of Family (Iuran is House-based)
+        const warga = await Warga.getHeadsOfFamily();
 
         // Get bills for the year
         const [rows] = await db.query(`
-            SELECT warga_id, MONTH(periode) as bulan_num, jenis, status 
-            FROM iuran 
-            WHERE YEAR(periode) = ?
+            SELECT i.warga_id, MONTH(i.periode) as bulan_num, i.jenis, i.status 
+            FROM iuran i
+            WHERE YEAR(i.periode) = ?
         `, [year]);
 
         // Initialize Matrix: wargaId -> Array[12] -> { kas_rt: null, kas_gang: null, sampah: null }

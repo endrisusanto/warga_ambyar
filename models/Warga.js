@@ -28,7 +28,42 @@ const Warga = {
         return rows[0];
     },
     create: async (data) => {
-        const { nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status } = data;
+        const { nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status, replaceDummy } = data;
+        
+        // Block duplicates: if email already exists in warga (Bug 1 - Duplicate email when submitting form 2x)
+        if (email && email.trim() !== '') {
+            const [existingEmail] = await db.query('SELECT id FROM warga WHERE email = ? LIMIT 1', [email]);
+            if (existingEmail.length > 0) {
+                throw new Error("Email ini sudah digunakan oleh akun lain atau sedang menunggu verifikasi.");
+            }
+        }
+
+        if (replaceDummy) {
+            // Cari dummy akun: (Bug 2 - Replace dummy account)
+            // Ciri dummy: blok & no rumah sama, user belum link, email masih kosong
+            const [dummy] = await db.query(`
+                SELECT w.id 
+                FROM warga w 
+                LEFT JOIN users u ON w.id = u.warga_id 
+                WHERE w.blok = ? AND w.nomor_rumah = ? AND u.id IS NULL AND (w.email IS NULL OR w.email = '')
+                ORDER BY 
+                   CASE WHEN w.status_keluarga = ? THEN 0 ELSE 1 END,
+                   w.id ASC
+                LIMIT 1
+            `, [blok, nomor_rumah, status_keluarga]);
+
+            if (dummy.length > 0) {
+                const dummyId = dummy[0].id;
+                // Update dummy account
+                await db.query(
+                    'UPDATE warga SET nama = ?, status_keluarga = ?, no_hp = ?, email = ?, status_huni = ?, is_ronda = ?, approval_status = ? WHERE id = ?',
+                    [nama, status_keluarga, no_hp, email || null, status_huni, is_ronda ? 1 : 0, approval_status || 'approved', dummyId]
+                );
+                return dummyId;
+            }
+        }
+
+        // Insert baru jika tidak ada dummy atau jika ini penambahan dari admin (replaceDummy = false)
         const [result] = await db.query(
             'INSERT INTO warga (nama, blok, nomor_rumah, status_keluarga, no_hp, email, status_huni, is_ronda, approval_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [nama, blok, nomor_rumah, status_keluarga, no_hp, email || null, status_huni, is_ronda ? 1 : 0, approval_status || 'approved']

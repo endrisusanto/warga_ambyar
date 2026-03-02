@@ -69,14 +69,16 @@ exports.storeCampaign = (req, res) => {
             return res.redirect('/donasi/campaign/create');
         }
         try {
-            const { judul, deskripsi, target_dana, tanggal_mulai, tanggal_selesai } = req.body;
+            const { judul, deskripsi, tipe_target, target_dana, allow_anonim, tanggal_mulai, tanggal_selesai } = req.body;
             const foto = req.file ? req.file.filename : null;
             const created_by = req.session.user.id;
 
             await Donasi.createCampaign({
                 judul,
                 deskripsi,
+                tipe_target: tipe_target || 'total',
                 target_dana: target_dana || 0,
+                allow_anonim: allow_anonim === 'on' || allow_anonim === '1' ? 1 : 0,
                 foto,
                 tanggal_mulai,
                 tanggal_selesai: tanggal_selesai || null,
@@ -103,11 +105,17 @@ exports.showCampaign = async (req, res) => {
         const showReal = canViewReal && req.query.showReal === 'true';
 
         const donatur = await Donasi.getDonaturByCampaign(req.params.id, showReal);
+        
+        let donaturPerRumah = [];
+        if (campaign.tipe_target === 'per_rumah') {
+            donaturPerRumah = await Donasi.getDonaturPerRumah(req.params.id);
+        }
 
         res.render('donasi/show', {
             title: campaign.judul,
             campaign,
             donatur,
+            donaturPerRumah,
             showReal,
             canViewReal,
             moment
@@ -142,7 +150,7 @@ exports.updateCampaign = (req, res) => {
         }
         try {
             const { id } = req.params;
-            const { judul, deskripsi, target_dana, tanggal_mulai, tanggal_selesai, status } = req.body;
+            const { judul, deskripsi, tipe_target, target_dana, allow_anonim, tanggal_mulai, tanggal_selesai, status } = req.body;
             const campaign = await Donasi.getCampaignById(id);
 
             let foto = campaign.foto;
@@ -157,7 +165,9 @@ exports.updateCampaign = (req, res) => {
             await Donasi.updateCampaign(id, {
                 judul,
                 deskripsi,
+                tipe_target: tipe_target || 'total',
                 target_dana: target_dana || 0,
+                allow_anonim: allow_anonim === 'on' || allow_anonim === '1' ? 1 : 0,
                 foto,
                 tanggal_mulai,
                 tanggal_selesai: tanggal_selesai || null,

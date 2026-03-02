@@ -76,31 +76,59 @@
                                         %>
 
                                         <!-- Progress Section -->
-                                        <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-6 mb-6">
-                                            <div class="flex justify-between items-end mb-3">
-                                                <div>
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Terkumpul</p>
-                                                    <p class="text-3xl font-black text-green-400">Rp <%=
-                                                            terkumpul.toLocaleString('id-ID') %>
-                                                    </p>
-                                                </div>
-                                                <% if(target> 0) { %>
-                                                    <div class="text-right">
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Target</p>
-                                                        <p class="text-xl font-bold text-gray-700 dark:text-gray-300">Rp <%=
-                                                                target.toLocaleString('id-ID') %>
+                                        <% if (!campaign.tipe_target || campaign.tipe_target === 'total') { %>
+                                            <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-6 mb-6">
+                                                <div class="flex justify-between items-end mb-3">
+                                                    <div>
+                                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Terkumpul</p>
+                                                        <p class="text-3xl font-black text-green-400">Rp <%=
+                                                                terkumpul.toLocaleString('id-ID') %>
                                                         </p>
                                                     </div>
-                                                    <% } %>
+                                                    <% if(target> 0) { %>
+                                                        <div class="text-right">
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Target</p>
+                                                            <p class="text-xl font-bold text-gray-700 dark:text-gray-300">Rp <%=
+                                                                    target.toLocaleString('id-ID') %>
+                                                            </p>
+                                                        </div>
+                                                        <% } %>
+                                                </div>
+                                                <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden mb-2">
+                                                    <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                                                        style="width: <%= percentage %>%"></div>
+                                                </div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                    <%= percentage.toFixed(1) %>% tercapai
+                                                </p>
                                             </div>
-                                            <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden mb-2">
-                                                <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                                                    style="width: <%= percentage %>%"></div>
+                                        <% } else { %>
+                                            <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-6 mb-6">
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 font-bold">Target Nominal / Rumah</p>
+                                                <p class="text-3xl font-black text-indigo-400 mb-4">Rp <%= target.toLocaleString('id-ID') %></p>
+                                                
+                                                <% 
+                                                    const totalRumah = campaign.total_rumah || 1; 
+                                                    const totalLunasData = donaturPerRumah.filter(d => d.total_bayar >= target).length;
+                                                    const percentageRumah = Math.min((totalLunasData / totalRumah) * 100, 100);
+                                                %>
+                                                <div class="flex justify-between items-end mb-3 mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+                                                    <div>
+                                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Dana Terkumpul</p>
+                                                        <p class="text-2xl font-bold text-green-400">Rp <%= terkumpul.toLocaleString('id-ID') %></p>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Progress Rumah Lunas</p>
+                                                        <p class="text-xl font-bold text-gray-700 dark:text-gray-300"><%= totalLunasData %> / <%= totalRumah %></p>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden mb-2">
+                                                    <div class="bg-gradient-to-r from-indigo-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+                                                        style="width: <%= percentageRumah %>%"></div>
+                                                </div>
+                                                <p class="text-xs text-gray-500 text-right"><%= percentageRumah.toFixed(1) %>% Rumah Lunas</p>
                                             </div>
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                <%= percentage.toFixed(1) %>% tercapai
-                                            </p>
-                                        </div>
+                                        <% } %>
 
                                         <!-- Description -->
                                         <div class="mb-6">
@@ -111,21 +139,61 @@
                                         </div>
 
                                         <!-- Timeline -->
-                                        <div class="grid grid-cols-2 gap-4 mb-6">
-                                            <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4">
-                                                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Dimulai</p>
-                                                <p class="text-sm font-bold text-gray-200">
-                                                    <%= moment(campaign.tanggal_mulai).format('DD MMM YYYY') %>
-                                                </p>
-                                            </div>
-                                            <% if(campaign.tanggal_selesai) { %>
-                                                <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4">
-                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Berakhir</p>
-                                                    <p class="text-sm font-bold text-gray-200">
-                                                        <%= moment(campaign.tanggal_selesai).format('DD MMM YYYY') %>
-                                                    </p>
+                                        <div class="bg-gray-100 dark:bg-white/5 rounded-2xl p-6 mb-6">
+                                            <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4">Waktu Pelaksanaan</h3>
+                                            <% 
+                                                const btnNow = moment();
+                                                const btnStart = moment(campaign.tanggal_mulai);
+                                                let timePercentage = 0;
+                                                let timeLabel = '';
+                                                let timeDesc = '';
+                                                
+                                                if (campaign.tanggal_selesai) {
+                                                    const btnEnd = moment(campaign.tanggal_selesai);
+                                                    if (btnNow.isBefore(btnStart)) {
+                                                        timePercentage = 0;
+                                                        timeLabel = 'Belum Dimulai';
+                                                        timeDesc = 'Dimulai ' + btnStart.fromNow();
+                                                    } else if (btnNow.isAfter(btnEnd)) {
+                                                        timePercentage = 100;
+                                                        timeLabel = 'Berakhir';
+                                                        timeDesc = 'Selesai ' + btnEnd.fromNow();
+                                                    } else {
+                                                        const totalDuration = btnEnd.diff(btnStart);
+                                                        const passedDuration = btnNow.diff(btnStart);
+                                                        timePercentage = Math.max(0, Math.min((passedDuration / totalDuration) * 100, 100));
+                                                        timeLabel = 'Sedang Berjalan';
+                                                        timeDesc = 'Berakhir ' + btnEnd.fromNow();
+                                                    }
+                                                } else {
+                                                    timePercentage = 100; // No end date = full bar
+                                                    if (btnNow.isBefore(btnStart)) {
+                                                        timeLabel = 'Belum Dimulai';
+                                                        timeDesc = 'Dimulai ' + btnStart.fromNow();
+                                                        timePercentage = 0;
+                                                    } else {
+                                                        timeLabel = 'Sedang Berjalan';
+                                                        timeDesc = 'Tanpa Batas Waktu';
+                                                    }
+                                                }
+                                            %>
+                                            
+                                            <div class="flex justify-between items-end mb-2">
+                                                <div>
+                                                    <p class="text-xs text-gray-500"><%= btnStart.format('DD MMM YYYY') %></p>
                                                 </div>
-                                                <% } %>
+                                                <div class="text-right">
+                                                    <p class="text-xs text-gray-500"><%= campaign.tanggal_selesai ? moment(campaign.tanggal_selesai).format('DD MMM YYYY') : '∞' %></p>
+                                                </div>
+                                            </div>
+                                            <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-3 overflow-hidden mb-3">
+                                                <div class="bg-gradient-to-r <%= timePercentage === 100 && campaign.tanggal_selesai ? 'from-gray-500 to-gray-600' : 'from-indigo-500 to-purple-600' %> h-3 rounded-full transition-all duration-500"
+                                                    style="width: <%= timePercentage %>%"></div>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200"><%= timeLabel %></p>
+                                                <p class="text-xs font-semibold <%= timePercentage === 100 && campaign.tanggal_selesai ? 'text-red-400' : 'text-indigo-400' %>"><%= timeDesc %></p>
+                                            </div>
                                         </div>
 
                                         <!-- Donasi Button (Only if Active) -->
@@ -133,7 +201,7 @@
                                             <div class="border-t border-white/10 pt-6">
                                                 <a href="/donasi/campaign/<%= campaign.id %>/donate"
                                                     class="block w-full text-center px-8 py-4 rounded-xl text-base font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transform transition hover:-translate-y-0.5">
-                                                    💝 Donasi Sekarang
+                                                    💳 Bayar Sekarang
                                                 </a>
                                             </div>
                                             <% } %>
@@ -167,21 +235,64 @@
                         </div>
 
                         <div class="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                            <% if(donatur.length===0) { %>
-                                <div class="text-center py-8">
-                                    <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                        </path>
-                                    </svg>
-                                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Belum ada donatur</p>
-                                </div>
+                            <% if (campaign.tipe_target === 'per_rumah') { %>
+                                <% if(donaturPerRumah.length === 0) { %>
+                                    <div class="text-center py-8">
+                                        <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                        </svg>
+                                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Belum ada data rumah</p>
+                                    </div>
                                 <% } else { %>
                                     <div class="space-y-3">
-                                        <% donatur.forEach(d=> { %>
-                                            <div
-                                                class="bg-gray-100 dark:bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-gray-200 dark:bg-white/10 transition-all">
+                                        <% donaturPerRumah.forEach(d => { %>
+                                            <% const isLunas = parseFloat(d.total_bayar) >= parseFloat(campaign.target_dana); %>
+                                            <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4 border <%= isLunas ? 'border-green-500/30' : 'border-red-500/30' %> hover:bg-gray-200 dark:bg-white/10 transition-all">
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <p class="font-bold text-gray-800 dark:text-gray-200 text-sm truncate">
+                                                                🏠 Blok <%= d.rumah %>
+                                                            </p>
+                                                        </div>
+                                                        <p class="text-xs text-gray-500 mb-2 truncate">
+                                                            Penyewa/Huni: <%= d.daftar_penghuni || '-' %>
+                                                        </p>
+                                                        <p class="font-bold text-sm mb-1 <%= isLunas ? 'text-green-500' : 'text-red-400' %>">
+                                                            Telah Dibayar: Rp <%= parseFloat(d.total_bayar).toLocaleString('id-ID') %>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <% if (isLunas) { %>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-800 dark:text-green-400">
+                                                                Lunas
+                                                            </span>
+                                                        <% } else { %>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-400">
+                                                                Terutang
+                                                            </span>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <% if(donatur.length === 0) { %>
+                                    <div class="text-center py-8">
+                                        <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                            </path>
+                                        </svg>
+                                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Belum ada donatur</p>
+                                    </div>
+                                <% } else { %>
+                                    <div class="space-y-3">
+                                        <% donatur.forEach(d => { %>
+                                            <div class="bg-gray-100 dark:bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-gray-200 dark:bg-white/10 transition-all">
                                                 <div class="flex items-start gap-3">
                                                     <div
                                                         class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold flex-shrink-0">
@@ -189,7 +300,7 @@
                                                     </div>
                                                     <div class="flex-1 min-w-0">
                                                         <div class="flex items-center gap-2 mb-1">
-                                                            <p class="font-bold text-gray-200 text-sm truncate">
+                                                            <p class="font-bold text-gray-800 dark:text-gray-200 text-sm truncate">
                                                                 <%= d.nama_donatur %>
                                                             </p>
                                                             <% if(d.is_anonim) { %>
@@ -210,9 +321,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <% }) %>
+                                        <% }) %>
                                     </div>
-                                    <% } %>
+                                <% } %>
+                            <% } %>
                         </div>
                     </div>
                 </div>

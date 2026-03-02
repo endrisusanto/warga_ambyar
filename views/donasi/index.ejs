@@ -100,11 +100,12 @@
                                                     </p>
 
                                                     <!-- Progress Bar -->
-                                                    <% const terkumpul=parseFloat(campaign.terkumpul) || 0; const
-                                                        target=parseFloat(campaign.target_dana) || 0; const
-                                                        percentage=target> 0 ? Math.min((terkumpul / target) * 100, 100)
-                                                        : 0;
-                                                        %>
+                                                    <% 
+                                                        const terkumpul=parseFloat(campaign.terkumpul) || 0; 
+                                                        const target=parseFloat(campaign.target_dana) || 0; 
+                                                        const percentage=target > 0 ? Math.min((terkumpul / target) * 100, 100) : 0;
+                                                    %>
+                                                    <% if (!campaign.tipe_target || campaign.tipe_target === 'total') { %>
                                                         <div class="mb-3">
                                                             <div
                                                                 class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -127,6 +128,27 @@
                                                                     <% } %>
                                                             </div>
                                                         </div>
+                                                    <% } else { %>
+                                                        <%
+                                                            const lunas = campaign.rumah_lunas || 0;
+                                                            const totalRumah = campaign.total_rumah || 1;
+                                                            const percentageRumah = Math.min((lunas / totalRumah) * 100, 100);
+                                                        %>
+                                                        <div class="mb-3">
+                                                            <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                                                <span>Progress Rumah Lunas</span>
+                                                                <span class="font-bold text-indigo-400"><%= lunas %> / <%= totalRumah %></span>
+                                                            </div>
+                                                            <div class="w-full bg-gray-200 dark:bg-white/10 rounded-full h-2 overflow-hidden mb-2">
+                                                                <div class="bg-gradient-to-r from-indigo-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+                                                                    style="width: <%= percentageRumah %>%"></div>
+                                                            </div>
+                                                            <div class="flex justify-between text-xs mt-2">
+                                                                <span class="text-green-400 font-bold text-[10px]">Terkumpul: Rp <%= terkumpul.toLocaleString('id-ID') %></span>
+                                                                <span class="text-gray-500 text-[10px]">Target: Rp <%= target.toLocaleString('id-ID') %> / rumah</span>
+                                                            </div>
+                                                        </div>
+                                                    <% } %>
 
                                                         <div
                                                             class="flex items-center justify-between text-xs text-gray-500 mb-4">
@@ -154,7 +176,7 @@
                                                             <% if(campaign.status==='aktif' ) { %>
                                                                 <a href="/donasi/campaign/<%= campaign.id %>/donate"
                                                                     class="flex-1 text-center py-2 px-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold transition-all shadow-lg">
-                                                                    Donasi
+                                                                    Bayar
                                                                 </a>
                                                                 <% } %>
                                                         </div>

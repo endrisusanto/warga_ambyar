@@ -22,11 +22,14 @@
                         <p class="text-xs text-gray-500 mt-1">Nama yang akan ditampilkan (jika tidak anonim)</p>
                     </div>
 
+                    <% if(campaign.allow_anonim !== 0) { %>
                     <div class="mb-6">
                         <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" name="is_anonim"
-                                class="w-5 h-5 rounded border-white/20 bg-gray-100 dark:bg-white/5 text-indigo-600 focus:ring-2 focus:ring-indigo-500/50">
-                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-medium">
+                            <input type="checkbox" name="is_anonim" id="is_anonim" class="sr-only peer">
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-[#1C1C1E] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-white/10 peer-checked:bg-purple-600 relative border border-gray-300 dark:border-white/10">
+                            </div>
+                            <span class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-300">
                                 🕶️ Donasi sebagai Anonim (Hamba Allah)
                             </span>
                         </label>
@@ -35,12 +38,19 @@
                             tetapi admin/ketua/bendahara tetap dapat melihat identitas asli Anda.
                         </p>
                     </div>
+                    <% } %>
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Jumlah Donasi (Rp)</label>
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Jumlah Bayar (Rp)</label>
                         <input type="number" name="jumlah" id="jumlah" required min="1000" step="1000"
                             placeholder="Contoh: 50000"
-                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
+                            <% if(campaign.tipe_target === 'per_rumah') { %>
+                                value="<%= campaign.target_dana %>" readonly
+                            <% } %>
+                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl <%= campaign.tipe_target === 'per_rumah' ? 'bg-gray-100 dark:bg-white/5 cursor-not-allowed text-gray-500' : '' %>">
+                        <% if (campaign.tipe_target === 'per_rumah') { %>
+                            <p class="text-xs text-indigo-500 mt-1 font-medium">Nominal sudah ditentukan per rumah</p>
+                        <% } %>
                     </div>
 
                     <div class="mb-6">
@@ -127,7 +137,7 @@
                         </a>
                         <button type="submit"
                             class="px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transform transition hover:-translate-y-0.5">
-                            💝 Kirim Donasi
+                            💳 Bayar Sekarang
                         </button>
                     </div>
                 </form>
@@ -155,10 +165,20 @@
                 }
             });
 
+            // Trigger QRIS generation if value is preset (for per_rumah)
+            document.addEventListener('DOMContentLoaded', () => {
+                if (jumlahInput.value) {
+                    const amount = parseInt(jumlahInput.value) || 0;
+                    if (amount >= 1000) {
+                        setTimeout(() => generateQris(amount), 500);
+                    }
+                }
+            });
+
             async function generateQris(amount) {
                 qrisAmountDisplay.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
 
-                const merchantName = `DONASI <%= campaign.judul.substring(0, 15).toUpperCase() %>`;
+                const merchantName = `<%= campaign.judul.substring(0, 25).toUpperCase() %>`;
 
                 try {
                     const response = await fetch('/iuran/generate-qris', {
