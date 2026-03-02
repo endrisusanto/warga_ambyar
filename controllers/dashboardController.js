@@ -19,7 +19,8 @@ exports.index = async (req, res) => {
         chartData: { labels: [], pemasukan: [], pengeluaran: [] },
         user: req.session.user,
         pendingCount: 0,
-        dashboardAlerts: [] // Array untuk carousel alert
+        dashboardAlerts: [], // Array untuk carousel alert
+        dendaRondaInfo: null
     };
 
     // Logic Alerts Pengurus (Admin, Ketua, Bendahara)
@@ -255,6 +256,23 @@ exports.index = async (req, res) => {
         } catch (e) {
             console.error('Error fetching Events:', e.message);
             require('fs').appendFileSync('debug.log', `ERROR Events: ${e.message}\n`);
+        }
+
+        // Fetch All Denda Ronda info
+        try {
+            const db = require('../config/db');
+            const [dendaList] = await db.query(`
+                SELECT w.nama, w.blok, w.nomor_rumah, SUM(r.denda) as total_denda, COUNT(r.id) as count 
+                FROM ronda_jadwal r
+                JOIN warga w ON r.warga_id = w.id
+                WHERE r.denda > 0 AND (r.status_bayar IS NULL OR r.status_bayar != 'paid')
+                GROUP BY w.id
+                ORDER BY total_denda DESC
+            `);
+            data.dendaList = dendaList;
+        } catch (e) {
+            console.error('Error fetching Denda Ronda info:', e.message);
+            data.dendaList = [];
         }
 
         // 5. Complaints for Modal & Alerts

@@ -465,6 +465,23 @@
                                     </button>
                                 </div>
                                 <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <% if (typeof dendaList !== 'undefined' && dendaList && dendaList.length > 0) { %>
+                                        <% dendaList.forEach(denda => { %>
+                                        <div class="glass-card bg-red-500/10 p-4 hover:bg-red-500/20 transition-all border border-red-500/30">
+                                            <div class="text-xs text-red-600 dark:text-red-400 font-bold mb-1.5 uppercase tracking-wide bg-red-500/20 inline-block px-2 py-0.5 rounded-md">
+                                                ⚠️ Tunggakan Denda Ronda
+                                            </div>
+                                            <div class="text-sm font-semibold text-red-800 dark:text-red-200 mt-1">
+                                                <%= denda.nama %> (Blok <%= denda.blok %>-<%= denda.nomor_rumah %>)
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs text-red-600 dark:text-red-400 mt-2 font-medium">
+                                                <span>Total: <%= denda.count %>x absen</span>
+                                                <span>Rp <%= new Intl.NumberFormat('id-ID').format(denda.total_denda) %></span>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                    <% } %>
+
                                     <% if (events && events.length> 0) { %>
                                         <% events.forEach(event=> { %>
                                             <div onclick="openEventDetail(<%= JSON.stringify(event) %>)"
@@ -497,7 +514,7 @@
                                                     <% } %>
                                             </div>
                                             <% }); %>
-                                                <% } else { %>
+                                                <% } else if (!(typeof dendaList !== 'undefined' && dendaList && dendaList.length > 0)) { %>
                                                     <div
                                                         class="text-center py-8 text-gray-500 bg-gray-100 dark:bg-white/5 rounded-xl border border-dashed border-white/10">
                                                         Belum ada pengumuman</div>
