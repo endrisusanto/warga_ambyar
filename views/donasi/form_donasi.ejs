@@ -42,12 +42,21 @@
 
                     <div class="mb-6">
                         <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Jumlah Bayar (Rp)</label>
-                        <input type="number" name="jumlah" id="jumlah" required min="1000" step="1000"
-                            placeholder="Contoh: 50000"
+                        <!-- Visible formatted input (type="text") -->
+                        <div class="relative">
+                            <input type="text" id="jumlah-display" inputmode="numeric"
+                                placeholder="Contoh: 50.000"
+                                <% if(campaign.tipe_target === 'per_rumah') { %>
+                                    value="<%= parseInt(campaign.target_dana).toLocaleString('id-ID') %>" readonly
+                                <% } %>
+                                class="glass-input w-full py-3 pl-10 pr-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl <%= campaign.tipe_target === 'per_rumah' ? 'bg-gray-100 dark:bg-white/5 cursor-not-allowed text-gray-500' : '' %>">
+                            <span id="rp-prefix" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-weight:700;font-size:0.875rem;pointer-events:none;user-select:none;z-index:10;color:#6b7280;">Rp</span>
+                        </div>
+                        <!-- Hidden input carries the raw numeric value for form submission -->
+                        <input type="hidden" name="jumlah" id="jumlah"
                             <% if(campaign.tipe_target === 'per_rumah') { %>
-                                value="<%= campaign.target_dana %>" readonly
-                            <% } %>
-                            class="glass-input w-full py-3 px-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl <%= campaign.tipe_target === 'per_rumah' ? 'bg-gray-100 dark:bg-white/5 cursor-not-allowed text-gray-500' : '' %>">
+                                value="<%= parseInt(campaign.target_dana) %>"
+                            <% } %>>
                         <% if (campaign.tipe_target === 'per_rumah') { %>
                             <p class="text-xs text-indigo-500 mt-1 font-medium">Nominal sudah ditentukan per rumah</p>
                         <% } %>
@@ -148,15 +157,38 @@
         <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
         <script>
-            const jumlahInput = document.getElementById('jumlah');
+            const jumlahDisplay = document.getElementById('jumlah-display');
+            const jumlahHidden  = document.getElementById('jumlah');
             const qrisContainer = document.getElementById('qris-container');
             const qrCanvas = document.getElementById('qrcode-canvas');
             const qrisAmountDisplay = document.getElementById('qris-amount-display');
 
             let qrisDebounce;
 
-            jumlahInput.addEventListener('input', function () {
-                const amount = parseInt(this.value) || 0;
+
+            // Format angka ke format id-ID (titik tiap 3 digit)
+            function formatRibuan(val) {
+                const num = val.replace(/\D/g, ''); // strip non-digit
+                return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            jumlahDisplay.addEventListener('input', function () {
+                const raw = this.value.replace(/\D/g, ''); // angka saja
+                const caretPos = this.selectionStart;
+                const prevLen = this.value.length;
+
+                // Format displayed value
+                const formatted = raw ? formatRibuan(raw) : '';
+                this.value = formatted;
+
+                // Restore caret position (adjust for added/removed dots)
+                const newLen = formatted.length;
+                this.setSelectionRange(caretPos + (newLen - prevLen), caretPos + (newLen - prevLen));
+
+                // Sync to hidden input
+                const amount = parseInt(raw) || 0;
+                jumlahHidden.value = amount || '';
+
                 if (amount >= 1000) {
                     clearTimeout(qrisDebounce);
                     qrisDebounce = setTimeout(() => generateQris(amount), 500);
@@ -165,10 +197,17 @@
                 }
             });
 
+            // Prevent non-numeric keys (allow: backspace, delete, arrows, tab)
+            jumlahDisplay.addEventListener('keydown', function (e) {
+                if (!/[\d]/.test(e.key) && !['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'].includes(e.key) && !e.metaKey && !e.ctrlKey) {
+                    e.preventDefault();
+                }
+            });
+
             // Trigger QRIS generation if value is preset (for per_rumah)
             document.addEventListener('DOMContentLoaded', () => {
-                if (jumlahInput.value) {
-                    const amount = parseInt(jumlahInput.value) || 0;
+                if (jumlahHidden.value) {
+                    const amount = parseInt(jumlahHidden.value) || 0;
                     if (amount >= 1000) {
                         setTimeout(() => generateQris(amount), 500);
                     }
@@ -176,7 +215,7 @@
             });
 
             async function generateQris(amount) {
-                qrisAmountDisplay.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+                qrisAmountDisplay.innerText = 'Rp ' + amount.toLocaleString('id-ID');
 
                 const merchantName = `<%= campaign.judul.substring(0, 25).toUpperCase() %>`;
 

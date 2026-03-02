@@ -696,6 +696,54 @@ exports.updatePublicStatus = (req, res) => {
     });
 };
 
+exports.skipWeek = async (req, res) => {
+    try {
+        const { date } = req.body;
+        if (!date) {
+            return res.json({ success: false, error: 'Date is required' });
+        }
+
+        await Ronda.skipWeek(date);
+
+        // Regenerate schedules from the affected month onward (current year)
+        const affectedDate = moment(date);
+        const currentYear = affectedDate.format('YYYY');
+        const affectedMonth = parseInt(affectedDate.format('M'));
+        for (let m = affectedMonth; m <= 12; m++) {
+            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear);
+        }
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error in skipWeek:', e);
+        res.json({ success: false, error: e.message });
+    }
+};
+
+exports.resetWeek = async (req, res) => {
+    try {
+        const { date } = req.body;
+        if (!date) {
+            return res.json({ success: false, error: 'Date is required' });
+        }
+
+        await Ronda.resetWeek(date);
+
+        // Regenerate schedules from the affected month onward (current year)
+        const affectedDate = moment(date);
+        const currentYear = affectedDate.format('YYYY');
+        const affectedMonth = parseInt(affectedDate.format('M'));
+        for (let m = affectedMonth; m <= 12; m++) {
+            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear);
+        }
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error in resetWeek:', e);
+        res.json({ success: false, error: e.message });
+    }
+};
+
 exports.control = async (req, res) => {
     try {
         await Ronda.autoProcessLateSchedules();
@@ -711,15 +759,25 @@ exports.control = async (req, res) => {
             }
         }
 
-        // Determine ALL Saturdays in the year
+        // Determine ALL Saturdays in the year (including libur dates — shown in view as LIBUR)
         const startDate = moment(`${year}-01-01`, 'YYYY-MM-DD');
         const endDate = moment(`${year}-12-31`, 'YYYY-MM-DD');
-        const saturdays = [];
         let day = startDate.clone();
+        const saturdays = [];
         while (day <= endDate) {
             if (day.day() === 6) saturdays.push(day.format('YYYY-MM-DD'));
             day.add(1, 'days');
         }
+
+        // Fetch libur dates to pass to view for visual highlighting
+        let liburDates = new Set();
+        try {
+            const [liburRows] = await db.query('SELECT tanggal FROM ronda_libur');
+            liburDates = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
+        } catch (e) {
+            // Table may not exist yet — ok, no libur dates
+        }
+        const liburDatesArray = Array.from(liburDates);
 
         // USER-BASED SCHEDULING: One row per user
         const [wargas] = await db.query(`
@@ -761,7 +819,12 @@ exports.control = async (req, res) => {
                 dates: {}
             };
             saturdays.forEach(d => {
-                matrix[userKey].dates[d] = { status: null, denda: 0 };
+                // For libur dates, set a special marker so view can render it as LIBUR
+                if (liburDates.has(d)) {
+                    matrix[userKey].dates[d] = { _libur: true };
+                } else {
+                    matrix[userKey].dates[d] = { status: null, denda: 0 };
+                }
             });
         });
 
@@ -779,6 +842,7 @@ exports.control = async (req, res) => {
             title: 'Control Ronda / Absensi',
             year,
             saturdays,
+            liburDatesArray,
             matrix,
             moment,
             user: req.user,

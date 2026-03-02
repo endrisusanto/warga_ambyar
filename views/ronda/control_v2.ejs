@@ -159,16 +159,25 @@
                                     <% 
                                     saturdays.forEach(d=> { 
                                         const isActive = d === activeSaturday;
+                                        const isLibur = liburDatesArray && liburDatesArray.includes(d);
                                     %>
                                         <th scope="col"
-                                        class="px-2 py-2 sm:px-6 sm:py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider min-w-[120px] <%= isActive ? 'bg-indigo-50 dark:bg-indigo-900/40 border-b-2 border-indigo-500' : '' %>">
-                                        <div class="mb-1">Tgl <%= moment(d).format('DD') %></div>
-                                        <div class="text-[10px] text-gray-500 dark:text-gray-400">
+                                        class="px-2 py-2 sm:px-6 sm:py-3 text-center text-xs font-medium uppercase tracking-wider min-w-[120px] cursor-pointer transition-colors group relative
+                                            <%= isLibur ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30' : 'text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/20' %>
+                                            <%= isActive && !isLibur ? 'border-b-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/40' : '' %>"
+                                        onclick="showWeekMenu(event, '<%= d %>')">
+                                        <div class="mb-1 flex items-center justify-center gap-1">
+                                            Tgl <%= moment(d).format('DD') %>
+                                            <% if (isLibur) { %><span class="text-red-400 text-[9px]">🚫</span><% } else { %><span class="opacity-0 group-hover:opacity-60 transition-opacity text-orange-400 text-[9px]">&#9881;</span><% } %>
+                                        </div>
+                                        <div class="text-[10px] <%= isLibur ? 'text-red-400 dark:text-red-500' : 'text-gray-500 dark:text-gray-400' %>">
                                             <%= moment(d).format('MMM') %>
                                         </div>
-                                            <% if (isActive) { %>
-                                                <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">● Upcoming</div>
-                                            <% } %>
+                                        <% if (isLibur) { %>
+                                            <div class="text-[9px] font-bold text-white bg-red-500 dark:bg-red-600 mt-0.5 px-1.5 py-0.5 rounded-full inline-block">LIBUR</div>
+                                        <% } else if (isActive) { %>
+                                            <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">● Upcoming</div>
+                                        <% } %>
                                         </th>
                                         <% }) %>
                                         
@@ -277,18 +286,24 @@
                                             saturdays.forEach((d, satIndex)=> {
                                             const cell = row.dates[d];
                                             const isActiveColumn = d === activeSaturday;
+                                            const isLiburColumn = liburDatesArray && liburDatesArray.includes(d);
                                             
                                             let tdClasses = "px-1 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-center text-sm relative ";
                                             
-                                            // Active column highlighting
-                                            if (isActiveColumn) {
+                                            // Libur column styling
+                                            if (isLiburColumn) {
+                                                tdClasses += "bg-red-50/60 dark:bg-red-900/10 border-x border-red-200 dark:border-red-800/30 ";
+                                            } else if (isActiveColumn) {
+                                                // Active column highlighting
                                                 tdClasses += "bg-indigo-50 dark:bg-indigo-900/20 border-x-2 border-indigo-400 ";
                                             }
                                         %>
                                                     <td class="<%= tdClasses %>">
                                                         <div
                                                             class="relative z-10 inline-flex flex-col items-center justify-center w-full h-full">
-                                                            <% if (cell.status) { %>
+                                                            <% if (isLiburColumn) { %>
+                                                                <span class="text-red-300 dark:text-red-700 text-xl select-none" title="Minggu ini LIBUR ronda">🚫</span>
+                                                            <% } else if (cell && cell.status) { %>
     <span 
         data-schedule-id="<%= cell.id %>"
         data-status="<%= cell.status %>"
@@ -300,7 +315,7 @@
         title="Klik untuk ubah status">
         <%= cell.status %>
     </span>
-<% } else if (cell.id) { %>
+<% } else if (cell && cell.id) { %>
      <span 
         data-schedule-id="<%= cell.id %>"
         data-status="scheduled"
@@ -696,7 +711,115 @@
                     alert('Error preparing QRIS: ' + error.message);
                 }
             }
+
+            // ── Week Menu Dropdown ────────────────────────────────────────────
+            let _activeWeekDate = null;
+
+            function showWeekMenu(event, date) {
+                event.stopPropagation();
+                _activeWeekDate = date;
+
+                const menu = document.getElementById('weekActionMenu');
+                const label = document.getElementById('weekMenuDateLabel');
+
+                // Format tanggal untuk label
+                const d = new Date(date + 'T00:00:00');
+                const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                label.textContent = 'Tgl ' + d.toLocaleDateString('id-ID', options);
+
+                // Posisikan dropdown di dekat kursor / th
+                const rect = event.currentTarget.getBoundingClientRect();
+                const scrollY = window.scrollY || window.pageYOffset;
+                const scrollX = window.scrollX || window.pageXOffset;
+
+                menu.style.top = (rect.bottom + scrollY + 4) + 'px';
+                let left = rect.left + scrollX;
+                // Pastikan tidak overflow ke kanan
+                if (left + 200 > window.innerWidth) left = window.innerWidth - 210;
+                menu.style.left = left + 'px';
+
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+            }
+
+            function closeWeekMenu() {
+                const menu = document.getElementById('weekActionMenu');
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+                _activeWeekDate = null;
+            }
+
+            async function doSkipWeek() {
+                if (!_activeWeekDate) return;
+                const date = _activeWeekDate;
+                closeWeekMenu();
+                if (!confirm('Liburkan ronda tanggal ' + date + '?\n\nSemua jadwal pada dan SETELAH tanggal ini akan bergeser maju 1 minggu secara otomatis.')) return;
+                await callWeekAction('/ronda/skip-week', date, 'Jadwal berhasil diliburkan dan digeser 1 minggu.');
+            }
+
+            async function doResetWeek() {
+                if (!_activeWeekDate) return;
+                const date = _activeWeekDate;
+                closeWeekMenu();
+                if (!confirm('Reset / kembalikan jadwal tanggal ' + date + '?\n\nSemua jadwal pada dan SETELAH tanggal ini akan digeser mundur 1 minggu (kebalikan dari Liburkan).')) return;
+                await callWeekAction('/ronda/reset-week', date, 'Jadwal berhasil di-reset / digeser mundur 1 minggu.');
+            }
+
+            async function callWeekAction(url, date, successMsg) {
+                try {
+                    const btn = document.getElementById('weekMenuLoading');
+                    if (btn) btn.classList.remove('hidden');
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(successMsg);
+                        window.location.reload();
+                    } else {
+                        alert('Gagal: ' + data.error);
+                    }
+                } catch (err) {
+                    alert('Terjadi kesalahan jaringan.');
+                    console.error(err);
+                }
+            }
+
+            // Tutup dropdown saat klik di luar
+            document.addEventListener('click', function(e) {
+                const menu = document.getElementById('weekActionMenu');
+                if (menu && !menu.contains(e.target)) {
+                    closeWeekMenu();
+                }
+            });
         </script>
+
+        <!-- Week Action Dropdown Menu -->
+        <div id="weekActionMenu" class="hidden fixed z-[9999] flex-col min-w-[210px] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-600 overflow-hidden backdrop-blur-xl bg-white dark:bg-gray-800" style="top:0;left:0">
+            <!-- Header -->
+            <div class="px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
+                <div class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aksi Jadwal</div>
+                <div id="weekMenuDateLabel" class="text-sm font-bold text-gray-800 dark:text-gray-100 mt-0.5"></div>
+            </div>
+            <!-- Liburkan -->
+            <button onclick="doSkipWeek()" class="flex items-center gap-3 w-full px-4 py-3 text-left text-sm hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors border-b border-gray-100 dark:border-gray-700">
+                <span class="text-xl">🚫</span>
+                <div>
+                    <div class="font-bold text-amber-700 dark:text-amber-300">Liburkan Ronda</div>
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400">Geser semua jadwal +1 minggu</div>
+                </div>
+            </button>
+            <!-- Reset -->
+            <button onclick="doResetWeek()" class="flex items-center gap-3 w-full px-4 py-3 text-left text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                <span class="text-xl">🔄</span>
+                <div>
+                    <div class="font-bold text-blue-700 dark:text-blue-300">Reset Minggu</div>
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400">Kembalikan jadwal -1 minggu</div>
+                </div>
+            </button>
+        </div>
 
         <!-- QRIS Pay Modal -->
         <div id="qrisModal" class="fixed inset-0 z-[10000] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">

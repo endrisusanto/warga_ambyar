@@ -21,6 +21,8 @@ router.post('/create-share', ensureAuthenticated, rondaController.createShare);
 router.get('/control', ensureAuthenticated, rondaController.control);
 
 router.post('/update-fine-status', ensureAuthenticated, rondaController.updateFineStatus);
+router.post('/skip-week', ensureAuthenticated, rondaController.skipWeek);
+router.post('/reset-week', ensureAuthenticated, rondaController.resetWeek);
 
 // Regenerate January 2026 schedule
 router.get('/regenerate-january', ensureAuthenticated, async (req, res) => {
