@@ -364,8 +364,15 @@ exports.confirm = async (req, res) => {
 
         await Iuran.updateStatus(id, 'lunas');
 
+        let jenisName = 'Sampah';
+        if (bill.jenis === 'kas' || bill.jenis === 'kas_rt') {
+            jenisName = 'Kas RT';
+        } else if (bill.jenis === 'kas_gang') {
+            jenisName = 'Kas Gang';
+        }
+
         // Add to Kas with Block/House Number
-        const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')}`;
+        const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')} [${jenisName}]`;
         const kasDate = bill.tanggal_bayar ? moment(bill.tanggal_bayar).format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss');
         await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
 
@@ -375,12 +382,6 @@ exports.confirm = async (req, res) => {
         if (wargaData.length > 0 && wargaData[0].no_hp) {
             const wargaPhone = wargaData[0].no_hp.replace(/^0/, '62').replace(/\D/g, '');
             const wargaName = wargaData[0].nama;
-            let jenisName = 'Sampah';
-            if (bill.jenis === 'kas' || bill.jenis === 'kas_rt') {
-                jenisName = 'Kas RT';
-            } else if (bill.jenis === 'kas_gang') {
-                jenisName = 'Kas Gang';
-            }
             const message = `Halo ${wargaName}, pembayaran iuran ${jenisName} untuk periode ${moment(bill.periode).format('MMMM YYYY')} sebesar Rp ${bill.jumlah.toLocaleString('id-ID')} telah diverifikasi dan diterima. Terima kasih!`;
             const waUrl = `https://wa.me/${wargaPhone}?text=${encodeURIComponent(message)}`;
 
@@ -858,11 +859,12 @@ exports.confirmBatch = async (req, res) => {
         // Add to Kas from batch
         for (const bill of rows) {
             let jenisLabel = bill.jenis;
-            if (bill.jenis === 'kas_rt') jenisLabel = 'Kas RT';
-            if (bill.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
+            if (bill.jenis === 'kas' || bill.jenis === 'kas_rt') jenisLabel = 'Kas RT';
+            else if (bill.jenis === 'kas_gang') jenisLabel = 'Kas Gang';
+            else if (bill.jenis === 'sampah') jenisLabel = 'Sampah';
             
             // Add to Kas with Block/House Number
-            const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')}`;
+            const ket = `Iuran Warga ${bill.blok}/${bill.nomor_rumah} Periode:${moment(bill.periode).format('MMM YYYY')} [${jenisLabel}]`;
             const kasDate = moment().format('YYYY-MM-DD HH:mm:ss');
             await Kas.add('masuk', bill.jumlah, ket, kasDate, bill.bukti_bayar);
         }
