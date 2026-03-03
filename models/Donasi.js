@@ -92,8 +92,8 @@ const Donasi = {
             LEFT JOIN users u ON dt.user_id = u.id
             LEFT JOIN warga w ON u.warga_id = w.id
             LEFT JOIN users v ON dt.verified_by = v.id
-            WHERE dt.campaign_id = ? AND dt.status = 'verified'
-            ORDER BY dt.created_at DESC
+            WHERE dt.campaign_id = ? AND dt.status IN ('verified', 'pending')
+            ORDER BY dt.status ASC, dt.created_at DESC
         `, [campaignId]);
 
         // Mask nama if anonim and not showing real names
@@ -110,13 +110,17 @@ const Donasi = {
     getDonaturPerRumah: async (campaignId) => {
         const [rows] = await db.query(`
             SELECT 
-                CONCAT(w.blok, ' - ', w.nomor_rumah) as rumah,
+                CONCAT(w.blok, '-', w.nomor_rumah) as rumah,
                 COALESCE(SUM(CASE WHEN dt.status = 'verified' THEN dt.jumlah ELSE 0 END), 0) as total_bayar,
+                COALESCE(SUM(CASE WHEN dt.status = 'pending' THEN dt.jumlah ELSE 0 END), 0) as pending_bayar,
+                SUM(CASE WHEN dt.status = 'pending' THEN 1 ELSE 0 END) as pending_count,
                 MAX(dt.created_at) as last_payment,
-                GROUP_CONCAT(DISTINCT w.nama SEPARATOR ', ') as daftar_penghuni
+                (SELECT ww.nama FROM warga ww WHERE ww.blok = w.blok AND ww.nomor_rumah = w.nomor_rumah AND ww.status_keluarga = 'Kepala Keluarga' AND ww.approval_status = 'approved' LIMIT 1) as kepala_keluarga,
+                GROUP_CONCAT(DISTINCT w.nama SEPARATOR ', ') as daftar_penghuni,
+                MAX(CASE WHEN dt.status = 'verified' THEN dt.id ELSE NULL END) as last_transaksi_id
             FROM warga w
             LEFT JOIN users u ON w.id = u.warga_id
-            LEFT JOIN donasi_transaksi dt ON dt.user_id = u.id AND dt.campaign_id = ? AND dt.status = 'verified'
+            LEFT JOIN donasi_transaksi dt ON dt.user_id = u.id AND dt.campaign_id = ? AND dt.status IN ('verified', 'pending')
             WHERE w.status_huni IN ('tetap', 'kontrak') AND w.approval_status = 'approved'
             GROUP BY w.blok, w.nomor_rumah
             ORDER BY w.blok ASC, CAST(w.nomor_rumah AS UNSIGNED) ASC
@@ -178,9 +182,11 @@ const Donasi = {
     // Financial report for donasi
     getLaporanKeuangan: async (campaignId = null) => {
         let query = `
-            SELECT dt.*, dc.judul as campaign_judul
+            SELECT dt.*, dc.judul as campaign_judul, dc.tipe_target, w.blok, w.nomor_rumah
             FROM donasi_transaksi dt
             JOIN donasi_campaign dc ON dt.campaign_id = dc.id
+            LEFT JOIN users u ON dt.user_id = u.id
+            LEFT JOIN warga w ON u.warga_id = w.id
             WHERE dt.status = 'verified'
         `;
         const params = [];

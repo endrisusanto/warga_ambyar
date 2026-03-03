@@ -4,6 +4,7 @@ const controller = require('../controllers/donasiController');
 const { ensureAuthenticated, isAdminOrBendahara } = require('../middleware/auth');
 
 // Public routes
+router.get('/v/:id', controller.viewPublicDonasi);
 router.get('/', ensureAuthenticated, controller.index);
 
 // Admin/Ketua/Bendahara routes - MUST come before :id routes
@@ -18,7 +19,7 @@ router.get('/laporan/export', ensureAuthenticated, isAdminOrBendahara, controlle
 
 
 // Parameterized routes - MUST come after specific routes
-router.get('/campaign/:id', ensureAuthenticated, controller.showCampaign);
+router.get('/campaign/:id', controller.showCampaign);
 router.get('/campaign/:id/donate', ensureAuthenticated, controller.formDonasi);
 router.get('/campaign/:id/edit', ensureAuthenticated, isAdminOrBendahara, controller.editCampaign);
 router.post('/campaign/:id/update', ensureAuthenticated, isAdminOrBendahara, controller.updateCampaign);

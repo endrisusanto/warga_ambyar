@@ -101,7 +101,8 @@ exports.showCampaign = async (req, res) => {
         if (!campaign) return res.status(404).send('Campaign tidak ditemukan');
 
         // Check if user is admin/ketua/bendahara
-        const canViewReal = ['admin', 'ketua', 'bendahara'].includes(req.session.user.role);
+        const user = req.session && req.session.user ? req.session.user : null;
+        const canViewReal = user ? ['admin', 'ketua', 'bendahara'].includes(user.role) : false;
         const showReal = canViewReal && req.query.showReal === 'true';
 
         const donatur = await Donasi.getDonaturByCampaign(req.params.id, showReal);
@@ -113,11 +114,14 @@ exports.showCampaign = async (req, res) => {
 
         res.render('donasi/show', {
             title: campaign.judul,
+            description: campaign.deskripsi || 'Sistem manajemen donasi warga.',
+            ogImage: campaign.foto ? `/uploads/donasi/campaign/${campaign.foto}` : null,
             campaign,
             donatur,
             donaturPerRumah,
             showReal,
             canViewReal,
+            user,
             moment
         });
     } catch (e) {
@@ -206,9 +210,20 @@ exports.formDonasi = async (req, res) => {
     try {
         const campaign = await Donasi.getCampaignById(req.params.id);
         if (!campaign) return res.status(404).send('Campaign tidak ditemukan');
+
+        let defaultName = req.session.user.username;
+        if (campaign.tipe_target === 'per_rumah' && req.session.user.warga_id) {
+            const db = require('../config/db');
+            const [warga] = await db.query('SELECT nama, blok, nomor_rumah FROM warga WHERE id = ?', [req.session.user.warga_id]);
+            if (warga && warga.length > 0) {
+                defaultName = `${warga[0].nama} (Blok ${warga[0].blok}-${warga[0].nomor_rumah})`; 
+            }
+        }
+
         res.render('donasi/form_donasi', {
             title: 'Donasi - ' + campaign.judul,
-            campaign
+            campaign,
+            defaultName
         });
     } catch (e) {
         console.error(e);
@@ -343,11 +358,14 @@ exports.exportExcel = async (req, res) => {
 
         // Add data
         transaksi.forEach((t, index) => {
+            const donaturName = t.tipe_target === 'per_rumah' && t.blok && t.nomor_rumah 
+                ? `${t.nama_donatur} (Blok ${t.blok}-${t.nomor_rumah})`
+                : t.nama_donatur;
             worksheet.addRow({
                 no: index + 1,
                 tanggal: moment(t.verified_at).format('DD MMM YYYY HH:mm'),
                 campaign: t.campaign_judul,
-                donatur: t.nama_donatur,
+                donatur: donaturName,
                 anonim: t.is_anonim ? 'Ya' : 'Tidak',
                 metode: t.metode_bayar.toUpperCase(),
                 jumlah: parseFloat(t.jumlah)
@@ -704,6 +722,32 @@ exports.exportNeraca = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Error generating Excel file');
+    }
+};
+
+// Public view for individual donation (like iuran/v/:id)
+exports.viewPublicDonasi = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const donasi = await Donasi.getDonasiById(id);
+
+        if (!donasi) return res.status(404).send('Donasi tidak ditemukan');
+
+        const ogImage = donasi.bukti_bayar 
+            ? `https://gang.ambyar.biz.id/uploads/donasi/bukti/${donasi.bukti_bayar}` 
+            : null;
+
+        res.render('donasi/public_view', {
+            title: `Bukti Pembayaran - ${donasi.campaign_judul}`,
+            description: `Bukti pembayaran ${donasi.nama_donatur} sebesar Rp ${parseFloat(donasi.jumlah).toLocaleString('id-ID')} untuk ${donasi.campaign_judul}`,
+            ogImage,
+            donasi,
+            moment,
+            user: null
+        });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send('Server Error');
     }
 };
 

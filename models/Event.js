@@ -5,8 +5,15 @@ const Event = {
         const [rows] = await db.query('SELECT * FROM agenda ORDER BY tanggal ASC');
         return rows;
     },
-    getUpcoming: async (limit = 5) => {
-        const [rows] = await db.query('SELECT * FROM agenda WHERE tanggal >= CURDATE() ORDER BY tanggal ASC LIMIT ?', [limit]);
+    getUpcoming: async (limit = 15) => {
+        const [rows] = await db.query(`
+            SELECT * FROM agenda 
+            ORDER BY 
+                CASE WHEN tanggal >= CURDATE() THEN 0 ELSE 1 END,
+                CASE WHEN tanggal >= CURDATE() THEN tanggal END ASC,
+                CASE WHEN tanggal < CURDATE() THEN tanggal END DESC
+            LIMIT ?
+        `, [limit]);
         return rows;
     },
     getById: async (id) => {

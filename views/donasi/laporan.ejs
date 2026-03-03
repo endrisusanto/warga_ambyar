@@ -13,10 +13,12 @@
                 <div class="flex items-center gap-3">
                     <form method="GET" class="flex gap-2">
                         <select name="campaign" onchange="this.form.submit()"
-                            class="glass-input py-2 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl">
-                            <option value="">Semua Campaign</option>
+                            class="glass-input py-2 px-4 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl bg-white dark:bg-gray-800"
+                            style="color-scheme: light dark;">
+                            <option value="" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Semua Campaign</option>
                             <% campaigns.forEach(c=> { %>
-                                <option value="<%= c.id %>" <%=selectedCampaign==c.id ? 'selected' : '' %>>
+                                <option value="<%= c.id %>" <%=selectedCampaign==c.id ? 'selected' : '' %>
+                                    class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                                     <%= c.judul %>
                                 </option>
                                 <% }) %>
@@ -125,7 +127,11 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                     <div class="flex items-center gap-2">
                                                         <span class="text-gray-700 dark:text-gray-300">
-                                                            <%= t.nama_donatur %>
+                                                            <% if (t.tipe_target === 'per_rumah' && t.blok && t.nomor_rumah) { %>
+                                                                <%= t.nama_donatur %> (Blok <%= t.blok %>-<%= t.nomor_rumah %>)
+                                                            <% } else { %>
+                                                                <%= t.nama_donatur %>
+                                                            <% } %>
                                                         </span>
                                                         <% if(t.is_anonim) { %>
                                                             <span
