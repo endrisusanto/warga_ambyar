@@ -255,16 +255,22 @@ exports.processPayment = (req, res) => {
                 
                 let firstPaymentId = null; // Store first payment ID for public link
 
+                // Get status_huni for the warga
+                const [wargaRow] = await db.query('SELECT status_huni FROM warga WHERE id = ?', [warga_id]);
+                const statusHuni = wargaRow[0] ? wargaRow[0].status_huni : 'tetap';
+
                 for (const m of selectedMonths) {
                     const currentPeriode = m + '-01';
 
                     for (const jenisItem of jenis) {
-                        // Determine amount based on type
-                        let jumlahPerItem = 25000; // default sampah
-                        if (jenisItem === 'kas' || jenisItem === 'kas_rt' || jenisItem === 'kas_gang') {
-                            jumlahPerItem = 10000;
-                        } else if (jenisItem === 'sampah') {
-                            jumlahPerItem = 25000;
+                        // Determine amount based on type and status_huni
+                        const jumlahPerItem = Iuran.getAmountByStatus(statusHuni, jenisItem);
+
+                        if (jumlahPerItem === 0 && statusHuni !== 'kosong') {
+                            // If amount is 0 but it's not 'kosong', it might be 'tidak huni' skipping Kas RT/Sampah
+                            // We should probably skip creating this record or alert the user
+                            console.log(`Skipping 0 amount payment for ${jenisItem} and status ${statusHuni}`);
+                            continue;
                         }
 
                         console.log(`Processing payment: jenis=${jenisItem}, amount=${jumlahPerItem}`);

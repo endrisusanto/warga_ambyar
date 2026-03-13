@@ -107,22 +107,6 @@
                                             <span class="sort-icon ml-1 text-gray-900 dark:text-white">↑</span>
                                         </div>
                                     </th>
-                                    <% 
-                                    // Determine active Saturday (current week's Saturday)
-                                    const now = moment();
-                                    const currentDay = now.day();
-                                    const currentHour = now.hour();
-                                    let activeSaturday = null;
-                                    
-                                    // If it's Sunday before 6 AM, the active Saturday is yesterday
-                                    if (currentDay === 0 && currentHour < 6) {
-                                        activeSaturday = now.clone().subtract(1, 'days').format('YYYY-MM-DD');
-                                    } else {
-                                        // Find the Saturday of the current week
-                                        const startOfWeek = now.clone().startOf('week');
-                                        activeSaturday = startOfWeek.clone().add(6, 'days').format('YYYY-MM-DD');
-                                    }
-                                    
                                     %>
                                     <th scope="col" onclick="sortTable(1, 'number')"
                                         class="table-cell lg:hidden px-1 py-3 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider bg-green-100 bg-green-soft w-[90px] min-w-[90px] max-w-[90px] cursor-pointer group hover:brightness-95 transition-all">
@@ -157,9 +141,10 @@
                                         </div>
                                     </th>
                                     <% 
-                                    saturdays.forEach(d=> { 
-                                        const isActive = d === activeSaturday;
-                                        const isLibur = liburDatesArray && liburDatesArray.includes(d);
+                                    if (typeof saturdays !== 'undefined' && Array.isArray(saturdays)) {
+                                        saturdays.forEach(d=> { 
+                                            const isActive = (typeof activeSaturday !== 'undefined') ? d === activeSaturday : false;
+                                            const isLibur = (typeof liburDatesArray !== 'undefined' && Array.isArray(liburDatesArray)) && liburDatesArray.includes(d);
                                     %>
                                         <th scope="col"
                                         class="px-2 py-2 sm:px-6 sm:py-3 text-center text-xs font-medium uppercase tracking-wider min-w-[120px] cursor-pointer transition-colors group relative
@@ -179,7 +164,8 @@
                                             <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 mt-0.5">● Upcoming</div>
                                         <% } %>
                                         </th>
-                                        <% }) %>
+                                        <% })
+                                        } %>
                                         
                                     <!-- Desktop Sticky Columns -->
                                     <th scope="col" onclick="sortTable(-4, 'number')"
@@ -245,20 +231,24 @@
                                             let terhutang = 0;
                                             let tidakHadir = 0;
                                             
-                                            saturdays.forEach(d => {
-                                                const cell = row.dates[d];
-                                                if (cell.status === 'alpa') {
-                                                    tidakHadir++;
-                                                }
-                                                if (cell.denda > 0) {
-                                                    totalDenda += cell.denda;
-                                                    if (cell.status_bayar === 'paid') {
-                                                        sudahBayar += cell.denda;
-                                                    } else {
-                                                        terhutang += cell.denda;
+                                            if (typeof saturdays !== 'undefined' && Array.isArray(saturdays)) {
+                                                saturdays.forEach(d => {
+                                                    const cell = row.dates[d];
+                                                    if (cell) {
+                                                        if (cell.status === 'alpa') {
+                                                            tidakHadir++;
+                                                        }
+                                                        if (cell.denda > 0) {
+                                                            totalDenda += cell.denda;
+                                                            if (cell.status_bayar === 'paid') {
+                                                                sudahBayar += cell.denda;
+                                                            } else {
+                                                                terhutang += cell.denda;
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                            });
+                                                });
+                                            }
                                         %>
                                         
                                         <td class="table-cell lg:hidden px-1 py-4 whitespace-nowrap text-center text-sm bg-green-50 bg-green-soft w-[90px] min-w-[90px] max-w-[90px]">
@@ -283,10 +273,11 @@
                                         </td>
 
                                         <% 
-                                            saturdays.forEach((d, satIndex)=> {
-                                            const cell = row.dates[d];
-                                            const isActiveColumn = d === activeSaturday;
-                                            const isLiburColumn = liburDatesArray && liburDatesArray.includes(d);
+                                            if (typeof saturdays !== 'undefined' && Array.isArray(saturdays)) {
+                                                saturdays.forEach((d, satIndex)=> {
+                                                const cell = row.dates[d];
+                                                const isActiveColumn = (typeof activeSaturday !== 'undefined') ? d === activeSaturday : false;
+                                                const isLiburColumn = (typeof liburDatesArray !== 'undefined' && Array.isArray(liburDatesArray)) && liburDatesArray.includes(d);
                                             
                                             let tdClasses = "px-1 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-center text-sm relative ";
                                             
@@ -341,7 +332,8 @@
 <% } %>
                                                         </div>
                                                     </td>
-                                                    <% }) %>
+                                                    <% })
+                                                } %>
                                                     
                                         <td class="hidden lg:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-green-50 bg-green-soft border-l-2 border-green-400 lg:sticky lg:right-[270px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
                                             <span class="font-bold text-gray-900 dark:text-gray-100 text-[10px] sm:text-xs">
@@ -382,20 +374,24 @@
                                             
                                             Object.keys(matrix).forEach(wId => {
                                                 const row = matrix[wId];
-                                                saturdays.forEach(d => {
-                                                    const cell = row.dates[d];
-                                                    if (cell.status === 'alpa') {
-                                                        grandTidakHadir++;
-                                                    }
-                                                    if (cell.denda > 0) {
-                                                        grandTotalDenda += cell.denda;
-                                                        if (cell.status_bayar === 'paid') {
-                                                            grandSudahBayar += cell.denda;
-                                                        } else {
-                                                            grandTerhutang += cell.denda;
+                                                if (typeof saturdays !== 'undefined' && Array.isArray(saturdays)) {
+                                                    saturdays.forEach(d => {
+                                                        const cell = row.dates[d];
+                                                        if (cell) {
+                                                            if (cell.status === 'alpa') {
+                                                                grandTidakHadir++;
+                                                            }
+                                                            if (cell.denda > 0) {
+                                                                grandTotalDenda += cell.denda;
+                                                                if (cell.status_bayar === 'paid') {
+                                                                    grandSudahBayar += cell.denda;
+                                                                } else {
+                                                                    grandTerhutang += cell.denda;
+                                                                }
+                                                            }
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
                                             });
                                         %>
                                         
@@ -422,10 +418,12 @@
 
                                         <% 
                                             // Empty cells for Saturday columns
-                                            saturdays.forEach(d => {
+                                            if (typeof saturdays !== 'undefined' && Array.isArray(saturdays)) {
+                                                saturdays.forEach(d => {
                                         %>
                                             <td class="px-6 py-4"></td>
-                                        <% }) %>
+                                        <%      });
+                                            } %>
                                         
                                         <td class="hidden lg:table-cell px-1 py-4 whitespace-nowrap text-center text-sm bg-green-100 bg-green-medium border-l-2 border-green-400 lg:sticky lg:right-[270px] z-10 w-[90px] min-w-[90px] max-w-[90px]">
                                             <span class="font-bold text-[10px] sm:text-sm text-gray-900 dark:text-gray-100">

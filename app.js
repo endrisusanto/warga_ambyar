@@ -70,19 +70,35 @@ app.use('/monitoring', require('./routes/monitoring'));
 
 
 // Run Migrations
-require('./utils/googleAuthMigration')();
-require('./utils/photoMigration')();
-require('./utils/emailWargaMigration')();
-require('./utils/fixRoleColumn')();
-require('./utils/fixIuranStatus')();
-require('./utils/updateIuranJenis')();
-require('./utils/migrateOldKasData')();
-require('./utils/addDibayarOlehCol')();
-require('./utils/fixKasTanggalType')();
-require('./utils/addTanggalKonfirmasiCol')();
-require('./utils/houseBasedRondaMigration')();
-require('./utils/activityTrackingMigration')();
-require('./utils/activityLogsMigration')();
+const { waitForDatabase } = require('./utils/dbHelper');
+const ensureColumns = require('./utils/ensureColumns');
+
+async function runMigrations() {
+    const isDbReady = await waitForDatabase();
+    if (isDbReady) {
+        // Ensure critical columns exist first
+        await ensureColumns();
+
+        // Run other specific migrations
+        require('./utils/googleAuthMigration')();
+        require('./utils/photoMigration')();
+        require('./utils/emailWargaMigration')();
+        require('./utils/fixRoleColumn')();
+        require('./utils/fixIuranStatus')();
+        require('./utils/updateIuranJenis')();
+        require('./utils/migrateOldKasData')();
+        require('./utils/addDibayarOlehCol')();
+        require('./utils/fixKasTanggalType')();
+        require('./utils/addTanggalKonfirmasiCol')();
+        require('./utils/houseBasedRondaMigration')();
+        require('./utils/activityTrackingMigration')();
+        require('./utils/activityLogsMigration')();
+    } else {
+        console.error('🛑 Skipping migrations due to database being unavailable.');
+    }
+}
+
+runMigrations();
 
 // Fetch Admin Contact
 const getAdminContact = require('./utils/getAdminContact');

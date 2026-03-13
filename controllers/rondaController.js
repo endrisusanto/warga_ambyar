@@ -838,10 +838,26 @@ exports.control = async (req, res) => {
             }
         });
 
+        // Determine active Saturday (current week's Saturday) for UI highlighting
+        const now = moment();
+        const currentDay = now.day();
+        const currentHour = now.hour();
+        let activeSaturday = null;
+
+        // If it's Sunday before 6 AM, the active Saturday is yesterday
+        if (currentDay === 0 && currentHour < 6) {
+            activeSaturday = now.clone().subtract(1, 'days').format('YYYY-MM-DD');
+        } else {
+            // Find the Saturday of the current week
+            const startOfWeek = now.clone().startOf('week');
+            activeSaturday = startOfWeek.clone().add(6, 'days').format('YYYY-MM-DD');
+        }
+
         res.render('ronda/control_v2', {
             title: 'Control Ronda / Absensi',
             year,
             saturdays,
+            activeSaturday,
             liburDatesArray,
             matrix,
             moment,

@@ -1,0 +1,14 @@
+--- Verification Started ---
+Checking table: warga
+✅ warga.email exists.
+✅ warga.tim_ronda exists.
+Checking table: users
+✅ users.profile_photo_url exists.
+Checking table: musyawarah
+✅ musyawarah.created_by exists.
+Checking table: pengaduan_comments
+✅ pengaduan_comments.lampiran exists.
+Checking table: iuran
+✅ iuran.tanggal_konfirmasi exists.
+✅ iuran.dibayar_oleh exists.
+--- Verification Finished ---
