@@ -12,14 +12,17 @@ router.get('/edit/:id', ensureAuthenticated, canEdit, wargaController.edit);
 router.post('/update/:id', ensureAuthenticated, canEdit, wargaController.update);
 router.get('/delete/:id', ensureAuthenticated, canEdit, wargaController.delete);
 router.post('/toggle-ronda/:id', ensureAuthenticated, isAdmin, wargaController.toggleRonda);
+router.get('/toggle-ronda/:id', (req, res) => res.redirect('/warga'));
 
 // Role management (admin only)
 router.post('/update-role/:id', ensureAuthenticated, isAdmin, wargaController.updateRole);
+router.get('/update-role/:id', (req, res) => res.redirect('/warga'));
 
 // Approval (admin or ketua)
 router.get('/approve/:id', ensureAuthenticated, isAdminOrKetua, wargaController.approve);
 router.get('/reject/:id', ensureAuthenticated, isAdminOrKetua, wargaController.reject);
 router.post('/update-approval/:id', ensureAuthenticated, isAdminOrKetua, wargaController.updateApproval);
+router.get('/update-approval/:id', (req, res) => res.redirect('/warga'));
 
 // Temporary route for resetting names
 router.get('/reset-names-temp', ensureAuthenticated, isAdmin, wargaController.resetNames);
