@@ -478,11 +478,12 @@
                         <div class="px-4 py-5 sm:p-6">
                             <ul class="space-y-3">
                                 <% let loopItems=[]; if (teamMembers && teamMembers.length> 0) {
+                                    // USER-BASED: Start from teamMembers list
                                     loopItems = [...teamMembers];
-                                    const teamHouseKeys = new Set(teamMembers.map(function(m) { return m.blok + '-' + m.nomor_rumah; }));
+                                    // Add schedules that belong to "ganti hari" guests (not in current team)
+                                    const teamUserIds = new Set(teamMembers.map(function(m) { return m.id; }));
                                     schedules.forEach(function(sch) {
-                                        const houseKey = sch.blok + '-' + sch.nomor_rumah;
-                                        if (!teamHouseKeys.has(houseKey)) {
+                                        if (!teamUserIds.has(sch.warga_id)) {
                                             loopItems.push(sch);
                                         }
                                     });
@@ -491,14 +492,15 @@
                                     }
 
                                     loopItems.forEach(function(item) {
-                                    // HOUSE-BASED: Match by blok and nomor_rumah instead of warga_id
+                                    // USER-BASED: Match by warga_id (consistent with how schedules are stored)
+                                    const itemUserId = item.id || item.warga_id;
                                     let s = schedules.find(function(sc) { 
-                                        return sc.blok === item.blok && sc.nomor_rumah === item.nomor_rumah;
+                                        return sc.warga_id == itemUserId;
                                     });
                                     if (!s) {
                                     s = {
                                     id: '',
-                                    warga_id: item.id,
+                                    warga_id: item.id || item.warga_id,
                                     nama: item.nama,
                                     blok: item.blok,
                                     nomor_rumah: item.nomor_rumah,
@@ -507,9 +509,10 @@
                                     foto_bukti: []
                                     };
                                     }
+                                    // isGuest: user is in schedule but NOT in current tim's member list
                                     const isGuest = teamMembers && teamMembers.length > 0 &&
                                     !teamMembers.some(function(m) {
-                                        return m.blok === s.blok && m.nomor_rumah === s.nomor_rumah;
+                                        return m.id == (s.warga_id);
                                     });
                                     %>
                                     <li onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>', '<%= s.warga_id %>', '<%= date %>')"

@@ -282,11 +282,13 @@ exports.payFine = async (req, res) => {
         const { id } = req.body;
         await Ronda.payFine(id);
         req.flash('success_msg', 'Denda lunas');
-        res.redirect('/ronda');
+        const redirectUrl = req.body.redirectUrl || req.get('Referer') || '/ronda/control';
+        res.redirect(redirectUrl);
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal bayar denda');
-        res.redirect('/ronda');
+        const redirectUrl = req.body.redirectUrl || req.get('Referer') || '/ronda/control';
+        res.redirect(redirectUrl);
     }
 };
 
@@ -329,6 +331,7 @@ exports.submitFine = (req, res) => {
 exports.verifyFine = async (req, res) => {
     try {
         const { id, action } = req.body;
+        const redirectUrl = req.body.redirectUrl || req.get('Referer') || '/ronda/control';
         if (action === 'approve') {
             // Get fine details before resetting it
             const [rows] = await db.query("SELECT r.denda, w.nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id = ?", [id]);
@@ -346,16 +349,14 @@ exports.verifyFine = async (req, res) => {
                 req.flash('success_msg', 'Pembayaran denda disetujui dan dicatat di Kas.');
             }
         } else if (action === 'reject') {
-            // Logic to reject (maybe reset status_bayar to null or 'rejected')
-            // For now, let's just keep it simple or add a reject method in model
-            // await Ronda.rejectFine(id); 
-            req.flash('info_msg', 'Pembayaran ditolak (Not implemented yet)');
+            await db.query("UPDATE ronda_jadwal SET status_bayar = 'rejected', bukti_bayar = NULL WHERE id = ?", [id]);
+            req.flash('info_msg', 'Pembayaran ditolak.');
         }
-        res.redirect('/ronda');
+        res.redirect(redirectUrl);
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal verifikasi pembayaran');
-        res.redirect('/ronda');
+        res.redirect('/ronda/control');
     }
 };
 
@@ -367,8 +368,6 @@ exports.updateFineStatus = async (req, res) => {
         await Ronda.markAsPaid(ids);
         
         // Add to Kas (Optional, calculate total first)
-        // For simplicity, we just mark as paid for now.
-        // If we want to add to Kas, we need to fetch amounts.
         try {
             const [rows] = await db.query("SELECT denda, nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id IN (?)", [ids]);
             let total = 0;
@@ -379,7 +378,8 @@ exports.updateFineStatus = async (req, res) => {
         } catch(e) { console.error('Error adding to kas', e); }
 
         req.flash('success_msg', 'Status denda berhasil diupdate menjadi LUNAS');
-        res.redirect('/ronda/control');
+        const redirectUrl = req.body.redirectUrl || req.get('Referer') || '/ronda/control';
+        res.redirect(redirectUrl);
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal update status denda');
@@ -902,51 +902,35 @@ exports.exportControl = async (req, res) => {
         const startDate = moment(`${year}-01-01`, 'YYYY-MM-DD');
         const endDate = moment(`${year}-12-31`, 'YYYY-MM-DD');
 
+        // Collect all Saturdays in the year (same as control function)
         const saturdays = [];
         let day = startDate.clone();
-        
-        // Find first Saturday of the year
-        while(day.day() !== 6) {
+        while (day <= endDate) {
+            if (day.day() === 6) saturdays.push(day.format('YYYY-MM-DD'));
             day.add(1, 'days');
         }
-        
-        while (day <= endDate) {
-            saturdays.push(day.format('YYYY-MM-DD'));
-            day.add(7, 'days'); // Optimization: add 7 days instead of 1
-        }
 
-        // Get All HOUSES (unique blok + nomor_rumah) with their representatives
-        // HOUSE-BASED SCHEDULING: One row per house, not per user
-        const [houses] = await db.query(`
+        // Fetch libur dates to mark them
+        let liburDates = new Set();
+        try {
+            const [liburRows] = await db.query('SELECT tanggal FROM ronda_libur');
+            liburDates = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
+        } catch (e) { /* ronda_libur may not exist */ }
+
+        // USER-BASED SCHEDULING: One row per user (consistent with control page)
+        const [wargas] = await db.query(`
             SELECT 
-                blok, 
+                id as representative_id,
+                nama as representative_nama,
+                blok,
                 nomor_rumah,
-                tim_ronda,
-                (SELECT id FROM warga w2 
-                 WHERE w2.blok = w1.blok 
-                 AND w2.nomor_rumah = w1.nomor_rumah 
-                 AND w2.is_ronda = 1
-                 ORDER BY 
-                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                    w2.id
-                 LIMIT 1
-                ) as representative_id,
-                (SELECT nama FROM warga w2 
-                 WHERE w2.blok = w1.blok 
-                 AND w2.nomor_rumah = w1.nomor_rumah 
-                 AND w2.is_ronda = 1
-                 ORDER BY 
-                    CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                    w2.id
-                 LIMIT 1
-                ) as representative_nama
-            FROM warga w1
+                tim_ronda
+            FROM warga
             WHERE is_ronda = 1 
             AND tim_ronda IS NOT NULL 
             AND tim_ronda != '-' 
             AND tim_ronda != ''
-            GROUP BY blok, nomor_rumah, tim_ronda
-            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+            ORDER BY TRIM(tim_ronda) ASC, blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
         `);
 
         // Get Schedules for this wide range
@@ -955,13 +939,13 @@ exports.exportControl = async (req, res) => {
             WHERE tanggal BETWEEN ? AND ?
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
-        // Build Matrix based on HOUSES
+        // Build Matrix based on USERS (same as control page)
         const matrix = {};
-        houses.forEach(h => {
+        wargas.forEach(h => {
             if (!h.representative_id) return;
             
-            const houseKey = `${h.blok}-${h.nomor_rumah}`;
-            matrix[houseKey] = {
+            const userKey = `${h.representative_id}`;
+            matrix[userKey] = {
                 info: {
                     id: h.representative_id,
                     nama: h.representative_nama,
@@ -972,15 +956,19 @@ exports.exportControl = async (req, res) => {
                 dates: {}
             };
             saturdays.forEach(d => {
-                matrix[houseKey].dates[d] = { status: null, denda: 0 };
+                if (liburDates.has(d)) {
+                    matrix[userKey].dates[d] = { _libur: true };
+                } else {
+                    matrix[userKey].dates[d] = { status: null, denda: 0 };
+                }
             });
         });
 
         schedules.forEach(s => {
             const d = moment(s.tanggal).format('YYYY-MM-DD');
-            const houseKey = `${s.blok}-${s.nomor_rumah}`;
-            if (matrix[houseKey] && matrix[houseKey].dates[d]) {
-                matrix[houseKey].dates[d] = s;
+            const userKey = `${s.warga_id}`;
+            if (matrix[userKey] && matrix[userKey].dates[d]) {
+                matrix[userKey].dates[d] = s;
             }
         });
 

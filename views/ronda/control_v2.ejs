@@ -471,6 +471,7 @@
                 </h3>
                 <form action="/ronda/update-fine-status" method="POST">
                     <input type="hidden" id="fineIds" name="ids">
+                    <input type="hidden" name="redirectUrl" value="/ronda/control?year=<%= year %>">
                     <div class="mb-5">
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Nama Warga</label>
                         <div id="fineWargaName" class="text-gray-900 dark:text-gray-100 font-bold bg-gray-100 dark:bg-white/5 p-3 rounded-xl border border-white/10"></div>

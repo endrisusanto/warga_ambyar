@@ -265,8 +265,10 @@ exports.index = async (req, res) => {
                 SELECT w.nama, w.blok, w.nomor_rumah, SUM(r.denda) as total_denda, COUNT(r.id) as count 
                 FROM ronda_jadwal r
                 JOIN warga w ON r.warga_id = w.id
-                WHERE r.denda > 0 AND (r.status_bayar IS NULL OR r.status_bayar != 'paid')
-                GROUP BY w.id
+                WHERE r.denda > 0
+                  AND r.status = 'alpa'
+                  AND (r.status_bayar IS NULL OR r.status_bayar = 'rejected')
+                GROUP BY w.id, w.nama, w.blok, w.nomor_rumah
                 ORDER BY total_denda DESC
             `);
             data.dendaList = dendaList;
