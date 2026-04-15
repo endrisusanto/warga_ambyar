@@ -782,8 +782,8 @@ exports.control = async (req, res) => {
         // USER-BASED SCHEDULING: One row per user
         const [wargas] = await db.query(`
             SELECT 
-                id as representative_id,
-                nama as representative_nama,
+                id,
+                nama,
                 blok, 
                 nomor_rumah,
                 tim_ronda
@@ -803,27 +803,17 @@ exports.control = async (req, res) => {
 
         // Build Matrix based on USERS
         const matrix = {};
-        wargas.forEach(h => {
-            if (!h.representative_id) return; // Skip without representatives
-            
-            // Use user identifier as key
-            const userKey = `${h.representative_id}`;
-            matrix[userKey] = {
-                info: {
-                    id: h.representative_id,
-                    nama: h.representative_nama,
-                    blok: h.blok,
-                    nomor_rumah: h.nomor_rumah,
-                    tim_ronda: h.tim_ronda
-                },
+        wargas.forEach(w => {
+            matrix[w.id] = {
+                info: w,
                 dates: {}
             };
             saturdays.forEach(d => {
                 // For libur dates, set a special marker so view can render it as LIBUR
                 if (liburDates.has(d)) {
-                    matrix[userKey].dates[d] = { _libur: true };
+                    matrix[w.id].dates[d] = { _libur: true };
                 } else {
-                    matrix[userKey].dates[d] = { status: null, denda: 0 };
+                    matrix[w.id].dates[d] = { status: null, denda: 0 };
                 }
             });
         });

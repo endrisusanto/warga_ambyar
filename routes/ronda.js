@@ -289,30 +289,16 @@ router.get('/regenerate-week', ensureAuthenticated, async (req, res) => {
             
             output += `<p>🗑️  Dihapus ${deleteResult.affectedRows} jadwal lama</p>`;
             
-            // Generate ulang untuk tanggal ini saja
-            // Get HOUSES for this team
-            const [houses] = await db.query(`
-                SELECT 
-                    blok, 
-                    nomor_rumah,
-                    (SELECT id FROM warga w2 
-                     WHERE w2.blok = w1.blok 
-                     AND w2.nomor_rumah = w1.nomor_rumah 
-                     AND w2.tim_ronda = w1.tim_ronda
-                     AND w2.is_ronda = 1
-                     ORDER BY 
-                        CASE WHEN w2.status_keluarga = 'Kepala Keluarga' THEN 0 ELSE 1 END,
-                        w2.id
-                     LIMIT 1
-                    ) as representative_id
-                FROM warga w1
+            // USER-BASED: Get all individuals for this team
+            const [wargas] = await db.query(`
+                SELECT id as representative_id, blok, nomor_rumah, nama
+                FROM warga
                 WHERE tim_ronda = ? AND is_ronda = 1
-                GROUP BY blok, nomor_rumah
-                ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC
+                ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
             `, [team]);
             
             let insertedCount = 0;
-            for (const house of houses) {
+            for (const house of wargas) {
                 if (!house.representative_id) continue;
                 
                 try {

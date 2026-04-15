@@ -760,15 +760,19 @@ exports.control = async (req, res) => {
 
 exports.exportExcel = async (req, res) => {
     try {
+        const year = req.query.year || moment().format('YYYY');
+        
+        // 1. Get Data for Sheet 1 (Transaction List)
         const [rows] = await db.query(`
             SELECT i.*, w.nama, w.blok, w.nomor_rumah 
             FROM iuran i 
             JOIN warga w ON i.warga_id = w.id 
+            WHERE YEAR(i.periode) = ?
             ORDER BY i.periode DESC
-        `);
+        `, [year]);
 
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Data Iuran');
+        const worksheet = workbook.addWorksheet('Detail Transaksi ' + year);
 
         worksheet.columns = [
             { header: 'No', key: 'no', width: 5 },
@@ -778,7 +782,7 @@ exports.exportExcel = async (req, res) => {
             { header: 'No Rumah', key: 'nomor_rumah', width: 10 },
             { header: 'Jenis', key: 'jenis', width: 15 },
             { header: 'Jumlah', key: 'jumlah', width: 15 },
-            { header: 'Status', key: 'status', width: 15 },
+            { header: 'Status', key: 'status', width: 20 },
             { header: 'Tgl Bayar', key: 'tanggal_bayar', width: 20 },
             { header: 'Tgl Approved', key: 'tanggal_konfirmasi', width: 20 }
         ];
@@ -792,20 +796,96 @@ exports.exportExcel = async (req, res) => {
                 nomor_rumah: row.nomor_rumah,
                 jenis: row.jenis,
                 jumlah: row.jumlah,
-                status: row.status,
+                status: row.status.replace('_', ' ').toUpperCase(),
                 tanggal_bayar: row.tanggal_bayar ? moment(row.tanggal_bayar).format('DD-MM-YYYY HH:mm') : '-',
                 tanggal_konfirmasi: row.tanggal_konfirmasi ? moment(row.tanggal_konfirmasi).format('DD-MM-YYYY HH:mm') : '-'
             });
         });
 
+        // 2. Data for Sheet 2 (Monitoring Matrix) - LIKE THE UI
+        const warga = await Warga.getHeadsOfFamily();
+        const [matrixRows] = await db.query(`
+            SELECT i.warga_id, MONTH(i.periode) as bulan_num, i.jenis, i.status 
+            FROM iuran i
+            WHERE YEAR(i.periode) = ?
+        `, [year]);
+
+        const matrix = {};
+        warga.forEach(w => {
+            matrix[w.id] = Array(12).fill(null).map(() => ({ kas_rt: null, kas_gang: null, sampah: null }));
+        });
+
+        matrixRows.forEach(r => {
+            if (matrix[r.warga_id]) {
+                const idx = r.bulan_num - 1;
+                let type = 'sampah';
+                if (r.jenis === 'keamanan' || r.jenis === 'kas' || r.jenis === 'kas_rt') type = 'kas_rt';
+                else if (r.jenis === 'kas_gang') type = 'kas_gang';
+                matrix[r.warga_id][idx][type] = r.status;
+            }
+        });
+
+        const worksheet2 = workbook.addWorksheet('Monitoring Iuran ' + year);
+        
+        // Define Columns
+        const columns2 = [
+            { header: 'Blok/No', key: 'rumah', width: 15 },
+            { header: 'Nama Warga', key: 'nama', width: 25 }
+        ];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        months.forEach(m => {
+            columns2.push({ header: m, key: m.toLowerCase(), width: 15 });
+        });
+        worksheet2.columns = columns2;
+
+        // Fill Rows
+        warga.forEach(w => {
+            const rowData = {
+                rumah: `${w.blok}/${w.nomor_rumah}`,
+                nama: w.nama
+            };
+
+            months.forEach((m, idx) => {
+                const s = matrix[w.id][idx];
+                const getCode = (status) => {
+                    if (status === 'lunas') return '✓';
+                    if (status === 'menunggu_konfirmasi') return '?';
+                    if (status) return 'X';
+                    return '-';
+                };
+                // Example format: "RT:✓ GG:✓ SP:✓"
+                rowData[m.toLowerCase()] = `RT:${getCode(s.kas_rt)} GG:${getCode(s.kas_gang)} SP:${getCode(s.sampah)}`;
+            });
+
+            const row = worksheet2.addRow(rowData);
+            
+            // Add conditional formatting / styling if needed
+            months.forEach((m, idx) => {
+                const cell = row.getCell(idx + 3);
+                // Simple color logic based on full lunas or not
+                const s = matrix[w.id][idx];
+                if (s.kas_rt === 'lunas' && s.kas_gang === 'lunas' && s.sampah === 'lunas') {
+                    cell.font = { color: { argb: 'FF008000' }, bold: true }; // Green
+                } else if (s.kas_rt || s.kas_gang || s.sampah) {
+                    cell.font = { color: { argb: 'FFFF0000' } }; // Red if any unpaid
+                }
+            });
+        });
+
+        // Legend row at bottom
+        worksheet2.addRow([]);
+        worksheet2.addRow({ rumah: 'KETERANGAN:' });
+        worksheet2.addRow({ rumah: 'RT: Kas RT', nama: 'GG: Kas Gang', jan: 'SP: Sampah' });
+        worksheet2.addRow({ rumah: '✓: Lunas', nama: '?: Menunggu', jan: 'X: Belum Lunas', feb: '-: Belum Ditagih' });
+
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', 'attachment; filename=' + 'data_iuran.xlsx');
+        res.setHeader('Content-Disposition', `attachment; filename=data_iuran_${year}.xlsx`);
 
         await workbook.xlsx.write(res);
         res.end();
     } catch (err) {
         console.error(err);
-        req.flash('error_msg', 'Gagal export excel');
+        req.flash('error_msg', 'Gagal export excel: ' + err.message);
         res.redirect('/iuran');
     }
 };

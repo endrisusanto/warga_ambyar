@@ -661,7 +661,8 @@
                                         </div>
 
                                         <!-- KOLOM KANAN: LIVE PREVIEW DESKTOP ONLY -->
-                                        <div class="hidden md:flex flex-col p-6 bg-gray-50/50 dark:bg-black/20 overflow-hidden relative" id="live-preview-container">
+                                        <div class="hidden md:flex flex-col p-6 overflow-hidden relative transition-colors duration-300" id="live-preview-container"
+                                             style="background: var(--lp-bg-container, rgba(249,250,251,0.5))">
                                             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center justify-between">
                                                 <span>Live Preview Gambar</span>
                                                 <span class="text-[10px] bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 px-2 py-0.5 rounded-full normal-case tracking-normal">Share WA</span>
@@ -669,32 +670,74 @@
                                             
                                             <!-- Miniatur Capture Card -->
                                             <div class="flex-1 w-full flex items-center justify-center">
-                                                <div id="live-preview-card" class="w-[400px] bg-gray-900 border border-white/10 p-5 rounded-xl relative overflow-hidden shadow-2xl scale-[0.9] xl:scale-100 transform origin-center transition-all">
-                                                    <!-- Branding -->
-                                                    <div class="absolute top-0 right-0 p-3 text-right">
-                                                        <h1 class="text-[14px] font-bold text-white tracking-widest uppercase">Warga Ambyar</h1>
-                                                        <p class="text-[9px] text-gray-400">Sistem Informasi RT</p>
-                                                    </div>
+                                                <div id="live-preview-card"
+                                                     class="lp-dark w-[400px] border p-5 rounded-xl relative overflow-hidden shadow-2xl scale-[0.9] xl:scale-100 transform origin-center transition-all duration-300"
+                                                     style="background: var(--lp-card-bg, #111827); border-color: var(--lp-card-border, rgba(255,255,255,0.1));">
 
                                                     <!-- Gradient Orbs -->
-                                                    <div class="absolute top-[-20%] left-[-10%] w-[100px] h-[100px] bg-indigo-500/30 rounded-full blur-[40px]"></div>
-                                                    <div class="absolute bottom-[-20%] right-[-10%] w-[100px] h-[100px] bg-purple-500/30 rounded-full blur-[40px]"></div>
+                                                    <div class="absolute top-[-20%] left-[-10%] w-[100px] h-[100px] bg-indigo-500/30 rounded-full blur-[40px] pointer-events-none"></div>
+                                                    <div class="absolute bottom-[-20%] right-[-10%] w-[100px] h-[100px] bg-purple-500/30 rounded-full blur-[40px] pointer-events-none"></div>
+
+                                                    <!-- Branding -->
+                                                    <div class="absolute top-0 right-0 p-3 text-right">
+                                                        <h1 class="text-[14px] font-bold tracking-widest uppercase" style="color: var(--lp-title-color, white)">Warga Ambyar</h1>
+                                                        <p class="text-[9px]" style="color: var(--lp-subtitle-color, #9ca3af)">Sistem Informasi RT</p>
+                                                    </div>
 
                                                     <!-- Content -->
                                                     <div class="relative z-10 mt-6">
-                                                        <div class="inline-block px-2 py-0.5 rounded bg-gray-200 dark:bg-white/10 text-indigo-300 text-[9px] font-bold uppercase tracking-wide mb-3 border border-white/5" id="live-preview-date"></div>
-                                                        <h2 class="text-lg font-bold text-white mb-3 leading-snug" id="live-preview-title">Judul Pengumuman</h2>
-                                                        <div class="flex items-center text-gray-400 mb-4 text-[11px]" id="live-preview-location-container">
+                                                        <div class="inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide mb-3 border"
+                                                             id="live-preview-date"
+                                                             style="background: var(--lp-badge-bg, rgba(255,255,255,0.1)); color: var(--lp-badge-text, #a5b4fc); border-color: var(--lp-badge-border, rgba(255,255,255,0.05))"></div>
+                                                        <h2 class="text-lg font-bold mb-3 leading-snug" id="live-preview-title"
+                                                            style="color: var(--lp-title-color, white)">Judul Pengumuman</h2>
+                                                        <div class="flex items-center mb-4 text-[11px]" id="live-preview-location-container"
+                                                             style="color: var(--lp-meta-color, #9ca3af)">
                                                             <svg class="w-3 h-3 mr-1.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                             </svg>
                                                             <span id="live-preview-location"></span>
                                                         </div>
-                                                        <div class="bg-gray-100/10 p-3 rounded-lg border border-white/10 text-gray-200 text-xs leading-relaxed whitespace-pre-wrap font-medium" id="live-preview-desc"></div>
+                                                        <div class="p-3 rounded-lg border text-xs leading-relaxed whitespace-pre-wrap font-medium" id="live-preview-desc"
+                                                             style="background: var(--lp-desc-bg, rgba(255,255,255,0.05)); border-color: var(--lp-desc-border, rgba(255,255,255,0.1)); color: var(--lp-desc-text, #e5e7eb)"></div>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Theme CSS Variables -->
+                                            <style>
+                                                /* Default: Dark Theme */
+                                                #live-preview-card.lp-dark {
+                                                    --lp-card-bg: #111827;
+                                                    --lp-card-border: rgba(255,255,255,0.1);
+                                                    --lp-title-color: #ffffff;
+                                                    --lp-subtitle-color: #9ca3af;
+                                                    --lp-badge-bg: rgba(255,255,255,0.1);
+                                                    --lp-badge-text: #a5b4fc;
+                                                    --lp-badge-border: rgba(255,255,255,0.05);
+                                                    --lp-meta-color: #9ca3af;
+                                                    --lp-desc-bg: rgba(255,255,255,0.05);
+                                                    --lp-desc-border: rgba(255,255,255,0.1);
+                                                    --lp-desc-text: #e5e7eb;
+                                                }
+                                                /* Light Theme */
+                                                #live-preview-card.lp-light {
+                                                    --lp-card-bg: #ffffff;
+                                                    --lp-card-border: #e5e7eb;
+                                                    --lp-title-color: #111827;
+                                                    --lp-subtitle-color: #6b7280;
+                                                    --lp-badge-bg: #ede9fe;
+                                                    --lp-badge-text: #6d28d9;
+                                                    --lp-badge-border: #ddd6fe;
+                                                    --lp-meta-color: #6b7280;
+                                                    --lp-desc-bg: #f9fafb;
+                                                    --lp-desc-border: #e5e7eb;
+                                                    --lp-desc-text: #374151;
+                                                }
+                                                #live-preview-card.lp-light .bg-indigo-500\/30 { opacity: 0.15; }
+                                                #live-preview-card.lp-light .bg-purple-500\/30 { opacity: 0.15; }
+                                            </style>
                                         </div>
                                     </div>
                                 </div>
@@ -913,6 +956,31 @@
                                 const rawDesc = desc ? desc.substring(0, 300) + (desc.length > 300 ? '...' : '') : 'Tidak ada deskripsi';
                                 document.getElementById('live-preview-desc').innerHTML = parseWAToHtml(rawDesc);
                             }
+
+                            // Sync live preview card with the global dark/light mode
+                            function syncPreviewTheme() {
+                                const card = document.getElementById('live-preview-card');
+                                if (!card) return;
+                                const isDark = document.documentElement.classList.contains('dark');
+                                if (isDark) {
+                                    card.classList.remove('lp-light');
+                                    card.classList.add('lp-dark');
+                                } else {
+                                    card.classList.remove('lp-dark');
+                                    card.classList.add('lp-light');
+                                }
+                            }
+
+                            // Observe global theme changes and sync preview
+                            (function() {
+                                syncPreviewTheme(); // init on load
+                                const observer = new MutationObserver(function(mutations) {
+                                    mutations.forEach(function(m) {
+                                        if (m.attributeName === 'class') syncPreviewTheme();
+                                    });
+                                });
+                                observer.observe(document.documentElement, { attributes: true });
+                            })();
 
                             function openEventModal() { 
                                 document.getElementById('eventModal').classList.remove('hidden');

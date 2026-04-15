@@ -16,9 +16,9 @@ module.exports = async function ensureColumns() {
             { table: 'musyawarah', column: 'created_by', fk: 'FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL' },
             { table: 'pengaduan_comments', column: 'lampiran', definition: 'VARCHAR(255) DEFAULT NULL' },
             { table: 'iuran', column: 'tanggal_konfirmasi', definition: 'DATETIME DEFAULT NULL' },
-            { table: 'iuran', column: 'dibayar_oleh', definition: 'INT' },
-            { table: 'iuran', column: 'dibayar_oleh', definition: 'INT' },
-            { table: 'iuran', column: 'dibayar_oleh', fk: 'FOREIGN KEY (dibayar_oleh) REFERENCES users(id) ON DELETE SET NULL' },
+            { table: 'iuran', column: 'dibayar_oleh', definition: 'INT DEFAULT NULL' },
+            // Note: dibayar_oleh FK is managed manually as fk_iuran_payer -> warga(id). Do NOT add auto FK here.
+            { table: 'iuran', column: 'metode_pembayaran', definition: "ENUM('DANA', 'QRIS', 'Tunai') DEFAULT NULL" },
             { table: 'warga', column: 'status_huni', definition: "ENUM('tetap', 'kontrak', 'kosong', 'tidak huni') DEFAULT 'tetap'" }
         ];
 

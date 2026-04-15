@@ -98,13 +98,11 @@
                                                 role="menuitem" tabindex="-1">
                                                 📄 PDF
                                             </button>
-                                            <% if(user && (user.role==='admin' || user.role==='bendahara' )) { %>
-                                                <a href="/iuran/export"
+                                                <a href="/iuran/export?year=<%= year %>"
                                                     class="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-indigo-600 dark:hover:text-indigo-400 block px-4 py-2.5 text-sm w-full text-left transition-colors font-medium"
                                                     role="menuitem" tabindex="-1">
                                                     📊 Excel
                                                 </a>
-                                                <% } %>
                                         </div>
                                     </div>
                                 </div>
