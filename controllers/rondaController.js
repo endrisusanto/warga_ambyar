@@ -56,7 +56,10 @@ exports.index = async (req, res) => {
         const month = queryMonth || now.format('MM');
         const year = queryYear || now.format('YYYY');
 
+        // First generate regular schedule
         await Ronda.generateSchedule(month, year);
+        // Then process movements and cleanup redundant items
+        await Ronda.autoProcessLateSchedules();
 
         const schedule = await Ronda.getMonthlySchedule(month, year);
 
@@ -125,10 +128,14 @@ exports.index = async (req, res) => {
             // Mark scheduled entries ONLY for upcoming Saturday
             schedule.forEach(s => {
                 const scheduleDate = moment(s.tanggal).format('YYYY-MM-DD');
+                const isAutoRescheduled = s.keterangan && s.keterangan.includes('Auto Reschedule');
+                
                 if (s.status === 'scheduled' && 
-                    wargaWithReschedule.has(s.warga_id) &&
+                    (wargaWithReschedule.has(s.warga_id) || isAutoRescheduled) &&
                     scheduleDate === upcomingSaturday) {
                     s.hasRecentReschedule = true;
+                    // If it's an auto-reschedule, we can make the label even more specific
+                    if (isAutoRescheduled) s.isAutoReschedule = true;
                 }
             });
         }
@@ -250,18 +257,36 @@ exports.updateStatus = (req, res) => {
                 return res.redirect(req.get('Referer') || '/ronda');
             }
 
-            if (status === 'reschedule') {
-                await Ronda.reschedule(id, keterangan);
+            let nextDate = null;
+            let prevDate = null;
+            if (status === 'reschedule_next') {
+                nextDate = await Ronda.rescheduleNext(id, keterangan);
                 req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu depan');
+            } else if (status === 'reschedule_prev') {
+                prevDate = await Ronda.reschedulePrev(id, keterangan);
+                req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu lalu');
             } else {
                 await Ronda.updateStatus(id, status, keterangan);
                 
                 // If 'hadir' and file exists, update photo proof
-                if (status === 'hadir' && req.file) {
-                    await Ronda.updatePhotos(id, [req.file.filename]);
+                if (status === 'hadir') {
+                    if (req.file) {
+                        await Ronda.updatePhotos(id, [req.file.filename]);
+                    }
                 }
                 
                 req.flash('success_msg', 'Status ronda diperbarui');
+            }
+
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') > -1)) {
+                return res.json({ 
+                    success: true, 
+                    message: 'Status berhasil diperbarui', 
+                    id, 
+                    status, 
+                    warga_id, 
+                    nextDate 
+                });
             }
 
             if (redirectUrl) {
@@ -668,10 +693,14 @@ exports.updatePublicStatus = (req, res) => {
             const Ronda = require('../models/Ronda');
             
             // 1. Update Status
-            if (status === 'reschedule') {
-                await Ronda.reschedule(id, keterangan);
-                console.log('[DEBUG] Reschedule success');
+            if (status === 'reschedule_next') {
+                await Ronda.rescheduleNext(id, keterangan);
+                console.log('[DEBUG] Reschedule Next success');
                 req.flash('success_msg', 'Jadwal berhasil diganti ke minggu depan');
+            } else if (status === 'reschedule_prev') {
+                await Ronda.reschedulePrev(id, keterangan);
+                console.log('[DEBUG] Reschedule Prev success');
+                req.flash('success_msg', 'Jadwal berhasil diganti ke minggu lalu');
             } else {
                 await Ronda.updateStatus(id, status, keterangan);
                 console.log('[DEBUG] UpdateStatus success');

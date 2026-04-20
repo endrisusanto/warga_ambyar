@@ -493,14 +493,15 @@
 
                                     loopItems.forEach(function(item) {
                                     // USER-BASED: Match by warga_id (consistent with how schedules are stored)
-                                    const itemUserId = item.id || item.warga_id;
+                                    // Prefer warga_id (resident id) over id (which might be schedule id)
+                                    const itemUserId = item.warga_id || item.id;
                                     let s = schedules.find(function(sc) { 
                                         return sc.warga_id == itemUserId;
                                     });
                                     if (!s) {
                                     s = {
                                     id: '',
-                                    warga_id: item.id || item.warga_id,
+                                    warga_id: itemUserId,
                                     nama: item.nama,
                                     blok: item.blok,
                                     nomor_rumah: item.nomor_rumah,
@@ -537,36 +538,69 @@
                                                                 %>
                                                                 <span
                                                                     class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-blue-600 text-blue-600">
-                                                                    🔄 Hadir
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                                    Hadir
                                                                 </span>
                                                                 <%
-                                                            } else if(isGuest || s.status === 'reschedule' || s.hasRecentReschedule) {
-                                                                // Badge Ganti Hari (untuk isGuest, reschedule, atau hasRecentReschedule)
+                                                            } else if(s.isAutoReschedule) {
+                                                                %>
+                                                                <span
+                                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 border border-red-600 text-red-600 animate-pulse">
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                                    Wajib Hadir
+                                                                </span>
+                                                                <%
+                                                            } else if(s.status === 'reschedule_prev' || (s.status === 'reschedule' && s.keterangan && (s.keterangan.includes('[Maju Jadwal]') || (s.keterangan.match(/Reschedule ke (\d{2} [a-zA-Z]{3} \d{4})/) && moment(s.keterangan.match(/Reschedule ke (\d{2} [a-zA-Z]{3} \d{4})/)[1], 'DD MMM YYYY').isBefore(moment(s.tanggal)))))) {
+                                                                %>
+                                                                <span
+                                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-green-600 text-green-600">
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                    Sudah Hadir Minggu Lalu
+                                                                </span>
+                                                                <%
+                                                            } else if(isGuest || s.status === 'reschedule' || s.status === 'reschedule_next' || s.hasRecentReschedule) {
+                                                                // Badge Ganti Hari (untuk isGuest, reschedule_next, atau hasRecentReschedule)
                                                                 %>
                                                                 <span
                                                                     class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-orange-600 text-orange-600">
-                                                                    🔄 Ganti Hari
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                                    Ganti Hari
                                                                 </span>
                                                                 <%
                                                             } else if(s.status && s.status !=='scheduled') {
                                                                 // Badge status lainnya
                                                                 let statusText=s.status; 
                                                                 let statusClass='' ; 
-                                                                if (s.status_bayar==='paid' ) { 
+                                                                let svgIcon = '';
+                                                                const isEarly = s.keterangan && s.keterangan.includes('Sudah Hadir Lebih Awal');
+                                                                
+                                                                if (isEarly) {
+                                                                    statusText = 'Sudah Hadir';
+                                                                    statusClass = 'bg-blue-100 border border-blue-600 text-blue-600';
+                                                                    svgIcon = '<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                                                                } else if (s.status_bayar==='paid' ) { 
                                                                     statusText='Pay Up' ;
                                                                     statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                                    svgIcon = '<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
                                                                 } else if (s.status==='hadir' ) {
                                                                     statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                                    svgIcon = '<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
                                                                 } else {
                                                                     statusClass='bg-transparent border border-red-600 text-red-600'; 
+                                                                    svgIcon = '<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
                                                                 } 
                                                                 %>
                                                                 <span
                                                                     class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <%= statusClass %>">
-                                                                    <%= statusText %>
+                                                                    <%- svgIcon %> <%= statusText %>
                                                                 </span>
                                                                 <%
-                                                            } 
+                                                            } else { %>
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-transparent border border-gray-400 text-gray-400">
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                    Scheduled
+                                                                </span>
+                                                            <% } 
                                                         %>
                                             </div>
 
@@ -1193,7 +1227,7 @@
 
             <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-3xl">
                         <form action="/ronda/update-status" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="id" id="modalScheduleId">
                             <input type="hidden" name="warga_id" id="modalWargaId">
@@ -1210,24 +1244,34 @@
                                     </p>
                                     
                                     <!-- Step 1: Status Selection -->
-                                    <div id="step-status" class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div id="step-status" class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
                                         <!-- Hadir -->
                                         <label class="cursor-pointer group relative">
                                             <input type="radio" name="status" value="hadir" class="peer sr-only">
                                             <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/30 dark:peer-checked:bg-emerald-900/20 peer-checked:ring-2 peer-checked:ring-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">✅</div>
-                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
-                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Datang tepat waktu</div>
+                                                <svg class="w-10 h-10 mx-auto mb-3 text-emerald-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
+                                                <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Tepat waktu</div>
                                             </div>
                                         </label>
                                         
-                                        <!-- Ganti Hari -->
+                                        <!-- Ganti Hari Depan -->
                                         <label class="cursor-pointer group relative">
-                                            <input type="radio" name="status" value="reschedule" class="peer sr-only">
+                                            <input type="radio" name="status" value="reschedule_next" class="peer sr-only">
                                             <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-orange-500 peer-checked:bg-orange-50/30 dark:peer-checked:bg-orange-900/20 peer-checked:ring-2 peer-checked:ring-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">🔄</div>
-                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Ganti Hari</div>
-                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Pindah minggu depan</div>
+                                                <svg class="w-10 h-10 mx-auto mb-3 text-orange-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Reschedule</div>
+                                                <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Minggu Depan</div>
+                                            </div>
+                                        </label>
+
+                                        <!-- Ganti Hari Lalu -->
+                                        <label class="cursor-pointer group relative">
+                                            <input type="radio" name="status" value="reschedule_prev" class="peer sr-only">
+                                            <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-indigo-500 peer-checked:bg-indigo-50/30 dark:peer-checked:bg-indigo-900/20 peer-checked:ring-2 peer-checked:ring-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                <svg class="w-10 h-10 mx-auto mb-3 text-indigo-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
+                                                <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-indigo-700 dark:peer-checked:text-indigo-400 uppercase tracking-wider">Maju Jadwal</div>
+                                                <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Minggu Lalu</div>
                                             </div>
                                         </label>
                                         
@@ -1235,9 +1279,9 @@
                                         <label class="cursor-pointer group relative">
                                             <input type="radio" name="status" value="alpa" class="peer sr-only">
                                             <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-red-500 peer-checked:bg-red-50/30 dark:peer-checked:bg-red-900/20 peer-checked:ring-2 peer-checked:ring-red-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">❌</div>
-                                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
-                                                <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Tidak ada kabar</div>
+                                                <svg class="w-10 h-10 mx-auto mb-3 text-red-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
+                                                <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Tanpa kabar</div>
                                             </div>
                                         </label>
                                     </div>

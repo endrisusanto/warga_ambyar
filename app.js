@@ -76,23 +76,25 @@ const ensureColumns = require('./utils/ensureColumns');
 async function runMigrations() {
     const isDbReady = await waitForDatabase();
     if (isDbReady) {
+        console.log('🚀 Starting sequential migrations...');
         // Ensure critical columns exist first
         await ensureColumns();
 
-        // Run other specific migrations
-        require('./utils/googleAuthMigration')();
-        require('./utils/photoMigration')();
-        require('./utils/emailWargaMigration')();
-        require('./utils/fixRoleColumn')();
-        require('./utils/fixIuranStatus')();
-        require('./utils/updateIuranJenis')();
-        require('./utils/migrateOldKasData')();
-        require('./utils/addDibayarOlehCol')();
-        require('./utils/fixKasTanggalType')();
-        require('./utils/addTanggalKonfirmasiCol')();
-        require('./utils/houseBasedRondaMigration')();
-        require('./utils/activityTrackingMigration')();
-        require('./utils/activityLogsMigration')();
+        // Run other specific migrations sequentially to avoid contention/crashes
+        await require('./utils/googleAuthMigration')();
+        await require('./utils/photoMigration')();
+        await require('./utils/emailWargaMigration')();
+        await require('./utils/fixRoleColumn')();
+        await require('./utils/fixIuranStatus')();
+        await require('./utils/updateIuranJenis')();
+        await require('./utils/migrateOldKasData')();
+        await require('./utils/addDibayarOlehCol')();
+        await require('./utils/fixKasTanggalType')();
+        await require('./utils/addTanggalKonfirmasiCol')();
+        await require('./utils/houseBasedRondaMigration')();
+        await require('./utils/activityTrackingMigration')();
+        await require('./utils/activityLogsMigration')();
+        console.log('🏁 All migrations finished successfully.');
     } else {
         console.error('🛑 Skipping migrations due to database being unavailable.');
     }

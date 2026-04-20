@@ -462,7 +462,7 @@ exports.arrears = async (req, res) => {
                    w.nama, w.no_hp, w.blok, w.nomor_rumah
             FROM ronda_jadwal r
             JOIN warga w ON r.warga_id = w.id
-            WHERE r.status = 'alpa' AND r.denda > 0 AND (r.status_bayar IS NULL OR r.status_bayar != 'paid')
+            WHERE r.status = 'alpa' AND r.denda > 0 AND (r.status_bayar IS NULL OR r.status_bayar = 'rejected')
         `);
         
         tunggakan.push(...rondaDenda);

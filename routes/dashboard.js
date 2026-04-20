@@ -7,6 +7,7 @@ router.get('/', ensureAuthenticated, dashboardController.index);
 router.post('/add-event', ensureAuthenticated, dashboardController.addEvent);
 router.post('/edit-event/:id', ensureAuthenticated, dashboardController.editEvent);
 router.post('/delete-event/:id', ensureAuthenticated, dashboardController.deleteEvent);
+router.post('/dismiss-denda/:wargaId', ensureAuthenticated, dashboardController.dismissDenda);
 router.post('/share-image', ensureAuthenticated, dashboardController.uploadShareImage);
 router.get('/event/v/:id', dashboardController.viewPublicEvent);
 router.post('/reset-data', ensureAuthenticated, dashboardController.resetData);

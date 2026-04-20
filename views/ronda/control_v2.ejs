@@ -50,14 +50,7 @@
                                 </svg>
                                 Excel
                             </a>
-                            <button onclick="exportToImage()"
-                                class="flex items-center gap-2 px-3 py-2 text-sm font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                Image
-                            </button>
+
                             <button onclick="exportToCSV()"
                                 class="flex items-center gap-2 px-3 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,42 +287,71 @@
                                                             class="relative z-10 inline-flex flex-col items-center justify-center w-full h-full">
                                                             <% if (isLiburColumn) { %>
                                                                 <span class="text-red-300 dark:text-red-700 text-xl select-none" title="Minggu ini LIBUR ronda">🚫</span>
-                                                            <% } else if (cell && cell.status) { %>
-    <span 
-        data-schedule-id="<%= cell.id %>"
-        data-status="<%= cell.status %>"
-        data-nama="<%= row.info.nama %>"
-        data-date="<%= moment(d).format('DD MMM YYYY') %>"
-        data-keterangan="<%= cell.keterangan || '' %>"
-        onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
-        class="cursor-pointer hover:ring-2 hover:ring-indigo-400 hover:scale-105 transition-all px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase mb-1 <%= cell.status === 'hadir' ? 'bg-green-100 text-green-800' : (cell.status === 'alpa' ? 'bg-red-500 text-white' : (cell.status === 'reschedule' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')) %>"
-        title="Klik untuk ubah status">
-        <%= cell.status %>
-    </span>
-<% } else if (cell && cell.id) { %>
-     <span 
-        data-schedule-id="<%= cell.id %>"
-        data-status="scheduled"
-        data-nama="<%= row.info.nama %>"
-        data-date="<%= moment(d).format('DD MMM YYYY') %>"
-        data-keterangan=""
-        onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan)"
-        class="cursor-pointer hover:bg-gray-200 transition-colors px-2 py-1 rounded text-xs font-bold text-gray-400 uppercase mb-1">
-        -
-    </span>
-<% } %>
-<% if (cell.denda > 0) { %>
-    <% if (cell.status_bayar === 'paid') { %>
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 mt-1 cursor-default">
-            ✓ Lunas
-        </span>
-    <% } else { %>
-        <span onclick="event.stopPropagation(); openQrisPayModal('<%= cell.id %>', '<%= cell.denda %>', '<%= row.info.nama %>')" 
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 mt-1 cursor-pointer hover:bg-red-200 hover:scale-105 transition-all shadow-sm">
-            💸 Bayar
-        </span>
-    <% } %>
-<% } %>
+                                                            <% } else { %>
+                                                                <span 
+                                                                    id="cell-<%= row.info.id %>-<%= d %>"
+                                                                    data-schedule-id="<%= cell ? cell.id : '' %>"
+                                                                    data-warga-id="<%= row.info.id %>"
+                                                                    data-date-value="<%= d %>"
+                                                                    data-status="<%= (cell && cell.status) ? cell.status : 'scheduled' %>"
+                                                                    data-nama="<%= row.info.nama %>"
+                                                                    data-date="<%= moment(d).format('DD MMM YYYY') %>"
+                                                                    data-keterangan="<%= (cell && cell.keterangan) ? cell.keterangan : '' %>"
+                                                                    onclick="openStatusModal(this.dataset.scheduleId, this.dataset.status, this.dataset.nama, this.dataset.date, this.dataset.keterangan, this.dataset.wargaId, this.dataset.dateValue)"
+                                                                    class="cursor-pointer hover:bg-gray-200 transition-colors px-2 py-1 rounded text-xs font-bold <%= (cell && cell.status && cell.status !== 'scheduled') ? 'text-indigo-600' : 'text-gray-400' %> uppercase mb-1">
+                                                                    <% if (cell && cell.status === 'hadir') { 
+                                                                        const isEarly = cell.keterangan && cell.keterangan.includes('Sudah Hadir Lebih Awal');
+                                                                    %>
+                                                                        <% if (isEarly) { %>
+                                                                            <div class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-sm transition-transform hover:scale-110" title="Sudah Hadir Lebih Awal">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                                                </svg>
+                                                                                <span class="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white rounded-full w-3 h-3 flex items-center justify-center">2</span>
+                                                                            </div>
+                                                                        <% } else { %>
+                                                                            <div class="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30 shadow-sm transition-transform hover:scale-110" title="Hadir">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                                                </svg>
+                                                                            </div>
+                                                                        <% } %>
+                                                                    <% } else if (cell && cell.status === 'reschedule') { %>
+                                                                        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 shadow-sm transition-transform hover:scale-110" title="Reschedule">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    <% } else if (cell && cell.status === 'alpa') { %>
+                                                                        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 shadow-sm" title="Alpa">
+                                                                            <span class="text-[10px] font-black">A</span>
+                                                                        </div>
+                                                                    <% } else if (cell && cell.status === 'izin') { %>
+                                                                        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-sm" title="Izin">
+                                                                            <span class="text-[10px] font-black">I</span>
+                                                                        </div>
+                                                                    <% } else if (cell && cell.status === 'scheduled') { %>
+                                                                        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-500/10 text-indigo-500 dark:bg-indigo-400/20 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800" title="Scheduled">
+                                                                            <div class="w-1.5 h-1.5 rounded-full bg-current"></div>
+                                                                        </div>
+                                                                    <% } else { %>
+                                                                        <span class="text-gray-400 text-xs font-bold uppercase">-</span>
+                                                                    <% } %>
+                                                                </span>
+
+                                                                <% if (cell && cell.denda > 0) { %>
+                                                                    <% if (cell.status_bayar === 'paid') { %>
+                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 mt-1 cursor-default">
+                                                                            ✓ Lunas
+                                                                        </span>
+                                                                    <% } else { %>
+                                                                        <span onclick="event.stopPropagation(); openQrisPayModal('<%= cell.id %>', '<%= cell.denda %>', '<%= row.info.nama %>')" 
+                                                                              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 mt-1 cursor-pointer hover:bg-red-200 hover:scale-105 transition-all shadow-sm">
+                                                                            💸 Bayar
+                                                                        </span>
+                                                                    <% } %>
+                                                                <% } %>
+                                                            <% } %>
                                                         </div>
                                                     </td>
                                                     <% })
@@ -508,8 +530,10 @@
                     </svg>
                     Ubah Status Absensi
                 </h3>
-                <form action="/ronda/update-status" method="POST">
+                <form id="statusForm" action="/ronda/update-status" method="POST">
                     <input type="hidden" id="statusScheduleId" name="id">
+                    <input type="hidden" id="statusWargaId" name="warga_id">
+                    <input type="hidden" id="statusDate" name="date">
                     <input type="hidden" name="redirectUrl" value="/ronda/control?year=<%= year %>">
                     
                     <div class="mb-4">
@@ -522,9 +546,10 @@
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status Kehadiran</label>
                         <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 border border-gray-200 dark:border-gray-700 dark:[color-scheme:dark]">
                             <option value="scheduled">Scheduled (Reset)</option>
-                            <option value="hadir">Hadir</option>
+                            <option value="hadir">✅ Hadir</option>
                             <option value="alpa">Alpa (Denda)</option>
-                            <option value="reschedule">Reschedule</option>
+                            <option value="reschedule_next">➡️ Reschedule (Minggu Depan)</option>
+                            <option value="reschedule_prev">⬅️ Maju Jadwal (Minggu Lalu)</option>
                         </select>
                     </div>
                     
@@ -535,7 +560,9 @@
 
                     <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-white/10">
                         <button type="button" onclick="document.getElementById('statusModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">Batal</button>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02]">Simpan Perubahan</button>
+                        <button type="submit" id="submitStatusBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02] flex items-center gap-2">
+                            <span>Simpan Perubahan</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -613,12 +640,117 @@
                 rows.forEach(row => tbody.insertBefore(row, grandTotalRow));
             }
 
+            // AJAX Status Update
+            document.getElementById('statusForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('submitStatusBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+                btn.disabled = true;
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        // Update UI for current cell
+                        const cellId = `cell-${result.warga_id}-${data.date}`;
+                        const cellElement = document.getElementById(cellId);
+                        if (cellElement) {
+                            updateCellUI(cellElement, result.status, result.id, data.keterangan);
+                        }
+
+                        // If reschedule, update target cell
+                        if (result.status === 'reschedule' && result.nextDate) {
+                            const nextCellId = `cell-${result.warga_id}-${result.nextDate}`;
+                            const nextCellElement = document.getElementById(nextCellId);
+                            if (nextCellElement) {
+                                // For the target week, it becomes 'scheduled'
+                                updateCellUI(nextCellElement, 'scheduled', '', '');
+                            }
+                        }
+
+                        document.getElementById('statusModal').classList.add('hidden');
+                        // Show success toast (optional, using simple alert for now)
+                        console.log('Update success');
+                    } else {
+                        alert('Gagal update: ' + (result.message || 'Unknown error'));
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    alert('Terjadi kesalahan jaringan');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+
+            function updateCellUI(el, status, newId, newKet) {
+                // Update data attributes
+                el.dataset.status = status;
+                if (newId) el.dataset.scheduleId = newId;
+                el.dataset.keterangan = newKet;
+
+                // Update content based on status
+                let content = '';
+                if (status === 'hadir') {
+                    if (newKet && newKet.includes('Sudah Hadir Lebih Awal')) {
+                        content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-sm transition-transform hover:scale-110" title="Sudah Hadir Lebih Awal">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="absolute -top-1 -right-1 text-[8px] bg-blue-500 text-white rounded-full w-3 h-3 flex items-center justify-center">2</span>
+                                  </div>`;
+                    } else {
+                        content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30 shadow-sm transition-transform hover:scale-110" title="Hadir"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>`;
+                    }
+                } else if (status === 'reschedule_prev' || (status === 'reschedule' && newKet && newKet.includes('[Maju Jadwal]'))) {
+                    content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30 shadow-sm transition-transform hover:scale-110" title="Maju Jadwal / Sudah Hadir">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                <span class="absolute -top-1 -right-1 text-[8px] bg-green-500 text-white rounded-full w-3 h-3 flex items-center justify-center"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></span>
+                              </div>`;
+                } else if (status === 'reschedule' || status === 'reschedule_next') {
+                    content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 shadow-sm transition-transform hover:scale-110" title="Reschedule"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></div>`;
+                } else if (status === 'alpa') {
+                    content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 shadow-sm" title="Alpa"><span class="text-[10px] font-black">A</span></div>`;
+                } else if (status === 'izin') {
+                    content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-sm" title="Izin"><span class="text-[10px] font-black">I</span></div>`;
+                } else if (status === 'scheduled') {
+                    content = `<div class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-500/10 text-indigo-500 dark:bg-indigo-400/20 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800" title="Scheduled"><div class="w-1.5 h-1.5 rounded-full bg-current"></div></div>`;
+                } else {
+                    content = `<span class="text-gray-400 text-xs font-bold uppercase">-</span>`;
+                }
+                el.innerHTML = content;
+                
+                // Update text color of span
+                if (status !== 'scheduled' && status !== '') {
+                    el.classList.remove('text-gray-400');
+                    el.classList.add('text-indigo-600');
+                } else {
+                    el.classList.remove('text-indigo-600');
+                    el.classList.add('text-gray-400');
+                }
+            }
+
             function getCellValue(cell, type) {
                 // Priority: Custom sort attribute for Tim Ronda (Warga column)
                 if (cell.hasAttribute('data-tim')) {
                     const val = cell.getAttribute('data-tim');
                     // Put empty values at the end when ascending ('z')
                     return val ? val.toLowerCase() : 'z';
+                }
+
+                // For attendance cells, look for data-status on the inner span
+                const statusSpan = cell.querySelector('[data-status]');
+                if (statusSpan) {
+                    return statusSpan.getAttribute('data-status').toLowerCase();
                 }
 
                 let text = cell.innerText.trim(); 
@@ -634,8 +766,10 @@
                 return text.toLowerCase();
             }
 
-            function openStatusModal(id, currentStatus, name, date, keterangan) {
-                document.getElementById('statusScheduleId').value = id;
+            function openStatusModal(id, currentStatus, name, date, keterangan, wargaId, dateValue) {
+                document.getElementById('statusScheduleId').value = id || '';
+                document.getElementById('statusWargaId').value = wargaId || '';
+                document.getElementById('statusDate').value = dateValue || '';
                 document.getElementById('statusWargaName').textContent = name;
                 document.getElementById('statusDateLabel').textContent = date;
                 document.getElementById('statusSelect').value = currentStatus && currentStatus !== '' ? currentStatus : 'scheduled';

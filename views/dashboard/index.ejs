@@ -467,7 +467,16 @@
                                 <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                     <% if (typeof dendaList !== 'undefined' && dendaList && dendaList.length > 0) { %>
                                         <% dendaList.forEach(denda => { %>
-                                        <div class="glass-card bg-red-500/10 p-4 hover:bg-red-500/20 transition-all border border-red-500/30">
+                                        <div class="glass-card bg-red-500/10 p-4 hover:bg-red-500/20 transition-all border border-red-500/30 relative group">
+                                            <% if (user && user.role === 'admin') { %>
+                                                <form action="/dashboard/dismiss-denda/<%= denda.warga_id %>" method="POST" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" onsubmit="return confirm('Hapus pemberitahuan tunggakan ini?')">
+                                                    <button type="submit" class="p-1.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg border border-red-500/30 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            <% } %>
                                             <div class="text-xs text-red-600 dark:text-red-400 font-bold mb-1.5 uppercase tracking-wide bg-red-500/20 inline-block px-2 py-0.5 rounded-md">
                                                 ⚠️ Tunggakan Denda Ronda
                                             </div>
@@ -746,9 +755,9 @@
 
                         <!-- Hidden Template for Capture -->
                         <div id="capture-container"
-                            class="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none w-[600px]">
+                            class="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none w-[1200px] h-[630px]">
                             <div id="capture-card"
-                                class="bg-gray-900 border border-white/10 p-8 rounded-xl relative overflow-hidden">
+                                class="bg-gray-900 border border-white/10 p-12 rounded-xl relative overflow-hidden w-[1200px] h-[630px]">
                                 <!-- Branding -->
                                 <div class="absolute top-0 right-0 p-4">
                                     <div class="text-right">
@@ -1078,10 +1087,14 @@
 
                                     // Capture
                                     const canvas = await html2canvas(captureEl, {
-                                        scale: 2,
+                                        scale: 1,
                                         useCORS: true,
                                         logging: false,
-                                        backgroundColor: null
+                                        backgroundColor: null,
+                                        width: 1200,
+                                        height: 630,
+                                        windowWidth: 1200,
+                                        windowHeight: 630
                                     });
 
                                     canvas.toBlob(async (blob) => {

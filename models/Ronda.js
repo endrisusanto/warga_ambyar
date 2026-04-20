@@ -4,6 +4,27 @@ const moment = require('moment');
 const Ronda = {
     // Generate schedule for a specific month (only Saturdays)
     // Respects ronda_libur table: skips libur dates and adjusts team rotation accordingly
+    getTeamForDate: async (date) => {
+        const dateStr = moment(date).format('YYYY-MM-DD');
+        const [liburRows] = await db.query('SELECT tanggal FROM ronda_libur ORDER BY tanggal ASC');
+        const liburSet = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
+
+        if (liburSet.has(dateStr)) return null;
+
+        const teamsList = ['A', 'B', 'C', 'D'];
+        const epochDate = moment('2026-01-10');
+        const epochIndex = 2; // C
+
+        const dateObj = moment(date);
+        const diffDays = dateObj.diff(epochDate, 'days');
+        const diffWeeks = Math.floor(diffDays / 7);
+        const liburCountBefore = liburRows.filter(r => moment(r.tanggal).format('YYYY-MM-DD') < dateStr).length;
+
+        let teamIndex = (epochIndex + diffWeeks - liburCountBefore) % 4;
+        if (teamIndex < 0) teamIndex += 4;
+        return teamsList[teamIndex];
+    },
+
     generateSchedule: async (month, year) => {
         // Don't generate schedules for years before 2026
         if (parseInt(year) < 2026) return;
@@ -160,13 +181,18 @@ const Ronda = {
     },
 
     updateStatus: async (id, status, keterangan = null) => {
+        let finalKeterangan = keterangan;
+
+        // Jika meriset ke scheduled, bersihkan semua tag "Auto" dan tag dalam kurung [] agar tidak terproses ulang
+        if (status === 'scheduled' && finalKeterangan) {
+            finalKeterangan = finalKeterangan
+                .replace(/Auto (Reschedule|Move) \(\d+\)/g, '')
+                .replace(/\[.*?\]/g, '')
+                .trim();
+        }
+
         let query = "UPDATE ronda_jadwal SET status = ?";
         const params = [status];
-
-        if (keterangan) {
-            query += ", keterangan = ?";
-            params.push(keterangan);
-        }
 
         if (status === 'alpa') {
             query += ", denda = 50000";
@@ -174,8 +200,13 @@ const Ronda = {
             query += ", denda = 0";
         }
 
+        if (finalKeterangan !== undefined && finalKeterangan !== null) {
+            query += ", keterangan = ?";
+            params.push(finalKeterangan);
+        }
+
         query += " WHERE id = ?";
-        params.push(id);
+params.push(id);
 
         await db.query(query, params);
 
@@ -188,47 +219,151 @@ const Ronda = {
                 const wargaId = currentSchedule[0].warga_id;
                 const fourWeeksLater = moment(currentDate).add(4, 'weeks').format('YYYY-MM-DD');
                 
-                await db.query(
-                    "DELETE FROM ronda_jadwal WHERE warga_id = ? AND id != ? AND tanggal > ? AND tanggal <= ? AND (status IN ('scheduled', 'reschedule') OR (status = 'alpa' AND (status_bayar IS NULL OR status_bayar = '')))",
-                    [wargaId, id, currentDate, fourWeeksLater]
-                );
+                if (status === 'hadir') {
+                    // CURI START LOGIC: Cari jadwal aslinya di masa depan
+                    const [futureSchedules] = await db.query(
+                        "SELECT tanggal FROM ronda_jadwal WHERE warga_id = ? AND tanggal > ? AND status = 'scheduled' ORDER BY tanggal ASC LIMIT 1",
+                        [wargaId, currentDate]
+                    );
+                    
+                    if (futureSchedules.length > 0) {
+                        const futureDate = futureSchedules[0].tanggal;
+                        const futureDateStr = moment(futureDate).format('DD MMM');
+                        const currentDateStr = moment(currentDate).format('DD MMM');
+                        
+                        // 1. Tandai jadwal masa depan sebagai 'hadir' dengan catatan
+                        await db.query(`
+                            UPDATE ronda_jadwal 
+                            SET status = 'hadir', 
+                                keterangan = CONCAT(IFNULL(keterangan, ''), ' [Sudah Hadir Lebih Awal pada ', ?, ']')
+                            WHERE warga_id = ? AND tanggal = ? AND status = 'scheduled'
+                        `, [currentDateStr, wargaId, futureDate]);
+                        
+                        // 2. Tambahkan catatan pemajuan pada jadwal saat ini
+                        await db.query(`
+                            UPDATE ronda_jadwal 
+                            SET keterangan = CONCAT(IFNULL(keterangan, ''), ' [Pemajuan Jadwal dari ', ?, ']')
+                            WHERE id = ?
+                        `, [futureDateStr, id]);
+                        
+                        console.log(`[CURI START] Linked ${currentDateStr} to future ${futureDateStr} for Warga ${wargaId}`);
+                    }
+                } else {
+                    // For 'alpa', we still delete future redundant schedules to avoid confusion
+                    await db.query(
+                        "DELETE FROM ronda_jadwal WHERE warga_id = ? AND id != ? AND tanggal > ? AND tanggal <= ? AND (status IN ('scheduled', 'reschedule') OR (status = 'alpa' AND (status_bayar IS NULL OR status_bayar = '')))",
+                        [wargaId, id, currentDate, fourWeeksLater]
+                    );
+                }
+            }
+        } else if (status === 'scheduled') {
+            // REVERT LOGIC: Jika kehadiran dibatalkan (kembali ke 'scheduled')
+            const [currentSchedule] = await db.query("SELECT tanggal, warga_id, keterangan FROM ronda_jadwal WHERE id = ?", [id]);
+            if (currentSchedule.length > 0) {
+                const currentDate = currentSchedule[0].tanggal;
+                const wargaId = currentSchedule[0].warga_id;
+                const currentKet = currentSchedule[0].keterangan || '';
+                
+                // Cek apakah ini adalah record "Pemajuan"
+                if (currentKet.includes('[Pemajuan Jadwal dari')) {
+                    const dateTag = ` [Sudah Hadir Lebih Awal pada ${moment(currentDate).format('DD MMM')}]`;
+                    
+                    // 1. Kembalikan jadwal masa depan yang tertaut menjadi 'scheduled'
+                    await db.query(`
+                        UPDATE ronda_jadwal 
+                        SET status = 'scheduled',
+                            keterangan = TRIM(REPLACE(keterangan, ?, ''))
+                        WHERE warga_id = ? 
+                          AND tanggal > ? 
+                          AND status = 'hadir' 
+                          AND keterangan LIKE ?
+                    `, [dateTag, wargaId, currentDate, `%${dateTag.trim()}%`]);
+                    
+                    // 2. HAPUS record pemajuan ini (agar hilang dari minggu sebelumnya)
+                    await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [id]);
+                    
+                    console.log(`[REVERT CURI START] Deleted early record and restored future schedule for Warga ${wargaId}`);
+                } else {
+                    // Reset reguler (untuk jadwal asli)
+                    const dateTag = ` [Sudah Hadir Lebih Awal pada ${moment(currentDate).format('DD MMM')}]`;
+                    await db.query(`
+                        UPDATE ronda_jadwal 
+                        SET status = 'scheduled',
+                            keterangan = TRIM(REPLACE(keterangan, ?, ''))
+                        WHERE warga_id = ? 
+                          AND tanggal > ? 
+                          AND status = 'hadir' 
+                          AND keterangan LIKE ?
+                    `, [dateTag, wargaId, currentDate, `%${dateTag.trim()}%`]);
+                }
             }
         }
     },
 
-    reschedule: async (id, keterangan) => {
+    rescheduleNext: async (id, keterangan) => {
         const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE id = ?", [id]);
         if (rows.length === 0) return;
         const current = rows[0];
 
-        // Fetch all libur dates to skip over them
         let liburSet = new Set();
         try {
             const [liburRows] = await db.query("SELECT tanggal FROM ronda_libur");
             liburSet = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
-        } catch (e) {
-            // Table doesn't exist yet — no libur dates
-        }
+        } catch (e) { }
 
-        // Find the next available (non-libur) Saturday after current date
         let nextWeekDate = moment(current.tanggal).add(7, 'days');
-        // Keep skipping if the candidate week is a libur week
         while (liburSet.has(nextWeekDate.format('YYYY-MM-DD'))) {
             nextWeekDate.add(7, 'days');
         }
         const nextWeek = nextWeekDate.format('YYYY-MM-DD');
+        const nextWeekStr = nextWeekDate.format('DD MMM YYYY');
 
-        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || 'Diganti ke minggu depan', id]);
+        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || `Reschedule ke ${nextWeekStr}`, id]);
 
         try {
-            // USER-BASED: Insert new schedule for the USER on the next available (non-libur) week
             await db.query(
-                "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status) VALUES (?, ?, ?, ?, 'scheduled')",
-                [nextWeek, current.warga_id, current.blok, current.nomor_rumah]
+                "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status, keterangan) VALUES (?, ?, ?, ?, 'scheduled', ?)",
+                [nextWeek, current.warga_id, current.blok, current.nomor_rumah, `Reschedule dari ${moment(current.tanggal).format('DD MMM YYYY')}`]
             );
-        } catch (e) {
-            // Ignore duplicate key errors
+        } catch (e) { }
+
+        return nextWeek;
+    },
+
+    reschedulePrev: async (id, keterangan) => {
+        const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE id = ?", [id]);
+        if (rows.length === 0) return;
+        const current = rows[0];
+
+        let liburSet = new Set();
+        try {
+            const [liburRows] = await db.query("SELECT tanggal FROM ronda_libur");
+            liburSet = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
+        } catch (e) { }
+
+        let prevWeekDate = moment(current.tanggal).subtract(7, 'days');
+        while (liburSet.has(prevWeekDate.format('YYYY-MM-DD'))) {
+            prevWeekDate.subtract(7, 'days');
         }
+        const prevWeek = prevWeekDate.format('YYYY-MM-DD');
+        const prevWeekStr = prevWeekDate.format('DD MMM YYYY');
+
+        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || `[Maju Jadwal] Reschedule ke ${prevWeekStr}`, id]);
+
+        try {
+            // Cek apakah sudah ada jadwal di minggu lalu
+            const [existing] = await db.query("SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?", [prevWeek, current.warga_id]);
+            if (existing.length > 0) {
+                await db.query("UPDATE ronda_jadwal SET status = 'hadir', keterangan = CONCAT(IFNULL(keterangan, ''), ?) WHERE id = ?", [` [Reschedule dari ${moment(current.tanggal).format('DD MMM YYYY')}]`, existing[0].id]);
+            } else {
+                await db.query(
+                    "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status, keterangan) VALUES (?, ?, ?, ?, 'hadir', ?)",
+                    [prevWeek, current.warga_id, current.blok, current.nomor_rumah, `Reschedule dari ${moment(current.tanggal).format('DD MMM YYYY')}`]
+                );
+            }
+        } catch (e) { }
+
+        return prevWeek;
     },
 
     markAsPaid: async (ids) => {
@@ -349,9 +484,15 @@ const Ronda = {
     
     autoProcessLateSchedules: async () => {
         const today = moment().format('YYYY-MM-DD');
+        const fiveMinutesAgo = moment().subtract(5, 'minutes').format('YYYY-MM-DD HH:mm:ss');
         
-        // Find past scheduled items
-        const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE status = 'scheduled' AND tanggal < ?", [today]);
+        // Find past scheduled items that haven't been touched in the last 5 minutes
+        const [rows] = await db.query(`
+            SELECT * FROM ronda_jadwal 
+            WHERE status = 'scheduled' 
+              AND tanggal < ? 
+              AND updated_at < ?
+        `, [today, fiveMinutesAgo]);
         
         // Fetch libur dates once for efficiency
         let liburSet = new Set();
@@ -375,7 +516,16 @@ const Ronda = {
 
             if (moveCount >= 3) {
                 // Already moved 3 times -> Denda
-                await db.query("UPDATE ronda_jadwal SET status = 'alpa', denda = 50000, keterangan = CONCAT(IFNULL(keterangan, ''), ' [Otomatis Denda - 4x Reschedule]') WHERE id = ?", [r.id]);
+                await db.query(`
+                    UPDATE ronda_jadwal 
+                    SET status = 'alpa', 
+                        denda = 50000, 
+                        keterangan = CASE 
+                            WHEN keterangan LIKE '%[Otomatis Denda - 4x Reschedule]%' THEN keterangan
+                            ELSE CONCAT(IFNULL(keterangan, ''), ' [Otomatis Denda - 4x Reschedule]')
+                        END
+                    WHERE id = ?
+                `, [r.id]);
             } else {
                 // Find next available (non-libur) Saturday
                 let nextDateObj = moment(r.tanggal).add(7, 'days');
@@ -395,6 +545,56 @@ const Ronda = {
                 }
             }
         }
+        
+        // --- CLEANUP LOGIC ---
+        // If someone is scheduled for the future but they already attended recently (fulfillment),
+        // we should remove the redundant scheduled entries.
+        try {
+            await Ronda.cleanupAllRedundantSchedules();
+        } catch (cleanupErr) {
+            console.error('[ERROR] Cleanup schedules:', cleanupErr);
+        }
+    },
+
+    cleanupAllRedundantSchedules: async () => {
+        // Find all 'scheduled' entries that have a 'hadir' entry within +/- 10 days
+        const [toDelete] = await db.query(`
+            SELECT s.id
+            FROM ronda_jadwal s
+            INNER JOIN ronda_jadwal h ON s.warga_id = h.warga_id
+            WHERE s.status = 'scheduled'
+              AND h.status = 'hadir'
+              AND h.tanggal < s.tanggal
+              AND h.tanggal >= DATE_SUB(s.tanggal, INTERVAL 10 DAY)
+              AND s.tanggal <= DATE_ADD(h.tanggal, INTERVAL 10 DAY)
+        `);
+
+        if (toDelete.length > 0) {
+            const ids = toDelete.map(r => r.id);
+            await db.query('DELETE FROM ronda_jadwal WHERE id IN (?)', [ids]);
+            console.log(`[CLEANUP] Deleted ${ids.length} redundant future schedules (fulfilled).`);
+            return ids.length;
+        }
+        return 0;
+    },
+
+    cleanupRedundantSchedulesForUser: async (wargaId, date) => {
+        // If user just attended on 'date', update any 'scheduled' entries in the next 14 days
+        // to 'hadir' status with a special note, so they don't appear as 'upcoming' but stay in history.
+        const [result] = await db.query(`
+            UPDATE ronda_jadwal 
+            SET status = 'hadir', 
+                keterangan = CONCAT(IFNULL(keterangan, ''), ' [Sudah Hadir Lebih Awal pada ', ?, ']')
+            WHERE warga_id = ? 
+              AND status = 'scheduled' 
+              AND tanggal > ? 
+              AND tanggal <= DATE_ADD(?, INTERVAL 14 DAY)
+        `, [moment(date).format('DD MMM'), wargaId, date, date]);
+        
+        if (result.affectedRows > 0) {
+            console.log(`[CLEANUP] Updated ${result.affectedRows} future schedules to 'hadir' for Warga ${wargaId} after early attendance on ${date}.`);
+        }
+        return result.affectedRows;
     },
 
     // Ensure a schedule entry exists (create if not)
@@ -437,8 +637,9 @@ const Ronda = {
         // Mark this date as libur
         await db.query("INSERT IGNORE INTO ronda_libur (tanggal) VALUES (?)", [date]);
 
-        // Delete ALL entries for the libur date itself (any status)
-        await db.query("DELETE FROM ronda_jadwal WHERE tanggal = ?", [date]);
+        // Delete ONLY non-finalized entries for the libur date itself (scheduled/reschedule)
+        // Preserving hadir/alpa/izin records to maintain historical data if any were recorded
+        await db.query("DELETE FROM ronda_jadwal WHERE tanggal = ? AND (status = 'scheduled' OR status = 'reschedule')", [date]);
 
         // Delete all SCHEDULED entries AFTER the libur date
         // (hadir/alpa records are preserved for history)

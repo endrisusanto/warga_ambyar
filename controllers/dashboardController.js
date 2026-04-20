@@ -3,6 +3,7 @@ const Warga = require('../models/Warga');
 const Iuran = require('../models/Iuran');
 const Ronda = require('../models/Ronda');
 const Pengaduan = require('../models/Pengaduan');
+const moment = require('moment');
 
 exports.index = async (req, res) => {
     console.log('===== DASHBOARD INDEX CALLED =====');
@@ -216,6 +217,15 @@ exports.index = async (req, res) => {
 
         // 3. Ronda Schedule
         try {
+            // Generate monthly first, then process movements/cleanup
+            const now = moment();
+            // Optimization: Always ensure current and NEXT month exist
+            await Ronda.generateSchedule(now.format('MM'), now.format('YYYY'));
+            
+            const nextMonth = now.clone().add(1, 'month');
+            await Ronda.generateSchedule(nextMonth.format('MM'), nextMonth.format('YYYY'));
+            
+            await Ronda.autoProcessLateSchedules();
             // Ronda Schedule - get today's schedule or next
             let todaySchedule = await Ronda.getTodaySchedule();
             let isUpcoming = false;
@@ -262,7 +272,7 @@ exports.index = async (req, res) => {
         try {
             const db = require('../config/db');
             const [dendaList] = await db.query(`
-                SELECT w.nama, w.blok, w.nomor_rumah, SUM(r.denda) as total_denda, COUNT(r.id) as count 
+                SELECT w.id as warga_id, w.nama, w.blok, w.nomor_rumah, SUM(r.denda) as total_denda, COUNT(r.id) as count 
                 FROM ronda_jadwal r
                 JOIN warga w ON r.warga_id = w.id
                 WHERE r.denda > 0
@@ -351,6 +361,30 @@ exports.deleteEvent = async (req, res) => {
     } catch (err) {
         console.error(err);
         req.flash('error_msg', 'Gagal menghapus event');
+        res.redirect('/dashboard');
+    }
+};
+
+exports.dismissDenda = async (req, res) => {
+    try {
+        const { wargaId } = req.params;
+        const db = require('../config/db');
+        
+        // Mark all unpaid denda for this resident as dismissed/forgiven
+        await db.query(`
+            UPDATE ronda_jadwal 
+            SET status_bayar = 'dismissed', denda = 0 
+            WHERE warga_id = ? 
+              AND denda > 0 
+              AND status = 'alpa' 
+              AND (status_bayar IS NULL OR status_bayar = 'rejected')
+        `, [wargaId]);
+
+        req.flash('success_msg', 'Pemberitahuan tunggakan denda telah dihapus.');
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error('Error dismissDenda:', err);
+        req.flash('error_msg', 'Gagal menghapus pemberitahuan.');
         res.redirect('/dashboard');
     }
 };

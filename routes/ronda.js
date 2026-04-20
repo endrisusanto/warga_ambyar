@@ -126,21 +126,14 @@ router.get('/admin-regenerate', ensureAuthenticated, async (req, res) => {
         let currentDate = startOfYear.clone();
         while (currentDate <= endOfYear) {
             if (currentDate.day() === 6) { // Saturday
-                // Calculate team based on epoch (Jan 10 2026 = Tim C)
-                const epochDate = moment('2026-01-10');
-                const epochIndex = 2; // C
-                const teamsList = ['A', 'B', 'C', 'D'];
-                
-                const diffDays = currentDate.diff(epochDate, 'days');
-                const diffWeeks = Math.floor(diffDays / 7);
-                let teamIndex = (epochIndex + diffWeeks) % 4;
-                if (teamIndex < 0) teamIndex += 4;
-                const team = teamsList[teamIndex];
+                // Calculate team using centralized model logic (respects libur shift)
+                const Ronda = require('../models/Ronda');
+                const team = await Ronda.getTeamForDate(currentDate);
                 
                 saturdays.push({
                     date: currentDate.format('YYYY-MM-DD'),
                     displayDate: currentDate.format('DD MMM YYYY'),
-                    team: team
+                    team: team || 'LIBUR'
                 });
             }
             currentDate.add(1, 'days');
@@ -253,15 +246,8 @@ router.get('/regenerate-week', ensureAuthenticated, async (req, res) => {
         const displayDate = dateObj.format('DD MMMM YYYY');
         const year = dateObj.format('YYYY');
         
-        // Calculate team
-        const epochDate = moment('2026-01-10');
-        const epochIndex = 2; // C
-        const teamsList = ['A', 'B', 'C', 'D'];
-        const diffDays = dateObj.diff(epochDate, 'days');
-        const diffWeeks = Math.floor(diffDays / 7);
-        let teamIndex = (epochIndex + diffWeeks) % 4;
-        if (teamIndex < 0) teamIndex += 4;
-        const team = teamsList[teamIndex];
+        // Calculate team using centralized model logic
+        const team = await Ronda.getTeamForDate(dateObj);
         
         let output = `<!DOCTYPE html><html><head><title>Regenerate ${displayDate}</title>
         <style>
@@ -289,15 +275,18 @@ router.get('/regenerate-week', ensureAuthenticated, async (req, res) => {
             
             output += `<p>🗑️  Dihapus ${deleteResult.affectedRows} jadwal lama</p>`;
             
-            // USER-BASED: Get all individuals for this team
-            const [wargas] = await db.query(`
-                SELECT id as representative_id, blok, nomor_rumah, nama
-                FROM warga
-                WHERE tim_ronda = ? AND is_ronda = 1
-                ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
-            `, [team]);
-            
-            let insertedCount = 0;
+            if (!team) {
+                output += `<p style="color: orange; font-weight: bold;">⚠️ Tanggal ini adalah hari LIBUR. Tidak ada jadwal baru yang dibuat.</p>`;
+            } else {
+                // USER-BASED: Get all individuals for this team
+                const [wargas] = await db.query(`
+                    SELECT id as representative_id, blok, nomor_rumah, nama
+                    FROM warga
+                    WHERE tim_ronda = ? AND is_ronda = 1
+                    ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
+                `, [team]);
+                
+                let insertedCount = 0;
             for (const house of wargas) {
                 if (!house.representative_id) continue;
                 
@@ -317,6 +306,7 @@ router.get('/regenerate-week', ensureAuthenticated, async (req, res) => {
             output += `<p>✅ Berhasil membuat ${insertedCount} jadwal baru</p>`;
             output += `<p class="success">✅ Jadwal ${displayDate} berhasil di-regenerate!</p>`;
             output += `<a href="/ronda/admin-regenerate?year=${year}" class="btn btn-success">Kembali ke Daftar</a>`;
+            }
         } else {
             output += `<div class="info-box">`;
             output += `<strong>Tanggal:</strong> ${displayDate}<br>`;

@@ -85,38 +85,65 @@
                                                 </div>
                                             </div>
                                         </div>
-                                            <div onclick="openStatusModal('<%= s.id %>', '<%= s.nama %>', '<%= s.status %>')" class="cursor-pointer hover:opacity-80 transition-opacity text-xs font-bold uppercase tracking-wider">
+                                            <div onclick="<%= (typeof user !== 'undefined' && user) ? `openStatusModal('${s.id}', '${s.nama}', '${s.status}')` : `alert('Silakan login terlebih dahulu untuk mengupdate kehadiran'); window.location.href='/login';` %>" class="cursor-pointer hover:opacity-80 transition-opacity text-xs font-bold uppercase tracking-wider">
                                                 <% 
                                                 const isGuest = s.is_ganti_hari;
-                                                
+                                                // Prioritas badge: Ganti Hari Hadir > Ganti Hari (isGuest/reschedule/hasRecentReschedule) > Status lainnya
                                                 if(isGuest && s.status === 'hadir') {
-                                                %>
-                                                    <span class="text-blue-600">(Ganti Hari - Hadir)</span>
-                                                <%
-                                                } else if(isGuest || s.status === 'reschedule') {
-                                                %>
-                                                    <span class="text-orange-600">(Ganti Hari)</span>
-                                                <%
-                                                } else if(s.status && s.status !=='scheduled') { 
-                                                    let statusText = s.status;
-                                                    let statusClass = '';
-                                                    if (s.status_bayar === 'paid') {
-                                                        statusText = 'Lunas';
-                                                        statusClass = 'text-green-600';
-                                                    } else if (s.status === 'hadir') {
+                                                    // Badge Ganti Hari yang sudah Hadir (biru)
+                                                    %>
+                                                    <span class="inline-flex items-center p-1 rounded-full bg-transparent border border-blue-600 text-blue-600" title="Ganti Hari - Hadir">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                    </span>
+                                                    <%
+                                                } else if(s.isAutoReschedule) {
+                                                    %>
+                                                    <span class="inline-flex items-center p-1 rounded-full bg-red-100 border border-red-600 text-red-600 animate-pulse" title="Wajib Hadir">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                    </span>
+                                                    <%
+                                                } else if(s.status === 'reschedule_prev' || (s.status === 'reschedule' && s.keterangan && (s.keterangan.includes('[Maju Jadwal]') || (s.keterangan.match(/Reschedule ke (\d{2} [a-zA-Z]{3} \d{4})/) && moment(s.keterangan.match(/Reschedule ke (\d{2} [a-zA-Z]{3} \d{4})/)[1], 'DD MMM YYYY').isBefore(moment(s.tanggal)))))) {
+                                                    %>
+                                                    <span class="inline-flex items-center p-1 rounded-full bg-transparent border border-green-600 text-green-600" title="Sudah Hadir Minggu Lalu">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    </span>
+                                                    <%
+                                                } else if(isGuest || s.status === 'reschedule' || s.status === 'reschedule_next' || s.hasRecentReschedule) {
+                                                    %>
+                                                    <span class="inline-flex items-center p-1 rounded-full bg-transparent border border-orange-600 text-orange-600" title="Ganti Hari">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                    </span>
+                                                    <%
+                                                } else if(s.status && s.status !=='scheduled') {
+                                                    let statusText=s.status; 
+                                                    let statusClass='' ; 
+                                                    let svgIcon = '';
+                                                    const isEarly = s.keterangan && s.keterangan.includes('Sudah Hadir Lebih Awal');
+                                                    
+                                                    if (isEarly) {
+                                                        statusText = 'Sudah Hadir';
+                                                        statusClass = 'bg-blue-100 border border-blue-600 text-blue-600';
+                                                        svgIcon = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                                                    } else if (s.status_bayar==='paid' ) { 
+                                                        statusText='Pay Up' ;
+                                                        statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                        svgIcon = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                                                    } else if (s.status==='hadir' ) {
                                                         statusText = 'Hadir';
-                                                        statusClass = 'text-green-600';
+                                                        statusClass='bg-transparent border border-green-600 text-green-600'; 
+                                                        svgIcon = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
                                                     } else {
                                                         statusText = 'Alpa';
-                                                        statusClass = 'text-red-600';
-                                                    }
-                                                %>
-                                                    <span class="<%= statusClass %>">
-                                                        (<%= statusText %>)
+                                                        statusClass='bg-transparent border border-red-600 text-red-600'; 
+                                                        svgIcon = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                                                    } 
+                                                    %>
+                                                    <span class="inline-flex items-center p-1 rounded-full <%= statusClass %>" title="<%= statusText %>">
+                                                        <%- svgIcon %>
                                                     </span>
                                                 <% } else { %>
-                                                    <span class="text-gray-400">
-                                                        (Scheduled)
+                                                    <span class="inline-flex items-center p-1 rounded-full bg-transparent border border-gray-400 text-gray-400" title="Scheduled">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                     </span>
                                                 <% } %>
                                             </div>
@@ -224,7 +251,7 @@
 
                         <div class="fixed inset-0 z-10 overflow-y-auto">
                             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                                <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl ring-1 ring-black/5 transition-all sm:my-8 sm:w-full sm:max-w-3xl">
                                     <form action="/ronda/v/update-status" method="POST" enctype="multipart/form-data">
                                         <input type="hidden" name="id" id="modalScheduleId">
                                         
@@ -239,24 +266,34 @@
                                                 </p>
                                                 
                                                 <!-- Step 1: Status Selection -->
-                                                <div id="step-status" class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                <div id="step-status" class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
                                                     <!-- Hadir -->
                                                     <label class="cursor-pointer group relative">
                                                         <input type="radio" name="status" value="hadir" class="peer sr-only">
                                                         <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-emerald-500 peer-checked:bg-emerald-50/30 dark:peer-checked:bg-emerald-900/20 peer-checked:ring-2 peer-checked:ring-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">✅</div>
-                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
-                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Datang tepat waktu</div>
+                                                            <svg class="w-10 h-10 mx-auto mb-3 text-emerald-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 uppercase tracking-wider">Hadir</div>
+                                                            <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Tepat waktu</div>
                                                         </div>
                                                     </label>
                                                     
-                                                    <!-- Ganti Hari -->
+                                                    <!-- Ganti Hari Depan -->
                                                     <label class="cursor-pointer group relative">
-                                                        <input type="radio" name="status" value="reschedule" class="peer sr-only">
+                                                        <input type="radio" name="status" value="reschedule_next" class="peer sr-only">
                                                         <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-orange-500 peer-checked:bg-orange-50/30 dark:peer-checked:bg-orange-900/20 peer-checked:ring-2 peer-checked:ring-orange-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">🔄</div>
-                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Ganti Hari</div>
-                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Pindah minggu depan</div>
+                                                            <svg class="w-10 h-10 mx-auto mb-3 text-orange-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-orange-700 dark:peer-checked:text-orange-400 uppercase tracking-wider">Reschedule</div>
+                                                            <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Minggu Depan</div>
+                                                        </div>
+                                                    </label>
+
+                                                    <!-- Ganti Hari Lalu -->
+                                                    <label class="cursor-pointer group relative">
+                                                        <input type="radio" name="status" value="reschedule_prev" class="peer sr-only">
+                                                        <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-indigo-500 peer-checked:bg-indigo-50/30 dark:peer-checked:bg-indigo-900/20 peer-checked:ring-2 peer-checked:ring-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
+                                                            <svg class="w-10 h-10 mx-auto mb-3 text-indigo-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
+                                                            <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-indigo-700 dark:peer-checked:text-indigo-400 uppercase tracking-wider">Maju Jadwal</div>
+                                                            <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Minggu Lalu</div>
                                                         </div>
                                                     </label>
                                                     
@@ -264,9 +301,9 @@
                                                     <label class="cursor-pointer group relative">
                                                         <input type="radio" name="status" value="alpa" class="peer sr-only">
                                                         <div class="h-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 peer-checked:border-red-500 peer-checked:bg-red-50/30 dark:peer-checked:bg-red-900/20 peer-checked:ring-2 peer-checked:ring-red-500 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-200 dark:hover:border-slate-600 transition-all text-center shadow-sm group-hover:shadow-md">
-                                                            <div class="text-4xl mb-3 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300">❌</div>
-                                                            <div class="text-sm font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
-                                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Tidak ada kabar</div>
+                                                            <svg class="w-10 h-10 mx-auto mb-3 text-red-500 grayscale peer-checked:grayscale-0 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            <div class="text-xs font-bold text-slate-700 dark:text-slate-200 peer-checked:text-red-700 dark:peer-checked:text-red-400 uppercase tracking-wider">Alpha</div>
+                                                            <div class="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Tanpa kabar</div>
                                                         </div>
                                                     </label>
                                                 </div>
@@ -378,28 +415,37 @@
                         }
 
                         function shareWa() {
-                            const url = encodeURIComponent(window.location.href);
+                            const currentUrl = window.location.href;
+                            const teamName = "<%= teamName || '' %>";
+                            const scheduleData = <%- JSON.stringify(schedule) %>;
+                            
+                            // Safe emoji generation bypassing ALL file encoding and parsing limits
+                            const EMOJI_HADIR = decodeURIComponent('%E2%9C%85'); // ✅
+                            const EMOJI_ALPA = decodeURIComponent('%E2%9D%8C');  // ❌
+                            const EMOJI_GANTI = decodeURIComponent('%F0%9F%94%84'); // 🔄
+                            const EMOJI_LUNAS = decodeURIComponent('%F0%9F%92%B8'); // 💸
 
-                            // Build members list from EJS data
-                            let membersList = "Anggota Bertugas <%= teamName ? '(Tim ' + teamName + ')' : '' %>:\n";
-                        <% schedule.forEach((s, index) => { 
-                            let statusStr = '';
-                            if (s.status && s.status !== 'scheduled') {
-                                if (s.status_bayar === 'paid') {
-                                    statusStr = ' 💸'; // Lunas
-                                } else if (s.status === 'hadir') {
-                                    statusStr = ' ✅'; // Hadir
-                                } else if (s.status === 'alpa') {
-                                    statusStr = ' ❌'; // Alpa/Tanpa Keterangan
+                            let membersList = "Anggota Bertugas" + (teamName ? " (Tim " + teamName + ")" : "") + ":\n";
+                            
+                            scheduleData.forEach((s, index) => {
+                                let statusStr = '';
+                                if (s.status && s.status !== 'scheduled') {
+                                    if (s.status_bayar === 'paid') {
+                                        statusStr = ' ' + EMOJI_LUNAS;
+                                    } else if (s.status === 'hadir' || s.status === 'reschedule_prev' || (s.status === 'reschedule' && s.keterangan && s.keterangan.includes('[Maju Jadwal]'))) {
+                                        statusStr = ' ' + EMOJI_HADIR;
+                                    } else if (s.status === 'alpa') {
+                                        statusStr = ' ' + EMOJI_ALPA;
+                                    }
                                 }
-                            }
-                            let rescheduleStr = (s.is_ganti_hari || s.status === 'reschedule') ? ' 🔄' : '';
-                        %>
-                                membersList += "<%= index + 1 %>. <%= s.nama %> (Blok <%= s.blok %>-<%= s.nomor_rumah %>)<%= rescheduleStr %>" + "<%= statusStr %>" + "\n";
-                            <% }) %>
+                                let rescheduleStr = (s.is_ganti_hari || s.status === 'reschedule' || s.status === 'reschedule_next') ? ' ' + EMOJI_GANTI : '';
+                                
+                                membersList += `${index + 1}. ${s.nama} (Blok ${s.blok}-${s.nomor_rumah})${rescheduleStr}${statusStr}\n`;
+                            });
 
-                                const text = encodeURIComponent('Cek Jadwal Ronda: *' + document.title.replace('Jadwal Ronda ', '') + '*\n\n' + membersList);
-                            window.open(`https://wa.me/?text=${text}%0A${url}`, '_blank');
+                            const text = `Cek Jadwal Ronda: *${document.title.replace('Jadwal Ronda ', '')}*\n\n${membersList}\n${currentUrl}`;
+                            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                            window.open(waUrl, '_blank');
                         }
                     </script>
 
@@ -422,10 +468,14 @@
 
                             try {
                                 const canvas = await html2canvas(card, { 
-                                    scale: 2, 
+                                    scale: 1, 
                                     useCORS: true, 
                                     logging: false,
                                     backgroundColor: '#ffffff',
+                                    width: 1200,
+                                    height: 630,
+                                    windowWidth: 1200,
+                                    windowHeight: 630,
                                     ignoreElements: (element) => {
                                         return element.id === 'share-buttons';
                                     },
@@ -433,6 +483,16 @@
                                         // Force light mode for screenshot
                                         clonedDoc.documentElement.classList.remove('dark');
                                         if (clonedDoc.body) clonedDoc.body.classList.remove('dark');
+
+                                        // Force exact 1200x630 dimensions on the cloned card
+                                        const clonedCard = clonedDoc.getElementById('share-card');
+                                        if (clonedCard) {
+                                            clonedCard.style.width = '1200px';
+                                            clonedCard.style.height = '630px';
+                                            clonedCard.style.overflow = 'hidden';
+                                            clonedCard.style.margin = '0';
+                                            clonedCard.style.maxWidth = 'none';
+                                        }
 
                                         // Force text color to black for titles in the cloned document
                                         const titles = clonedDoc.querySelectorAll('h2');

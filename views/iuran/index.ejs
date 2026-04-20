@@ -761,9 +761,13 @@
                     btn.innerHTML = 'Generating...';
                     
                     html2canvas(modalContent, {
-                        scale: 2,
+                        scale: 1,
                         backgroundColor: '#ffffff', 
                         useCORS: true,
+                        width: 1200,
+                        height: 630,
+                        windowWidth: 1200,
+                        windowHeight: 630,
                         onclone: (doc) => {
                             // Hide share button in capture (already done by placement, but good to keep safe)
                             const shareBtn = doc.getElementById('modal-share-btn-container'); 
@@ -899,9 +903,10 @@
                             if(el) {
                                 el.style.color = 'black';
                                 el.style.background = 'white';
-                                el.style.overflow = 'visible';
-                                el.style.height = 'auto';
-                                el.style.maxHeight = 'none';
+                                el.style.overflow = 'hidden';
+                                el.style.width = '1200px';
+                                el.style.height = '630px';
+                                el.style.maxWidth = 'none';
                             }
                             const root = doc.documentElement;
                             root.classList.remove('dark');
