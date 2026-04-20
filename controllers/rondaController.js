@@ -1014,10 +1014,10 @@ exports.exportControl = async (req, res) => {
         
         worksheet.columns = columns;
 
-        // Freeze Panes (First 8 columns + Header Row)
-        worksheet.views = [
-            { state: 'frozen', xSplit: 8, ySplit: 1 }
-        ];
+        // Freeze Panes disabled as per user request
+        // worksheet.views = [
+        //     { state: 'frozen', xSplit: 8, ySplit: 1 }
+        // ];
 
         // Style Header Row
         const headerRow = worksheet.getRow(1);
@@ -1050,7 +1050,9 @@ exports.exportControl = async (req, res) => {
             saturdays.forEach(d => {
                 const cell = row.dates[d];
                 let statusText = '-';
-                if (cell.status) {
+                if (cell._libur) {
+                    statusText = 'LIBUR';
+                } else if (cell.status) {
                     statusText = cell.status.toUpperCase();
                     if (cell.status === 'alpa' && cell.denda > 0) statusText = 'DENDA';
                     if (cell.status === 'alpa') totalAbsent++;
@@ -1179,6 +1181,9 @@ exports.exportControl = async (req, res) => {
                     } else if (val === 'RESCHEDULE') {
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } }; 
                         cell.font = { color: { argb: 'FF1E40AF' } }; 
+                    } else if (val === 'LIBUR') {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } }; 
+                        cell.font = { color: { argb: 'FF9CA3AF' }, italic: true }; 
                     }
                 }
             });
