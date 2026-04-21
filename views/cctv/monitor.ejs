@@ -247,11 +247,28 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="cctvGrid"></div>
                 </div>
 
-                <!-- Frigate Content -->
+                <!-- MSE Go2RTC Content -->
                 <div id="content-frigate" class="hidden">
-                    <div class="w-full bg-black rounded-xl overflow-hidden relative" style="height: 70vh;">
-                        <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">Loading Frigate UI...</div>
-                        <iframe src="https://cctv.ambyar.biz.id/" class="w-full h-full border-0 relative z-10" title="Frigate NVR"></iframe>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Camera 1: CCTV Gang Ambyar -->
+                        <div class="w-full bg-black rounded-xl overflow-hidden relative aspect-video border-2 border-indigo-500/30 hover:border-indigo-500/80 transition-colors duration-300">
+                            <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 z-20 pointer-events-none">
+                                <h4 class="text-white font-bold text-sm drop-shadow-md">CCTV Gang</h4>
+                                <p class="text-green-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">● LIVE (MSE)</p>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">Menghubungkan ke Stream...</div>
+                            <iframe src="https://camera.ambyar.biz.id/stream.html?src=cctv_gang_ambyar&mode=mse" class="w-full h-full border-0 relative z-10" title="CCTV Gang Ambyar" allow="autoplay; fullscreen"></iframe>
+                        </div>
+
+                        <!-- Camera 2: CCTV Rumah Kalula -->
+                        <div class="w-full bg-black rounded-xl overflow-hidden relative aspect-video border-2 border-indigo-500/30 hover:border-indigo-500/80 transition-colors duration-300">
+                            <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 z-20 pointer-events-none">
+                                <h4 class="text-white font-bold text-sm drop-shadow-md">CCTV Rumah Kalula</h4>
+                                <p class="text-green-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">● LIVE (MSE)</p>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">Menghubungkan ke Stream...</div>
+                            <iframe src="https://camera.ambyar.biz.id/stream.html?src=kalula&mode=mse" class="w-full h-full border-0 relative z-10" title="CCTV Rumah Kalula" allow="autoplay; fullscreen"></iframe>
+                        </div>
                     </div>
                 </div>
             </div>
