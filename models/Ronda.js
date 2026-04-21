@@ -449,36 +449,52 @@ params.push(id);
     },
 
     deletePhoto: async (filename) => {
-        // Try to delete from ronda_jadwal
-        // Since photos are stored as JSON array, we need to find rows containing the filename
-        // This is tricky with JSON in MySQL 5.7/8.0 without JSON functions, but let's assume simple string search or fetch all
-        // A better approach is to fetch all rows that might contain it, update them.
-
         // 1. Check ronda_jadwal
         const [schedules] = await db.query("SELECT id, foto_bukti FROM ronda_jadwal WHERE foto_bukti LIKE ?", [`%${filename}%`]);
         for (const s of schedules) {
             try {
-                let photos = JSON.parse(s.foto_bukti);
+                let raw = String(s.foto_bukti);
+                let photos = [];
+                try {
+                    let parsed = JSON.parse(raw);
+                    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                    if (Array.isArray(parsed)) photos = parsed;
+                    else photos = [raw];
+                } catch (e) {
+                    if (raw.includes(',')) photos = raw.split(',').map(p => p.trim());
+                    else photos = [raw.trim()];
+                }
+                
                 const initialLength = photos.length;
                 photos = photos.filter(p => p !== filename);
                 if (photos.length !== initialLength) {
                     await db.query("UPDATE ronda_jadwal SET foto_bukti = ? WHERE id = ?", [JSON.stringify(photos), s.id]);
                 }
-            } catch (e) { }
+            } catch (e) { console.error('Error deleting photo from ronda_jadwal:', e); }
         }
 
         // 2. Check ronda_dokumentasi
         const [docs] = await db.query("SELECT id, foto FROM ronda_dokumentasi WHERE foto LIKE ?", [`%${filename}%`]);
         for (const d of docs) {
             try {
-                let photos = JSON.parse(d.foto);
+                let raw = String(d.foto);
+                let photos = [];
+                try {
+                    let parsed = JSON.parse(raw);
+                    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                    if (Array.isArray(parsed)) photos = parsed;
+                    else photos = [raw];
+                } catch (e) {
+                    if (raw.includes(',')) photos = raw.split(',').map(p => p.trim());
+                    else photos = [raw.trim()];
+                }
+                
                 const initialLength = photos.length;
                 photos = photos.filter(p => p !== filename);
                 if (photos.length !== initialLength) {
-                    // If empty, maybe delete the row? Or just update. Let's update.
                     await db.query("UPDATE ronda_dokumentasi SET foto = ? WHERE id = ?", [JSON.stringify(photos), d.id]);
                 }
-            } catch (e) { }
+            } catch (e) { console.error('Error deleting photo from ronda_dokumentasi:', e); }
         }
     },
     
