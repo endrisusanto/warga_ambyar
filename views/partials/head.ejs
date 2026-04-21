@@ -20,6 +20,37 @@
     <meta name="keywords"
         content="manajemen warga, sistem RT/RW, iuran warga, jadwal ronda, keuangan komunitas, musyawarah">
     <meta name="author" content="Gang Ambyar">
+    <meta name="theme-color" content="#FF69B4" media="(prefers-color-scheme: light)" id="theme-color-light">
+    <meta name="theme-color" content="#FF69B4" media="(prefers-color-scheme: dark)" id="theme-color-dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script>
+        (function() {
+            // Function to convert HSL to HEX safely for all mobile browsers
+            function hslToHex(h, s, l) {
+                l /= 100;
+                const a = s * Math.min(l, 1 - l) / 100;
+                const f = n => {
+                    const k = (n + h / 30) % 12;
+                    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                    return Math.round(255 * color).toString(16).padStart(2, '0');
+                };
+                return `#${f(0)}${f(8)}${f(4)}`;
+            }
+
+            let hue = 0;
+            // Use setInterval to continuously update the theme-color
+            setInterval(() => {
+                hue = (hue + 1.5) % 360; // Adjust speed by changing 1.5
+                const hexColor = hslToHex(hue, 100, 50);
+                const themeTags = document.querySelectorAll('meta[name="theme-color"]');
+                themeTags.forEach(tag => {
+                    tag.setAttribute('content', hexColor);
+                });
+            }, 100); // 10 updates per second
+        })();
+    </script>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">

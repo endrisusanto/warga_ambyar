@@ -249,27 +249,7 @@
 
                 <!-- MSE Go2RTC Content -->
                 <div id="content-frigate" class="hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <!-- Camera 1: CCTV Gang Ambyar -->
-                        <div class="w-full bg-black rounded-xl overflow-hidden relative aspect-video border-2 border-indigo-500/30 hover:border-indigo-500/80 transition-colors duration-300">
-                            <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 z-20 pointer-events-none">
-                                <h4 class="text-white font-bold text-sm drop-shadow-md">CCTV Gang</h4>
-                                <p class="text-green-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">● LIVE (MSE)</p>
-                            </div>
-                            <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">Menghubungkan ke Stream...</div>
-                            <iframe src="https://camera.ambyar.biz.id/stream.html?src=cctv_gang_ambyar&mode=mse" class="w-full h-full border-0 relative z-10" title="CCTV Gang Ambyar" allow="autoplay; fullscreen"></iframe>
-                        </div>
-
-                        <!-- Camera 2: CCTV Rumah Kalula -->
-                        <div class="w-full bg-black rounded-xl overflow-hidden relative aspect-video border-2 border-indigo-500/30 hover:border-indigo-500/80 transition-colors duration-300">
-                            <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 z-20 pointer-events-none">
-                                <h4 class="text-white font-bold text-sm drop-shadow-md">CCTV Rumah Kalula</h4>
-                                <p class="text-green-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">● LIVE (MSE)</p>
-                            </div>
-                            <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">Menghubungkan ke Stream...</div>
-                            <iframe src="https://camera.ambyar.biz.id/stream.html?src=kalula&mode=mse" class="w-full h-full border-0 relative z-10" title="CCTV Rumah Kalula" allow="autoplay; fullscreen"></iframe>
-                        </div>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="frigateGrid"></div>
                 </div>
             </div>
         </div>
@@ -279,8 +259,9 @@
             <div class="modal-content" onclick="event.stopPropagation()">
                 <button class="modal-close" onclick="closeModal()">×</button>
                 <div class="modal-video-container">
-                    <video class="modal-video" id="modalVideo" autoplay muted controls></video>
-                    <div class="modal-info">
+                    <video class="modal-video" id="modalVideo" style="display: none;" autoplay muted controls></video>
+                    <iframe id="modalIframe" class="modal-video border-0" style="display: none;" allow="autoplay; fullscreen"></iframe>
+                    <div class="modal-info pointer-events-none">
                         <div class="text-sm font-bold text-white drop-shadow-md"
                             style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);"
                             id="modalCameraName"></div>
@@ -365,6 +346,41 @@
                 grid.appendChild(card);
             });
 
+            // Frigate Camera Data
+            const frigateCameras = [
+                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View', src: 'cctv_gang_ambyar' },
+                { id: 'CCTV-KALULA', name: 'CCTV Rumah Kalula', src: 'kalula' }
+            ];
+
+            // Create Frigate Cards
+            const frigateGrid = document.getElementById('frigateGrid');
+            frigateCameras.forEach(camera => {
+                const card = document.createElement('div');
+                card.className = 'cctv-card';
+                card.innerHTML = `
+            <div class="cctv-video-wrapper">
+                <iframe src="https://camera.ambyar.biz.id/stream.html?src=${camera.src}&mode=mse" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" muted onload="this.nextElementSibling.style.display='none'"></iframe>
+                <div class="cctv-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
+                </div>
+                <div class="cctv-overlay">
+                    <div class="live-badge">● LIVE</div>
+                    <div class="cctv-info">
+                        <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
+                        <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
+                    </div>
+                    <button class="expand-button" onclick="openFrigateModal('${camera.id}')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+                frigateGrid.appendChild(card);
+            });
+
             // Modal Functions
             let modalHls = null;
 
@@ -374,9 +390,14 @@
 
                 const modal = document.getElementById('modalOverlay');
                 const video = document.getElementById('modalVideo');
+                const iframe = document.getElementById('modalIframe');
 
                 document.getElementById('modalCameraName').textContent = camera.name;
                 document.getElementById('modalCameraId').textContent = camera.id;
+
+                video.style.display = 'block';
+                iframe.style.display = 'none';
+                iframe.src = '';
 
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
@@ -388,8 +409,37 @@
                 modalHls = initHLS(video, camera.url);
             }
 
+            function openFrigateModal(cameraId) {
+                const camera = frigateCameras.find(c => c.id === cameraId);
+                if (!camera) return;
+
+                const modal = document.getElementById('modalOverlay');
+                const video = document.getElementById('modalVideo');
+                const iframe = document.getElementById('modalIframe');
+
+                document.getElementById('modalCameraName').textContent = camera.name;
+                document.getElementById('modalCameraId').textContent = camera.id;
+
+                iframe.style.display = 'block';
+                video.style.display = 'none';
+                if (modalHls) {
+                    modalHls.destroy();
+                    modalHls = null;
+                }
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+                iframe.src = `https://camera.ambyar.biz.id/stream.html?src=${camera.src}&mode=mse`;
+
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
             function closeModal() {
                 const modal = document.getElementById('modalOverlay');
+                const video = document.getElementById('modalVideo');
+                const iframe = document.getElementById('modalIframe');
+
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
 
@@ -397,6 +447,11 @@
                     modalHls.destroy();
                     modalHls = null;
                 }
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+                
+                iframe.src = '';
             }
 
             // Close modal on ESC key
