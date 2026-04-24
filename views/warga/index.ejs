@@ -103,16 +103,16 @@
                                                 <form action="/warga/update-role/<%= w.id %>" method="POST"
                                                     class="inline">
                                                     <select name="role" onchange="this.form.submit()"
-                                                        class="glass-input text-xs rounded-md">
-                                                        <option value="warga" <%=(w.role==='warga' || !w.role)
+                                                        class="glass-input text-xs rounded-md py-1 px-2 cursor-pointer dark:bg-gray-800 dark:text-white">
+                                                        <option value="warga" class="dark:bg-gray-800" <%=(w.role==='warga' || !w.role)
                                                             ? 'selected' : '' %>>Warga
                                                         </option>
-                                                        <option value="ketua" <%=w.role==='ketua' ? 'selected' : '' %>
+                                                        <option value="ketua" class="dark:bg-gray-800" <%=w.role==='ketua' ? 'selected' : '' %>
                                                             >Ketua
                                                         </option>
-                                                        <option value="bendahara" <%=w.role==='bendahara' ? 'selected'
+                                                        <option value="bendahara" class="dark:bg-gray-800" <%=w.role==='bendahara' ? 'selected'
                                                             : '' %>>Bendahara</option>
-                                                        <option value="admin" <%=w.role==='admin' ? 'selected' : '' %>
+                                                        <option value="admin" class="dark:bg-gray-800" <%=w.role==='admin' ? 'selected' : '' %>
                                                             >Admin
                                                         </option>
                                                     </select>

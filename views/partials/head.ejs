@@ -202,6 +202,13 @@
             color: var(--text-main);
         }
 
+        /* Fix for select elements in dark mode */
+        .dark select.glass-input,
+        .dark select.glass-input option {
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+        }
+
         .glass-input:focus {
             outline: none;
             border-color: rgba(59, 130, 246, 0.5);
