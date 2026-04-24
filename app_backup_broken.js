@@ -37,7 +37,7 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');
     res.locals.user = req.session.user || null;
     res.locals.currentPath = req.path;
-    res.locals.adminPhone = app.locals.adminPhone || '6281234567890';
+    res.locals.adminPhone = app.locals.adminPhone || '6285176970180';
     next();
 });
 

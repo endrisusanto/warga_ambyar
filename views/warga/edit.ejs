@@ -38,8 +38,7 @@
                         <div class="mt-1">
                             <select id="status_keluarga" name="status_keluarga"
                                 class="glass-input block w-full sm:text-sm rounded-md p-2 dark:bg-gray-800 dark:text-gray-100">
-                                <% const roles=['Kepala Keluarga', 'Istri' , 'Anak' , 'Kakek' , 'Nenek' , 'Lainnya' ];
-                                    %>
+                                <% const roles=['Kepala Keluarga', 'Istri', 'Anak', 'Kakek', 'Nenek', 'Famili Lain', 'Lainnya']; %>
                                     <% roles.forEach(role=> { %>
                                         <option value="<%= role %>" <%=warga.status_keluarga===role ? 'selected' : '' %>
                                             >

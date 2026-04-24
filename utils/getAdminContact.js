@@ -27,9 +27,9 @@ module.exports = async function () {
             return adminRows[0].no_hp;
         }
 
-        return '6281234567890'; // Default fallback
+        return '6285176970180'; // Default fallback
     } catch (err) {
         console.error('Failed to fetch admin phone:', err);
-        return '6281234567890';
+        return '6285176970180';
     }
 };
