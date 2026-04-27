@@ -197,7 +197,7 @@ const Ronda = {
         if (status === 'alpa') {
             query += ", denda = 50000";
         } else {
-            query += ", denda = 0";
+            query += ", denda = 0, status_bayar = NULL, bukti_bayar = NULL";
         }
 
         if (finalKeterangan !== undefined && finalKeterangan !== null) {
@@ -318,7 +318,7 @@ params.push(id);
         const nextWeek = nextWeekDate.format('YYYY-MM-DD');
         const nextWeekStr = nextWeekDate.format('DD MMM YYYY');
 
-        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || `Reschedule ke ${nextWeekStr}`, id]);
+        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', denda = 0, status_bayar = NULL, bukti_bayar = NULL, keterangan = ? WHERE id = ?", [keterangan || `Reschedule ke ${nextWeekStr}`, id]);
 
         try {
             await db.query(
@@ -348,7 +348,7 @@ params.push(id);
         const prevWeek = prevWeekDate.format('YYYY-MM-DD');
         const prevWeekStr = prevWeekDate.format('DD MMM YYYY');
 
-        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', keterangan = ? WHERE id = ?", [keterangan || `[Maju Jadwal] Reschedule ke ${prevWeekStr}`, id]);
+        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', denda = 0, status_bayar = NULL, bukti_bayar = NULL, keterangan = ? WHERE id = ?", [keterangan || `[Maju Jadwal] Reschedule ke ${prevWeekStr}`, id]);
 
         try {
             // Cek apakah sudah ada jadwal di minggu lalu
@@ -375,7 +375,7 @@ params.push(id);
     },
 
     payFine: async (id) => {
-        await db.query("UPDATE ronda_jadwal SET denda = 0, status = 'hadir', status_bayar = 'paid', keterangan = CONCAT(IFNULL(keterangan, ''), ' [Denda Lunas]') WHERE id = ?", [id]);
+        await db.query("UPDATE ronda_jadwal SET status_bayar = 'paid', keterangan = CONCAT(IFNULL(keterangan, ''), ' [Denda Lunas]') WHERE id = ?", [id]);
     },
 
     submitFinePayment: async (id, filename) => {

@@ -231,13 +231,18 @@
                                         Transfer</label>
                                     <div
                                         class="relative group rounded-3xl overflow-hidden border-8 border-white/5 bg-black/40 shadow-2xl transition-transform hover:scale-[1.01]">
-                                        <% let filename=iuran ? iuran.bukti_bayar : (kas.length> 0 ? kas[0].bukti_foto :
-                                            '');
-                                            let proofUrl = filename && filename.startsWith('bukti_bayar-') ? '/uploads/'
-                                            + filename
-                                            :
-                                            (filename ? '/uploads/keuangan/' + filename : '/img/placeholder.png');
-                                            %>
+                                        <% let filename=iuran ? iuran.bukti_bayar : (kas.length> 0 ? kas[0].bukti_foto : '');
+                                            let proofUrl = '/img/placeholder.png';
+                                            if (filename) {
+                                                if (filename.startsWith('bukti_bayar-')) {
+                                                    proofUrl = '/uploads/' + filename;
+                                                } else if (filename.startsWith('ronda-')) {
+                                                    proofUrl = '/uploads/ronda/' + filename;
+                                                } else {
+                                                    proofUrl = '/uploads/keuangan/' + filename;
+                                                }
+                                            }
+                                        %>
                                             <img src="<%= proofUrl %>"
                                                 class="w-full object-contain max-h-[700px] transition-transform duration-700 group-hover:scale-110"
                                                 alt="Bukti Transfer">

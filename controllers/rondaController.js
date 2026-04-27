@@ -359,16 +359,16 @@ exports.verifyFine = async (req, res) => {
         const redirectUrl = req.body.redirectUrl || req.get('Referer') || '/ronda/control';
         if (action === 'approve') {
             // Get fine details before resetting it
-            const [rows] = await db.query("SELECT r.denda, w.nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id = ?", [id]);
+            const [rows] = await db.query("SELECT r.denda, r.bukti_bayar, w.nama FROM ronda_jadwal r JOIN warga w ON r.warga_id = w.id WHERE r.id = ?", [id]);
 
             if (rows.length > 0) {
-                const { denda, nama } = rows[0];
+                const { denda, bukti_bayar, nama } = rows[0];
 
                 await Ronda.payFine(id);
 
                 // Add to Kas
                 if (denda > 0) {
-                    await Kas.add('masuk', denda, `Denda Ronda - ${nama}`, new Date());
+                    await Kas.add('masuk', denda, `Denda Ronda - ${nama}`, new Date(), bukti_bayar);
                 }
 
                 req.flash('success_msg', 'Pembayaran denda disetujui dan dicatat di Kas.');
@@ -609,12 +609,16 @@ exports.viewPublic = async (req, res) => {
         dayDocs.forEach(d => {
             d.parsedPhotos = [];
             if (d.foto) {
-                try {
-                    let parsed = JSON.parse(d.foto);
-                    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-                    if (Array.isArray(parsed)) d.parsedPhotos = parsed;
-                } catch (e) {
-                    d.parsedPhotos = [d.foto];
+                if (Array.isArray(d.foto)) {
+                    d.parsedPhotos = d.foto;
+                } else {
+                    try {
+                        let parsed = JSON.parse(d.foto);
+                        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                        if (Array.isArray(parsed)) d.parsedPhotos = parsed;
+                    } catch (e) {
+                        d.parsedPhotos = [String(d.foto).trim()];
+                    }
                 }
             }
         });
@@ -622,10 +626,24 @@ exports.viewPublic = async (req, res) => {
         const allPhotos = [];
         // Combine photos logic
         daySchedule.forEach(s => {
-            if (s.parsedPhotos) s.parsedPhotos.forEach(p => allPhotos.push({ src: p, type: 'individual', uploader: s.nama }));
+            if (s.parsedPhotos && Array.isArray(s.parsedPhotos)) {
+                s.parsedPhotos.forEach(p => {
+                    const strP = String(p).trim();
+                    if (strP && strP !== '[]') {
+                        allPhotos.push({ src: strP, type: 'individual', uploader: s.nama });
+                    }
+                });
+            }
         });
         dayDocs.forEach(d => {
-            if (d.parsedPhotos) d.parsedPhotos.forEach(p => allPhotos.push({ src: p, type: 'condition', uploader: 'Kondisi' }));
+            if (d.parsedPhotos && Array.isArray(d.parsedPhotos)) {
+                d.parsedPhotos.forEach(p => {
+                    const strP = String(p).trim();
+                    if (strP && strP !== '[]') {
+                        allPhotos.push({ src: strP, type: 'condition', uploader: 'Kondisi' });
+                    }
+                });
+            }
         });
 
         // Determine Team Name logic
@@ -656,7 +674,7 @@ exports.viewPublic = async (req, res) => {
         });
     } catch (e) {
         console.error(e);
-        res.status(500).send('Error loading page');
+        res.status(500).send('Error loading page: ' + e.stack);
     }
 };
 
@@ -1054,7 +1072,13 @@ exports.exportControl = async (req, res) => {
                     statusText = 'LIBUR';
                 } else if (cell.status) {
                     statusText = cell.status.toUpperCase();
-                    if (cell.status === 'alpa' && cell.denda > 0) statusText = 'DENDA';
+                    if (cell.denda > 0) {
+                        if (cell.status_bayar === 'paid') {
+                            statusText = 'LUNAS';
+                        } else {
+                            statusText = 'DENDA';
+                        }
+                    }
                     if (cell.status === 'alpa') totalAbsent++;
                 }
                 
