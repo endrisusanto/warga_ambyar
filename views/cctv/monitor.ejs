@@ -209,7 +209,7 @@
             <div class="px-4 py-5 sm:px-6 border-b border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Monitor CCTV</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400" id="monitor-desc">Live streaming dari 9 titik kamera CCTV di area perjalanan kerja</p>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400" id="monitor-desc">Sistem monitoring CCTV lokal area gang</p>
                 </div>
                 <!-- Buttons -->
                 <div class="flex flex-row gap-2">
@@ -231,25 +231,25 @@
             <!-- Tabs -->
             <div class="border-b border-white/10">
                 <nav class="-mb-px flex space-x-8 px-4 sm:px-6 overflow-x-auto" aria-label="Tabs">
-                    <button id="tab-lalu-lintas" class="border-indigo-500 text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200" onclick="switchTab('lalu-lintas')">
-                        CCTV Lalu Lintas
-                    </button>
-                    <button id="tab-frigate" class="border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200" onclick="switchTab('frigate')">
+                    <button id="tab-frigate" class="border-indigo-500 text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200" onclick="switchTab('frigate')">
                         CCTV Gang
+                    </button>
+                    <button id="tab-lalu-lintas" class="border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200" onclick="switchTab('lalu-lintas')">
+                        CCTV Lalu Lintas
                     </button>
                 </nav>
             </div>
 
             <div class="p-6">
-                <!-- CCTV Lalu Lintas Content -->
-                <div id="content-lalu-lintas" class="block">
-                    <!-- CCTV Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="cctvGrid"></div>
+                <!-- MSE Go2RTC Content -->
+                <div id="content-frigate" class="block">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="frigateGrid"></div>
                 </div>
 
-                <!-- MSE Go2RTC Content -->
-                <div id="content-frigate" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="frigateGrid"></div>
+                <!-- CCTV Lalu Lintas Content -->
+                <div id="content-lalu-lintas" class="hidden">
+                    <!-- CCTV Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="cctvGrid"></div>
                 </div>
             </div>
         </div>

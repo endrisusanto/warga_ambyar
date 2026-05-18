@@ -1,11 +1,24 @@
 const db = require('../config/db');
 const moment = require('moment');
 
+const ensureLiburTable = async () => {
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS ronda_libur (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tanggal DATE NOT NULL,
+            alasan VARCHAR(255) DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_libur (tanggal)
+        )
+    `);
+};
+
 const Ronda = {
     // Generate schedule for a specific month (only Saturdays)
     // Respects ronda_libur table: skips libur dates and adjusts team rotation accordingly
     getTeamForDate: async (date) => {
         const dateStr = moment(date).format('YYYY-MM-DD');
+        await ensureLiburTable();
         const [liburRows] = await db.query('SELECT tanggal FROM ronda_libur ORDER BY tanggal ASC');
         const liburSet = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
 
@@ -29,16 +42,7 @@ const Ronda = {
         // Don't generate schedules for years before 2026
         if (parseInt(year) < 2026) return;
 
-        // Auto-create ronda_libur table if not exists
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS ronda_libur (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                tanggal DATE NOT NULL,
-                alasan VARCHAR(255) DEFAULT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE KEY unique_libur (tanggal)
-            )
-        `);
+        await ensureLiburTable();
 
         // Fetch ALL libur dates (across all years, not just this month)
         const [liburRows] = await db.query('SELECT tanggal FROM ronda_libur ORDER BY tanggal ASC');
@@ -82,24 +86,26 @@ const Ronda = {
                 ORDER BY blok ASC, CAST(nomor_rumah AS UNSIGNED) ASC, id ASC
             `, [currentTeam]);
 
-            for (const house of wargas) {
-                if (!house.representative_id) continue;
+            if (wargas.length === 0) continue;
 
-                const [existing] = await db.query(
-                    'SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?',
-                    [dateStr, house.representative_id]
-                );
+            const [existing] = await db.query(
+                'SELECT warga_id FROM ronda_jadwal WHERE tanggal = ?',
+                [dateStr]
+            );
+            const existingWargaIds = new Set(existing.map(row => Number(row.warga_id)));
+            const values = wargas
+                .filter(house => house.representative_id && !existingWargaIds.has(Number(house.representative_id)))
+                .map(house => [dateStr, house.representative_id, house.blok, house.nomor_rumah, 'scheduled']);
 
-                if (existing.length === 0) {
-                    try {
-                        await db.query(
-                            `INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status)
-                             VALUES (?, ?, ?, ?, 'scheduled')`,
-                            [dateStr, house.representative_id, house.blok, house.nomor_rumah]
-                        );
-                    } catch (e) {
-                        console.error('Error inserting schedule:', e);
-                    }
+            if (values.length > 0) {
+                try {
+                    await db.query(
+                        `INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status)
+                         VALUES ?`,
+                        [values]
+                    );
+                } catch (e) {
+                    console.error('Error inserting schedule batch:', e);
                 }
             }
         }
@@ -181,6 +187,10 @@ const Ronda = {
     },
 
     updateStatus: async (id, status, keterangan = null) => {
+        if (status === 'clear_status') {
+            return Ronda.clearStatus(id);
+        }
+
         let finalKeterangan = keterangan;
 
         // Jika meriset ke scheduled, bersihkan semua tag "Auto" dan tag dalam kurung [] agar tidak terproses ulang
@@ -206,7 +216,7 @@ const Ronda = {
         }
 
         query += " WHERE id = ?";
-params.push(id);
+        params.push(id);
 
         await db.query(query, params);
 
@@ -297,6 +307,49 @@ params.push(id);
                     `, [dateTag, wargaId, currentDate, `%${dateTag.trim()}%`]);
                 }
             }
+        }
+    },
+
+    clearStatus: async (id) => {
+        const [currentRows] = await db.query(
+            "SELECT tanggal, warga_id, keterangan FROM ronda_jadwal WHERE id = ?",
+            [id]
+        );
+
+        if (currentRows.length === 0) return;
+
+        const current = currentRows[0];
+        const currentDate = current.tanggal;
+        const wargaId = current.warga_id;
+        const currentKet = current.keterangan || '';
+
+        await db.query(`
+            UPDATE ronda_jadwal
+            SET status = 'scheduled',
+                denda = 0,
+                status_bayar = NULL,
+                bukti_bayar = NULL,
+                foto_bukti = NULL,
+                keterangan = NULL
+            WHERE id = ?
+        `, [id]);
+
+        const earlyAttendanceTag = ` [Sudah Hadir Lebih Awal pada ${moment(currentDate).format('DD MMM')}]`;
+        await db.query(`
+            UPDATE ronda_jadwal
+            SET status = 'scheduled',
+                denda = 0,
+                status_bayar = NULL,
+                bukti_bayar = NULL,
+                keterangan = NULLIF(TRIM(REPLACE(IFNULL(keterangan, ''), ?, '')), '')
+            WHERE warga_id = ?
+              AND tanggal > ?
+              AND status = 'hadir'
+              AND keterangan LIKE ?
+        `, [earlyAttendanceTag, wargaId, currentDate, `%${earlyAttendanceTag.trim()}%`]);
+
+        if (currentKet.includes('[Pemajuan Jadwal dari')) {
+            await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [id]);
         }
     },
 
@@ -640,15 +693,7 @@ params.push(id);
     // 2. DELETE ALL entries for the libur date itself (clean slate for that column)
     // 3. DELETE all SCHEDULED entries after the libur date (force fresh regeneration)
     skipWeek: async (date) => {
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS ronda_libur (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                tanggal DATE NOT NULL,
-                alasan VARCHAR(255) DEFAULT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE KEY unique_libur (tanggal)
-            )
-        `);
+        await ensureLiburTable();
 
         // Mark this date as libur
         await db.query("INSERT IGNORE INTO ronda_libur (tanggal) VALUES (?)", [date]);
@@ -669,15 +714,7 @@ params.push(id);
     // 1. Remove date from ronda_libur
     // 2. Delete all SCHEDULED entries >= date (force fresh regeneration with normal rotation)
     resetWeek: async (date) => {
-        await db.query(`
-            CREATE TABLE IF NOT EXISTS ronda_libur (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                tanggal DATE NOT NULL,
-                alasan VARCHAR(255) DEFAULT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE KEY unique_libur (tanggal)
-            )
-        `);
+        await ensureLiburTable();
 
         // Remove from libur list
         await db.query("DELETE FROM ronda_libur WHERE tanggal = ?", [date]);

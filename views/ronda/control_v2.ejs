@@ -557,7 +557,7 @@
                     <div class="mb-5">
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status Kehadiran</label>
                         <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 border border-gray-200 dark:border-gray-700 dark:[color-scheme:dark]">
-                            <option value="scheduled">Scheduled (Reset)</option>
+                            <option value="clear_status">Hapus Status</option>
                             <option value="hadir">✅ Hadir</option>
                             <option value="alpa">Alpa (Denda)</option>
                             <option value="reschedule_next">➡️ Reschedule (Minggu Depan)</option>
@@ -662,6 +662,12 @@
 
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
+
+                if (data.status === 'clear_status' && !confirm('Hapus status absensi ini? Denda, bukti bayar, foto bukti, dan catatan pada jadwal ini akan dibersihkan.')) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
 
                 try {
                     const response = await fetch(this.action, {
@@ -784,7 +790,7 @@
                 document.getElementById('statusDate').value = dateValue || '';
                 document.getElementById('statusWargaName').textContent = name;
                 document.getElementById('statusDateLabel').textContent = date;
-                document.getElementById('statusSelect').value = currentStatus && currentStatus !== '' ? currentStatus : 'scheduled';
+                document.getElementById('statusSelect').value = currentStatus && currentStatus !== '' && currentStatus !== 'scheduled' ? currentStatus : 'clear_status';
                 document.getElementById('statusKeterangan').value = keterangan || '';
                 document.getElementById('statusModal').classList.remove('hidden');
             }
@@ -906,8 +912,8 @@
                 if (!_activeWeekDate) return;
                 const date = _activeWeekDate;
                 closeWeekMenu();
-                if (!confirm('Reset / kembalikan jadwal tanggal ' + date + '?\n\nSemua jadwal pada dan SETELAH tanggal ini akan digeser mundur 1 minggu (kebalikan dari Liburkan).')) return;
-                await callWeekAction('/ronda/reset-week', date, 'Jadwal berhasil di-reset / digeser mundur 1 minggu.');
+                if (!confirm('Batalkan libur ronda tanggal ' + date + '?\n\nJadwal pada dan SETELAH tanggal ini akan dihitung ulang mengikuti rotasi normal.')) return;
+                await callWeekAction('/ronda/reset-week', date, 'Libur ronda berhasil dibatalkan dan jadwal dihitung ulang.');
             }
 
             async function callWeekAction(url, date, successMsg) {
@@ -956,12 +962,12 @@
                     <div class="text-[10px] text-gray-500 dark:text-gray-400">Geser semua jadwal +1 minggu</div>
                 </div>
             </button>
-            <!-- Reset -->
+            <!-- Batalkan libur -->
             <button onclick="doResetWeek()" class="flex items-center gap-3 w-full px-4 py-3 text-left text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                <span class="text-xl">🔄</span>
+                <span class="text-xl">↩</span>
                 <div>
-                    <div class="font-bold text-blue-700 dark:text-blue-300">Reset Minggu</div>
-                    <div class="text-[10px] text-gray-500 dark:text-gray-400">Kembalikan jadwal -1 minggu</div>
+                    <div class="font-bold text-blue-700 dark:text-blue-300">Batalkan Libur</div>
+                    <div class="text-[10px] text-gray-500 dark:text-gray-400">Hitung ulang rotasi normal</div>
                 </div>
             </button>
         </div>

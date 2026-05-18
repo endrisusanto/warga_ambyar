@@ -275,15 +275,15 @@ exports.updateStatus = (req, res) => {
                     }
                 }
                 
-                req.flash('success_msg', 'Status ronda diperbarui');
+                req.flash('success_msg', status === 'clear_status' ? 'Status ronda dihapus' : 'Status ronda diperbarui');
             }
 
             if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') > -1)) {
                 return res.json({ 
                     success: true, 
-                    message: 'Status berhasil diperbarui', 
+                    message: status === 'clear_status' ? 'Status berhasil dihapus' : 'Status berhasil diperbarui',
                     id, 
-                    status, 
+                    status: status === 'clear_status' ? 'scheduled' : status,
                     warga_id, 
                     nextDate 
                 });
@@ -844,8 +844,14 @@ exports.control = async (req, res) => {
 
         // Get Schedules for this year
         const [schedules] = await db.query(`
-            SELECT * FROM ronda_jadwal 
-            WHERE tanggal BETWEEN ? AND ?
+            SELECT *
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER(PARTITION BY tanggal, warga_id ORDER BY (status != 'scheduled') DESC, id DESC) AS rn
+                FROM ronda_jadwal
+                WHERE tanggal BETWEEN ? AND ?
+            ) ranked
+            WHERE rn = 1
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
         // Build Matrix based on USERS
@@ -972,8 +978,14 @@ exports.exportControl = async (req, res) => {
 
         // Get Schedules for this wide range
         const [schedules] = await db.query(`
-            SELECT * FROM ronda_jadwal 
-            WHERE tanggal BETWEEN ? AND ?
+            SELECT *
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER(PARTITION BY tanggal, warga_id ORDER BY (status != 'scheduled') DESC, id DESC) AS rn
+                FROM ronda_jadwal
+                WHERE tanggal BETWEEN ? AND ?
+            ) ranked
+            WHERE rn = 1
         `, [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]);
 
         // Build Matrix based on USERS (same as control page)
