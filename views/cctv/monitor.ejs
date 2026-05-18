@@ -128,6 +128,54 @@
                 transform: translate(-50%, -50%) scale(1.1);
             }
 
+            .hide-camera-button {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                z-index: 20;
+                background: rgba(0, 0, 0, 0.58);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.28);
+                color: white;
+                padding: 0.55rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                opacity: 0;
+            }
+
+            .cctv-card:hover .hide-camera-button {
+                opacity: 1;
+            }
+
+            .hide-camera-button:hover {
+                background: rgba(220, 38, 38, 0.9);
+                transform: scale(1.06);
+            }
+
+            .hide-camera-button.is-hidden:hover {
+                background: rgba(22, 163, 74, 0.9);
+            }
+
+            .cctv-card.camera-hidden {
+                opacity: 0.55;
+            }
+
+            .hidden-camera-badge {
+                position: absolute;
+                top: 0.75rem;
+                left: 5.25rem;
+                z-index: 20;
+                background: rgba(220, 38, 38, 0.88);
+                color: white;
+                padding: 0.25rem 0.6rem;
+                border-radius: 999px;
+                font-size: 0.65rem;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+            }
+
             /* Modal Styles */
             .modal-overlay {
                 position: fixed;
@@ -212,7 +260,7 @@
                     <p class="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400" id="monitor-desc">Sistem monitoring CCTV lokal area gang</p>
                 </div>
                 <!-- Buttons -->
-                <div class="flex flex-row gap-2">
+                <div class="flex flex-row flex-wrap gap-2">
                     <a href="https://wa.me/?text=Pantau%20CCTV%20Lalu%20Lintas%20dan%20Area%20Warga%20secara%20langsung%20di%20sini:%20https://gang.ambyar.biz.id/cctv/monitor" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-green-800 bg-green-100 hover:bg-green-200 dark:text-white dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
                         <svg class="mr-2 -ml-1 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
@@ -225,6 +273,14 @@
                         </svg>
                         Buka CCTV Gang
                     </a>
+                    <% if (user) { %>
+                        <button type="button" id="sirenButton" onclick="triggerGangSiren()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-800 bg-red-100 hover:bg-red-200 dark:text-white dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                            <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
+                            </svg>
+                            Siren CCTV Gang
+                        </button>
+                    <% } %>
                 </div>
             </div>
 
@@ -261,6 +317,7 @@
                 <div class="modal-video-container">
                     <video class="modal-video" id="modalVideo" style="display: none;" autoplay muted controls></video>
                     <iframe id="modalIframe" class="modal-video border-0" style="display: none;" allow="autoplay; fullscreen"></iframe>
+                    <img id="modalImage" class="modal-video" style="display: none; object-fit: cover;" alt="">
                     <div class="modal-info pointer-events-none">
                         <div class="text-sm font-bold text-white drop-shadow-md"
                             style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);"
@@ -275,6 +332,9 @@
 
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
         <script>
+            const isAdmin = <%- JSON.stringify(Boolean(user && user.role === 'admin')) %>;
+            const hiddenCameras = new Set(<%- JSON.stringify(typeof hiddenCameras !== 'undefined' ? hiddenCameras : []) %>);
+
             // Camera Data
             const cameras = [
                 { id: 'CT-01', name: 'Tambun Selatan (Showroom MG)', url: 'https://its.binamarga.pu.go.id:8989/play/hls/CT-01/index.m3u8' },
@@ -347,18 +407,59 @@
             });
 
             // Frigate Camera Data
+            const go2rtcBaseUrl = 'https://camera.ambyar.biz.id';
             const frigateCameras = [
-                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View', src: 'cctv_gang_ambyar' }
+                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View', src: 'cctv_gang_ambyar', type: 'mse' },
+                { id: 'KALULA-HOME', name: 'CCTV Kalula Home', src: 'cctv_kalula_home', type: 'snapshot' }
             ];
+
+            function frameUrl(src) {
+                return `${go2rtcBaseUrl}/api/frame.jpeg?src=${encodeURIComponent(src)}&_=${Date.now()}`;
+            }
+
+            function startSnapshotRefresh(img, src, intervalMs = 5000) {
+                const refresh = () => {
+                    img.src = frameUrl(src);
+                };
+                refresh();
+                return window.setInterval(refresh, intervalMs);
+            }
+
+            function adminHideButton(camera) {
+                if (!isAdmin) return '';
+                const hidden = hiddenCameras.has(camera.src);
+                const title = hidden ? 'Tampilkan kamera' : 'Sembunyikan kamera';
+                const iconPath = hidden
+                    ? 'M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.412-.584M9.88 4.24A9.85 9.85 0 0112 4c4.478 0 8.268 2.943 9.542 7a10.515 10.515 0 01-3.07 4.568M6.11 6.11A10.506 10.506 0 002.458 11C3.732 15.057 7.523 18 12 18c1.347 0 2.633-.268 3.807-.754'
+                    : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z';
+
+                return `
+                    <button class="hide-camera-button ${hidden ? 'is-hidden' : ''}" onclick="toggleCameraHidden('${camera.src}', event)" title="${title}" aria-label="${title}">
+                        <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>
+                        </svg>
+                    </button>
+                `;
+            }
+
+            function hiddenCameraBadge(camera) {
+                return isAdmin && hiddenCameras.has(camera.src) ? '<div class="hidden-camera-badge">Hidden</div>' : '';
+            }
 
             // Create Frigate Cards
             const frigateGrid = document.getElementById('frigateGrid');
             frigateCameras.forEach(camera => {
+                if (!isAdmin && hiddenCameras.has(camera.src)) return;
+
                 const card = document.createElement('div');
-                card.className = 'cctv-card';
+                card.className = `cctv-card${hiddenCameras.has(camera.src) ? ' camera-hidden' : ''}`;
+                const mediaHtml = camera.type === 'snapshot'
+                    ? `<img class="cctv-video" alt="${camera.name}" style="object-fit: cover;">`
+                    : `<iframe src="${go2rtcBaseUrl}/stream.html?src=${camera.src}&mode=mse" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" muted onload="this.nextElementSibling.style.display='none'"></iframe>`;
                 card.innerHTML = `
             <div class="cctv-video-wrapper">
-                <iframe src="https://camera.ambyar.biz.id/stream.html?src=${camera.src}&mode=mse" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" muted onload="this.nextElementSibling.style.display='none'"></iframe>
+                ${mediaHtml}
+                ${hiddenCameraBadge(camera)}
                 <div class="cctv-loading">
                     <div class="loading-spinner"></div>
                     <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
@@ -374,14 +475,55 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
                         </svg>
                     </button>
+                    ${adminHideButton(camera)}
                 </div>
             </div>
         `;
+                if (camera.type === 'snapshot') {
+                    const img = card.querySelector('img.cctv-video');
+                    const loading = card.querySelector('.cctv-loading');
+                    img.addEventListener('load', () => {
+                        loading.style.display = 'none';
+                    });
+                    startSnapshotRefresh(img, camera.src);
+                }
                 frigateGrid.appendChild(card);
             });
 
+            async function toggleCameraHidden(cameraSrc, event) {
+                event.stopPropagation();
+                const shouldHide = !hiddenCameras.has(cameraSrc);
+                const actionText = shouldHide ? 'sembunyikan' : 'tampilkan kembali';
+
+                if (!confirm(`Yakin ingin ${actionText} kamera ini?`)) return;
+
+                try {
+                    const response = await fetch('/cctv/hide-camera', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            camera_id: cameraSrc,
+                            hidden: shouldHide
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || 'Gagal menyimpan status kamera.');
+                    }
+
+                    window.location.reload();
+                } catch (error) {
+                    alert(error.message || 'Gagal menyimpan status kamera.');
+                }
+            }
+
             // Modal Functions
             let modalHls = null;
+            let modalSnapshotTimer = null;
 
             function openModal(cameraId) {
                 const camera = cameras.find(c => c.id === cameraId);
@@ -390,16 +532,24 @@
                 const modal = document.getElementById('modalOverlay');
                 const video = document.getElementById('modalVideo');
                 const iframe = document.getElementById('modalIframe');
+                const image = document.getElementById('modalImage');
 
                 document.getElementById('modalCameraName').textContent = camera.name;
                 document.getElementById('modalCameraId').textContent = camera.id;
 
                 video.style.display = 'block';
                 iframe.style.display = 'none';
+                image.style.display = 'none';
                 iframe.src = '';
+                image.src = '';
 
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
+
+                if (modalSnapshotTimer) {
+                    clearInterval(modalSnapshotTimer);
+                    modalSnapshotTimer = null;
+                }
 
                 if (modalHls) {
                     modalHls.destroy();
@@ -415,20 +565,33 @@
                 const modal = document.getElementById('modalOverlay');
                 const video = document.getElementById('modalVideo');
                 const iframe = document.getElementById('modalIframe');
+                const image = document.getElementById('modalImage');
 
                 document.getElementById('modalCameraName').textContent = camera.name;
                 document.getElementById('modalCameraId').textContent = camera.id;
 
-                iframe.style.display = 'block';
+                iframe.style.display = camera.type === 'snapshot' ? 'none' : 'block';
+                image.style.display = camera.type === 'snapshot' ? 'block' : 'none';
                 video.style.display = 'none';
                 if (modalHls) {
                     modalHls.destroy();
                     modalHls = null;
                 }
+                if (modalSnapshotTimer) {
+                    clearInterval(modalSnapshotTimer);
+                    modalSnapshotTimer = null;
+                }
                 video.pause();
                 video.removeAttribute('src');
                 video.load();
-                iframe.src = `https://camera.ambyar.biz.id/stream.html?src=${camera.src}&mode=mse`;
+                if (camera.type === 'snapshot') {
+                    iframe.src = '';
+                    image.alt = camera.name;
+                    modalSnapshotTimer = startSnapshotRefresh(image, camera.src, 3000);
+                } else {
+                    image.src = '';
+                    iframe.src = `${go2rtcBaseUrl}/stream.html?src=${camera.src}&mode=mse`;
+                }
 
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
@@ -438,10 +601,15 @@
                 const modal = document.getElementById('modalOverlay');
                 const video = document.getElementById('modalVideo');
                 const iframe = document.getElementById('modalIframe');
+                const image = document.getElementById('modalImage');
 
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
 
+                if (modalSnapshotTimer) {
+                    clearInterval(modalSnapshotTimer);
+                    modalSnapshotTimer = null;
+                }
                 if (modalHls) {
                     modalHls.destroy();
                     modalHls = null;
@@ -449,6 +617,8 @@
                 video.pause();
                 video.removeAttribute('src');
                 video.load();
+                image.removeAttribute('src');
+                image.style.display = 'none';
                 
                 iframe.src = '';
             }
@@ -465,6 +635,7 @@
                 const contentLaluLintas = document.getElementById('content-lalu-lintas');
                 const contentFrigate = document.getElementById('content-frigate');
                 const desc = document.getElementById('monitor-desc');
+                const sirenButton = document.getElementById('sirenButton');
 
                 const activeTabClass = 'border-indigo-500 text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200';
                 const inactiveTabClass = 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200';
@@ -477,6 +648,7 @@
                     contentFrigate.className = 'hidden';
                     
                     desc.textContent = 'Live streaming dari 9 titik kamera CCTV di area perjalanan kerja';
+                    if (sirenButton) sirenButton.classList.add('hidden');
                 } else if (tab === 'frigate') {
                     tabFrigate.className = activeTabClass;
                     tabLaluLintas.className = inactiveTabClass;
@@ -485,6 +657,44 @@
                     contentLaluLintas.className = 'hidden';
                     
                     desc.textContent = 'Sistem monitoring CCTV lokal area gang';
+                    if (sirenButton) sirenButton.classList.remove('hidden');
+                }
+            }
+
+            async function triggerGangSiren() {
+                if (!confirm('Nyalakan siren CCTV Gang sekarang?')) return;
+
+                const button = document.getElementById('sirenButton');
+                const originalContent = button ? button.innerHTML : '';
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = 'Menyalakan...';
+                }
+
+                try {
+                    const response = await fetch('/cctv/siren', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ entity_id: 'siren.camera_gcc2_f7f8_siren' })
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || 'Gagal menyalakan siren.');
+                    }
+
+                    alert(result.message || 'Siren CCTV Gang dinyalakan.');
+                } catch (error) {
+                    alert('Gagal menyalakan siren: ' + error.message);
+                } finally {
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = originalContent;
+                    }
                 }
             }
         </script>

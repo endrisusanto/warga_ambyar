@@ -1,5 +1,9 @@
 const User = require('../models/User');
 
+function wantsJson(req) {
+    return req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'));
+}
+
 module.exports = {
     ensureAuthenticated: async function (req, res, next) {
         if (req.session.user) {
@@ -39,11 +43,23 @@ module.exports = {
                 }
 
                 // Redirect unauthorized users to pending page
+                if (wantsJson(req)) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Akun Anda belum disetujui admin.'
+                    });
+                }
                 req.flash('error_msg', 'Akun Anda belum disetujui admin.'); // Optional feedback
                 return res.redirect('/auth/pending');
             }
 
             return next();
+        }
+        if (wantsJson(req)) {
+            return res.status(401).json({
+                success: false,
+                message: 'Sesi login habis. Silakan refresh halaman dan login kembali.'
+            });
         }
         req.flash('error_msg', 'Please log in to view that resource');
         res.redirect('/auth/login');
@@ -51,6 +67,12 @@ module.exports = {
     isAdminOrBendahara: function (req, res, next) {
         if (req.session.user && (['admin', 'bendahara', 'ketua'].includes(req.session.user.role))) {
             return next();
+        }
+        if (wantsJson(req)) {
+            return res.status(403).json({
+                success: false,
+                message: 'Akses ditolak. Hanya untuk Admin/Pengurus.'
+            });
         }
         req.flash('error_msg', 'Akses ditolak. Hanya untuk Admin/Pengurus.');
         res.redirect('/dashboard');

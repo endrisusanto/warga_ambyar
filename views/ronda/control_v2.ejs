@@ -316,12 +316,21 @@
                                                                                 </svg>
                                                                             </div>
                                                                         <% } %>
-                                                                    <% } else if (cell && cell.status === 'reschedule') { %>
-                                                                        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 shadow-sm transition-transform hover:scale-110" title="Reschedule">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                                                            </svg>
-                                                                        </div>
+                                                                    <% } else if (cell && cell.status === 'reschedule') {
+                                                                        const isMajuJadwal = cell.keterangan && cell.keterangan.includes('[Maju Jadwal]');
+                                                                    %>
+                                                                        <% if (isMajuJadwal) { %>
+                                                                            <div class="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30 shadow-sm transition-transform hover:scale-110" title="Maju Jadwal">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                                                <span class="absolute -top-1 -right-1 text-[8px] bg-green-500 text-white rounded-full w-3 h-3 flex items-center justify-center"><svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></span>
+                                                                            </div>
+                                                                        <% } else { %>
+                                                                            <div class="flex items-center justify-center w-7 h-7 rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 shadow-sm transition-transform hover:scale-110" title="Reschedule">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                                                </svg>
+                                                                            </div>
+                                                                        <% } %>
                                                                     <% } else if (cell && cell.status === 'alpa') { %>
                                                                         <div class="flex items-center justify-center w-7 h-7 rounded-full bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 shadow-sm" title="Alpa">
                                                                             <span class="text-[10px] font-black">A</span>
@@ -557,11 +566,10 @@
                     <div class="mb-5">
                         <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Status Kehadiran</label>
                         <select name="status" id="statusSelect" class="glass-input block w-full rounded-xl p-3 outline-none cursor-pointer text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 border border-gray-200 dark:border-gray-700 dark:[color-scheme:dark]">
-                            <option value="clear_status">Hapus Status</option>
+                            <option value="clear_status">Reset Status</option>
                             <option value="hadir">✅ Hadir</option>
                             <option value="alpa">Alpa (Denda)</option>
                             <option value="reschedule_next">➡️ Reschedule (Minggu Depan)</option>
-                            <option value="reschedule_prev">⬅️ Maju Jadwal (Minggu Lalu)</option>
                         </select>
                     </div>
                     
@@ -663,7 +671,7 @@
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
 
-                if (data.status === 'clear_status' && !confirm('Hapus status absensi ini? Denda, bukti bayar, foto bukti, dan catatan pada jadwal ini akan dibersihkan.')) {
+                if (data.status === 'clear_status' && !confirm('Reset status absensi ini?\n\nStatus dikembalikan ke terjadwal. Denda, bukti bayar, foto bukti, dan catatan pada jadwal ini akan dibersihkan.')) {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     return;
@@ -674,26 +682,58 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
 
-                    const result = await response.json();
+                    const contentType = response.headers.get('content-type') || '';
+                    let result;
+                    if (contentType.includes('application/json')) {
+                        result = await response.json();
+                    } else {
+                        const text = await response.text();
+                        const looksLikeHtml = /<!doctype html|<html|<body|<head/i.test(text);
+                        result = {
+                            success: false,
+                            message: looksLikeHtml
+                                ? 'Server mengirim halaman HTML. Kemungkinan sesi login habis atau akses ditolak. Silakan refresh halaman lalu coba lagi.'
+                                : (text || 'Server tidak mengembalikan JSON.')
+                        };
+                    }
+
+                    if (!response.ok && !result.success) {
+                        throw new Error(result.message || 'Server gagal memproses status');
+                    }
+
                     if (result.success) {
                         // Update UI for current cell
                         const cellId = `cell-${result.warga_id}-${data.date}`;
                         const cellElement = document.getElementById(cellId);
                         if (cellElement) {
-                            updateCellUI(cellElement, result.status, result.id, data.keterangan);
+                            const currentKet = result.keterangan !== undefined ? result.keterangan : data.keterangan;
+                            updateCellUI(cellElement, result.status, result.id, data.status === 'clear_status' ? '' : currentKet);
                         }
 
-                        // If reschedule, update target cell
-                        if (result.status === 'reschedule' && result.nextDate) {
+                        if (result.next && result.next.date) {
+                            const nextCellId = `cell-${result.warga_id}-${result.next.date}`;
+                            const nextCellElement = document.getElementById(nextCellId);
+                            if (nextCellElement) {
+                                updateCellUI(nextCellElement, result.next.status, result.next.id, result.next.keterangan || '');
+                            }
+                        } else if (result.status === 'reschedule' && result.nextDate) {
                             const nextCellId = `cell-${result.warga_id}-${result.nextDate}`;
                             const nextCellElement = document.getElementById(nextCellId);
                             if (nextCellElement) {
-                                // For the target week, it becomes 'scheduled'
                                 updateCellUI(nextCellElement, 'scheduled', '', '');
+                            }
+                        }
+
+                        if (result.prev && result.prev.date) {
+                            const prevCellId = `cell-${result.warga_id}-${result.prev.date}`;
+                            const prevCellElement = document.getElementById(prevCellId);
+                            if (prevCellElement) {
+                                updateCellUI(prevCellElement, result.prev.status, result.prev.id, result.prev.keterangan || '');
                             }
                         }
 
@@ -705,7 +745,7 @@
                     }
                 } catch (err) {
                     console.error('Error:', err);
-                    alert('Terjadi kesalahan jaringan');
+                    alert('Gagal update: ' + err.message);
                 } finally {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
@@ -715,7 +755,7 @@
             function updateCellUI(el, status, newId, newKet) {
                 // Update data attributes
                 el.dataset.status = status;
-                if (newId) el.dataset.scheduleId = newId;
+                el.dataset.scheduleId = newId || '';
                 el.dataset.keterangan = newKet;
 
                 // Update content based on status

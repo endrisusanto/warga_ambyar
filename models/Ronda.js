@@ -320,19 +320,9 @@ const Ronda = {
 
         const current = currentRows[0];
         const currentDate = current.tanggal;
+        const currentDateStr = moment(currentDate).format('YYYY-MM-DD');
         const wargaId = current.warga_id;
         const currentKet = current.keterangan || '';
-
-        await db.query(`
-            UPDATE ronda_jadwal
-            SET status = 'scheduled',
-                denda = 0,
-                status_bayar = NULL,
-                bukti_bayar = NULL,
-                foto_bukti = NULL,
-                keterangan = NULL
-            WHERE id = ?
-        `, [id]);
 
         const earlyAttendanceTag = ` [Sudah Hadir Lebih Awal pada ${moment(currentDate).format('DD MMM')}]`;
         await db.query(`
@@ -350,7 +340,39 @@ const Ronda = {
 
         if (currentKet.includes('[Pemajuan Jadwal dari')) {
             await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [id]);
+            return { status: '', id: null };
         }
+
+        const scheduledTeam = await Ronda.getTeamForDate(currentDateStr);
+        const [wargaRows] = await db.query(
+            "SELECT tim_ronda, is_ronda FROM warga WHERE id = ?",
+            [wargaId]
+        );
+        const warga = wargaRows[0];
+        const shouldKeepSchedule = Boolean(
+            scheduledTeam &&
+            warga &&
+            Number(warga.is_ronda) === 1 &&
+            String(warga.tim_ronda || '').trim() === scheduledTeam
+        );
+
+        if (!shouldKeepSchedule) {
+            await db.query("DELETE FROM ronda_jadwal WHERE id = ?", [id]);
+            return { status: '', id: null };
+        }
+
+        await db.query(`
+            UPDATE ronda_jadwal
+            SET status = 'scheduled',
+                denda = 0,
+                status_bayar = NULL,
+                bukti_bayar = NULL,
+                foto_bukti = NULL,
+                keterangan = NULL
+            WHERE id = ?
+        `, [id]);
+
+        return { status: 'scheduled', id };
     },
 
     rescheduleNext: async (id, keterangan) => {
@@ -381,42 +403,6 @@ const Ronda = {
         } catch (e) { }
 
         return nextWeek;
-    },
-
-    reschedulePrev: async (id, keterangan) => {
-        const [rows] = await db.query("SELECT * FROM ronda_jadwal WHERE id = ?", [id]);
-        if (rows.length === 0) return;
-        const current = rows[0];
-
-        let liburSet = new Set();
-        try {
-            const [liburRows] = await db.query("SELECT tanggal FROM ronda_libur");
-            liburSet = new Set(liburRows.map(r => moment(r.tanggal).format('YYYY-MM-DD')));
-        } catch (e) { }
-
-        let prevWeekDate = moment(current.tanggal).subtract(7, 'days');
-        while (liburSet.has(prevWeekDate.format('YYYY-MM-DD'))) {
-            prevWeekDate.subtract(7, 'days');
-        }
-        const prevWeek = prevWeekDate.format('YYYY-MM-DD');
-        const prevWeekStr = prevWeekDate.format('DD MMM YYYY');
-
-        await db.query("UPDATE ronda_jadwal SET status = 'reschedule', denda = 0, status_bayar = NULL, bukti_bayar = NULL, keterangan = ? WHERE id = ?", [keterangan || `[Maju Jadwal] Reschedule ke ${prevWeekStr}`, id]);
-
-        try {
-            // Cek apakah sudah ada jadwal di minggu lalu
-            const [existing] = await db.query("SELECT id FROM ronda_jadwal WHERE tanggal = ? AND warga_id = ?", [prevWeek, current.warga_id]);
-            if (existing.length > 0) {
-                await db.query("UPDATE ronda_jadwal SET status = 'hadir', keterangan = CONCAT(IFNULL(keterangan, ''), ?) WHERE id = ?", [` [Reschedule dari ${moment(current.tanggal).format('DD MMM YYYY')}]`, existing[0].id]);
-            } else {
-                await db.query(
-                    "INSERT INTO ronda_jadwal (tanggal, warga_id, blok, nomor_rumah, status, keterangan) VALUES (?, ?, ?, ?, 'hadir', ?)",
-                    [prevWeek, current.warga_id, current.blok, current.nomor_rumah, `Reschedule dari ${moment(current.tanggal).format('DD MMM YYYY')}`]
-                );
-            }
-        } catch (e) { }
-
-        return prevWeek;
     },
 
     markAsPaid: async (ids) => {

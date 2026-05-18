@@ -226,8 +226,13 @@ exports.updateStatus = (req, res) => {
     const uploadSelfie = multer({ storage: storage }).single('bukti_hadir');
 
     uploadSelfie(req, res, async (err) => {
+        const wantsJson = req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') > -1);
+
         if (err) {
             console.error('[ERROR] Multer:', err);
+            if (wantsJson) {
+                return res.status(400).json({ success: false, message: 'Gagal upload foto: ' + err.message });
+            }
             req.flash('error_msg', 'Gagal upload foto: ' + err.message);
             return res.redirect(req.get('Referer') || '/ronda');
         }
@@ -245,6 +250,9 @@ exports.updateStatus = (req, res) => {
                     id = await Ronda.ensureSchedule(date, warga_id);
                 } catch (createErr) {
                     console.error('[ERROR] Failed to ensure schedule:', createErr);
+                    if (wantsJson) {
+                        return res.status(500).json({ success: false, message: 'Gagal membuat jadwal baru: ' + createErr.message });
+                    }
                     req.flash('error_msg', 'Gagal membuat jadwal baru: ' + createErr.message);
                     return res.redirect(req.get('Referer') || '/ronda');
                 }
@@ -253,20 +261,26 @@ exports.updateStatus = (req, res) => {
             console.log(`[DEBUG] Updating status for ID: ${id} to ${status}`);
 
             if (!id || !status) {
+                if (wantsJson) {
+                    return res.status(400).json({ success: false, message: 'Data tidak lengkap (ID/Status missing)' });
+                }
                 req.flash('error_msg', 'Data tidak lengkap (ID/Status missing)');
                 return res.redirect(req.get('Referer') || '/ronda');
             }
 
             let nextDate = null;
-            let prevDate = null;
+            let resultStatus = status;
+            let resultId = id;
+            let resultKeterangan = keterangan;
             if (status === 'reschedule_next') {
                 nextDate = await Ronda.rescheduleNext(id, keterangan);
                 req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu depan');
-            } else if (status === 'reschedule_prev') {
-                prevDate = await Ronda.reschedulePrev(id, keterangan);
-                req.flash('success_msg', 'Jadwal berhasil di-reschedule ke minggu lalu');
             } else {
-                await Ronda.updateStatus(id, status, keterangan);
+                const updateResult = await Ronda.updateStatus(id, status, keterangan);
+                if (status === 'clear_status') {
+                    resultStatus = updateResult && updateResult.status !== undefined ? updateResult.status : 'scheduled';
+                    resultId = updateResult && updateResult.id !== undefined ? updateResult.id : id;
+                }
                 
                 // If 'hadir' and file exists, update photo proof
                 if (status === 'hadir') {
@@ -275,17 +289,18 @@ exports.updateStatus = (req, res) => {
                     }
                 }
                 
-                req.flash('success_msg', status === 'clear_status' ? 'Status ronda dihapus' : 'Status ronda diperbarui');
+                req.flash('success_msg', status === 'clear_status' ? 'Status ronda direset' : 'Status ronda diperbarui');
             }
 
-            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') > -1)) {
+            if (wantsJson) {
                 return res.json({ 
                     success: true, 
-                    message: status === 'clear_status' ? 'Status berhasil dihapus' : 'Status berhasil diperbarui',
-                    id, 
-                    status: status === 'clear_status' ? 'scheduled' : status,
+                    message: status === 'clear_status' ? 'Status berhasil direset' : 'Status berhasil diperbarui',
+                    id: resultId,
+                    status: resultStatus,
+                    keterangan: resultKeterangan,
                     warga_id, 
-                    nextDate 
+                    nextDate
                 });
             }
 
@@ -296,6 +311,9 @@ exports.updateStatus = (req, res) => {
 
         } catch (err) {
             console.error('[ERROR] Controller Exception:', err);
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') > -1)) {
+                return res.status(500).json({ success: false, message: 'Gagal update status: ' + err.message });
+            }
             req.flash('error_msg', 'Gagal update status: ' + err.message);
             res.redirect(req.get('Referer') || '/ronda');
         }
@@ -715,10 +733,6 @@ exports.updatePublicStatus = (req, res) => {
                 await Ronda.rescheduleNext(id, keterangan);
                 console.log('[DEBUG] Reschedule Next success');
                 req.flash('success_msg', 'Jadwal berhasil diganti ke minggu depan');
-            } else if (status === 'reschedule_prev') {
-                await Ronda.reschedulePrev(id, keterangan);
-                console.log('[DEBUG] Reschedule Prev success');
-                req.flash('success_msg', 'Jadwal berhasil diganti ke minggu lalu');
             } else {
                 await Ronda.updateStatus(id, status, keterangan);
                 console.log('[DEBUG] UpdateStatus success');
