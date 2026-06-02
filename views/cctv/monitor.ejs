@@ -278,7 +278,7 @@
                             <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
                             </svg>
-                            Siren CCTV Gang
+                            Lampu alarm CCTV
                         </button>
                     <% } %>
                 </div>
@@ -394,6 +394,8 @@
 
                 const video = card.querySelector('.cctv-video');
                 const loading = card.querySelector('.cctv-loading');
+                video.muted = true;
+                video.defaultMuted = true;
 
                 // Initialize HLS
                 const hls = initHLS(video, camera.url);
@@ -410,8 +412,14 @@
             const go2rtcBaseUrl = 'https://camera.ambyar.biz.id';
             const frigateCameras = [
                 { id: 'CCTV-GANG', name: 'CCTV Birds Eye View', src: 'cctv_gang_ambyar', type: 'mse' },
-                { id: 'KALULA-HOME', name: 'CCTV Kalula Home', src: 'cctv_kalula_home', type: 'snapshot' }
+                { id: 'KALULA-HOME', name: 'CCTV Kalula Home (Snapshot)', src: 'cctv_kalula_home', type: 'snapshot' },
+                { id: 'KALULA-HOME-LIVE', name: 'CCTV Kalula Home (Live)', src: 'cctv_kalula_home', type: 'mse' },
+                { id: 'SECURITY-CAM', name: 'Security Camera', src: 'security_camera', type: 'mse' }
             ];
+
+            function mseStreamUrl(src) {
+                return `${go2rtcBaseUrl}/stream.html?src=${encodeURIComponent(src)}&mode=mse&media=video&muted=1`;
+            }
 
             function frameUrl(src) {
                 return `${go2rtcBaseUrl}/api/frame.jpeg?src=${encodeURIComponent(src)}&_=${Date.now()}`;
@@ -455,7 +463,7 @@
                 card.className = `cctv-card${hiddenCameras.has(camera.src) ? ' camera-hidden' : ''}`;
                 const mediaHtml = camera.type === 'snapshot'
                     ? `<img class="cctv-video" alt="${camera.name}" style="object-fit: cover;">`
-                    : `<iframe src="${go2rtcBaseUrl}/stream.html?src=${camera.src}&mode=mse" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" muted onload="this.nextElementSibling.style.display='none'"></iframe>`;
+                    : `<iframe src="${mseStreamUrl(camera.src)}" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" onload="this.nextElementSibling.style.display='none'"></iframe>`;
                 card.innerHTML = `
             <div class="cctv-video-wrapper">
                 ${mediaHtml}
@@ -540,6 +548,8 @@
                 video.style.display = 'block';
                 iframe.style.display = 'none';
                 image.style.display = 'none';
+                video.muted = true;
+                video.defaultMuted = true;
                 iframe.src = '';
                 image.src = '';
 
@@ -590,7 +600,7 @@
                     modalSnapshotTimer = startSnapshotRefresh(image, camera.src, 3000);
                 } else {
                     image.src = '';
-                    iframe.src = `${go2rtcBaseUrl}/stream.html?src=${camera.src}&mode=mse`;
+                    iframe.src = mseStreamUrl(camera.src);
                 }
 
                 modal.classList.remove('hidden');

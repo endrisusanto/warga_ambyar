@@ -124,7 +124,7 @@ const Ronda = {
                 WHERE tanggal BETWEEN ? AND ?
             ) r
             LEFT JOIN warga w ON r.warga_id = w.id
-            WHERE r.rn = 1
+            WHERE r.rn = 1 AND w.is_ronda = 1 AND w.tim_ronda IS NOT NULL AND w.tim_ronda != ''
             ORDER BY r.tanggal ASC, r.blok, CAST(r.nomor_rumah AS UNSIGNED), r.warga_id
         `, [startDate, endDate]);
 
@@ -150,7 +150,7 @@ const Ronda = {
                 WHERE tanggal = ?
             ) r
             LEFT JOIN warga w ON r.warga_id = w.id
-            WHERE r.rn = 1
+            WHERE r.rn = 1 AND w.is_ronda = 1 AND w.tim_ronda IS NOT NULL AND w.tim_ronda != ''
         `, [targetDate]);
         return rows;
     },
@@ -180,7 +180,7 @@ const Ronda = {
                 WHERE tanggal = ?
             ) r
             LEFT JOIN warga w ON r.warga_id = w.id
-            WHERE r.rn = 1
+            WHERE r.rn = 1 AND w.is_ronda = 1 AND w.tim_ronda IS NOT NULL AND w.tim_ronda != ''
         `, [nextDate]);
 
         return schedule;
