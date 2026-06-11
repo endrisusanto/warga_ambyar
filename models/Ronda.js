@@ -38,7 +38,7 @@ const Ronda = {
         return teamsList[teamIndex];
     },
 
-    generateSchedule: async (month, year) => {
+    generateSchedule: async (month, year, allowPast = false) => {
         // Don't generate schedules for years before 2026
         if (parseInt(year) < 2026) return;
 
@@ -53,8 +53,14 @@ const Ronda = {
         const endDate = startDate.clone().endOf('month');
         const saturdays = [];
         let day = startDate.clone();
+        const todayStr = moment().format('YYYY-MM-DD');
         while (day <= endDate) {
-            if (day.day() === 6) saturdays.push(day.format('YYYY-MM-DD'));
+            const dateStr = day.format('YYYY-MM-DD');
+            if (day.day() === 6) {
+                if (allowPast || dateStr >= todayStr) {
+                    saturdays.push(dateStr);
+                }
+            }
             day.add(1, 'days');
         }
 
@@ -108,6 +114,39 @@ const Ronda = {
                     console.error('Error inserting schedule batch:', e);
                 }
             }
+        }
+
+        // Self-heal curi-start links:
+        // Find all past 'hadir' schedules that have a 'Pemajuan Jadwal' note
+        try {
+            const [hadirRows] = await db.query(`
+                SELECT tanggal, warga_id, keterangan 
+                FROM ronda_jadwal 
+                WHERE status = 'hadir' AND keterangan LIKE '%[Pemajuan Jadwal dari %'
+            `);
+            
+            for (const row of hadirRows) {
+                const match = row.keterangan.match(/\[Pemajuan Jadwal dari ([^\]]+)\]/);
+                if (match) {
+                    const targetDateStr = match[1].trim();
+                    const targetDate = moment(targetDateStr, ['DD MMM', 'DD MMM YYYY', 'DD MMMM YYYY']);
+                    if (targetDate.isValid()) {
+                        if (!targetDateStr.match(/\d{4}$/)) {
+                            targetDate.year(moment(row.tanggal).year());
+                        }
+                        const targetDateFormatted = targetDate.format('YYYY-MM-DD');
+                        const dateTag = `[Sudah Hadir Lebih Awal pada ${moment(row.tanggal).format('DD MMM')}]`;
+                        await db.query(`
+                            UPDATE ronda_jadwal 
+                            SET status = 'hadir',
+                                keterangan = ?
+                            WHERE warga_id = ? AND tanggal = ? AND status = 'scheduled'
+                        `, [dateTag, row.warga_id, targetDateFormatted]);
+                    }
+                }
+            }
+        } catch (healErr) {
+            console.error('Error healing curi-start links:', healErr);
         }
     },
 
@@ -582,9 +621,10 @@ const Ronda = {
                     WHERE id = ?
                 `, [r.id]);
             } else {
-                // Find next available (non-libur) Saturday
+                // Find next available (non-libur) Saturday starting from today or tomorrow
                 let nextDateObj = moment(r.tanggal).add(7, 'days');
-                while (liburSet.has(nextDateObj.format('YYYY-MM-DD'))) {
+                const todayStr = moment().format('YYYY-MM-DD');
+                while (nextDateObj.format('YYYY-MM-DD') < todayStr || liburSet.has(nextDateObj.format('YYYY-MM-DD'))) {
                     nextDateObj.add(7, 'days');
                 }
                 const nextDate = nextDateObj.format('YYYY-MM-DD');

@@ -771,7 +771,7 @@ exports.skipWeek = async (req, res) => {
         const currentYear = affectedDate.format('YYYY');
         const affectedMonth = parseInt(affectedDate.format('M'));
         for (let m = affectedMonth; m <= 12; m++) {
-            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear);
+            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear, true);
         }
 
         res.json({ success: true });
@@ -795,7 +795,7 @@ exports.resetWeek = async (req, res) => {
         const currentYear = affectedDate.format('YYYY');
         const affectedMonth = parseInt(affectedDate.format('M'));
         for (let m = affectedMonth; m <= 12; m++) {
-            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear);
+            await Ronda.generateSchedule(String(m).padStart(2, '0'), currentYear, true);
         }
 
         res.json({ success: true });

@@ -1,5 +1,9 @@
 {
   "hiddenCameras": [
+    "CCTV-GANG-SNAP",
+    "KALULA-HOME",
+    "KALULA-HOME-LIVE",
+    "SECURITY-CAM",
     "cctv_kalula_home"
   ]
 }

@@ -42,7 +42,7 @@ router.get('/regenerate-january', ensureAuthenticated, async (req, res) => {
             output += `<p>🗑️  Dihapus ${deleteResult.affectedRows} jadwal lama</p>`;
             
             // Generate ulang
-            await Ronda.generateSchedule('01', '2026');
+            await Ronda.generateSchedule('01', '2026', true);
             
             output += `<p style="color: green; font-weight: bold; font-size: 18px;">✅ Jadwal Januari 2026 berhasil di-regenerate!</p>`;
             output += `<p><a href="/ronda?month=1&year=2026" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Lihat Jadwal Januari</a></p>`;
@@ -85,7 +85,7 @@ router.get('/regenerate-february', ensureAuthenticated, async (req, res) => {
             output += `<p>🗑️  Dihapus ${deleteResult.affectedRows} jadwal lama</p>`;
             
             // Generate ulang
-            await Ronda.generateSchedule('02', '2026');
+            await Ronda.generateSchedule('02', '2026', true);
             
             output += `<p style="color: green; font-weight: bold; font-size: 18px;">✅ Jadwal Februari 2026 berhasil di-regenerate!</p>`;
             output += `<p><a href="/ronda?month=2&year=2026" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Lihat Jadwal Februari</a></p>`;
@@ -368,7 +368,7 @@ router.get('/regenerate-month', ensureAuthenticated, async (req, res) => {
             output += `<p>🗑️  Dihapus ${deleteResult.affectedRows} jadwal lama</p>`;
             
             // Generate ulang
-            await Ronda.generateSchedule(month, year);
+            await Ronda.generateSchedule(month, year, true);
             
             output += `<p class="success">✅ Jadwal ${monthName} berhasil di-regenerate!</p>`;
             output += `<a href="/ronda?month=${parseInt(month)}&year=${year}" class="btn btn-success">Lihat Jadwal</a>`;

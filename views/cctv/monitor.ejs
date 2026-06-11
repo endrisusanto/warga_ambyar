@@ -10,6 +10,8 @@
                 overflow: hidden;
                 transition: all 0.3s ease;
                 aspect-ratio: 16/9;
+                break-inside: avoid;
+                margin-bottom: 1rem;
             }
 
             .cctv-card:hover {
@@ -251,6 +253,152 @@
                 border-radius: 8px;
                 padding: 0.75rem 1rem;
             }
+
+            .shooter-vignette {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                pointer-events: none;
+                z-index: 999999;
+                box-shadow: inset 0 0 0px rgba(239, 68, 68, 0);
+                background: radial-gradient(circle, transparent 50%, rgba(239, 68, 68, 0) 100%);
+                transition: all 0.3s ease;
+                opacity: 0;
+            }
+
+            .shooter-vignette.active {
+                opacity: 1;
+                animation: shooterRedFlash 1.2s infinite alternate ease-in-out;
+            }
+
+            @keyframes shooterRedFlash {
+                0% {
+                    box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.4);
+                    background: radial-gradient(circle, transparent 45%, rgba(239, 68, 68, 0.3) 100%);
+                }
+                100% {
+                    box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.85);
+                    background: radial-gradient(circle, transparent 35%, rgba(239, 68, 68, 0.6) 100%);
+                }
+            }
+
+            /* Custom Alarm Modal styles */
+            .alarm-modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 99999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+            }
+
+            .alarm-modal-overlay.hidden {
+                display: none;
+            }
+
+            .alarm-modal-content {
+                width: 100%;
+                max-width: 480px;
+                background: rgba(26, 31, 58, 0.95);
+                border: 2px solid rgba(239, 68, 68, 0.3);
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+                border-radius: 20px;
+                padding: 2rem;
+                position: relative;
+                color: #ffffff;
+                backdrop-filter: blur(20px);
+                animation: slideIn 0.3s ease;
+            }
+
+            @keyframes slideIn {
+                from { transform: scale(0.9) translateY(10px); opacity: 0; }
+                to { transform: scale(1) translateY(0); opacity: 1; }
+            }
+
+            .alarm-slider-track {
+                width: 100%;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 999px;
+                outline: none;
+            }
+
+            .alarm-trigger-btn {
+                background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+                box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+                transition: all 0.2s ease;
+            }
+
+            .alarm-trigger-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+                filter: brightness(1.1);
+            }
+
+            .alarm-trigger-btn:active {
+                transform: translateY(0);
+            }
+
+            /* Custom switch styling */
+            .switch-container {
+                display: inline-flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .switch-input {
+                display: none;
+            }
+
+            .switch-label {
+                width: 44px;
+                height: 24px;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 999px;
+                position: relative;
+                transition: background-color 0.3s;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .switch-label::after {
+                content: '';
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: white;
+                top: 2px;
+                left: 2px;
+                transition: transform 0.3s;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .switch-input:checked + .switch-label {
+                background-color: #ef4444;
+            }
+
+            .switch-input:checked + .switch-label::after {
+                transform: translateX(20px);
+            }
+
+            /* Neon text alert */
+            .neon-alert-text {
+                color: #fff;
+                text-shadow: 0 0 5px #fff, 0 0 10px #ef4444, 0 0 20px #ef4444, 0 0 40px #ef4444;
+                animation: textBlink 1s infinite alternate;
+            }
+
+            @keyframes textBlink {
+                0% { opacity: 0.6; }
+                100% { opacity: 1; }
+            }
         </style>
 
         <div class="glass-card">
@@ -273,14 +421,12 @@
                         </svg>
                         Buka CCTV Gang
                     </a>
-                    <% if (user) { %>
-                        <button type="button" id="sirenButton" onclick="triggerGangSiren()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-800 bg-red-100 hover:bg-red-200 dark:text-white dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-                            <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
-                            </svg>
-                            Lampu alarm CCTV
-                        </button>
-                    <% } %>
+                    <button type="button" id="sirenButton" onclick="openAlarmModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-800 bg-red-100 hover:bg-red-200 dark:text-white dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                        <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
+                        </svg>
+                        Lampu alarm CCTV
+                    </button>
                 </div>
             </div>
 
@@ -299,13 +445,13 @@
             <div class="p-6">
                 <!-- MSE Go2RTC Content -->
                 <div id="content-frigate" class="block">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="frigateGrid"></div>
+                    <div class="columns-1 md:columns-2 lg:columns-3 gap-4" id="frigateGrid"></div>
                 </div>
 
                 <!-- CCTV Lalu Lintas Content -->
                 <div id="content-lalu-lintas" class="hidden">
                     <!-- CCTV Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="cctvGrid"></div>
+                    <div class="columns-1 md:columns-2 lg:columns-3 gap-4" id="cctvGrid"></div>
                 </div>
             </div>
         </div>
@@ -318,6 +464,7 @@
                     <video class="modal-video" id="modalVideo" style="display: none;" autoplay muted controls></video>
                     <iframe id="modalIframe" class="modal-video border-0" style="display: none;" allow="autoplay; fullscreen"></iframe>
                     <img id="modalImage" class="modal-video" style="display: none; object-fit: cover;" alt="">
+                    <video-rtc id="modalWebrtc" class="modal-video" style="display: none; object-fit: contain; width: 100%; height: 100%; background: #000;" autoplay controls></video-rtc>
                     <div class="modal-info pointer-events-none">
                         <div class="text-sm font-bold text-white drop-shadow-md"
                             style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);"
@@ -330,7 +477,99 @@
             </div>
         </div>
 
+        <!-- Alarm Control Modal -->
+        <div class="alarm-modal-overlay hidden" id="alarmModalOverlay" onclick="closeAlarmModal()">
+            <div class="alarm-modal-content" onclick="event.stopPropagation()">
+                <button class="modal-close" onclick="closeAlarmModal()">×</button>
+                <div class="text-center mb-6">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 mb-4 animate-pulse">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white tracking-wide">Kontrol Lampu Sorot & Alarm CCTV</h3>
+                    <p class="text-xs text-gray-400 mt-1">Aktifkan Alarm dan lampu sorot pada CCTV Gang (siren.camera_gcc2_f7f8_siren, siren.security_camera & light.security_camera_floodlight)</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Toggles -->
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-semibold text-white">Lampu Sorot CCTV depan Karsidi</span>
+                                <span class="text-xs text-gray-400">siren.camera_gcc2_f7f8_siren</span>
+                            </div>
+                            <label class="switch-container">
+                                <input type="checkbox" id="alarmSirenGcc2Toggle" class="switch-input" checked>
+                                <span class="switch-label"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-semibold text-white">Alarm CCTV Depan Dery</span>
+                                <span class="text-xs text-gray-400">siren.security_camera</span>
+                            </div>
+                            <label class="switch-container">
+                                <input type="checkbox" id="alarmSirenToggle" class="switch-input" checked>
+                                <span class="switch-label"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-semibold text-white">Lampu Sorot CCTV Depan Dery</span>
+                                <span class="text-xs text-gray-400">light.security_camera_floodlight</span>
+                            </div>
+                            <label class="switch-container">
+                                <input type="checkbox" id="alarmLightToggle" class="switch-input" checked>
+                                <span class="switch-label"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Slider for Duration -->
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-white">Durasi Alarm</span>
+                            <span id="alarmDurationVal" class="text-sm font-bold text-red-400">5 Detik</span>
+                        </div>
+                        <input type="range" id="alarmDurationSlider" min="1" max="30" value="5" class="w-full alarm-slider-track accent-red-500 cursor-pointer" oninput="updateDurationLabel(this.value)">
+                        <div class="flex justify-between text-[10px] text-gray-500 mt-1 px-1">
+                            <span>1s</span>
+                            <span>10s</span>
+                            <span>20s</span>
+                            <span>30s</span>
+                        </div>
+                    </div>
+
+                    <!-- Trigger Button -->
+                    <button type="button" onclick="triggerCustomAlarm()" class="w-full alarm-trigger-btn text-white py-3.5 px-4 rounded-xl font-bold tracking-wide uppercase focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 flex items-center justify-center gap-2">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Nyalakan Alarm Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shooter Game Red Vignette Overlay -->
+        <div id="shooter-vignette" class="shooter-vignette"></div>
+
+        <!-- Alarm Countdown Status Display -->
+        <div id="alarm-countdown-display" class="fixed top-12 left-1/2 transform -translate-x-1/2 z-[999999] pointer-events-none hidden text-center">
+            <div class="bg-black/80 backdrop-blur-md border border-red-500/30 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <span class="text-sm font-bold tracking-wider text-red-500 uppercase">Alarm Aktif</span>
+                <div class="h-4 w-px bg-white/20"></div>
+                <span id="alarm-countdown-seconds" class="text-sm font-black text-white w-12 text-left neon-alert-text">5s</span>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script src="https://camera.ambyar.biz.id/video-rtc.js"></script>
         <script>
             const isAdmin = <%- JSON.stringify(Boolean(user && user.role === 'admin')) %>;
             const hiddenCameras = new Set(<%- JSON.stringify(typeof hiddenCameras !== 'undefined' ? hiddenCameras : []) %>);
@@ -366,59 +605,73 @@
             }
 
             // Create CCTV Cards
-            const grid = document.getElementById('cctvGrid');
-            cameras.forEach(camera => {
-                const card = document.createElement('div');
-                card.className = 'cctv-card';
-                card.innerHTML = `
-            <div class="cctv-video-wrapper">
-                <video class="cctv-video" autoplay muted playsinline></video>
-                <div class="cctv-loading">
-                    <div class="loading-spinner"></div>
-                    <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
-                </div>
-                <div class="cctv-overlay">
-                    <div class="live-badge">● LIVE</div>
-                    <div class="cctv-info">
-                        <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
-                        <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
+            let publicCamerasLoaded = false;
+            
+            function initPublicCameras() {
+                const grid = document.getElementById('cctvGrid');
+                cameras.forEach(camera => {
+                    const card = document.createElement('div');
+                    card.className = 'cctv-card';
+                    card.innerHTML = `
+                <div class="cctv-video-wrapper">
+                    <video class="cctv-video" autoplay muted playsinline></video>
+                    <div class="cctv-loading">
+                        <div class="loading-spinner"></div>
+                        <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
                     </div>
-                    <button class="expand-button" onclick="openModal('${camera.id}')">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
-                        </svg>
-                    </button>
+                    <div class="cctv-overlay">
+                        <div class="live-badge">● LIVE</div>
+                        <div class="cctv-info">
+                            <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
+                            <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
+                        </div>
+                        <button class="expand-button" onclick="openModal('${camera.id}')">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
-                const video = card.querySelector('.cctv-video');
-                const loading = card.querySelector('.cctv-loading');
-                video.muted = true;
-                video.defaultMuted = true;
+                    const video = card.querySelector('.cctv-video');
+                    const loading = card.querySelector('.cctv-loading');
+                    video.muted = true;
+                    video.defaultMuted = true;
 
-                // Initialize HLS
-                const hls = initHLS(video, camera.url);
+                    // Initialize HLS
+                    const hls = initHLS(video, camera.url);
 
-                // Hide loading when video starts
-                video.addEventListener('loadeddata', () => {
-                    loading.style.display = 'none';
+                    // Hide loading when video starts
+                    video.addEventListener('loadeddata', () => {
+                        loading.style.display = 'none';
+                    });
+
+                    grid.appendChild(card);
                 });
-
-                grid.appendChild(card);
-            });
+            }
 
             // Frigate Camera Data
             const go2rtcBaseUrl = 'https://camera.ambyar.biz.id';
             const frigateCameras = [
-                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View', src: 'cctv_gang_ambyar', type: 'mse' },
-                { id: 'KALULA-HOME', name: 'CCTV Kalula Home (Snapshot)', src: 'cctv_kalula_home', type: 'snapshot' },
+                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View (Live)', src: 'cctv_gang_ambyar', type: 'mse' },
+                { id: 'CCTV-GANG-SNAP', name: 'CCTV Birds Eye View (Backup)', src: 'cctv_gang_ambyar', type: 'snapshot' },
+                { id: 'KALULA-HOME', name: 'CCTV Kalula Home (Backup)', src: 'cctv_kalula_home', type: 'snapshot' },
                 { id: 'KALULA-HOME-LIVE', name: 'CCTV Kalula Home (Live)', src: 'cctv_kalula_home', type: 'mse' },
-                { id: 'SECURITY-CAM', name: 'Security Camera', src: 'security_camera', type: 'mse' }
+                { id: 'SECURITY-CAM', name: 'Security Camera (Live)', src: 'security_camera', type: 'mse', ratio: '800/896' },
+                { id: 'SECURITY-CAM-SNAP', name: 'Security Camera (Backup)', src: 'security_camera', type: 'snapshot', ratio: '800/896' }
             ];
 
             function mseStreamUrl(src) {
                 return `${go2rtcBaseUrl}/stream.html?src=${encodeURIComponent(src)}&mode=mse&media=video&muted=1`;
+            }
+
+            function webrtcStreamUrl(src) {
+                return `${go2rtcBaseUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/api/ws?src=${encodeURIComponent(src)}`;
+            }
+
+            function mjpegStreamUrl(src) {
+                return `${go2rtcBaseUrl}/api/stream.mjpeg?src=${encodeURIComponent(src)}`;
             }
 
             function frameUrl(src) {
@@ -427,22 +680,32 @@
 
             function startSnapshotRefresh(img, src, intervalMs = 5000) {
                 const refresh = () => {
-                    img.src = frameUrl(src);
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        img.src = tempImg.src;
+                    };
+                    tempImg.src = frameUrl(src);
                 };
-                refresh();
+                
+                if (!img.getAttribute('src') || img.getAttribute('src') === '') {
+                    img.src = frameUrl(src);
+                } else {
+                    refresh();
+                }
+                
                 return window.setInterval(refresh, intervalMs);
             }
 
             function adminHideButton(camera) {
                 if (!isAdmin) return '';
-                const hidden = hiddenCameras.has(camera.src);
+                const hidden = hiddenCameras.has(camera.id);
                 const title = hidden ? 'Tampilkan kamera' : 'Sembunyikan kamera';
                 const iconPath = hidden
                     ? 'M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.412-.584M9.88 4.24A9.85 9.85 0 0112 4c4.478 0 8.268 2.943 9.542 7a10.515 10.515 0 01-3.07 4.568M6.11 6.11A10.506 10.506 0 002.458 11C3.732 15.057 7.523 18 12 18c1.347 0 2.633-.268 3.807-.754'
                     : 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z';
 
                 return `
-                    <button class="hide-camera-button ${hidden ? 'is-hidden' : ''}" onclick="toggleCameraHidden('${camera.src}', event)" title="${title}" aria-label="${title}">
+                    <button class="hide-camera-button ${hidden ? 'is-hidden' : ''}" onclick="toggleCameraHidden('${camera.id}', event)" title="${title}" aria-label="${title}">
                         <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>
                         </svg>
@@ -451,19 +714,31 @@
             }
 
             function hiddenCameraBadge(camera) {
-                return isAdmin && hiddenCameras.has(camera.src) ? '<div class="hidden-camera-badge">Hidden</div>' : '';
+                return isAdmin && hiddenCameras.has(camera.id) ? '<div class="hidden-camera-badge">Hidden</div>' : '';
             }
 
             // Create Frigate Cards
             const frigateGrid = document.getElementById('frigateGrid');
             frigateCameras.forEach(camera => {
-                if (!isAdmin && hiddenCameras.has(camera.src)) return;
+                if (!isAdmin && hiddenCameras.has(camera.id)) return;
 
                 const card = document.createElement('div');
-                card.className = `cctv-card${hiddenCameras.has(camera.src) ? ' camera-hidden' : ''}`;
-                const mediaHtml = camera.type === 'snapshot'
-                    ? `<img class="cctv-video" alt="${camera.name}" style="object-fit: cover;">`
-                    : `<iframe src="${mseStreamUrl(camera.src)}" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" onload="this.nextElementSibling.style.display='none'"></iframe>`;
+                card.className = `cctv-card${hiddenCameras.has(camera.id) ? ' camera-hidden' : ''}`;
+                if (camera.ratio) {
+                    card.style.aspectRatio = camera.ratio;
+                }
+                
+                let mediaHtml = '';
+                if (camera.type === 'snapshot') {
+                    mediaHtml = `<img class="cctv-video" alt="${camera.name}" data-camera-id="${camera.id}" style="object-fit: cover;">`;
+                } else if (camera.type === 'mjpeg') {
+                    mediaHtml = `<img class="cctv-video" src="${mjpegStreamUrl(camera.src)}" alt="${camera.name}" data-camera-id="${camera.id}" style="object-fit: contain; width: 100%; height: 100%; background: #000;">`;
+                } else if (camera.type === 'webrtc') {
+                    mediaHtml = `<video-rtc src="${webrtcStreamUrl(camera.src)}" class="cctv-video" autoplay controls style="object-fit: contain; width: 100%; height: 100%; background: #000;"></video-rtc>`;
+                } else {
+                    mediaHtml = `<iframe src="${mseStreamUrl(camera.src)}" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" onload="this.nextElementSibling.style.display='none'"></iframe>`;
+                }
+                
                 card.innerHTML = `
             <div class="cctv-video-wrapper">
                 ${mediaHtml}
@@ -493,14 +768,29 @@
                     img.addEventListener('load', () => {
                         loading.style.display = 'none';
                     });
-                    startSnapshotRefresh(img, camera.src);
+                    startSnapshotRefresh(img, camera.src, camera.interval || 5000);
+                } else if (camera.type === 'mjpeg') {
+                    const img = card.querySelector('img.cctv-video');
+                    const loading = card.querySelector('.cctv-loading');
+                    img.addEventListener('load', () => {
+                        loading.style.display = 'none';
+                    });
+                } else if (camera.type === 'webrtc') {
+                    const rtc = card.querySelector('video-rtc');
+                    const loading = card.querySelector('.cctv-loading');
+                    if (rtc) {
+                        rtc.addEventListener('playing', () => {
+                            loading.style.display = 'none';
+                        });
+                        setTimeout(() => { loading.style.display = 'none'; }, 5000);
+                    }
                 }
                 frigateGrid.appendChild(card);
             });
 
-            async function toggleCameraHidden(cameraSrc, event) {
+            async function toggleCameraHidden(cameraId, event) {
                 event.stopPropagation();
-                const shouldHide = !hiddenCameras.has(cameraSrc);
+                const shouldHide = !hiddenCameras.has(cameraId);
                 const actionText = shouldHide ? 'sembunyikan' : 'tampilkan kembali';
 
                 if (!confirm(`Yakin ingin ${actionText} kamera ini?`)) return;
@@ -513,7 +803,7 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            camera_id: cameraSrc,
+                            camera_id: cameraId,
                             hidden: shouldHide
                         })
                     });
@@ -576,13 +866,32 @@
                 const video = document.getElementById('modalVideo');
                 const iframe = document.getElementById('modalIframe');
                 const image = document.getElementById('modalImage');
+                const webrtc = document.getElementById('modalWebrtc');
+                const videoContainer = document.querySelector('.modal-video-container');
+                const modalContent = document.querySelector('.modal-content');
 
                 document.getElementById('modalCameraName').textContent = camera.name;
                 document.getElementById('modalCameraId').textContent = camera.id;
+                
+                if (videoContainer && modalContent) {
+                    videoContainer.style.aspectRatio = camera.ratio || '16/9';
+                    if (camera.ratio && camera.ratio !== '16/9') {
+                        const parts = camera.ratio.split('/');
+                        let ratioVal = 1;
+                        if (parts.length === 2) {
+                            ratioVal = parseFloat(parts[0]) / parseFloat(parts[1]);
+                        }
+                        modalContent.style.maxWidth = `min(1200px, calc(85vh * ${ratioVal}))`;
+                    } else {
+                        modalContent.style.maxWidth = '1200px';
+                    }
+                }
 
-                iframe.style.display = camera.type === 'snapshot' ? 'none' : 'block';
-                image.style.display = camera.type === 'snapshot' ? 'block' : 'none';
+                iframe.style.display = camera.type === 'mse' ? 'block' : 'none';
+                image.style.display = (camera.type === 'snapshot' || camera.type === 'mjpeg') ? 'block' : 'none';
+                if (webrtc) webrtc.style.display = camera.type === 'webrtc' ? 'block' : 'none';
                 video.style.display = 'none';
+                
                 if (modalHls) {
                     modalHls.destroy();
                     modalHls = null;
@@ -594,10 +903,28 @@
                 video.pause();
                 video.removeAttribute('src');
                 video.load();
+                if (webrtc) webrtc.src = '';
+                
                 if (camera.type === 'snapshot') {
                     iframe.src = '';
                     image.alt = camera.name;
-                    modalSnapshotTimer = startSnapshotRefresh(image, camera.src, 3000);
+                    
+                    const existingImg = document.querySelector(`img.cctv-video[data-camera-id="${camera.id}"]`);
+                    if (existingImg && existingImg.src) {
+                        image.src = existingImg.src;
+                    } else {
+                        image.src = '';
+                    }
+                    
+                    modalSnapshotTimer = startSnapshotRefresh(image, camera.src, camera.interval || 3000);
+                } else if (camera.type === 'mjpeg') {
+                    iframe.src = '';
+                    image.alt = camera.name;
+                    image.src = mjpegStreamUrl(camera.src);
+                } else if (camera.type === 'webrtc') {
+                    image.src = '';
+                    iframe.src = '';
+                    if (webrtc) webrtc.src = webrtcStreamUrl(camera.src);
                 } else {
                     image.src = '';
                     iframe.src = mseStreamUrl(camera.src);
@@ -612,6 +939,7 @@
                 const video = document.getElementById('modalVideo');
                 const iframe = document.getElementById('modalIframe');
                 const image = document.getElementById('modalImage');
+                const webrtc = document.getElementById('modalWebrtc');
 
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
@@ -631,6 +959,7 @@
                 image.style.display = 'none';
                 
                 iframe.src = '';
+                if (webrtc) webrtc.src = '';
             }
 
             // Close modal on ESC key
@@ -651,6 +980,10 @@
                 const inactiveTabClass = 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200';
 
                 if (tab === 'lalu-lintas') {
+                    if (!publicCamerasLoaded) {
+                        initPublicCameras();
+                        publicCamerasLoaded = true;
+                    }
                     tabLaluLintas.className = activeTabClass;
                     tabFrigate.className = inactiveTabClass;
                     
@@ -671,15 +1004,61 @@
                 }
             }
 
-            async function triggerGangSiren() {
-                if (!confirm('Nyalakan siren CCTV Gang sekarang?')) return;
+            // Client-side timer trackers
+            let alarmCountdownTimer = null;
+            let alarmCountdownValue = 0;
 
-                const button = document.getElementById('sirenButton');
-                const originalContent = button ? button.innerHTML : '';
-                if (button) {
-                    button.disabled = true;
-                    button.innerHTML = 'Menyalakan...';
+            function openAlarmModal() {
+                const modal = document.getElementById('alarmModalOverlay');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
                 }
+            }
+
+            function closeAlarmModal() {
+                const modal = document.getElementById('alarmModalOverlay');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            function updateDurationLabel(val) {
+                const label = document.getElementById('alarmDurationVal');
+                if (label) {
+                    label.textContent = `${val} Detik`;
+                }
+            }
+
+            // Close alarm config modal on ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAlarmModal();
+                }
+            });
+
+            async function triggerCustomAlarm() {
+                const triggerSirenGcc2 = document.getElementById('alarmSirenGcc2Toggle').checked;
+                const triggerSiren = document.getElementById('alarmSirenToggle').checked;
+                const triggerLight = document.getElementById('alarmLightToggle').checked;
+                const duration = parseInt(document.getElementById('alarmDurationSlider').value) || 5;
+
+                const entities = [];
+                if (triggerSirenGcc2) entities.push('siren.camera_gcc2_f7f8_siren');
+                if (triggerSiren) entities.push('siren.security_camera');
+                if (triggerLight) entities.push('light.security_camera_floodlight');
+
+                if (entities.length === 0) {
+                    alert('Silakan aktifkan minimal satu entitas alarm.');
+                    return;
+                }
+
+                if (!confirm(`Konfirmasi untuk mengaktifkan alarm selama ${duration} detik?`)) {
+                    return;
+                }
+
+                closeAlarmModal();
 
                 try {
                     const response = await fetch('/cctv/siren', {
@@ -689,23 +1068,55 @@
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
-                        body: JSON.stringify({ entity_id: 'siren.camera_gcc2_f7f8_siren' })
+                        body: JSON.stringify({
+                            duration: duration,
+                            entities: entities
+                        })
                     });
                     const result = await response.json();
 
                     if (!response.ok || !result.success) {
-                        throw new Error(result.message || 'Gagal menyalakan siren.');
+                        throw new Error(result.message || 'Gagal mengirim perintah alarm.');
                     }
 
-                    alert(result.message || 'Siren CCTV Gang dinyalakan.');
+                    // Start Shooter Game border pulse effect
+                    startShooterVignetteEffect(duration);
+
                 } catch (error) {
-                    alert('Gagal menyalakan siren: ' + error.message);
-                } finally {
-                    if (button) {
-                        button.disabled = false;
-                        button.innerHTML = originalContent;
-                    }
+                    alert('Gagal mengaktifkan alarm: ' + error.message);
                 }
+            }
+
+            function startShooterVignetteEffect(duration) {
+                const vignette = document.getElementById('shooter-vignette');
+                const display = document.getElementById('alarm-countdown-display');
+                const secondsLabel = document.getElementById('alarm-countdown-seconds');
+
+                if (!vignette || !display || !secondsLabel) return;
+
+                // Clear previous timers if any
+                if (alarmCountdownTimer) {
+                    clearInterval(alarmCountdownTimer);
+                }
+
+                alarmCountdownValue = duration;
+                secondsLabel.textContent = `${alarmCountdownValue}s`;
+
+                // Show elements
+                vignette.classList.add('active');
+                display.classList.remove('hidden');
+
+                alarmCountdownTimer = setInterval(() => {
+                    alarmCountdownValue--;
+                    if (alarmCountdownValue <= 0) {
+                        clearInterval(alarmCountdownTimer);
+                        alarmCountdownTimer = null;
+                        vignette.classList.remove('active');
+                        display.classList.add('hidden');
+                    } else {
+                        secondsLabel.textContent = `${alarmCountdownValue}s`;
+                    }
+                }, 1000);
             }
         </script>
 

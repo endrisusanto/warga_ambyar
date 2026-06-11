@@ -82,7 +82,9 @@ router.post('/hide-camera', ensureAuthenticated, async (req, res) => {
     }
 });
 
-router.post('/siren', ensureAuthenticated, async (req, res) => {
+const activeTimers = {};
+
+router.post('/siren', async (req, res) => {
     try {
         const baseUrl = process.env.HOME_ASSISTANT_URL || process.env.HASS_URL;
         const token = process.env.HOME_ASSISTANT_TOKEN || process.env.HASS_TOKEN;
@@ -94,24 +96,82 @@ router.post('/siren', ensureAuthenticated, async (req, res) => {
             });
         }
 
-        const response = await fetch(`${baseUrl.replace(/\/$/, '')}/api/services/siren/turn_on`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ entity_id: SIREN_ENTITY_ID })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            return res.status(response.status).json({
-                success: false,
-                message: errorText || 'Gagal menyalakan siren.'
-            });
+        const duration = Math.min(Math.max(parseInt(req.body.duration) || 5, 1), 120); // Limit between 1 and 120 seconds
+        
+        let entities = [];
+        if (Array.isArray(req.body.entities)) {
+            entities = req.body.entities;
+        } else {
+            // Legacy / singular parameters support
+            const triggerSiren = req.body.trigger_siren !== false && req.body.trigger_siren !== 'false';
+            const triggerLight = req.body.trigger_light === true || req.body.trigger_light === 'true';
+            const sirenEntityId = req.body.siren_entity || 'siren.security_camera';
+            const lightEntityId = req.body.light_entity || 'light.security_camera_floodlight';
+            
+            if (triggerSiren) entities.push(sirenEntityId);
+            if (triggerLight) entities.push(lightEntityId);
         }
 
-        res.json({ success: true, message: 'Siren CCTV Gang dinyalakan.' });
+        const hassHeaders = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        // Trigger and set timers for each selected entity
+        for (const entityId of entities) {
+            const domain = entityId.split('.')[0];
+            if (!['siren', 'light', 'switch'].includes(domain)) {
+                console.warn(`[Alarm] Unsupported domain for entity: ${entityId}`);
+                continue;
+            }
+
+            // Clear existing timeout for this entity if already running
+            if (activeTimers[entityId]) {
+                clearTimeout(activeTimers[entityId]);
+                delete activeTimers[entityId];
+                console.log(`[Alarm] Cleared existing timer for: ${entityId}`);
+            }
+
+            // Trigger turn_on
+            console.log(`[Alarm] Activating: ${entityId}`);
+            try {
+                const resTurnOn = await fetch(`${baseUrl.replace(/\/$/, '')}/api/services/${domain}/turn_on`, {
+                    method: 'POST',
+                    headers: hassHeaders,
+                    body: JSON.stringify({ entity_id: entityId })
+                });
+                if (!resTurnOn.ok) {
+                    const errorText = await resTurnOn.text();
+                    console.error(`Failed to turn on ${entityId}:`, errorText);
+                }
+            } catch (e) {
+                console.error(`Error turning on ${entityId}:`, e);
+            }
+
+            // Set timeout to turn off
+            const timerId = setTimeout(async () => {
+                console.log(`[Alarm] Automatically turning off: ${entityId}`);
+                try {
+                    await fetch(`${baseUrl.replace(/\/$/, '')}/api/services/${domain}/turn_off`, {
+                        method: 'POST',
+                        headers: hassHeaders,
+                        body: JSON.stringify({ entity_id: entityId })
+                    });
+                } catch (e) {
+                    console.error(`Error turning off ${entityId}:`, e);
+                }
+                delete activeTimers[entityId];
+            }, duration * 1000);
+
+            activeTimers[entityId] = timerId;
+        }
+
+        res.json({
+            success: true,
+            message: `Alarm diaktifkan selama ${duration} detik.`,
+            duration,
+            entities
+        });
     } catch (error) {
         console.error('CCTV siren error:', error);
         res.status(500).json({
