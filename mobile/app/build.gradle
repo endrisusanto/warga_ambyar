@@ -47,7 +47,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            def version = variant.versionName
+            def version = variant.getVersionName()
             outputFileName = "Gang_Ambar_v${version}.apk"
         }
     }
