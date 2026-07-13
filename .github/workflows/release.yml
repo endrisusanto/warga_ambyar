@@ -32,6 +32,41 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Recreate Flutter Project Structure
+        run: |
+          # Backup our custom files
+          mkdir -p /tmp/backup/lib
+          mkdir -p /tmp/backup/android/kotlin
+          mkdir -p /tmp/backup/android/layout
+          mkdir -p /tmp/backup/android/xml
+          
+          cp mobile/pubspec.yaml /tmp/backup/
+          cp mobile/lib/main.dart /tmp/backup/lib/
+          cp mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/WargaAmbyarWidgetProvider.kt /tmp/backup/android/kotlin/
+          cp mobile/android/app/src/main/res/layout/widget_layout.xml /tmp/backup/android/layout/
+          cp mobile/android/app/src/main/res/xml/widget_info.xml /tmp/backup/android/xml/
+          cp mobile/android/app/src/main/AndroidManifest.xml /tmp/backup/android/
+          
+          # Delete existing mobile dir to do a clean recreate
+          rm -rf mobile
+          
+          # Run flutter create to initialize all required wrapper build scripts (Gradle, etc.)
+          flutter create --org com.example --project-name warga_ambyar_mobile mobile
+          
+          # Restore our custom files
+          cp /tmp/backup/pubspec.yaml mobile/
+          cp /tmp/backup/lib/main.dart mobile/lib/
+          
+          # Ensure directories exist in the newly created project
+          mkdir -p mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile
+          mkdir -p mobile/android/app/src/main/res/layout
+          mkdir -p mobile/android/app/src/main/res/xml
+          
+          cp /tmp/backup/android/kotlin/WargaAmbyarWidgetProvider.kt mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/
+          cp /tmp/backup/android/layout/widget_layout.xml mobile/android/app/src/main/res/layout/
+          cp /tmp/backup/android/xml/widget_info.xml mobile/android/app/src/main/res/xml/
+          cp /tmp/backup/android/AndroidManifest.xml mobile/android/app/src/main/AndroidManifest.xml
+
       - name: Install Dependencies
         run: |
           cd mobile
