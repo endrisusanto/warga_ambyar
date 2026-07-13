@@ -1,4 +1,4 @@
-name: Build & Release Flutter APK
+name: Build & Release Native Kotlin APK
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Get all tags and history
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v3
@@ -24,118 +24,49 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-
-      - name: Recreate Flutter Project Structure
-        run: |
-          # Backup our custom files
-          mkdir -p /tmp/backup/lib
-          mkdir -p /tmp/backup/android/kotlin
-          mkdir -p /tmp/backup/android/layout
-          mkdir -p /tmp/backup/android/xml
-          
-          cp mobile/pubspec.yaml /tmp/backup/
-          cp mobile/lib/main.dart /tmp/backup/lib/
-          cp mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/WargaAmbyarWidgetProvider.kt /tmp/backup/android/kotlin/
-          cp mobile/android/app/src/main/res/layout/widget_layout.xml /tmp/backup/android/layout/
-          cp mobile/android/app/src/main/res/xml/widget_info.xml /tmp/backup/android/xml/
-          
-          # Delete existing mobile dir to do a clean recreate
-          rm -rf mobile
-          
-          # Run flutter create to initialize all required wrapper build scripts (Gradle, etc.)
-          flutter create --org com.example --project-name warga_ambyar_mobile mobile
-          
-          # Restore our custom files
-          cp /tmp/backup/pubspec.yaml mobile/
-          cp /tmp/backup/lib/main.dart mobile/lib/
-          
-          # Ensure directories exist in the newly created project
-          mkdir -p mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile
-          mkdir -p mobile/android/app/src/main/res/layout
-          mkdir -p mobile/android/app/src/main/res/xml
-          
-          cp /tmp/backup/android/kotlin/WargaAmbyarWidgetProvider.kt mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/
-          cp /tmp/backup/android/layout/widget_layout.xml mobile/android/app/src/main/res/layout/
-          cp /tmp/backup/android/xml/widget_info.xml mobile/android/app/src/main/res/xml/
-          
-          # Inject widget receiver and internet permissions into the newly generated AndroidManifest.xml safely
-          python3 -c '
-          import re
-          with open("mobile/android/app/src/main/AndroidManifest.xml", "r") as f:
-              content = f.read()
-          
-          if "android.permission.INTERNET" not in content:
-              permission = "    <uses-permission android:name=\"android.permission.INTERNET\" />"
-              content = content.replace("<application", f"{permission}\n    <application")
-          
-          if "WargaAmbyarWidgetProvider" not in content:
-              receiver = """
-                  <!-- Register WargaAmbyarWidgetProvider for home screen widget updates -->
-                  <receiver android:name=".WargaAmbyarWidgetProvider" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                      </intent-filter>
-                      <meta-data android:name="android.appwidget.provider"
-                                 android:resource="@xml/widget_info" />
-                  </receiver>
-              """
-              content = content.replace("</application>", f"{receiver}\n    </application>")
-          
-          with open("mobile/android/app/src/main/AndroidManifest.xml", "w") as f:
-              f.write(content)
-          '
-
-      - name: Install Dependencies
-        run: |
-          cd mobile
-          flutter pub get
-
-      # ponytail: Keep version bumping simple using plain bash. No heavy npm/python packages needed.
+      # ponytail: Keep version bumping simple using plain bash.
       - name: Auto-Bump Version
         id: bump_version
         run: |
-          VERSION_LINE=$(grep "^version:" mobile/pubspec.yaml)
-          VERSION=$(echo $VERSION_LINE | awk '{print $2}')
-          BASE_VERSION=$(echo $VERSION | cut -d'+' -f1)
-          BUILD_NUMBER=$(echo $VERSION | cut -d'+' -f2)
+          VERSION_CODE_LINE=$(grep "versionCode" mobile/app/build.gradle)
+          VERSION_NAME_LINE=$(grep "versionName" mobile/app/build.gradle)
           
-          MAJOR=$(echo $BASE_VERSION | cut -d'.' -f1)
-          MINOR=$(echo $BASE_VERSION | cut -d'.' -f2)
-          PATCH=$(echo $BASE_VERSION | cut -d'.' -f3)
+          CODE=$(echo $VERSION_CODE_LINE | awk '{print $2}')
+          NAME=$(echo $VERSION_NAME_LINE | awk '{print $2}' | tr -d '"')
           
+          NEW_CODE=$((CODE + 1))
+          
+          MAJOR=$(echo $NAME | cut -d'.' -f1)
+          MINOR=$(echo $NAME | cut -d'.' -f2)
+          PATCH=$(echo $NAME | cut -d'.' -f3)
           NEW_PATCH=$((PATCH + 1))
-          NEW_BUILD=$((BUILD_NUMBER + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH+$NEW_BUILD"
+          NEW_NAME="$MAJOR.$MINOR.$NEW_PATCH"
           
-          echo "Bumping version from $VERSION to $NEW_VERSION"
-          sed -i "s/^version:.*/version: $NEW_VERSION/" mobile/pubspec.yaml
+          echo "Bumping versionCode from $CODE to $NEW_CODE"
+          echo "Bumping versionName from $NAME to $NEW_NAME"
           
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "new_version_tag=v$MAJOR.$MINOR.$NEW_PATCH" >> $GITHUB_OUTPUT
-          echo "tag_name=v$MAJOR.$MINOR.$NEW_PATCH-build$NEW_BUILD" >> $GITHUB_OUTPUT
+          sed -i "s/versionCode.*/versionCode $NEW_CODE/" mobile/app/build.gradle
+          sed -i "s/versionName.*/versionName \"$NEW_NAME\"/" mobile/app/build.gradle
+          
+          echo "version=$NEW_NAME" >> $GITHUB_OUTPUT
+          echo "tag_name=v$NEW_NAME-build$NEW_CODE" >> $GITHUB_OUTPUT
 
-      - name: Analyze Code
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Generate Wrapper and Build APK
         run: |
           cd mobile
-          flutter analyze
-
-      - name: Build APK (Release Mode)
-        run: |
-          cd mobile
-          flutter build apk --release -v
+          gradle wrapper --gradle-version 8.0.2
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease
 
       - name: Commit & Push Version Bump
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add mobile/pubspec.yaml
-          # Use [skip ci] to strictly avoid trigger loops, although GITHUB_TOKEN pushes generally do not trigger actions
-          git commit -m "chore: bump version to ${{ steps.bump_version.outputs.version }} [skip ci]"
+          git add mobile/app/build.gradle
+          git commit -m "chore: bump android version to ${{ steps.bump_version.outputs.version }} [skip ci]"
           git push origin main
 
       - name: Create and Push Tag
@@ -147,14 +78,14 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.bump_version.outputs.tag_name }}
-          name: Release ${{ steps.bump_version.outputs.new_version_tag }}
+          name: Release ${{ steps.bump_version.outputs.tag_name }}
           body: |
-            Release Otomatis Build APK Warga Ambyar Mobile.
+            Release Otomatis Build APK Warga Ambyar Native Kotlin.
             
             - Versi Aplikasi: ${{ steps.bump_version.outputs.version }}
             - Tag Rilis: ${{ steps.bump_version.outputs.tag_name }}
           draft: false
           prerelease: false
-          files: mobile/build/app/outputs/flutter-apk/app-release.apk
+          files: mobile/app/build/outputs/apk/release/app-release-unsigned.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

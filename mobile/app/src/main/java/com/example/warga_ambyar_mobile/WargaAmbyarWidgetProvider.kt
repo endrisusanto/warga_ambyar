@@ -5,9 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.SharedPreferences
 import android.widget.RemoteViews
-import com.example.warga_ambyar_mobile.R
 
-// ponytail: keep widget updates dead-simple, reading values from HomeWidget Shared Preferences
 class WargaAmbyarWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
@@ -15,7 +13,7 @@ class WargaAmbyarWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         val prefs: SharedPreferences = context.getSharedPreferences(
-            "DATA_WIDGET_NAME_group.com.example.warga_ambyar", // Shared Preferences namespace used by home_widget
+            "warga_ambyar_widget_prefs",
             Context.MODE_PRIVATE
         )
 
@@ -27,7 +25,6 @@ class WargaAmbyarWidgetProvider : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             
-            // Set text values in layout RemoteViews
             views.setTextViewText(R.id.txt_saldo, saldo)
             views.setTextViewText(R.id.txt_ronda_tanggal, rondaTanggal)
             views.setTextViewText(R.id.txt_ronda_petugas, rondaPetugas)
