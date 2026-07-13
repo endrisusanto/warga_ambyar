@@ -53,11 +53,13 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 8.0.2
 
       - name: Generate Wrapper and Build APK
         run: |
           cd mobile
-          gradle wrapper --gradle-version 8.0.2
+          gradle wrapper
           chmod +x gradlew
           ./gradlew :app:assembleRelease
 
