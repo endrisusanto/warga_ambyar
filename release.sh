@@ -9,9 +9,13 @@ echo "=== Memulai Proses Git Commit & Push ==="
 echo "Staging perubahan..."
 git add .
 
-# 2. Melakukan commit dengan pesan rilis
-echo "Melakukan commit..."
-git commit -m "feat: add flutter app, kotlin widget, and release workflow"
+# 2. Melakukan commit jika ada perubahan
+if [ -n "$(git status --porcelain)" ]; then
+    echo "Melakukan commit..."
+    git commit -m "feat: add flutter app, kotlin widget, and release workflow"
+else
+    echo "Tidak ada perubahan baru untuk di-commit."
+fi
 
 # 3. Push ke branch main di origin
 echo "Pushing ke origin main..."
