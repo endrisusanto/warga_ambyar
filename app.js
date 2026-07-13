@@ -67,40 +67,8 @@ app.use('/cctv', require('./routes/cctv'));
 app.use('/pengaduan', require('./routes/pengaduan'));
 app.use('/banjir', require('./routes/banjir'));
 app.use('/monitoring', require('./routes/monitoring'));
+app.use('/api', require('./routes/api'));
 
-
-// Run Migrations
-const { waitForDatabase } = require('./utils/dbHelper');
-const ensureColumns = require('./utils/ensureColumns');
-
-async function runMigrations() {
-    const isDbReady = await waitForDatabase();
-    if (isDbReady) {
-        console.log('🚀 Starting sequential migrations...');
-        // Ensure critical columns exist first
-        await ensureColumns();
-
-        // Run other specific migrations sequentially to avoid contention/crashes
-        await require('./utils/googleAuthMigration')();
-        await require('./utils/photoMigration')();
-        await require('./utils/emailWargaMigration')();
-        await require('./utils/fixRoleColumn')();
-        await require('./utils/fixIuranStatus')();
-        await require('./utils/updateIuranJenis')();
-        await require('./utils/migrateOldKasData')();
-        await require('./utils/addDibayarOlehCol')();
-        await require('./utils/fixKasTanggalType')();
-        await require('./utils/addTanggalKonfirmasiCol')();
-        await require('./utils/houseBasedRondaMigration')();
-        await require('./utils/activityTrackingMigration')();
-        await require('./utils/activityLogsMigration')();
-        console.log('🏁 All migrations finished successfully.');
-    } else {
-        console.error('🛑 Skipping migrations due to database being unavailable.');
-    }
-}
-
-runMigrations();
 
 // Fetch Admin Contact
 const getAdminContact = require('./utils/getAdminContact');

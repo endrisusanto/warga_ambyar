@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2E1C4E"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Title Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RT/RW GANG AMBYAR"
+        android:textColor="#E0B0FF"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Saldo Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#3B2664"
+        android:padding="6dp"
+        android:layout_marginBottom="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💰 Saldo: "
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/txt_saldo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rp 0"
+            android:textColor="#39FF14"
+            android:textStyle="bold"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Ronda Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#3B2664"
+        android:padding="6dp"
+        android:layout_marginBottom="6dp">
+        <TextView
+            android:id="@+id/txt_ronda_tanggal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="👮 Ronda - "
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="10sp" />
+        <TextView
+            android:id="@+id/txt_ronda_petugas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tidak ada petugas"
+            android:textColor="#A0B0FF"
+            android:textSize="10sp"
+            android:maxLines="2" />
+    </LinearLayout>
+
+    <!-- Pengumuman Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#3B2664"
+        android:padding="6dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📢 Pengumuman:"
+            android:textColor="#FF9F43"
+            android:textStyle="bold"
+            android:textSize="10sp" />
+        <TextView
+            android:id="@+id/txt_pengumuman"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tidak ada pengumuman"
+            android:textColor="#E0E0E0"
+            android:textSize="10sp"
+            android:maxLines="2" />
+    </LinearLayout>
+
+</LinearLayout>

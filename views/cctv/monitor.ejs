@@ -33,6 +33,11 @@
                 background: #000;
             }
 
+            video-rtc video {
+                object-fit: cover !important;
+                background: #000;
+            }
+
             .cctv-loading {
                 position: absolute;
                 top: 50%;
@@ -402,26 +407,26 @@
         </style>
 
         <div class="glass-card">
-            <div class="px-4 py-5 sm:px-6 border-b border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div class="px-4 py-5 sm:px-6 border-b border-white/10 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
                 <div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Monitor CCTV</h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400" id="monitor-desc">Sistem monitoring CCTV lokal area gang</p>
                 </div>
                 <!-- Buttons -->
-                <div class="flex flex-row flex-wrap gap-2">
-                    <a href="https://wa.me/?text=Pantau%20CCTV%20Lalu%20Lintas%20dan%20Area%20Warga%20secara%20langsung%20di%20sini:%20https://gang.ambyar.biz.id/cctv/monitor" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-green-800 bg-green-100 hover:bg-green-200 dark:text-white dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                <div class="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap lg:w-auto">
+                    <a href="https://wa.me/?text=Pantau%20CCTV%20Lalu%20Lintas%20dan%20Area%20Warga%20secara%20langsung%20di%20sini:%20https://gang.ambyar.biz.id/cctv/monitor" target="_blank" class="inline-flex w-full items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-green-800 bg-green-100 hover:bg-green-200 dark:text-white dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 sm:w-auto">
                         <svg class="mr-2 -ml-1 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                         </svg>
                         Share WA
                     </a>
-                    <a href="https://cctv.ambyar.biz.id/" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-indigo-800 bg-indigo-100 hover:bg-indigo-200 dark:text-white dark:bg-indigo-600 dark:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    <a href="https://cctv.ambyar.biz.id/" target="_blank" class="inline-flex w-full items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-indigo-800 bg-indigo-100 hover:bg-indigo-200 dark:text-white dark:bg-indigo-600 dark:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 sm:w-auto">
                         <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                         Buka CCTV Gang
                     </a>
-                    <button type="button" id="sirenButton" onclick="openAlarmModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-800 bg-red-100 hover:bg-red-200 dark:text-white dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                    <button type="button" id="sirenButton" onclick="openAlarmModal()" class="inline-flex w-full items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-800 bg-red-100 hover:bg-red-200 dark:text-white dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 sm:w-auto">
                         <svg class="mr-2 -ml-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z" />
                         </svg>
@@ -496,7 +501,7 @@
                     <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col">
-                                <span class="text-sm font-semibold text-white">Lampu Sorot CCTV depan Karsidi</span>
+                                <span class="text-sm font-semibold text-white">Siren Ujung Selatan</span>
                                 <span class="text-xs text-gray-400">siren.camera_gcc2_f7f8_siren</span>
                             </div>
                             <label class="switch-container">
@@ -506,7 +511,7 @@
                         </div>
                         <div class="flex items-center justify-between border-t border-white/5 pt-4">
                             <div class="flex flex-col">
-                                <span class="text-sm font-semibold text-white">Alarm CCTV Depan Dery</span>
+                                <span class="text-sm font-semibold text-white">Alarm Ujung Utara & Tengah</span>
                                 <span class="text-xs text-gray-400">siren.security_camera</span>
                             </div>
                             <label class="switch-container">
@@ -516,7 +521,7 @@
                         </div>
                         <div class="flex items-center justify-between border-t border-white/5 pt-4">
                             <div class="flex flex-col">
-                                <span class="text-sm font-semibold text-white">Lampu Sorot CCTV Depan Dery</span>
+                                <span class="text-sm font-semibold text-white">Lampu Sorot Ujung Utara & Tengah</span>
                                 <span class="text-xs text-gray-400">light.security_camera_floodlight</span>
                             </div>
                             <label class="switch-container">
@@ -569,7 +574,6 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-        <script src="https://camera.ambyar.biz.id/video-rtc.js"></script>
         <script>
             const isAdmin = <%- JSON.stringify(Boolean(user && user.role === 'admin')) %>;
             const hiddenCameras = new Set(<%- JSON.stringify(typeof hiddenCameras !== 'undefined' ? hiddenCameras : []) %>);
@@ -653,26 +657,12 @@
 
             // Frigate Camera Data
             const go2rtcBaseUrl = 'https://camera.ambyar.biz.id';
+            // ponytail: aligned with go2rtc active streams, removed disabled and duplicate snapshot/mse entries (YAGNI)
             const frigateCameras = [
-                { id: 'CCTV-GANG', name: 'CCTV Birds Eye View (Live)', src: 'cctv_gang_ambyar', type: 'mse' },
-                { id: 'CCTV-GANG-SNAP', name: 'CCTV Birds Eye View (Backup)', src: 'cctv_gang_ambyar', type: 'snapshot' },
-                { id: 'KALULA-HOME', name: 'CCTV Kalula Home (Backup)', src: 'cctv_kalula_home', type: 'snapshot' },
-                { id: 'KALULA-HOME-LIVE', name: 'CCTV Kalula Home (Live)', src: 'cctv_kalula_home', type: 'mse' },
-                { id: 'SECURITY-CAM', name: 'Security Camera (Live)', src: 'security_camera', type: 'mse', ratio: '800/896' },
-                { id: 'SECURITY-CAM-SNAP', name: 'Security Camera (Backup)', src: 'security_camera', type: 'snapshot', ratio: '800/896' }
+                { id: 'CCTV-GANG-1', name: 'Ujung Selatan', src: 'cctv_gang_ambyar' },
+                { id: 'KALULA-HOME', name: 'CCTV Kalula Home', src: 'cctv_kalula' },
+                { id: 'CCTV-GANG-2', name: 'Ujung Utara & Tengah', src: 'security_camera', ratio: '800/896' }
             ];
-
-            function mseStreamUrl(src) {
-                return `${go2rtcBaseUrl}/stream.html?src=${encodeURIComponent(src)}&mode=mse&media=video&muted=1`;
-            }
-
-            function webrtcStreamUrl(src) {
-                return `${go2rtcBaseUrl.replace('https://', 'wss://').replace('http://', 'ws://')}/api/ws?src=${encodeURIComponent(src)}`;
-            }
-
-            function mjpegStreamUrl(src) {
-                return `${go2rtcBaseUrl}/api/stream.mjpeg?src=${encodeURIComponent(src)}`;
-            }
 
             function frameUrl(src) {
                 return `${go2rtcBaseUrl}/api/frame.jpeg?src=${encodeURIComponent(src)}&_=${Date.now()}`;
@@ -717,76 +707,150 @@
                 return isAdmin && hiddenCameras.has(camera.id) ? '<div class="hidden-camera-badge">Hidden</div>' : '';
             }
 
-            // Create Frigate Cards
-            const frigateGrid = document.getElementById('frigateGrid');
-            frigateCameras.forEach(camera => {
-                if (!isAdmin && hiddenCameras.has(camera.id)) return;
+            // Create Frigate Cards using video-rtc custom element
+            function initFrigateCameras() {
+                const frigateGrid = document.getElementById('frigateGrid');
+                if (!frigateGrid) return;
+                frigateGrid.innerHTML = '';
+                
+                frigateCameras.forEach(camera => {
+                    if (!isAdmin && hiddenCameras.has(camera.id)) return;
 
-                const card = document.createElement('div');
-                card.className = `cctv-card${hiddenCameras.has(camera.id) ? ' camera-hidden' : ''}`;
-                if (camera.ratio) {
-                    card.style.aspectRatio = camera.ratio;
-                }
-                
-                let mediaHtml = '';
-                if (camera.type === 'snapshot') {
-                    mediaHtml = `<img class="cctv-video" alt="${camera.name}" data-camera-id="${camera.id}" style="object-fit: cover;">`;
-                } else if (camera.type === 'mjpeg') {
-                    mediaHtml = `<img class="cctv-video" src="${mjpegStreamUrl(camera.src)}" alt="${camera.name}" data-camera-id="${camera.id}" style="object-fit: contain; width: 100%; height: 100%; background: #000;">`;
-                } else if (camera.type === 'webrtc') {
-                    mediaHtml = `<video-rtc src="${webrtcStreamUrl(camera.src)}" class="cctv-video" autoplay controls style="object-fit: contain; width: 100%; height: 100%; background: #000;"></video-rtc>`;
-                } else {
-                    mediaHtml = `<iframe src="${mseStreamUrl(camera.src)}" class="cctv-video pointer-events-none border-0" title="${camera.name}" allow="autoplay; fullscreen" onload="this.nextElementSibling.style.display='none'"></iframe>`;
-                }
-                
-                card.innerHTML = `
-            <div class="cctv-video-wrapper">
-                ${mediaHtml}
-                ${hiddenCameraBadge(camera)}
-                <div class="cctv-loading">
-                    <div class="loading-spinner"></div>
-                    <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
-                </div>
-                <div class="cctv-overlay">
-                    <div class="live-badge">● LIVE</div>
-                    <div class="cctv-info">
-                        <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
-                        <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
-                    </div>
-                    <button class="expand-button" onclick="openFrigateModal('${camera.id}')">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
-                        </svg>
-                    </button>
-                    ${adminHideButton(camera)}
-                </div>
-            </div>
-        `;
-                if (camera.type === 'snapshot') {
-                    const img = card.querySelector('img.cctv-video');
-                    const loading = card.querySelector('.cctv-loading');
-                    img.addEventListener('load', () => {
-                        loading.style.display = 'none';
-                    });
-                    startSnapshotRefresh(img, camera.src, camera.interval || 5000);
-                } else if (camera.type === 'mjpeg') {
-                    const img = card.querySelector('img.cctv-video');
-                    const loading = card.querySelector('.cctv-loading');
-                    img.addEventListener('load', () => {
-                        loading.style.display = 'none';
-                    });
-                } else if (camera.type === 'webrtc') {
-                    const rtc = card.querySelector('video-rtc');
-                    const loading = card.querySelector('.cctv-loading');
-                    if (rtc) {
-                        rtc.addEventListener('playing', () => {
-                            loading.style.display = 'none';
-                        });
-                        setTimeout(() => { loading.style.display = 'none'; }, 5000);
+                    const card = document.createElement('div');
+                    card.className = `cctv-card${hiddenCameras.has(camera.id) ? ' camera-hidden' : ''}`;
+                    if (camera.ratio) {
+                        card.style.aspectRatio = camera.ratio;
                     }
+                    
+                    card.innerHTML = `
+                <div class="cctv-video-wrapper">
+                    <video-rtc class="cctv-video live-player" data-camera-id="${camera.id}" style="width: 100%; height: 100%; display: none;" autoplay muted playsinline></video-rtc>
+                    <img class="cctv-video snapshot-img" alt="${camera.name}" data-camera-id="${camera.id}" style="display: block; object-fit: cover; width: 100%; height: 100%;">
+                    ${hiddenCameraBadge(camera)}
+                    <div class="cctv-loading">
+                        <div class="loading-spinner"></div>
+                        <div class="text-xs text-white font-bold drop-shadow-md mt-2" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Connecting...</div>
+                    </div>
+                    <div class="cctv-overlay">
+                        <div class="live-badge" style="display: none;">● LIVE</div>
+                        <div class="cctv-info">
+                            <div class="text-xs text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.id}</div>
+                            <div class="text-sm text-white font-bold drop-shadow-md" style="color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${camera.name}</div>
+                        </div>
+                        <button class="expand-button" onclick="openFrigateModal('${camera.id}')">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                            </svg>
+                        </button>
+                        <!-- Mode Toggle Button (Live/Snapshot) -->
+                        ${camera.id !== 'CCTV-GANG-2' ? `
+                        <button class="mode-toggle-btn absolute bottom-3 right-3 px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all duration-200" onclick="togglePlayMode('${camera.id}', event)">
+                            <span class="mode-indicator w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <span class="mode-label">Snapshot</span>
+                        </button>
+                        ` : `
+                        <div class="absolute bottom-3 right-3 px-3 py-1 bg-white/10 border border-white/20 backdrop-blur-md text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 opacity-90 cursor-default" title="Kamera ini hanya mendukung mode Snapshot">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <span>Snapshot</span>
+                        </div>
+                        `}
+                        ${adminHideButton(camera)}
+                    </div>
+                </div>
+            `;
+                    frigateGrid.appendChild(card);
+
+                    // Initialize video-rtc player properties (but don't load stream URL yet to save bandwidth)
+                    const player = card.querySelector('video-rtc.live-player');
+                    player.mode = 'mse';
+                    
+                    // Hide loading spinner when stream data starts playing
+                    const loading = card.querySelector('.cctv-loading');
+                    player.addEventListener('loadeddata', () => {
+                        loading.style.display = 'none';
+                    }, true);
+
+                    const video = player.querySelector('video');
+                    if (video) {
+                        video.controls = false;
+                    }
+
+                    // Start periodic snapshot refresh
+                    const img = card.querySelector('img.snapshot-img');
+                    img.src = frameUrl(camera.src);
+                    img.onload = () => { loading.style.display = 'none'; };
+                    img.onerror = () => { loading.style.display = 'none'; };
+
+                    snapshotTimers[camera.id] = startSnapshotRefresh(img, camera.src, 5000);
+                });
+            }
+
+            // Load and register video-rtc custom element, then initialize cards
+            import('/js/video-rtc.js')
+                .then(module => {
+                    if (!customElements.get('video-rtc')) {
+                        customElements.define('video-rtc', module.VideoRTC);
+                    }
+                    initFrigateCameras();
+                })
+                .catch(err => console.error('Failed to load video-rtc.js:', err));
+
+            // Keep track of active timers for snapshots per camera card
+            const snapshotTimers = {};
+
+            // ponytail: toggles stream element on and off to save bandwidth / CPU when requested (YAGNI / minimal code)
+            function togglePlayMode(cameraId, event) {
+                if (event) event.stopPropagation();
+                const card = document.querySelector(`.cctv-card [data-camera-id="${cameraId}"]`)?.closest('.cctv-card');
+                if (!card) return;
+
+                const player = card.querySelector('video-rtc.live-player');
+                const img = card.querySelector('img.snapshot-img');
+                const loading = card.querySelector('.cctv-loading');
+                const btn = card.querySelector('.mode-toggle-btn');
+                const indicator = btn.querySelector('.mode-indicator');
+                const label = btn.querySelector('.mode-label');
+                const liveBadge = card.querySelector('.live-badge');
+                const camera = frigateCameras.find(c => c.id === cameraId);
+                if (!camera) return;
+
+                if (player.style.display !== 'none') {
+                    // Switch to Snapshot mode
+                    player.style.display = 'none';
+                    player.ondisconnect(); // stop streaming
+                    img.style.display = 'block';
+                    if (liveBadge) liveBadge.style.display = 'none';
+                    
+                    // Start periodic snapshot refresh
+                    loading.style.display = 'block';
+                    img.src = frameUrl(camera.src);
+                    img.onload = () => { loading.style.display = 'none'; };
+                    img.onerror = () => { loading.style.display = 'none'; };
+
+                    snapshotTimers[cameraId] = startSnapshotRefresh(img, camera.src, 5000);
+
+                    // Update button UI
+                    indicator.className = 'mode-indicator w-2 h-2 rounded-full bg-yellow-500';
+                    label.textContent = 'Snapshot';
+                } else {
+                    // Switch to Live (MSE) mode
+                    if (snapshotTimers[cameraId]) {
+                        clearInterval(snapshotTimers[cameraId]);
+                        delete snapshotTimers[cameraId];
+                    }
+                    img.style.display = 'none';
+                    img.src = '';
+                    
+                    player.style.display = 'block';
+                    loading.style.display = 'block';
+                    if (liveBadge) liveBadge.style.display = 'block';
+                    player.src = `${go2rtcBaseUrl}/api/ws?src=${encodeURIComponent(camera.src)}`;
+
+                    // Update button UI
+                    indicator.className = 'mode-indicator w-2 h-2 rounded-full bg-green-500';
+                    label.textContent = 'Live';
                 }
-                frigateGrid.appendChild(card);
-            });
+            }
 
             async function toggleCameraHidden(cameraId, event) {
                 event.stopPropagation();
@@ -858,6 +922,7 @@
                 modalHls = initHLS(video, camera.url);
             }
 
+            // ponytail: simplified modal to always show the live MSE stream for maximum detail, eliminating WebRTC branching (YAGNI)
             function openFrigateModal(cameraId) {
                 const camera = frigateCameras.find(c => c.id === cameraId);
                 if (!camera) return;
@@ -887,11 +952,15 @@
                     }
                 }
 
-                iframe.style.display = camera.type === 'mse' ? 'block' : 'none';
-                image.style.display = (camera.type === 'snapshot' || camera.type === 'mjpeg') ? 'block' : 'none';
-                if (webrtc) webrtc.style.display = camera.type === 'webrtc' ? 'block' : 'none';
+                image.style.display = 'none';
                 video.style.display = 'none';
-                
+                iframe.style.display = 'none';
+                if (webrtc) {
+                    webrtc.style.display = 'block';
+                    webrtc.mode = 'mse';
+                    webrtc.src = `${go2rtcBaseUrl}/api/ws?src=${encodeURIComponent(camera.src)}`;
+                }
+
                 if (modalHls) {
                     modalHls.destroy();
                     modalHls = null;
@@ -899,35 +968,6 @@
                 if (modalSnapshotTimer) {
                     clearInterval(modalSnapshotTimer);
                     modalSnapshotTimer = null;
-                }
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-                if (webrtc) webrtc.src = '';
-                
-                if (camera.type === 'snapshot') {
-                    iframe.src = '';
-                    image.alt = camera.name;
-                    
-                    const existingImg = document.querySelector(`img.cctv-video[data-camera-id="${camera.id}"]`);
-                    if (existingImg && existingImg.src) {
-                        image.src = existingImg.src;
-                    } else {
-                        image.src = '';
-                    }
-                    
-                    modalSnapshotTimer = startSnapshotRefresh(image, camera.src, camera.interval || 3000);
-                } else if (camera.type === 'mjpeg') {
-                    iframe.src = '';
-                    image.alt = camera.name;
-                    image.src = mjpegStreamUrl(camera.src);
-                } else if (camera.type === 'webrtc') {
-                    image.src = '';
-                    iframe.src = '';
-                    if (webrtc) webrtc.src = webrtcStreamUrl(camera.src);
-                } else {
-                    image.src = '';
-                    iframe.src = mseStreamUrl(camera.src);
                 }
 
                 modal.classList.remove('hidden');
@@ -959,7 +999,10 @@
                 image.style.display = 'none';
                 
                 iframe.src = '';
-                if (webrtc) webrtc.src = '';
+                if (webrtc) {
+                    webrtc.ondisconnect();
+                    webrtc.style.display = 'none';
+                }
             }
 
             // Close modal on ESC key
