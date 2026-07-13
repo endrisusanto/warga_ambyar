@@ -49,7 +49,7 @@ jobs:
           sed -i "s/versionName.*/versionName \"$NEW_NAME\"/" mobile/app/build.gradle
           
           echo "version=$NEW_NAME" >> $GITHUB_OUTPUT
-          echo "tag_name=v$NEW_NAME-build$NEW_CODE" >> $GITHUB_OUTPUT
+          echo "tag_name=v$NEW_NAME" >> $GITHUB_OUTPUT
 
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
