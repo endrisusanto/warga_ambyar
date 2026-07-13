@@ -170,7 +170,7 @@ class _DashboardPageState extends State<DashboardPage> {
             
             // CARD SALDO KAS
             Card(
-              color: Colors.green.withOpacity(0.2),
+              color: const Color(0x334CAF50),
               child: ListTile(
                 leading: const Icon(Icons.account_balance_wallet, color: Colors.green, size: 40),
                 title: const Text('Saldo Kas RT'),
@@ -181,7 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             // CARD JADWAL RONDA
             Card(
-              color: Colors.blue.withOpacity(0.2),
+              color: const Color(0x332196F3),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -207,17 +207,17 @@ class _DashboardPageState extends State<DashboardPage> {
 
             // CARD PENGUMUMAN
             Card(
-              color: Colors.orange.withOpacity(0.2),
+              color: const Color(0x33FF9800),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.campaign, color: Colors.orange),
-                        const SizedBox(width: 8),
-                        const Text('Pengumuman / Agenda', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Icon(Icons.campaign, color: Colors.orange),
+                        SizedBox(width: 8),
+                        Text('Pengumuman / Agenda', style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 8),
