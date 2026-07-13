@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.SharedPreferences
 import android.widget.RemoteViews
+import com.example.warga_ambyar_mobile.R
 
 // ponytail: keep widget updates dead-simple, reading values from HomeWidget Shared Preferences
 class WargaAmbyarWidgetProvider : AppWidgetProvider() {

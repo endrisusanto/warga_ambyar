@@ -43,7 +43,6 @@ jobs:
           cp mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/WargaAmbyarWidgetProvider.kt /tmp/backup/android/kotlin/
           cp mobile/android/app/src/main/res/layout/widget_layout.xml /tmp/backup/android/layout/
           cp mobile/android/app/src/main/res/xml/widget_info.xml /tmp/backup/android/xml/
-          cp mobile/android/app/src/main/AndroidManifest.xml /tmp/backup/android/
           
           # Delete existing mobile dir to do a clean recreate
           rm -rf mobile
@@ -63,7 +62,33 @@ jobs:
           cp /tmp/backup/android/kotlin/WargaAmbyarWidgetProvider.kt mobile/android/app/src/main/kotlin/com/example/warga_ambyar_mobile/
           cp /tmp/backup/android/layout/widget_layout.xml mobile/android/app/src/main/res/layout/
           cp /tmp/backup/android/xml/widget_info.xml mobile/android/app/src/main/res/xml/
-          cp /tmp/backup/android/AndroidManifest.xml mobile/android/app/src/main/AndroidManifest.xml
+          
+          # Inject widget receiver and internet permissions into the newly generated AndroidManifest.xml safely
+          python3 -c '
+          import re
+          with open("mobile/android/app/src/main/AndroidManifest.xml", "r") as f:
+              content = f.read()
+          
+          if "android.permission.INTERNET" not in content:
+              permission = "    <uses-permission android:name=\"android.permission.INTERNET\" />"
+              content = content.replace("<application", f"{permission}\n    <application")
+          
+          if "WargaAmbyarWidgetProvider" not in content:
+              receiver = """
+                  <!-- Register WargaAmbyarWidgetProvider for home screen widget updates -->
+                  <receiver android:name=".WargaAmbyarWidgetProvider" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                      </intent-filter>
+                      <meta-data android:name="android.appwidget.provider"
+                                 android:resource="@xml/widget_info" />
+                  </receiver>
+              """
+              content = content.replace("</application>", f"{receiver}\n    </application>")
+          
+          with open("mobile/android/app/src/main/AndroidManifest.xml", "w") as f:
+              f.write(content)
+          '
 
       - name: Install Dependencies
         run: |
