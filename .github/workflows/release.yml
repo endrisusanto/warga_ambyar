@@ -80,12 +80,12 @@ jobs:
           tag_name: ${{ steps.bump_version.outputs.tag_name }}
           name: Release ${{ steps.bump_version.outputs.tag_name }}
           body: |
-            Release Otomatis Build APK Warga Ambyar Native Kotlin.
+            Release Otomatis Build APK Gang Ambar Native Kotlin.
             
             - Versi Aplikasi: ${{ steps.bump_version.outputs.version }}
             - Tag Rilis: ${{ steps.bump_version.outputs.tag_name }}
           draft: false
           prerelease: false
-          files: mobile/app/build/outputs/apk/release/app-release-unsigned.apk
+          files: mobile/app/build/outputs/apk/release/Gang_Ambar_v*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

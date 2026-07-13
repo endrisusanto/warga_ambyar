@@ -44,6 +44,13 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def version = variant.versionName
+            outputFileName = "Gang_Ambar_v${version}.apk"
+        }
+    }
 }
 
 dependencies {

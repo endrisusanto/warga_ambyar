@@ -251,7 +251,7 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Warga Ambyar Mobile", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Text("Gang Ambyar Mobile", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.height(8.dp))
         Text("Masuk menggunakan akun RT/RW Anda", fontSize = 14.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(32.dp))
@@ -418,7 +418,7 @@ fun DashboardScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dashboard Warga Ambyar") },
+                title = { Text("Dashboard Gang Ambyar") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
                 actions = {
                     IconButton(onClick = { syncDataAndWidget() }) {
