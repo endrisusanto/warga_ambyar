@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'mobile/**' # Only trigger when changes are made inside the mobile app directory
 
 jobs:
   build-and-release:
