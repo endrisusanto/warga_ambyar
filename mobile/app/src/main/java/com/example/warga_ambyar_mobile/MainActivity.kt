@@ -118,6 +118,7 @@ data class PengaduanData(
     @SerializedName("nama_warga") val namaWarga: String,
     val blok: String,
     @SerializedName("nomor_rumah") val nomorRumah: String,
+    @SerializedName("is_anonim") val isAnonim: Int,
     @SerializedName("created_at") val createdAt: String
 )
 
@@ -439,7 +440,7 @@ fun DashboardScreen(navController: NavController) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertizontally
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Halo, ${sharedPrefs.getString("username", "Warga")}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Text(statusText, fontSize = 12.sp, color = Color.Gray)
@@ -454,7 +455,7 @@ fun DashboardScreen(navController: NavController) {
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertizontally
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Default.AccountBalanceWallet, contentDescription = "Kas", tint = Color.Green, modifier = Modifier.size(48.dp))
                         Spacer(modifier = Modifier.width(16.dp))
@@ -473,7 +474,7 @@ fun DashboardScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth().clickable { navController.navigate("ronda") }
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertizontally) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Security, contentDescription = "Ronda", tint = Color.Blue)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Jadwal Ronda - $rondaTanggal", fontWeight = FontWeight.Bold)
@@ -499,7 +500,7 @@ fun DashboardScreen(navController: NavController) {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(Icons.Default.Videocam, contentDescription = "CCTV", tint = MaterialTheme.colorScheme.primary, size = 32.dp)
+                            Icon(Icons.Default.Videocam, contentDescription = "CCTV", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("Stream CCTV")
                         }
@@ -513,7 +514,7 @@ fun DashboardScreen(navController: NavController) {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(Icons.Default.Campaign, contentDescription = "Pengaduan", tint = Color.Orange, size = 32.dp)
+                            Icon(Icons.Default.Campaign, contentDescription = "Pengaduan", tint = Color(0xFFFF9800), modifier = Modifier.size(32.dp))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("Pengaduan")
                         }
@@ -528,8 +529,8 @@ fun DashboardScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertizontally) {
-                            Icon(Icons.Default.Campaign, contentDescription = "Pengumuman", tint = Color.Orange)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Campaign, contentDescription = "Pengumuman", tint = Color(0xFFFF9800))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Pengumuman / Agenda", fontWeight = FontWeight.Bold)
                         }
@@ -637,7 +638,7 @@ fun KeuanganScreen(navController: NavController) {
 
                     items(kd.transaksi) { tx ->
                         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))) {
-                            Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertizontally) {
+                            Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(tx.keterangan, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                     Text(tx.tanggal, fontSize = 12.sp, color = Color.Gray)
@@ -750,7 +751,7 @@ fun RondaScreen(navController: NavController) {
                     } else {
                         items(list) { s ->
                             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                                Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertizontally) {
+                                Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                     Column {
                                         Text(s.nama, fontWeight = FontWeight.Bold)
                                         Text("Blok ${s.blok} No. ${s.nomor_rumah}", fontSize = 12.sp, color = Color.Gray)
@@ -965,7 +966,7 @@ fun PengaduanScreen(navController: NavController) {
                         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    val pengirim = if (c.isAnonim) "Anonim" else c.namaWarga
+                                    val pengirim = if (c.isAnonim == 1) "Anonim" else c.namaWarga
                                     Text(pengirim, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                     
                                     val statusColor = when (c.status.lowercase()) {
@@ -1018,7 +1019,7 @@ fun PengaduanScreen(navController: NavController) {
                             label = { Text("Deskripsi / Detail Masalah") },
                             modifier = Modifier.fillMaxWidth().height(120.dp)
                         )
-                        Row(verticalAlignment = Alignment.CenterVertizontally) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(checked = isAnonim, onCheckedChange = { isAnonim = it })
                             Text("Kirim sebagai Anonim")
                         }

@@ -14,3 +14,9 @@ log_output.txt
 commit_94_files.txt
 commit_07_files.txt
 gitignore_content.txt
+
+# Android / Gradle Build Outputs
+mobile/.gradle/
+mobile/app/build/
+mobile/build/
+mobile/local.properties
