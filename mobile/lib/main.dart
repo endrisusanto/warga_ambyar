@@ -160,7 +160,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _isLoading ? null : _fetchAndSyncData,
-              icon: _isLoading ? const CircularProgressIndicator(size: 20) : const Icon(Icons.sync),
+              icon: _isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.sync),
               label: const Text('Sinkronkan Data & Widget'),
               style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
             ),
@@ -170,9 +170,9 @@ class _DashboardPageState extends State<DashboardPage> {
             
             // CARD SALDO KAS
             Card(
-              color: Colors.emerald.withOpacity(0.2),
+              color: Colors.green.withOpacity(0.2),
               child: ListTile(
-                leading: const Icon(Icons.account_balance_wallet, color: Colors.emerald, size: 40),
+                leading: const Icon(Icons.account_balance_wallet, color: Colors.green, size: 40),
                 title: const Text('Saldo Kas RT'),
                 subtitle: Text(_saldo, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
